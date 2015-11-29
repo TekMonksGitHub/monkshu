@@ -1,0 +1,81 @@
+/* 
+ * (C) 2015 TekMonks. All rights reserved.
+ * License: MIT - see enclosed license.txt file.
+ */
+
+@font-face {
+    font-family: corbert;
+    src: url(/framework/fonts/Corbert-Regular.otf);
+}
+
+@font-face {
+    font-family: orbitron;
+    src: url(/framework/fonts/orbitron-light-webfont.ttf);
+}
+
+#navbar {
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 12;
+    filter:alpha(opacity=90); opacity:0.9;
+    background: #45484d; /* Old browsers */
+   	/* No shadow for a flat look
+	-webkit-box-shadow: 0px 1px 6px 1px #777;
+	-moz-box-shadow: 0px 1px 6px 1px #777;
+	box-shadow: 0px 1px 6px 1px #777;*/
+}
+
+#navitemleft {
+	position: relative;
+	float: left;
+	padding: 6px 4px;
+	text-decoration: none;
+	font-size: 16px;
+	font-family: corbert;
+	color: #FFFFFF;
+	cursor: pointer;
+}
+
+#navitemleftgap {
+	position: relative;
+	float: left;
+	padding: 6px 4px 6px 40px;
+	text-decoration: none;
+	font-size: 16px;
+	font-family: corbert;
+	color: #FFFFFF;
+}
+
+#navitemlefttight {
+	position: relative;
+	float: left;
+	padding: 6px 2px;
+	text-decoration: none;
+	font-size: 16px;
+	font-family: orbitron;
+	color: #FFFFFF; 
+	cursor: pointer;
+}
+
+#navitemright {
+	position: relative;
+	float: right;
+	padding: 6px 10px;
+	text-decoration: none;
+	font-size: 16px;
+	font-family: corbert;
+	color: #FFFFFF; 
+	cursor: pointer;
+}
+
+img {
+	border: 0;
+	height: 100%;
+	width: 100%
+}
+
+a {
+	cursor: pointer;
+}

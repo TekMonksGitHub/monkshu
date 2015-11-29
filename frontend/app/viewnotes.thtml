@@ -1,0 +1,44 @@
+<!-- 
+(C) 2015 TekMonks. All rights reserved.
+License: MIT - see enclosed license.txt file.
+-->
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="-1">
+	
+	<link rel="stylesheet" type="text/css" href="/app/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/app/css/viewnotes.css">
+	<script type="text/javascript" src="/app/js/viewnotes.js"></script>	
+	
+	<title>{{i18n.Title}}</title>
+</head>
+
+<body>
+
+<div id="navbar">
+	<span id="navitemlefttight" onclick="doNavViewMain()"><img src="/app/img/back.png"></span>
+	<span id="navitemleft" onclick="doNavViewMain()">{{i18n.Back}}</span>
+	<span id="navitemright" onclick="$$.loginmanager.signout()">{{i18n.Logout}}</span>
+</div>
+
+<div class="maincontent" id="maincontent">
+	<img src="/app/img/list_paper.png">
+	<div class="listcontainer" id="listcontainer">
+		{{#notes}}
+		<div class="row" id="{{ts}}">
+			<div class="title"><a onclick="viewNote({{ts}})">{{title}}</a></div>
+			<div class="date">
+				<a onclick="viewNote({{ts}})">{{date}}</a>
+				<div class="delete"><a onclick="deleteNote({{ts}})"><img src="/app/img/delete.png"></a></div>
+			</div>
+		</div>
+		<div class="row-padding" id="{{ts}}_padding"></div>
+		{{/notes}}
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	
+	<title>{{i18n.Title}}</title>
+	
+	<script type="text/javascript" src="/framework/js/login.js"></script>
+	<link rel="stylesheet" type="text/css" href="/framework/css/login.css">
+</head>
+
+<body>
+<div class="lgbox">
+	<input id="userid" type="text" size="20" placeholder="{{i18n.UserID}}" 
+		onkeypress="$$._signinIfEnterPressed(event)" class="inputbox">
+	<input id="pass" type="password" size="20" placeholder="{{i18n.Password}}" 
+		onkeypress="$$._signinIfEnterPressed(event)" class="inputbox">
+	<div class="login_button">
+		<button onclick="$$._signin()">{{i18n.SignIn}}</button>
+	</div>	
+	<div class="signinerror" id="divsigninerror">{{i18n.BadLogin}}</div>
+</div>
+
+<div class="regbox">
+	<input id="regid" type="text" size="20" placeholder="{{i18n.DesiredUserID}}" 
+		onkeypress="$$._registerIfEnterPressed(event)" class="inputbox">
+	<input id="regpass" type="password" size="20" placeholder="{{i18n.Password}}" 
+		onkeypress="$$._registerIfEnterPressed(event)" class="inputbox">
+	<div class="register_button">
+		<button onclick="$$._register()">{{i18n.Register}}</button>
+	</div>	
+	<div class="registererrorid" id="registererror_id">{{i18n.LoginTaken}}</div>
+	<div class="registererrorpass" id="registererror_pass">{{i18n.PasswordTooShort}}</div>
+</div>
+
+<div class="langbox">
+	<span class="langsel" onclick="$$.lang('en')">English</span>&nbsp;&nbsp;
+	<span class="langsel" onclick="$$.lang('hi')">हिंदी</span>&nbsp;&nbsp;
+	<span class="langsel" onclick="$$.lang('ja')">日本語</span>
+</div>	
+</body>
+
+</html>

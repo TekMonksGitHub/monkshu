@@ -1,0 +1,10 @@
+{
+"/s_login.js" : "/code/s_login.js",
+"/login" : "/code/s_login.js",
+"/register" : "/code/s_register.js",
+"/savenote" : "/code/s_savenote.js",
+"/getnotes" : "/code/s_getnotes.js",
+"/viewnotes" : "/code/s_getnotes.js",
+"/getnote" : "/code/s_getnote.js",
+"/deletenote" : "/code/s_deletenote.js"
+}

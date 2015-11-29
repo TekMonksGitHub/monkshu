@@ -1,0 +1,853 @@
+{"level":"info","message":"*************************************","timestamp":"2015-11-28T11:40:14.164Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-28T11:40:14.164Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-28T11:40:14.164Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-28T11:40:14.164Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-28T11:40:14.164Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-28T11:40:14.179Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-28T11:40:14.179Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:40:25.384Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:40:25.384Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T11:40:25.415Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T11:40:25.524Z"}
+{"level":"info","message":"Login result: false","timestamp":"2015-11-28T11:40:25.524Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-28T11:40:25.524Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:41:04.682Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:41:04.682Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T11:41:04.682Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T11:41:04.776Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T11:41:04.776Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:41:04.776Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:41:37.796Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:41:37.796Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-11-28T11:41:37.797Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-11-28T11:41:37.912Z"}
+{"level":"info","message":"Login result: false","timestamp":"2015-11-28T11:41:37.912Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-28T11:41:37.912Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:42:16.872Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:42:16.872Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-11-28T11:42:16.872Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-11-28T11:42:16.967Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T11:42:16.967Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:42:16.967Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:42:47.360Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:42:47.360Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-11-28T11:42:47.360Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-11-28T11:42:47.453Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T11:42:47.453Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:42:47.453Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:50:56.916Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:50:56.916Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T11:50:56.917Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T11:50:57.011Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T11:50:57.011Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:50:57.011Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T11:51:04.161Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T11:51:04.161Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T11:51:04.161Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T11:51:04.258Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T11:51:04.258Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:51:04.258Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T11:54:04.064Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T11:54:04.064Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T11:54:04.208Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T11:54:06.620Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T11:54:06.620Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T11:54:06.745Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T11:54:07.453Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T11:54:14.554Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T11:54:14.554Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:54:14.679Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T11:54:18.650Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T11:54:18.650Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T11:54:18.763Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T11:54:19.855Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T11:54:19.856Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T11:54:20.004Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T11:54:20.119Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T11:54:24.303Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T11:54:24.303Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T11:54:24.417Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-28T15:06:44.229Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-28T15:06:44.229Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-28T15:06:44.229Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-28T15:06:44.229Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-28T15:06:44.229Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-28T15:06:44.245Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-28T15:06:44.245Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:19:07.885Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:19:07.886Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:19:07.931Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:19:08.054Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:19:08.056Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:19:08.056Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:19:41.147Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:19:41.147Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:19:41.147Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:19:41.249Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:19:41.249Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:19:41.249Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:20:05.739Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:20:05.739Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:20:05.739Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:20:05.841Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:20:05.841Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:20:05.841Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:20:27.335Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:20:27.335Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:20:27.335Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:20:27.429Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:20:27.429Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:20:27.429Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:22:13.724Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:22:13.724Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:22:13.724Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:22:13.820Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:22:13.820Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:22:13.820Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:22:46.533Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:22:46.533Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:22:46.533Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:22:46.643Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:22:46.646Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:22:46.646Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T15:58:51.860Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T15:58:51.860Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T15:58:51.860Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T15:58:51.972Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T15:58:51.972Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:58:51.972Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T15:58:53.306Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T15:58:53.306Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T15:58:53.415Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T15:58:55.135Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T15:58:55.135Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T15:58:55.278Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T15:58:55.412Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T15:59:10.419Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T15:59:10.419Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:59:10.540Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T15:59:12.336Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T15:59:12.336Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448726350422,\"title\":\"Test\"}]}","timestamp":"2015-11-28T15:59:12.456Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T15:59:13.969Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T15:59:13.969Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T15:59:14.093Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T15:59:20.947Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T15:59:20.947Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T15:59:21.073Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T16:04:15.224Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T16:04:15.224Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T16:04:15.224Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T16:04:15.321Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T16:04:15.321Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:04:15.321Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:04:24.575Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:04:24.575Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:04:24.683Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:04:33.110Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:04:33.110Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448726664561,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:04:33.236Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T16:04:35.446Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T16:04:35.446Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:04:35.556Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T16:09:46.526Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T16:09:46.526Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T16:09:46.528Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T16:09:46.621Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T16:09:46.621Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:09:46.621Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:09:55.319Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:09:55.319Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:09:55.437Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:09:56.672Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:09:56.672Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:09:56.782Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:10:01.086Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:10:01.086Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448726995319,\"title\":\"Kaka\"}]}","timestamp":"2015-11-28T16:10:01.241Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T16:10:03.208Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T16:10:03.208Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:10:03.318Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:11:22.532Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:11:22.532Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:11:22.647Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:11:30.437Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:11:30.437Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448727082531,\"title\":\"ffr\"}]}","timestamp":"2015-11-28T16:11:30.565Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T16:11:32.168Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T16:11:32.168Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:11:32.292Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T16:34:03.351Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T16:34:03.353Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T16:34:03.353Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T16:34:03.445Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T16:34:03.445Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:34:03.445Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:34:11.674Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:34:11.674Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:34:11.795Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:35:22.246Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:35:22.246Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:35:22.359Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:35:24.215Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:35:24.215Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:35:24.440Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:35:24.951Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:35:26.032Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:35:26.032Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:35:26.158Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:37:27.801Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:37:27.802Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:37:27.917Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:37:29.426Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:37:29.426Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:37:29.664Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:37:30.041Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:37:31.544Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:37:31.560Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:37:31.674Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:37:59.531Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:37:59.532Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:37:59.650Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:38:02.145Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:38:02.147Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:38:02.455Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:38:02.551Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:38:04.804Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:38:04.804Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:38:04.910Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:40:44.751Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:40:44.751Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:40:44.873Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:40:47.073Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:40:47.076Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:40:47.492Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:40:47.909Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:40:50.395Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:40:50.395Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:40:50.507Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:41:25.045Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:41:25.045Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:41:25.150Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:41:26.812Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:41:26.813Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:41:27.012Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:41:27.185Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:41:28.444Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:41:28.444Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:41:28.537Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:41:45.106Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:41:45.108Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:41:45.799Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:41:47.509Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:41:47.509Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:41:47.817Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:41:48.394Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:41:49.267Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:41:49.267Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:41:49.391Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:42:34.254Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:42:34.254Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:42:34.358Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T16:42:36.540Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T16:42:36.540Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448728451675.note.json","timestamp":"2015-11-28T16:42:36.779Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"Test baba!\",\"ts\":1448728451675}}","timestamp":"2015-11-28T16:42:37.240Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T16:42:38.696Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T16:42:38.696Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:42:38.808Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T16:45:03.233Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T16:45:03.233Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448728451675,\"title\":\"Test\"}]}","timestamp":"2015-11-28T16:45:03.333Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T16:45:05.106Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T16:45:05.111Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T16:45:05.221Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T17:39:25.843Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T17:39:25.848Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T17:39:25.853Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T17:39:25.960Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T17:39:25.964Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T17:39:25.964Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T17:39:27.368Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T17:39:27.368Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T17:39:27.494Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T17:39:30.567Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T17:39:30.568Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T17:39:30.827Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T17:39:31.161Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T17:39:44.371Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T17:39:44.372Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T17:39:44.486Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T17:39:46.709Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T17:39:46.710Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448732384365,\"title\":\"Kaka\"}]}","timestamp":"2015-11-28T17:39:46.841Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T17:39:49.588Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T17:39:49.590Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448732384365.note.json","timestamp":"2015-11-28T17:39:49.885Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Kaka\",\"note\":\"Kabootar!\",\"ts\":1448732384365}}","timestamp":"2015-11-28T17:39:49.886Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T17:39:52.346Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T17:39:52.346Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448732384365,\"title\":\"Kaka\"}]}","timestamp":"2015-11-28T17:39:52.456Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T17:39:53.562Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T17:39:53.562Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T17:39:53.674Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T17:58:43.281Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T17:58:43.281Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T17:58:43.283Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T17:58:43.384Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T17:58:43.385Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T17:58:43.387Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T17:58:44.953Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T17:58:44.955Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T17:58:45.082Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T17:58:46.912Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T17:58:46.912Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T17:58:47.305Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T17:58:47.487Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T17:59:10.164Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T17:59:10.166Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T17:59:10.169Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T17:59:10.276Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T17:59:10.278Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T17:59:10.351Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:04:06.083Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:04:06.086Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:04:06.087Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:04:06.195Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:04:06.196Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:04:06.196Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T18:04:10.012Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T18:04:10.012Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T18:04:10.121Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:25:22.273Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:25:22.276Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:25:22.278Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:25:22.390Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:25:22.390Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:25:22.390Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T18:25:24.046Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T18:25:24.046Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T18:25:24.155Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T18:25:25.717Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T18:25:25.719Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T18:25:25.921Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T18:25:26.451Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:29:06.682Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:29:06.683Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:29:06.685Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:29:06.783Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:29:06.783Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:29:06.783Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:29:14.219Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:29:14.219Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:29:14.219Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:29:14.336Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:29:14.337Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:29:14.337Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T18:29:15.928Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T18:29:15.930Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T18:29:16.050Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T18:29:17.928Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T18:29:17.928Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-28T18:29:18.186Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-28T18:29:18.745Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:33:42.637Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:33:42.638Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:33:42.640Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:33:42.733Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:33:42.733Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:33:42.749Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T18:41:28.904Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T18:41:28.905Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T18:41:28.907Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T18:41:29.017Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T18:41:29.017Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:41:29.017Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T18:41:37.499Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T18:41:37.499Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:41:37.629Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T18:41:41.362Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T18:41:41.365Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448736097499,\"title\":\"Bambal\"}]}","timestamp":"2015-11-28T18:41:41.493Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T18:41:43.207Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T18:41:43.207Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T18:41:43.317Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-28T19:21:26.640Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-28T19:21:26.641Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-28T19:21:26.644Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-28T19:21:26.740Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-28T19:21:26.740Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T19:21:26.740Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-28T19:21:34.550Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-28T19:21:34.565Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T19:21:34.675Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T19:21:37.273Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T19:21:37.273Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448738494552,\"title\":\"Poopda\"}]}","timestamp":"2015-11-28T19:21:37.382Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-28T19:21:40.343Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-28T19:21:40.344Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448738494552.note.json","timestamp":"2015-11-28T19:21:40.561Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Poopda\",\"note\":\"Boy!\",\"ts\":1448738494552}}","timestamp":"2015-11-28T19:21:41.267Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T19:21:43.451Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T19:21:43.461Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448738494552,\"title\":\"Poopda\"}]}","timestamp":"2015-11-28T19:21:43.559Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-28T19:21:44.872Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-28T19:21:44.872Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-28T19:21:44.981Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-28T19:21:48.799Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-28T19:21:48.800Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-28T19:21:48.928Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T08:32:52.464Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T08:32:52.464Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T08:32:52.464Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T08:32:52.464Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T08:32:52.464Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T08:32:52.476Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T08:32:52.492Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T08:33:18.827Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T08:33:18.827Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T08:33:18.873Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T08:33:18.983Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T08:33:18.983Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T08:33:18.983Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T08:33:19.967Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T08:33:19.968Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T08:33:20.069Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T08:33:21.974Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T08:33:21.974Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T08:33:22.098Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T08:33:22.257Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T10:24:15.871Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T10:24:15.881Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T10:24:15.930Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T10:24:16.046Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T10:24:16.050Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:16.051Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:24:17.474Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:24:17.474Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:24:17.717Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:24:20.039Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:24:20.039Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T10:24:20.187Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T10:24:20.322Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:24:22.083Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:24:22.083Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:22.203Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:24:26.556Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:24:26.556Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:26.666Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:24:28.202Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:24:28.203Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:24:28.321Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:24:29.217Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:24:29.217Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T10:24:29.475Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T10:24:29.476Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:24:33.162Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:24:33.162Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:33.285Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:24:34.864Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:24:34.864Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:24:34.972Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:24:36.053Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:24:36.053Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T10:24:36.202Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T10:24:36.204Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:24:43.384Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:24:43.384Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:43.487Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:24:46.215Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:24:46.215Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448792683383,\"title\":\"Kuku\"}]}","timestamp":"2015-11-29T10:24:46.337Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-29T10:24:47.885Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-29T10:24:47.885Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:24:48.013Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:24:52.719Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:24:52.722Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:24:52.849Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T10:32:13.449Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T10:32:13.449Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T10:32:13.449Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T10:32:13.546Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T10:32:13.546Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:32:13.546Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T10:32:28.709Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T10:32:28.709Z"}
+{"level":"info","message":"Got register request for new ID: Kaka","timestamp":"2015-11-29T10:32:28.709Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T10:35:58.569Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T10:35:58.586Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T10:36:02.186Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T10:36:02.186Z"}
+{"level":"info","message":"Got register request for new ID: Kaka","timestamp":"2015-11-29T10:36:02.186Z"}
+{"level":"info","message":"Incoming hash: null","timestamp":"2015-11-29T10:36:02.186Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T10:40:51.103Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T10:40:51.121Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:41:48.181Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:41:48.181Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T10:41:48.181Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T10:41:48.181Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T10:41:48.181Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T10:41:48.196Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T10:41:48.196Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:42:08.620Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:42:08.635Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T10:42:08.635Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T10:42:08.635Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T10:42:08.635Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T10:42:08.635Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T10:42:08.651Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T10:42:11.265Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T10:42:11.266Z"}
+{"level":"info","message":"Got register request for new ID: Kaka","timestamp":"2015-11-29T10:42:11.268Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:43:55.630Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T10:43:55.630Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T10:43:55.630Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T10:43:55.630Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T10:43:55.630Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T10:43:55.693Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T10:43:55.693Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T10:43:58.475Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T10:43:58.475Z"}
+{"level":"info","message":"Invalid ID or hash.","timestamp":"2015-11-29T10:43:58.475Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-29T10:43:58.475Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T10:48:11.353Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T10:48:11.354Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T10:48:11.383Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T10:48:11.482Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T10:48:11.482Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:48:11.482Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:48:12.523Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:48:12.523Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:48:12.648Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:48:14.914Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:48:14.914Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T10:48:15.139Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T10:48:15.234Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:48:18.872Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:48:18.872Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:48:18.980Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:48:20.311Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:48:20.311Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:48:20.436Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:48:22.095Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:48:22.095Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T10:48:22.351Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :\",\"ts\":1448625874446}}","timestamp":"2015-11-29T10:48:22.427Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:48:25.089Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:48:25.089Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:48:25.208Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:48:34.235Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:48:34.235Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:48:34.368Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:48:35.886Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:48:35.886Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448794114235,\"title\":\"khokho\"}]}","timestamp":"2015-11-29T10:48:35.995Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:48:38.777Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:48:38.777Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448794114235.note.json","timestamp":"2015-11-29T10:48:39.019Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"khokho\",\"note\":\"khakha\",\"ts\":1448794114235}}","timestamp":"2015-11-29T10:48:39.106Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:48:41.229Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:48:41.229Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448794114235,\"title\":\"khokho\"}]}","timestamp":"2015-11-29T10:48:41.343Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-29T10:48:42.506Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-29T10:48:42.506Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:48:42.631Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:48:45.458Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:48:45.458Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:48:45.567Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T10:49:13.008Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T10:49:13.008Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T10:49:13.009Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T10:49:13.109Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T10:49:13.109Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:49:13.109Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:49:15.419Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:49:15.419Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T10:49:15.528Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T10:53:39.295Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T10:53:39.295Z"}
+{"level":"info","message":"Got register request for new ID: Kaka","timestamp":"2015-11-29T10:53:39.295Z"}
+{"level":"info","message":"Registration result: Success.","timestamp":"2015-11-29T10:53:39.405Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:53:39.405Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:53:43.496Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:53:43.496Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[]}","timestamp":"2015-11-29T10:53:43.603Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T10:55:05.290Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T10:55:05.290Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:55:05.419Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:55:08.290Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:55:08.290Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448794505291,\"title\":\"काका हूँ\"}]}","timestamp":"2015-11-29T10:55:08.405Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:55:14.109Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:55:14.109Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeuF35dPSoT5AMGVB4c8.oKkh4Pi52M0i//1448794505291.note.json","timestamp":"2015-11-29T10:55:14.345Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"काका हूँ\",\"note\":\"कबूतर वाला काका हूँ में।\",\"ts\":1448794505291}}","timestamp":"2015-11-29T10:55:14.403Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:55:20.398Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:55:20.398Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448794505291,\"title\":\"काका हूँ\"}]}","timestamp":"2015-11-29T10:55:20.492Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T10:55:35.229Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T10:55:35.229Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeeU04CXglWjbM/qxDIJ4F7qyAGhcIMmy","timestamp":"2015-11-29T10:55:35.229Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeuF35dPSoT5AMGVB4c8.oKkh4Pi52M0i","timestamp":"2015-11-29T10:55:35.339Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T10:55:35.339Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T10:55:35.339Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T10:55:36.413Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T10:55:36.413Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448794505291,\"title\":\"काका हूँ\"}]}","timestamp":"2015-11-29T10:55:36.522Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T10:55:38.340Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T10:55:38.340Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeuF35dPSoT5AMGVB4c8.oKkh4Pi52M0i//1448794505291.note.json","timestamp":"2015-11-29T10:55:38.613Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"काका हूँ\",\"note\":\"कबूतर वाला काका हूँ में।\",\"ts\":1448794505291}}","timestamp":"2015-11-29T10:55:38.618Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:26:03.991Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:26:03.991Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T11:26:03.991Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T11:26:04.088Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T11:26:04.088Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T11:26:04.088Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:26:11.389Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:26:11.389Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T11:26:11.389Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T11:26:11.499Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T11:26:11.515Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T11:26:11.515Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:26:15.277Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:26:15.277Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppe5soKCV5PDM9/VIiKxgaAOCMsNKprW6m","timestamp":"2015-11-29T11:26:15.277Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppe6DAFWhcPOSizz%2FFE93lk8Sc2m1wg5K2","timestamp":"2015-11-29T11:26:15.379Z"}
+{"level":"info","message":"Login result: false","timestamp":"2015-11-29T11:26:15.379Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-29T11:26:15.379Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:26:20.161Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:26:20.161Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeXfGAkpoK/u7GU8J9oTRG8/fbC4d33Xm","timestamp":"2015-11-29T11:26:20.161Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexrV4LtDIKlL8jf2d3.Rt103nD4e.RVa","timestamp":"2015-11-29T11:26:20.276Z"}
+{"level":"info","message":"Login result: false","timestamp":"2015-11-29T11:26:20.276Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-29T11:26:20.276Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:26:28.101Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:26:28.101Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T11:26:28.101Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T11:26:28.196Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T11:26:28.196Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T11:26:28.196Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T11:26:36.451Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T11:26:36.451Z"}
+{"level":"info","message":"Got register request for new ID: ","timestamp":"2015-11-29T11:26:36.451Z"}
+{"level":"info","message":"Registration result: ID already exists.","timestamp":"2015-11-29T11:26:36.451Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-11-29T11:26:36.451Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-11-29T11:26:44.671Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-11-29T11:26:44.671Z"}
+{"level":"info","message":"Got register request for new ID: BamBhosadu","timestamp":"2015-11-29T11:26:44.671Z"}
+{"level":"info","message":"Registration result: Success.","timestamp":"2015-11-29T11:26:44.766Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T11:26:44.766Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T11:26:46.880Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T11:26:46.880Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[]}","timestamp":"2015-11-29T11:26:46.989Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T11:30:27.835Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T11:30:27.836Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T11:30:27.836Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T11:30:27.934Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T11:30:27.934Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T11:30:27.934Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T15:18:53.592Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T15:18:53.592Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T15:18:53.592Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T15:18:53.592Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T15:18:53.592Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T15:18:53.608Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T15:18:53.623Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T15:20:15.468Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T15:20:15.468Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T15:20:15.514Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T15:20:15.609Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T15:20:15.609Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T15:20:15.609Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T15:20:18.635Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T15:20:18.635Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T15:20:18.744Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T15:20:20.794Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T15:20:20.794Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T15:20:20.947Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T15:20:21.405Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T15:20:30.250Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T15:20:30.250Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-11-29T15:20:30.250Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-11-29T15:20:30.362Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T15:20:30.362Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T15:20:30.362Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T15:20:31.870Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T15:20:31.870Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448522621219,\"title\":\"We the people\"},{\"ts\":1448303472638,\"title\":\"Four score and seven years ago\"}]}","timestamp":"2015-11-29T15:20:31.979Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T15:20:33.849Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T15:20:33.849Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu//1448522621219.note.json","timestamp":"2015-11-29T15:20:34.042Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"We the people\",\"note\":\"We the people are actually foolish and don't really know what we do really want. Regardless we will rebel, cause violence and all sorts of bad things, if we don't get to elect our own government and rulers.\\n\\nSo we the people today decide that we will elect our own government and be responsible for it and all the resulting consequences.\\n\\nHereby, we the people, confirm this.\",\"ts\":1448522621219}}","timestamp":"2015-11-29T15:20:34.556Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T15:20:42.031Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T15:20:42.031Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448303472638,\"title\":\"Four score and seven years ago\"},{\"ts\":1448522621219,\"title\":\"We the people\"}]}","timestamp":"2015-11-29T15:20:42.136Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T15:20:43.528Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T15:20:43.528Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu//1448303472638.note.json","timestamp":"2015-11-29T15:20:43.765Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Four score and seven years ago\",\"note\":\"Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\\n\\nNow we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battlefield of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\",\"ts\":1448303472638}}","timestamp":"2015-11-29T15:20:43.765Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T16:04:09.387Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T16:04:09.388Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T16:04:09.392Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T16:04:09.485Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T16:04:09.485Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:04:09.485Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:04:12.541Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:04:12.541Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:04:12.650Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:04:16.880Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:04:16.881Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:04:17.084Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:04:17.625Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:04:22.616Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:04:22.616Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:04:22.761Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:04:28.620Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:04:28.620Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:04:28.714Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:04:29.797Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:04:29.798Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:04:30.005Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:04:30.009Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:04:31.961Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:04:31.961Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:04:32.065Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:07:19.850Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:07:19.850Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:07:19.959Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:07:21.376Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:07:21.376Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:07:21.476Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T16:14:43.177Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T16:14:43.178Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T16:14:43.178Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T16:14:43.272Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T16:14:43.272Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:14:43.272Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:14:51.332Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:14:51.332Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"},{\"ts\":1448813239834,\"title\":\"\"}]}","timestamp":"2015-11-29T16:14:51.441Z"}
+{"level":"info","message":"Got request for the url: /deletenote","timestamp":"2015-11-29T16:14:54.283Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_deletenote.js","timestamp":"2015-11-29T16:14:54.283Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:14:54.408Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:14:58.488Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:14:58.488Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:14:58.656Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:14:59.073Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:15:01.495Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:15:01.495Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:15:01.657Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:15:02.012Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T16:16:21.868Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T16:16:21.868Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T16:16:21.869Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T16:16:21.966Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T16:16:21.966Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:16:21.966Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:16:24.999Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:16:25.014Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:16:25.124Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:16:27.021Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:16:27.021Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:16:27.203Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:16:27.480Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:16:32.725Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:16:32.725Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:16:32.826Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:16:37.119Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:16:37.119Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:16:37.373Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:16:37.404Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:16:45.350Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:16:45.350Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:16:45.545Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:16:46.002Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:16:50.134Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:16:50.134Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:16:50.238Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:16:51.902Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:16:51.902Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:16:52.301Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:16:52.654Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:16:59.067Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:16:59.083Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:16:59.182Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:17:01.733Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:17:01.735Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:17:01.987Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;--)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:17:01.989Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:17:24.338Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:17:24.349Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:17:24.544Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. ;--)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:17:24.938Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-11-29T16:17:32.576Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-11-29T16:17:32.576Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:17:32.701Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:17:36.023Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:17:36.023Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:17:36.343Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:17:36.691Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:18:14.395Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:18:14.395Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:18:14.512Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T16:25:00.370Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T16:25:00.370Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T16:25:00.373Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T16:25:00.469Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T16:25:00.469Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:25:00.469Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:25:08.354Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:25:08.354Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:25:08.451Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:25:09.835Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:25:09.835Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:25:10.279Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:25:10.604Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:25:11.927Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:25:11.927Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:25:12.337Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:25:12.621Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T16:31:47.082Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T16:31:47.082Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T16:31:47.082Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T16:31:47.190Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T16:31:47.190Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T16:31:47.190Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T16:31:48.933Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T16:31:48.933Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T16:31:49.073Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T16:31:50.826Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T16:31:50.826Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T16:31:51.015Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T16:31:51.558Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T18:01:38.827Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-29T18:01:38.827Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-29T18:01:38.827Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-29T18:01:38.827Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-29T18:01:38.827Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-29T18:01:38.851Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-29T18:01:38.880Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-11-29T18:02:49.140Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-11-29T18:02:49.140Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-11-29T18:02:49.265Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-11-29T18:02:49.699Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-11-29T18:02:49.699Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-11-29T18:02:49.699Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-11-29T18:02:51.288Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-11-29T18:02:51.288Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448625874446,\"title\":\"A Day in the life of Tekmonks\"}]}","timestamp":"2015-11-29T18:02:51.710Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-11-29T18:02:57.132Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-11-29T18:02:57.132Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448625874446.note.json","timestamp":"2015-11-29T18:02:57.984Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"A Day in the life of Tekmonks\",\"note\":\"It is a lot of fun really to be doing what we all love doing you know!\\n\\nI like it and hope others do too. :)\",\"ts\":1448625874446}}","timestamp":"2015-11-29T18:02:58.374Z"}

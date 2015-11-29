@@ -1,0 +1,10 @@
+/* 
+ * (C) 2015 TekMonks. All rights reserved.
+ * License: MIT - see enclosed license.txt file.
+ */
+
+////////////////////////////////////////////////
+// The global namespace
+////////////////////////////////////////////////
+
+function $$() {};

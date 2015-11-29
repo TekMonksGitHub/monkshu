@@ -1,0 +1,63 @@
+/* 
+ * (C) 2015 TekMonks. All rights reserved.
+ * License: MIT - see enclosed license.txt file.
+ */
+
+body {
+	background: #ffffff url(/framework/img/logo_512.png)
+	0% 0% fixed no-repeat;
+}
+	
+#maincontent {
+	width: 55%;
+	top: 20%;
+	right: 5%;
+    position: absolute;
+}
+
+.applinkleft {
+	position: relative;
+	float: left;
+	width: 128px;	
+	height: 142px;
+	text-align: center;
+	color: #333333;
+	font-family: corbert;
+	text-transform: uppercase;
+	font-size: 18px;
+	font-weight: bold;
+	left: 10%;
+}
+
+.applinkright {
+	position: relative;
+	float: right;
+	width: 128px;	
+	height: 142px;
+	text-align: center;
+	color: #333333;
+	font-family: corbert;
+	text-transform: uppercase;
+	font-size: 18px;
+	font-weight: bold;
+	right: 10%;
+}
+
+img.sysappimg {
+	display: block;
+    margin: 15px;
+    position: relative;
+    float: left;
+    width: 128px;
+    -webkit-transition: margin 0.3s ease-out; 
+    -moz-transition: margin 0.3s ease-out; 
+    -o-transition: margin 0.3s ease-out; 
+    transition: margin 0.3s ease-out;
+    z-index: 1;
+    cursor: pointer;
+}
+
+img.sysappimg:hover {
+	margin-top: 2px;
+	cursor: pointer;
+}

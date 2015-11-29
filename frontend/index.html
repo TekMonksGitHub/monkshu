@@ -1,0 +1,48 @@
+<!-- 
+(C) 2015 TekMonks. All rights reserved.
+License: MIT - see enclosed license.txt file.
+-->
+
+<!doctype html>
+<html>
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="-1">
+	<meta name=viewport  content="width=device-width, initial-scale=1.0, minimum-scale=0.5 maximum-scale=1.0">
+
+	
+	<title>Monkshu Framework</title>
+	
+	<!-- Init the global namespace -->
+	<script type="text/javascript" src="/framework/js/lib/$$.js"></script>
+	
+	<!-- Includes for the main application -->
+	<script type="text/javascript" src="/app/js/constants.js"></script>
+	<script type="text/javascript" src="/app/js/Application.js"></script>
+	
+	<!-- Include app framework -->
+	<script type="text/javascript" src="/framework/js/lib/bootstrap.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/i18n.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/thtml.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/XHR.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/rest.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/WebSession.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/util.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/BrowserDetect.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/Log.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/LoginManager.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/constants.js"></script>
+	<script type="text/javascript" src="/framework/js/lib/index.js"></script>
+	
+	<!-- Include hash frameworks -->	
+	<script src="/framework/3p/bcrypt.js" type="text/javascript"></script>
+	
+	<!-- HTML templating frameworks -->
+	<script src="/framework/3p/mustache.min.js" type="text/javascript"></script>
+	
+	<!-- Start everything -->
+	<script>$$._bootstrap();</script>
+</head>
+</html>

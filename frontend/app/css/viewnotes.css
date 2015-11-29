@@ -1,0 +1,79 @@
+/* 
+ * (C) 2015 TekMonks. All rights reserved.
+ * License: MIT - see enclosed license.txt file.
+ */
+
+body {
+	background: #ffffff url(/framework/img/logo_512.png)
+	0% 0% fixed no-repeat;
+}
+
+@font-face {
+    font-family: opensans;
+    src: url(/app/fonts/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: pinyonscript;
+    src: url(/app/fonts/PinyonScript-Regular.ttf);
+}
+	
+#maincontent {
+	width: 55%;
+	height: 94.5%;
+	top: 5%;
+	right: 2%;
+    position: absolute;
+}
+
+.listcontainer {
+	width: 70%;
+	height: 70%;
+	top: 14%;
+	left: 0;
+	right: 0;
+    position: absolute;
+    margin: auto;
+    border: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.row {
+	width: 100%;
+    float: left;
+    border-bottom: 1px solid black;
+}
+
+.title {
+	width: 64%;
+	height: 2%;
+    float: left;
+    margin-bottom:-100%;
+    border: none;
+    font-family: pinyonscript;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.date {
+	width: 25%;
+    float: right;
+    margin-top:1%;
+    border: none;
+    font-family: pinyonscript;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.delete {
+	height: 16px;
+	width: 16px;
+    float: right;
+}
+
+.row-padding {
+	width: 100%;
+    float: left;
+    padding-bottom: 10px;
+}

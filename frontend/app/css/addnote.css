@@ -1,0 +1,118 @@
+/* 
+ * (C) 2015 TekMonks. All rights reserved.
+ * License: MIT - see enclosed license.txt file.
+ */
+
+body {
+	background: #ffffff url(/app/img/paper.png) no-repeat;
+	background-size: 100% 95%;
+	background-position: center bottom;
+}
+
+html {
+    height: 100%
+}
+
+@font-face {
+    font-family: opensans;
+    src: url(/app/fonts/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: pinyonscript;
+    src: url(/app/fonts/PinyonScript-Regular.ttf);
+}
+
+.maincontent {
+	width: 70%;
+	height: 70%;
+	top: 15%;
+	left: 0;
+	right: 0;
+    position: absolute;
+    margin-left:auto;
+    margin-right:auto;
+    border: none;
+}
+
+.titlebox {
+	width: 90%;
+	height: 10%;
+	top: 0;
+	left: 0;
+	right: 0;
+    position: absolute;
+    margin-left:auto;
+    margin-right:auto;
+    border: none;
+}
+
+.notebox {
+	width: 100%;
+	height: 90%;
+	top: 10%;
+	left: 0;
+	right: 0;
+    position: absolute;
+    margin-left:auto;
+    margin-right:auto;
+    border: none;
+}
+
+input[type="text"] {
+	width: 100%;
+	height: 100%;
+	background-color: transparent;
+    border: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    text-align: center;
+    font-family: pinyonscript;
+    font-size: 30px;
+}
+
+textarea {
+	width: 100%;
+	height: 100%;
+	background-color: transparent;
+    border: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    font-family: opensans;
+    font-size: 26px;
+}
+
+::-webkit-input-placeholder {
+    color: black!important;
+}
+:-moz-placeholder {
+    color: black!important;
+}
+::-moz-placeholder {
+    color: black!important;
+}
+:-ms-input-placeholder {
+    color: black!important;
+}
+input:focus::-webkit-input-placeholder{
+    color: transparent!important;
+}
+input:focus::-moz-placeholder{
+    color: transparent!important;
+}
+input:focus:-moz-placeholder{
+    color: transparent!important;
+}
+textarea:focus::-webkit-input-placeholder{
+    color: transparent!important;
+}
+textarea:focus::-moz-placeholder{
+    color: transparent!important;
+}
+textarea:focus:-moz-placeholder{
+    color: transparent!important;
+}

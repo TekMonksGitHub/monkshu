@@ -1,0 +1,42 @@
+<!-- 
+(C) 2015 TekMonks. All rights reserved.
+License: MIT - see enclosed license.txt file.
+-->
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="-1">
+	
+	<link rel="stylesheet" type="text/css" href="/app/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/app/css/addnote.css">
+	<script type="text/javascript" src="/app/js/addnote.js"></script>	
+	
+	<title>{{i18n.Title}}</title>
+</head>
+
+<body>
+
+<div id="navbar">
+	<span id="navitemlefttight" onclick="doNavAddMain()"><img src="/app/img/back.png"></span>
+	<span id="navitemleft" onclick="doNavAddMain()">{{i18n.Back}}</span>
+	<span id="navitemleftgap"></span>
+	<span id="navitemleft" onclick="doSaveNote()"><img src="/app/img/save.png"></span>
+	<span id="navitemleft" onclick="doSaveNote()">{{i18n.Save}}</span>
+	<span id="navitemright" onclick="$$.loginmanager.signout()">{{i18n.Logout}}</span>
+</div>
+
+<div class="maincontent">
+	<div class="titlebox">
+		<input type="text" id="title" placeholder="{{i18n.NoteTitle}}"></input>
+	</div>
+	
+	<div class="notebox">
+		<textarea id="note" placeholder="{{i18n.NoteContent}}"></textarea>
+	</div>
+</div>
+
+</body>
+</html>
