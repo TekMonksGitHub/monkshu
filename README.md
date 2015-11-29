@@ -51,6 +51,6 @@ Login password
 ==============
 Login phrase: Hello 123
 
-Add Header set Access-Control-Allow-Origin https://logincat.com in v-host to resolve cross -origin error
+Add Header set Access-Control-Allow-Origin <your frontend> to resolve cross-origin errors.
 
 
