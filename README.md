@@ -25,7 +25,7 @@ Create a new JSON Service
 1. Add JSON service file to /services/code, name as s_<purpose of the service>.js
 2. Add the service to the REST registry, under /conf/service_registry.json with a URL mapped to it.
 3. Implement the following method and export it
-
+```
 	exports.doService = doService;
 
 	function doService(jsonReq, callback) {
@@ -38,14 +38,15 @@ Create a new JSON Service
 		// my_Result_JSON_Object is your result as a Javascript
 		// object
 	}
+```
 4. That's it - run the node.js server - node server.js
 5. Call the service from web framework using this code
-
+```
 	REST.call(URL, req, function(resp){handleLoginResult(resp);});
 	
 	where handleJSONResult is your function which can consume this JSON result
 	req and resp are both Javascript objects
-
+```
 Login password
 ==============
 Login phrase: Hello 123
