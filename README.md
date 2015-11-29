@@ -1,10 +1,10 @@
 # monkshu
 The Monkshu Project
-Monkjutsu HTML5 App Framework
-=============================
+Monkjutsu - The HTML5/REST/JSON/Node.js/API Application Server
+================================================================
 HTML5 + Node.js + REST + Mobile (Android/iOS) + Globalization (i18n) support.
 
-Login, logout, session already supported.
+Login, logout, cookieless sessions supported out of the box.
 
 Mustache logicless templates used, as they work with JSON objects to inflate views in a non-complicated manner,
 and also allow full HTML5+CSS3 design capabilites instead of coming up with some complicated widget framework.
