@@ -49,7 +49,8 @@ Create a new JSON Service
 ```
 Login password
 ==============
-Login phrase: Hello 123
+Login ID: Hello 
+Login Password: 123
 
 Add Header set Access-Control-Allow-Origin <your frontend> to resolve cross-origin errors.
 
