@@ -1,6 +1,6 @@
 # monkshu
 The Monkshu Project
-Monkjutsu - The HTML5/REST/JSON/Node.js/API Application Server
+Monkshu - The HTML5/REST/JSON/Node.js/API Application Server
 ================================================================
 HTML5 + Node.js + REST + Mobile (Android/iOS) + Globalization (i18n) support.
 
@@ -39,10 +39,10 @@ Create a new JSON Service
 		// object
 	}
 ```
-4. That's it - run the node.js server - node server.js
+4. That's it - run the node.js server - ```node server.js```
 5. Call the service from web framework using this code
 ```
-	REST.call(URL, req, function(resp){handleLoginResult(resp);});
+	REST.call(URL, req, function(resp){handleJSONResult(resp);});
 	
 	where handleJSONResult is your function which can consume this JSON result
 	req and resp are both Javascript objects
