@@ -1,0 +1,294 @@
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.362Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.362Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:15:59.362Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.675Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.675Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.815Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:15:59.675Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:15:59.815Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:15:59.675Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:15:59.815Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:15:59.675Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:15:59.815Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:15:59.831Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:15:59.815Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:15:59.849Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:15:59.831Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:15:59.849Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.068Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.068Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:21.068Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.286Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.286Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:21.286Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:21.286Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:21.286Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:21.301Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.379Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:21.301Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.379Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:21.379Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:21.379Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:21.379Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:21.395Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:21.395Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:21.520Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:34.805Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:34.805Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:34.805Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:35.820Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:35.820Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:35.820Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:35.820Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:35.820Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:35.836Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:35.836Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:36.930Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:36.930Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:36.930Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:36.930Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:36.930Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.148Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:36.945Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.148Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.055Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.148Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.148Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.148Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.351Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.163Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.351Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.180Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.351Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.351Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.351Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.382Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.305Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.586Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.586Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.679Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:38.586Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.679Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:38.586Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:36.709Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.694Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:38.586Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:36.725Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.694Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:38.663Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.804Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:36.725Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.694Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.788Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.804Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:36.725Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.694Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.804Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:36.725Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.851Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.804Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:36.725Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.804Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.867Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.818Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:38.882Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.071Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.071Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.290Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:39.071Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.305Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:39.071Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:39.305Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:39.087Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:39.305Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:39.165Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:39.305Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.305Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:39.336Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.352Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.554Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.554Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.819Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:39.554Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.819Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:39.554Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.915Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:38.819Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:39.554Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.915Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:38.819Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:39.648Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.023Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.915Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:38.819Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.789Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.023Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.915Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:38.850Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:38.023Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.915Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.866Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:38.023Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.930Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:38.023Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.867Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.352Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:38.055Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.352Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:39.866Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:38.352Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:38.352Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:38.352Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.836Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:38.382Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.836Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.010Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:40.134Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:39.836Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:40.134Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:39.836Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:40.134Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:39.836Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:40.134Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:39.867Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.554Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:40.134Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.150Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:37.554Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:40.150Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:37.554Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.150Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:37.554Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:39.993Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:37.554Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.165Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:37.569Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.181Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:16:38.165Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:16:40.181Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:27.954Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:27.954Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:27.954Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:28.096Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:28.112Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.272Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.288Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:39.288Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.459Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.459Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.552Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:39.459Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:39.552Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:39.459Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:39.552Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:39.459Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:39.552Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:39.474Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:39.552Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:39.568Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:39.568Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:39.568Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:57.716Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:57.716Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:57.716Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.231Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.154Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.231Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:58.248Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.324Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.231Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.324Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.231Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.340Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.231Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.340Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.247Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.340Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:58.340Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.340Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:58.356Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.652Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.652Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.652Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.652Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.652Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.668Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.842Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.842Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.842Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.842Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.748Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.842Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.061Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.858Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.075Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.936Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:58.951Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.154Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:58.951Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.154Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:58.951Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:59.154Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:58.951Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:59.154Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:58.951Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:59.154Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.248Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:59.170Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.263Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:59.045Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.263Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:17:59.247Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:17:59.262Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:18:14.059Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:18:14.074Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:18:14.074Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:18:14.200Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-11-30T17:18:14.200Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-11-30T17:18:14.200Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-11-30T17:18:14.200Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:18:14.200Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:18:14.216Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:18:14.216Z"}

@@ -12,6 +12,7 @@ exports.LOGSDIR = rootdir+"/logs";
 exports.ACCESSLOG = rootdir+"/logs/server.log.json";
 exports.SERVICE_REGISTRY = rootdir + "/conf/service_registry.json";
 exports.TRANSPORT = rootdir + "/conf/transport.json";
+exports.CLUSTERCONF = rootdir+"/conf/cluster.json";
    
 /* SSL CERTIFICATE PATHS */
 exports.APACHE_KEY				= '/etc/apache2/ssl/apache.key';
