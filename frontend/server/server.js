@@ -1,5 +1,5 @@
 /* 
- * A very simple, static http GET server. Do not use ever in production.
+ * A very simple, static http GET server. Do not use in production.
  * 
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.

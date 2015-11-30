@@ -1,6 +1,6 @@
 /* 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: MIT - see enclosed LICENSE file.
  */
 
 var fs = require("fs");

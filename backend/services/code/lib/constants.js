@@ -1,6 +1,6 @@
 /* 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: MIT - see enclosed LICENSE file.
  */
 
 exports.SALT_PW = '$2a$10$VFyiln/PpFyZc.ABoi4ppf';
