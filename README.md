@@ -1,6 +1,6 @@
 # monkshu
 The Monkshu Project
-Monkjutsu - The HTML5/REST/JSON/Node.js/API Application Server
+Monkshu - The HTML5/REST/JSON/Node.js/API Application Server
 ================================================================
 HTML5 + Node.js + REST + Mobile (Android/iOS) + Globalization (i18n) support.
 
