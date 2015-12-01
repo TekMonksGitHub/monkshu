@@ -13,6 +13,7 @@ $$.S_REGISTER    =   $$.S_NODE+"/register";
 $$.S_BCRYPT_SALT =   "$2a$10$VFyiln/PpFyZc.ABoi4ppf";
 $$.S_USERID      =   "id";
 $$.S_APPID		 =	 "appid";
+$$.S_NEEDS_LOGIN =	 true;
 
 $$.S_LOGIN_THTML = $$.S_HOME+"/framework/login.thtml";
 $$.S_ERROR_THTML = $$.S_HOME+"/framework/error.thtml";

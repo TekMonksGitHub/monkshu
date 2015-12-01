@@ -1,0 +1,11 @@
+Session is always available to the code. In case the app just started
+it contains nothing, else it contains whatever was placed in it.
+
+For applications that support Logins, $$.session().get($$.S_USERID) returns
+the currently logged in user's user ID. User ID is not same as user name.
+
+If $$.session().get($$.S_USERID) == null, and the application supports logins
+then it implies that the current user has not been validated. 
+
+$$.session().get(<key>) to retrieve values.
+$$.session().put(<key>, <value>) to add session values.

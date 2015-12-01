@@ -1,0 +1,17 @@
+{
+"port" : 8080,
+"webroot" : "./../",
+"logdir" : "./logs",
+"accesslog" : "./logs/access.log.json",
+"errorlog" : "./logs/error.log.json",
+"indexfile" : "index.html",
+"mimeTypes" : {
+	    ".html" : "text/html",
+	    ".htm" : "text/html",
+	    ".thtml" : "text/html",
+	    ".css" : "text/css",
+	    ".js" : "text/javascript",
+	    ".otf" : "application/x-font-opentype",
+	    ".ttf" : "application/x-font-truetype"
+}
+}

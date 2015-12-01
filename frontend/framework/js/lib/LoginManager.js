@@ -28,9 +28,9 @@ $$.loginmanager.signin = function(id, pass, callback) {
 	});
 };
 
-$$.loginmanager.register = function (id, pass, callback) {
+$$.loginmanager.register = function (regid, pass, callback) {
 	
-	var pwph = id + " " + pass;
+	var pwph = regid + " " + pass;
 	
 	var bcrypt = dcodeIO.bcrypt;
 

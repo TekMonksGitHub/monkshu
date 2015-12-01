@@ -292,3 +292,174 @@
 {"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-11-30T17:18:14.200Z"}
 {"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-11-30T17:18:14.216Z"}
 {"level":"info","message":"Server started on port: 3800","timestamp":"2015-11-30T17:18:14.216Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:35.363Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:35.363Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T09:47:35.363Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T09:47:35.363Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T09:47:35.363Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T09:47:35.379Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T09:47:35.379Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.673Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.673Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T09:47:42.673Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T09:47:42.875Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T09:47:42.891Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.985Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T09:47:42.985Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T09:47:42.985Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T09:47:42.985Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T09:47:42.985Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T09:47:43.001Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T09:47:43.001Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-01T09:52:43.615Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-12-01T09:52:43.615Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-12-01T09:52:43.662Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-12-01T09:52:43.756Z"}
+{"level":"info","message":"Login result: false","timestamp":"2015-12-01T09:52:43.756Z"}
+{"level":"info","message":"Got result: {\"result\":false}","timestamp":"2015-12-01T09:52:43.756Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-01T09:52:51.584Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-12-01T09:52:51.584Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-12-01T09:52:51.584Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-12-01T09:52:51.678Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-12-01T09:52:51.693Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T09:52:51.693Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-12-01T09:52:59.366Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-12-01T09:52:59.366Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448303472638,\"title\":\"Four score and seven years ago\"}]}","timestamp":"2015-12-01T09:52:59.492Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-12-01T09:53:01.601Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-12-01T09:53:01.601Z"}
+{"level":"info","message":"Note file requested: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu//1448303472638.note.json","timestamp":"2015-12-01T09:53:01.751Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Four score and seven years ago\",\"note\":\"Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\\n\\nNow we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battlefield of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\",\"ts\":1448303472638}}","timestamp":"2015-12-01T09:53:02.089Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T11:22:59.283Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T11:22:59.313Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T11:22:59.298Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T11:22:59.298Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T11:22:59.298Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T11:22:59.298Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T11:22:59.314Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T11:22:59.314Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T11:22:59.314Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-01T11:23:46.942Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-12-01T11:23:46.942Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-12-01T11:23:46.988Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-12-01T11:23:47.082Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-12-01T11:23:47.082Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T11:23:47.082Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-01T12:28:49.094Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-12-01T12:28:49.094Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppepHR1ApxVCfDyuzbIZ4hlm3mRKqUTzDS","timestamp":"2015-12-01T12:28:49.094Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeBiBj%2FNyULZvZRCIP9o3xcVuX0bGlnSu","timestamp":"2015-12-01T12:28:49.207Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-12-01T12:28:49.212Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T12:28:49.212Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:28:57.497Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:28:57.498Z"}
+{"level":"info","message":"Got register request for new ID: [object Object]","timestamp":"2015-12-01T12:28:57.499Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:28:57.684Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:28:57.684Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:28:57.684Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:28:57.684Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:28:57.684Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:28:57.700Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:28:57.700Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:28:57.825Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:28:57.825Z"}
+{"level":"info","message":"Got register request for new ID: [object Object]","timestamp":"2015-12-01T12:28:57.825Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:28:57.995Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:28:58.012Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:30:14.806Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:30:14.946Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:30:24.232Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:30:24.232Z"}
+{"level":"info","message":"Got register request for new ID: [object Object]","timestamp":"2015-12-01T12:30:24.232Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:24.423Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:24.423Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:30:24.423Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:30:24.423Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:30:24.423Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:30:24.439Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:30:24.439Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:30:51.130Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:30:54.858Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:30:54.858Z"}
+{"level":"info","message":"Got register request for new ID: [object Object]","timestamp":"2015-12-01T12:30:54.858Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:34:08.245Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:34:08.245Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:34:08.245Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:34:08.245Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:34:08.245Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:34:08.260Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:34:08.260Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:34:12.272Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:34:12.272Z"}
+{"level":"info","message":"Got register request for new ID: [object Object]","timestamp":"2015-12-01T12:34:12.272Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:37:08.261Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-01T12:37:08.261Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-01T12:37:08.261Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-01T12:37:08.261Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/s_login.js\" : \"/code/s_login.js\",\r\n\"/login\" : \"/code/s_login.js\",\r\n\"/register\" : \"/code/s_register.js\",\r\n\"/savenote\" : \"/code/s_savenote.js\",\r\n\"/getnotes\" : \"/code/s_getnotes.js\",\r\n\"/viewnotes\" : \"/code/s_getnotes.js\",\r\n\"/getnote\" : \"/code/s_getnote.js\",\r\n\"/deletenote\" : \"/code/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-01T12:37:08.261Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-01T12:37:08.275Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-01T12:37:08.275Z"}
+{"level":"info","message":"Got request for the url: /register","timestamp":"2015-12-01T12:37:19.226Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_register.js","timestamp":"2015-12-01T12:37:19.226Z"}
+{"level":"info","message":"Got register request for new ID: rvkapoor","timestamp":"2015-12-01T12:37:19.226Z"}
+{"level":"info","message":"Registration result: Success.","timestamp":"2015-12-01T12:37:19.383Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T12:37:19.383Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-12-01T12:37:25.615Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-12-01T12:37:25.615Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[]}","timestamp":"2015-12-01T12:37:25.740Z"}
+{"level":"info","message":"Got request for the url: /savenote","timestamp":"2015-12-01T12:37:42.267Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_savenote.js","timestamp":"2015-12-01T12:37:42.267Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T12:37:42.375Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-12-01T12:37:44.480Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-12-01T12:37:44.480Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448973462268,\"title\":\"This is a test\"}]}","timestamp":"2015-12-01T12:37:44.576Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-12-01T12:38:15.968Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-12-01T12:38:15.968Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448973462268.note.json","timestamp":"2015-12-01T12:38:16.171Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"This is a test\",\"note\":\"Test file.\",\"ts\":1448973462268}}","timestamp":"2015-12-01T12:38:16.368Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-01T12:44:35.159Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_login.js","timestamp":"2015-12-01T12:44:35.159Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeKVKWBWXOLjfpeFNSDnkXQg5xeHxYQyK","timestamp":"2015-12-01T12:44:35.159Z"}
+{"level":"info","message":"Backend phrase: %242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6","timestamp":"2015-12-01T12:44:35.268Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-12-01T12:44:35.268Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-01T12:44:35.268Z"}
+{"level":"info","message":"Got request for the url: /viewnotes","timestamp":"2015-12-01T12:44:37.066Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnotes.js","timestamp":"2015-12-01T12:44:37.066Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"notes\":[{\"ts\":1448973462268,\"title\":\"This is a test\"}]}","timestamp":"2015-12-01T12:44:37.176Z"}
+{"level":"info","message":"Got request for the url: /getnote","timestamp":"2015-12-01T12:44:39.701Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/code/s_getnote.js","timestamp":"2015-12-01T12:44:39.702Z"}
+{"level":"info","message":"Note file requested: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\services/../db/users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1448973462268.note.json","timestamp":"2015-12-01T12:44:39.952Z"}
+{"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"This is a test\",\"note\":\"Test file.\",\"ts\":1448973462268}}","timestamp":"2015-12-01T12:44:40.849Z"}

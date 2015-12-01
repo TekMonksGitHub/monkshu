@@ -1,4 +1,4 @@
-$$._bootstrap = function() {
+$$.__bootstrap = function() {
 	$$.log = new $$.Log();												// setup the global logger
 	if (Application.init instanceof Function) {Application.init();};	// initialize the application
 	$$._initI18N();														// initialize globalization

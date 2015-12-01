@@ -10,87 +10,91 @@ var fs = require("fs");
 var path = require("path");
 var http = require("http");
 var url = require("url");
-var winston = require("winston");
+var access; var error;
 
 /* Configuration - Can change ports, webroot etc. here */
-var port = 8080;
-var webroot = path.resolve(__dirname+"/../");
-var logdir = __dirname + "/logs";
-var accesslog = logdir + "/access.log.json";
-var errorlog = logdir + "/error.log.json";
-var indexfile = "index.html";
-var mimeTypes = {
-    ".html": "text/html",
-    ".htm": "text/html",
-    ".thtml": "text/html",
-    ".css": "text/css",
-    ".js": "text/javascript",
-    ".otf" : "application/x-font-opentype",
-    ".ttf" : "pplication/x-font-truetype"
-};
+var conf = require(__dirname + "/conf/httpd.json");
+conf.webroot = path.resolve(conf.webroot);	// normalize webroot path
 
-/* Init - Server bootup */
-console.log("Starting...");
-console.log("Initializing the logs.");
+exports.bootstrap = bootstrap;
 
-/* Init logging */
-if (!fs.existsSync(logdir)) {fs.mkdirSync(logdir);}
-	
-var access = new (winston.Logger)({
-	transports: [ 
-		new winston.transports.File({ 
-			filename: accesslog,
-			maxsize: 1024 * 1024 * 100 // 100MB
-		})
-	]
-});
+// support starting in stand-alone config
+if (require("cluster").isMaster == true) bootstrap();	
 
-var error = new (winston.Logger)({
-	transports: [ 
-		new winston.transports.File({ 
-			filename: errorlog,
-			maxsize: 1024 * 1024 * 100 // 100MB
-		})
-	]
-});
+function bootstrap() {
+	initLogs();
 
-/* Start http server */
-var httpd = http.createServer(function(req, res) {
-	access.info("GET: " + req.url);
+	/* Start http server */
+	var httpd = http.createServer(function(req, res) {
+		access.info("GET: " + req.url);
+		
+		var fileRequested = path.resolve(conf.webroot) + "/" + url.parse(req.url).pathname;
+		
+		fs.exists(fileRequested, function(exists) {
+		    if(!exists) {
+		    	error.error("404: " + req.url);
+		    	res.writeHead(404, {"Content-Type": "text/plain"});
+		    	res.write("404 Path Not Found.\n");
+		    	res.end();
+		    	return;
+		    }
+		
+			if (fs.statSync(fileRequested).isDirectory()) fileRequested += "/" + conf.indexfile;
+		 
+			sendFile(fileRequested, res);
+		});
+		 
+	}).listen(conf.port);
 	
-	var fileRequested = webroot + "/" + url.parse(req.url).pathname;
+	access.log("Server started on port: " + conf.port);
+	console.log("Server started on port: " + conf.port);
+}
+
+function initLogs() {
+	var winston = require("winston");
+
+	/* Init - Server bootup */
+	console.log("Starting...");
+	console.log("Initializing the logs.");
 	
-	fs.exists(fileRequested, function(exists) {
-	    if(!exists) {
-	    	error.error("404: " + req.url);
-	    	res.writeHead(404, {"Content-Type": "text/plain"});
-	    	res.write("404 Path Not Found.\n");
-	    	res.end();
-	    	return;
-	    }
-	
-		if (fs.statSync(fileRequested).isDirectory()) fileRequested += "/" + indexfile;
-	 
-		fs.readFile(fileRequested, "binary", function(err, file) {
-			if(err) {
-				error.error("500: " + err);
-      			res.writeHead(500, {"Content-Type": "text/plain"});
-        		res.write(err + "\n");
-        		res.end();
-        		return;
-      		}
-      	
-	      	access.info("Sending: " + fileRequested);
-	      	var headers = {};
-	      	var mime = mimeTypes[path.extname(fileRequested)];
-	      	if (mime) headers["Content-Type"] = mime;
-	      	res.writeHead(200, headers);
-	      	res.write(file, "binary");
-	      	res.end();
-	    });
+	/* Init logging */
+	if (!fs.existsSync(conf.logdir)) {fs.mkdirSync(conf.logdir);}
+		
+	access = new (winston.Logger)({
+		transports: [ 
+			new winston.transports.File({ 
+				filename: conf.accesslog,
+				maxsize: 1024 * 1024 * 100 // 100MB
+			})
+		]
 	});
-	 
-}).listen(port);
+	
+	error = new (winston.Logger)({
+		transports: [ 
+			new winston.transports.File({ 
+				filename: conf.errorlog,
+				maxsize: 1024 * 1024 * 100 // 100MB
+			})
+		]
+	});
+}
 
-access.log("Server started on port: " + port);
-console.log("Server started on port: " + port);
+function sendFile(fileRequested, res) {
+	fs.readFile(fileRequested, "binary", function(err, file) {
+		if(err) {
+			error.error("500: " + err);
+  			res.writeHead(500, {"Content-Type": "text/plain"});
+    		res.write(err + "\n");
+    		res.end();
+    		return;
+  		}
+  	
+      	access.info("Sending: " + fileRequested);
+      	var headers = {};
+      	var mime = conf.mimeTypes[path.extname(fileRequested)];
+      	if (mime) headers["Content-Type"] = mime;
+      	res.writeHead(200, headers);
+      	res.write(file, "binary");
+      	res.end();
+    });
+}
