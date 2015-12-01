@@ -1,0 +1,3 @@
+backend/services/logs/server.log.json
+frontend/server/logs/access.log.json
+frontend/server/logs/error.log.json
