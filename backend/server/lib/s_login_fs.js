@@ -4,7 +4,6 @@
  */
 
 var fs = require("fs");
-var APP_CONSTANTS = require(__dirname + "/lib/constants.js");
 
 exports.doService = doService;
 
@@ -12,16 +11,11 @@ function doService(jsonReq, callback) {
 	
 	if (!validateRequest(jsonReq, callback)) return;
 	
-	var hashpath = require(APP_CONSTANTS.LIBDIR+"/hashpath.js");
-	
 	log.info("Got login request for ID: " + jsonReq.id);
 	
-	var phrase = hashpath.create_valid_hash_path(jsonReq.id);
+	var dirToCheck = require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(jsonReq.id);
+	log.info("Backend path: " + dirToCheck);
 	
-	log.info("Backend phrase: " + phrase);
-	
-	var dirToCheck = APP_CONSTANTS.USERS_DB_PATH+"/"+phrase;
-		
 	fs.exists(dirToCheck, function(exists) {
 		var resp = {};
 		resp["result"] = exists;

@@ -10,7 +10,7 @@ exports.doService = doService;
 
 function doService(jsonReq, callback) {
 	var userdbPath = 
-		require(APP_CONSTANTS.LIBDIR+"/userid.js").getUserPath(jsonReq.id);
+		require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(jsonReq.id);
 		
 	var filePath = userdbPath + "/" + jsonReq.ts + APP_CONSTANTS.NOTE_EXT;
 		

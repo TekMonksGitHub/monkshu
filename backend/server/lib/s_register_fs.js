@@ -4,7 +4,6 @@
  */
 
 var fs = require("fs");
-var APP_CONSTANTS = require(__dirname + "/lib/constants.js");
 
 exports.doService = doService;
 
@@ -14,7 +13,7 @@ function doService(jsonReq, callback) {
 	
 	log.info("Got register request for new ID: " + jsonReq.user);
 	
-	fs.readFile(APP_CONSTANTS.USERS_FILE, function(err, data) {
+	fs.readFile(CONSTANTS.USERS_FILE, function(err, data) {
 		if (!err) {
 			if (!stringArrayContainsIgnoreCase(JSON.parse(data), jsonReq.user)) {
 				registerUser(jsonReq.id, jsonReq.user, JSON.parse(data), callback);
@@ -45,9 +44,7 @@ function validateRequest(jsonReq, callback) {
 }
 
 function registerUser(id, user, users, callback) {
-	var hashpath = require(APP_CONSTANTS.LIBDIR+"/hashpath.js");
-	var phrase = hashpath.create_valid_hash_path(id);
-	var dirToCheck = APP_CONSTANTS.USERS_DB_PATH+"/"+phrase;
+	var dirToCheck = require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(id);
 	
 	fs.exists(dirToCheck, function(exists) {
 		if (exists) {
@@ -70,7 +67,7 @@ function registerUser(id, user, users, callback) {
 
 function addUserToUsersDBAndRegister(user, users, callback) {
 	users.push(user);
-	fs.writeFile(APP_CONSTANTS.USERS_FILE, JSON.stringify(users), function(err) {
+	fs.writeFile(CONSTANTS.USERS_FILE, JSON.stringify(users), function(err) {
 		var resp = {}; resp["result"] = true;
 		log.info("Registration result: Success.");
 		callback(resp);

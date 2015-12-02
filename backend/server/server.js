@@ -4,10 +4,10 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
-GLOBAL.CONSTANTS = require(__dirname + "/framework/constants.js");
+GLOBAL.CONSTANTS = require(__dirname + "/lib/constants.js");
 
 var fs 			= require("fs");
-var servicereg  = require(CONSTANTS.FRAMEWORKDIR+"/serviceregistry.js");
+var servicereg  = require(CONSTANTS.LIBDIR+"/serviceregistry.js");
 
 exports.bootstrap = bootstrap;
 
@@ -19,11 +19,11 @@ function bootstrap() {
 	console.log("Starting...");
 	
 	console.log("Initializing the logs.");
-	require(CONSTANTS.FRAMEWORKDIR+"/log.js").initGlobalLogger();
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLogger();
 	log.info("Initializing the service registry.");
 	servicereg.init();
 	var transport = require(CONSTANTS.TRANSPORT);
-	var server = require(CONSTANTS.FRAMEWORKDIR+"/"+transport.servertype+".js");
+	var server = require(CONSTANTS.LIBDIR+"/"+transport.servertype+".js");
 	server.init(transport.port);
 	
 	console.log("Server started on port: " + transport.port);
