@@ -18,27 +18,28 @@ Option 1 - Easiest
 (2) Download the Monkshu server distributable to a path on your desktop, let assume this is <monkshu>
 	
 (3) Create a file called <name>.thtml for example, main.html and place it at this path
-<monkshu>/frontend/app/main.thtml. Add the following HTML to it
-
+```<monkshu>/frontend/app/main.thtml```. Add the following HTML to it
+```
 <html>
 <head><title>Hello</title></head>
 <body>Hello World</body>
 </html>
-
+```
 (4) Create a file named Application.js at this path
-<monkshu>/frontend/app/application.js
+```<monkshu>/frontend/app/js/Application.js```
 
-(5) Implement this function:
+(5) Implement this function in Application.js
+```
 	Application.main = function() {
 	// Entry point for the application
 	$$.loadthtml(“/app/main.thtml”, {});
 };
-
+```
 (6) Start the front-end HTTP server using this command:
-<monkshu>/frontend/server/node.js server.js
+```<monkshu>/frontend/server/node.js server.js```
 
 (7) Run the web browser and point it to 
-http://localhost:8080
+```http://localhost:8080```
 
 
 Create a new JSON Service
