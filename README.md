@@ -37,7 +37,7 @@ Option 1 - Easiest
 };
 ```
 (6) Start the front-end HTTP server using this command:
-```<monkshu>/frontend/server/node.js server.js```
+```[monkshu]/frontend/server/node.js server.js```
 
 (7) Run the web browser and point it to 
 ```http://localhost:8080```
