@@ -47,7 +47,6 @@ Create a new JSON Service
 1. Add JSON service file to ```/backend/server/services/```, name as s_[purpose of the service].js, e.g. ```s_hello.js```
 2. Add the service to the REST registry, under ```/conf/service_registry.json``` with a URL mapped to it.
 3. Implement the following method and export it
-
 ```
 	exports.doService = doService;
 
@@ -62,14 +61,11 @@ Create a new JSON Service
 		// object
 	}
 ```
-
 4. That's it - run the node.js server using these steps:
-
 ```
 cd backend/server
 node server.js
 ```
-
 5. Call the service from web framework using this code
 ```
 	REST.call(URL, req, function(resp){handleJSONResult(resp);});
