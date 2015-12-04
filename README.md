@@ -29,12 +29,18 @@ Option 1 - Easiest
 
 (4) Create a file named Application.js at this path ```[monkshu]/frontend/app/js/Application.js```
 
-(5) Implement this function in Application.js
+(5) Implement the following functions in Application.js
 ```
+	function Application() {}
+	
+	Application.init = function() { 
+		$$.S_NEEDS_LOGIN = false;
+	}
+	
 	Application.main = function() {
-	// Entry point for the application
-	$$.loadthtml(“/app/main.thtml”, {});
-};
+		// Entry point for the application
+		$$.loadthtml(“/app/main.thtml”, {});
+	};
 ```
 (6) Start the front-end HTTP server using this command:
 ```[monkshu]/frontend/server/node.js server.js```
