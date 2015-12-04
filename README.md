@@ -11,8 +11,6 @@ and also allow full HTML5+CSS3 design capabilites instead of coming up with some
 
 Hello World in Monkshu
 ======================
-Option 1 - Easiest
-	
 (1) Install node.js 
 	
 (2) Download the Monkshu server distributable to a path on your desktop, let assume this is [monkshu]
@@ -101,6 +99,6 @@ Login ID: Hello
 
 Login Password: 123
 
-Add Header set Access-Control-Allow-Origin <your frontend> to resolve cross-origin errors.
+Add Header set Access-Control-Allow-Origin [your frontend] to resolve cross-origin errors.
 
 
