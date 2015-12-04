@@ -42,10 +42,21 @@ Option 1 - Easiest
 		$$.loadthtml(“/app/main.thtml”, {});
 	};
 ```
-(6) Start the front-end HTTP server using this command:
+(6) Implement the following two constants in ```[monkshu]/frontend/app/js/constants.js```. These inform the framework what the server URLs are for backend as well as the frontend:
+
+```
+/////////////////////////////////////////////////////
+// All the constants used by the application
+/////////////////////////////////////////////////////
+
+$$.S_FRONTEND = "http://localhost:8080";
+$$.S_NODE = "http://localhost:3800";
+```
+
+(7) Start the front-end HTTP server using this command:
 ```[monkshu]/frontend/server/node.js server.js```
 
-(7) Run the web browser and point it to ```http://localhost:8080```
+(8) Run the web browser and point it to ```http://localhost:8080```
 
 
 Create a new JSON Service
