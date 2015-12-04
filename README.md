@@ -61,7 +61,11 @@ Create a new JSON Service
 		// object
 	}
 ```
-4. That's it - run the node.js server - ```node server.js```
+4. That's it - run the node.js server using these steps:
+```
+cd backend/server
+node server.js
+```
 5. Call the service from web framework using this code
 ```
 	REST.call(URL, req, function(resp){handleJSONResult(resp);});
