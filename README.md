@@ -44,7 +44,7 @@ Option 1 - Easiest
 
 Create a new JSON Service
 =========================
-1. Add JSON service file to ```/backend/server/services/```, name as s_<purpose of the service>.js, e.g. ```s_hello.js```
+1. Add JSON service file to ```/backend/server/services/```, name as s_[purpose of the service].js, e.g. ```s_hello.js```
 2. Add the service to the REST registry, under ```/conf/service_registry.json``` with a URL mapped to it.
 3. Implement the following method and export it
 ```
@@ -55,7 +55,7 @@ Create a new JSON Service
 		//
 		// jsonReq is the incoming request as a Javascript object 
 		//
-		// return the final result as a JSON object 
+		// return the final result as a Javascript object 
 		// using callback(my_Result_JSON_Object) where
 		// my_Result_JSON_Object is your result as a Javascript
 		// object
