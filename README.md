@@ -73,9 +73,11 @@ Create a new JSON Service
 		// jsonReq is the incoming request as a Javascript object 
 		//
 		// return the final result as a Javascript object 
-		// using callback(my_Result_JSON_Object) where
-		// my_Result_JSON_Object is your result as a Javascript
+		// using callback(my_Result_Javascript_Object) where
+		// my_Result_Javascript_Object is your result as a Javascript
 		// object
+		
+		callback(my_Result_Javascript_Object);
 	}
 ```
 
