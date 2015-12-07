@@ -3,3 +3,4 @@ frontend/server/logs/access.log.json
 frontend/server/logs/error.log.json
 backend/db
 .project
+.dummy
