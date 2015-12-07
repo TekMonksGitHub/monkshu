@@ -25,7 +25,8 @@ function doService(jsonReq, callback) {
 				return;
 			}
 		} else {
-			log.error("Couldn't read users file. Possible corruption. Error is: " + err);
+			log.error("Couldn't read users file. Possible corruption or doesn't exist.");
+			log.error("Error is: " + err);
 			log.info("Registering anyway");
 			registerUser(jsonReq.id, jsonReq.user, [], callback);
 		}
