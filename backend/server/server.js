@@ -56,10 +56,19 @@ function doService(url, data, callback) {
 	log.info("Got request for the url: " + url);
 	
 	var service = servicereg.getService(url);
+	log.info("Looked up service, calling: " + service);
+	
+	var jsonObj;
+	try {
+		jsonObj = JSON.parse(data);
+	} catch (err) {
+		log.info("Input JSON parser error: " + err);
+		log.info("Bad JSON input, calling with empty object: " + url);
+		jsonObj = {};
+	}
 	
 	if (service !== undefined) {
-		log.info("Looked up service, calling: " + service);
-		require(service).doService(JSON.parse(data), callback);
+		require(service).doService(jsonObj, callback);
 	}
 	else {
 		log.info("Service not found: " + url);

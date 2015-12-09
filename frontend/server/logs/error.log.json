@@ -43,3 +43,6 @@
 {"level":"error","message":"404: /app/js/Application.js","timestamp":"2015-12-02T14:37:04.819Z"}
 {"level":"error","message":"404: /framework/fonts/orbitron-light-webfont.ttf","timestamp":"2015-12-02T14:42:01.572Z"}
 {"level":"error","message":"404: /framework/fonts/orbitron-light-webfont.ttf","timestamp":"2015-12-02T14:42:05.916Z"}
+{"level":"error","message":"404: /app/i18n/i18n_en.json","timestamp":"2015-12-07T09:57:34.761Z"}
+{"level":"error","message":"404: /favicon.ico","timestamp":"2015-12-07T09:57:34.858Z"}
+{"level":"error","message":"404: /app/i18n/i18n_en.json","timestamp":"2015-12-07T10:00:37.361Z"}

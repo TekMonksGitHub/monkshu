@@ -312,3 +312,95 @@
 {"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\server/services/s_getnote.js","timestamp":"2015-12-02T14:42:05.797Z"}
 {"level":"info","message":"Note file requested: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\monkshu\\monkshu\\backend\\db\\users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppexKKJKqz.g3Ib9o9SATWaj3urTXAOml6//1449056565517.note.json","timestamp":"2015-12-02T14:42:05.916Z"}
 {"level":"info","message":"Got result: {\"result\":true,\"data\":{\"title\":\"Test\",\"note\":\"This is a test note.\",\"ts\":1449056565517}}","timestamp":"2015-12-02T14:42:06.362Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-07T09:56:44.826Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-07T09:56:44.826Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-07T09:56:44.826Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-07T09:56:44.826Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/savenote\" : \"/services/s_savenote.js\",\r\n\"/getnotes\" : \"/services/s_getnotes.js\",\r\n\"/viewnotes\" : \"/services/s_getnotes.js\",\r\n\"/getnote\" : \"/services/s_getnote.js\",\r\n\"/deletenote\" : \"/services/s_deletenote.js\"\r\n}\r\n","timestamp":"2015-12-07T09:56:44.826Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-07T09:56:44.841Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-07T09:56:44.841Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:18:12.915Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:18:12.915Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:18:12.915Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:18:12.915Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:18:12.915Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:18:12.930Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:18:12.930Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:19:19.795Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:20:00.188Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:20:00.188Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:20:00.188Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:20:00.188Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:20:00.188Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:20:00.204Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:20:00.204Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:20:15.149Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:20:15.165Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:20:16.707Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:20:16.707Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:20:16.709Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:25:02.851Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:25:02.851Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:25:02.851Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:26:09.829Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:26:09.829Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:26:09.829Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:26:09.829Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:26:09.829Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:26:09.845Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:26:09.845Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:27:31.443Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:27:31.459Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:27:35.394Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:27:35.394Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:27:35.394Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:27:47.356Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:27:47.356Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:27:47.356Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:27:59.294Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:27:59.295Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:27:59.295Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:28:13.049Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:28:13.049Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:28:13.049Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:30:31.469Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:30:31.469Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:30:31.469Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:30:31.469Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:30:31.469Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:30:31.484Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:30:31.484Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:30:35.494Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:30:35.495Z"}
+{"level":"info","message":"Bad JSON input, calling with empty object: /newservice","timestamp":"2015-12-09T07:30:35.495Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:30:35.496Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:30:41.113Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:30:41.113Z"}
+{"level":"info","message":"Bad JSON input, calling with empty object: /newservice","timestamp":"2015-12-09T07:30:41.114Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:30:41.114Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:30:46.042Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:30:46.042Z"}
+{"level":"info","message":"Bad JSON input, calling with empty object: /newservice","timestamp":"2015-12-09T07:30:46.042Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:30:46.042Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\",\r\n\"/newservice\" : \"/services/s_hello.js\"\r\n}\r\n","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-09T07:32:09.906Z"}
+{"level":"info","message":"Got request for the url: /newservice","timestamp":"2015-12-09T07:32:12.623Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_hello.js","timestamp":"2015-12-09T07:32:12.623Z"}
+{"level":"info","message":"Input JSON parser error: SyntaxError: Unexpected token e","timestamp":"2015-12-09T07:32:12.624Z"}
+{"level":"info","message":"Bad JSON input, calling with empty object: /newservice","timestamp":"2015-12-09T07:32:12.624Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello World\"}","timestamp":"2015-12-09T07:32:12.626Z"}

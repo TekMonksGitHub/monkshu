@@ -1,9 +1,4 @@
 {
 "/login" : "/lib/s_login_fs.js",
-"/register" : "/lib/s_register_fs.js",
-"/savenote" : "/services/s_savenote.js",
-"/getnotes" : "/services/s_getnotes.js",
-"/viewnotes" : "/services/s_getnotes.js",
-"/getnote" : "/services/s_getnote.js",
-"/deletenote" : "/services/s_deletenote.js"
+"/register" : "/lib/s_register_fs.js"
 }
