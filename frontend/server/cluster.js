@@ -4,6 +4,7 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
+
 var cluster = require("cluster");
 
 if (cluster.isMaster) {
