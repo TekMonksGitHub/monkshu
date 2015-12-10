@@ -3,6 +3,7 @@ frontend/server/logs/access.log.json
 frontend/server/logs/error.log.json
 backend/db
 backend/server/services
+backend/server/conf/service_registry.json
 frontend/app
 .project
 .dummy
