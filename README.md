@@ -89,7 +89,7 @@ node server.js
 
 (5) Call the service from web framework using this code
 ```
-	REST.call(URL, req, function(resp){handleJSONResult(resp);});
+	$$.rest(URL, req, function(resp){handleJSONResult(resp);});
 	
 	where handleJSONResult is your function which can consume this JSON result
 	req and resp are both Javascript objects
