@@ -18,6 +18,11 @@ $$.doErrorNavigation = function () {
 	$$.loadthtml($$.S_ERROR_THTML);
 };
 
+$$.loginRequired = function(flag) {
+	if (flag != null ) $$.S_NEEDS_LOGIN = flag;
+	return $$.S_NEEDS_LOGIN;
+};
+
 $$.__doLoginOrRunMain = function() {
 	if ($$.S_NEEDS_LOGIN) $$.loadthtml($$.S_LOGIN_THTML);
 	else Application.main();

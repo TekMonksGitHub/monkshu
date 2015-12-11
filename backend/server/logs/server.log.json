@@ -64,3 +64,14 @@
 {"level":"info","message":"Got request for the url: /hello","timestamp":"2015-12-10T18:01:13.351Z"}
 {"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_helloworld.js","timestamp":"2015-12-10T18:01:13.351Z"}
 {"level":"info","message":"Got result: {\"message\":\"Hello JSON World\"}","timestamp":"2015-12-10T18:01:13.351Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-11T11:02:02.734Z"}
+{"level":"info","message":"*************************************","timestamp":"2015-12-11T11:02:02.734Z"}
+{"level":"info","message":"Logging subsystem initialized.","timestamp":"2015-12-11T11:02:02.734Z"}
+{"level":"info","message":"Initializing the service registry.","timestamp":"2015-12-11T11:02:02.734Z"}
+{"level":"info","message":"Read service registry: {\r\n\"/hello\" : \"/services/s_helloworld.js\"\r\n}\r\n","timestamp":"2015-12-11T11:02:02.734Z"}
+{"level":"info","message":"Attaching socket listener on port: 3800","timestamp":"2015-12-11T11:02:02.750Z"}
+{"level":"info","message":"Server started on port: 3800","timestamp":"2015-12-11T11:02:02.750Z"}
+{"level":"info","message":"Got request for the url: /hello","timestamp":"2015-12-11T11:02:18.985Z"}
+{"level":"info","message":"Looked up service, calling: c:\\Users\\Rohit\\Documents\\AptanaWorkspace\\Tutorials\\monkshu\\backend\\server/services/s_helloworld.js","timestamp":"2015-12-11T11:02:18.985Z"}
+{"level":"info","message":"Got result: {\"message\":\"Hello JSON World\"}","timestamp":"2015-12-11T11:02:18.985Z"}
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-11T11:02:37.471Z"}
