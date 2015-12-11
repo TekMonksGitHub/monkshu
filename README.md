@@ -32,7 +32,7 @@ Hello World in Monkshu
 	function Application() {}
 	
 	Application.init = function() { 
-		$$.S_NEEDS_LOGIN = false;
+		$$.loginRequired(false);
 	}
 	
 	Application.main = function() {
