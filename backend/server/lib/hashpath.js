@@ -24,3 +24,4 @@ create_valid_hash_path : function(data, callback) {
 		callback(encoded_hash);		
 	});
 }
+};

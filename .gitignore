@@ -1,6 +1,5 @@
-backend/services/logs/server.log.json
-frontend/server/logs/access.log.json
-frontend/server/logs/error.log.json
+backend/server/logs
+frontend/server/logs
 backend/db
 backend/server/services
 backend/server/conf/service_registry.json
