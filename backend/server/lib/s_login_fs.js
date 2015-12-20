@@ -13,16 +13,17 @@ function doService(jsonReq, callback) {
 	
 	log.info("Got login request for ID: " + jsonReq.id);
 	
-	var dirToCheck = require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(jsonReq.id);
-	log.info("Backend path: " + dirToCheck);
+	require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(jsonReq.id, function(dirToCheck) {
+		log.info("Backend path: " + dirToCheck);
 	
-	fs.exists(dirToCheck, function(exists) {
-		var resp = {};
-		resp["result"] = exists;
-		
-		log.info("Login result: " + exists);
-		
-		callback(resp);
+		fs.exists(dirToCheck, function(exists) {
+			var resp = {};
+			resp["result"] = exists;
+			
+			log.info("Login result: " + exists);
+			
+			callback(resp);
+		});
 	});
 }
 

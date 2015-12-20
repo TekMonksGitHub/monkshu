@@ -45,25 +45,26 @@ function validateRequest(jsonReq, callback) {
 }
 
 function registerUser(id, user, users, callback) {
-	var dirToCheck = require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(id);
-	
-	fs.exists(dirToCheck, function(exists) {
-		if (exists) {
-			var resp = {}; resp["result"] = false;
-			log.info("Registration result: ID already exists.");
-			callback(resp);
-			return;
-		} else {
-			fs.mkdir(dirToCheck, function(err){
-				if (err) {
-					var resp = {}; resp["result"] = false;
-					log.info("Registration result: Failed to create directory.");
-					callback(resp);
-					return;
-				} else addUserToUsersDBAndRegister(user, users, callback);
-			});
-		}
+	require(CONSTANTS.LIBDIR+"/userid.js").getUserPath(id, function(dirToCheck){
+		fs.exists(dirToCheck, function(exists) {
+			if (exists) {
+				var resp = {}; resp["result"] = false;
+				log.info("Registration result: ID already exists.");
+				callback(resp);
+				return;
+			} else {
+				fs.mkdir(dirToCheck, function(err){
+					if (err) {
+						var resp = {}; resp["result"] = false;
+						log.info("Registration result: Failed to create directory.");
+						callback(resp);
+						return;
+					} else addUserToUsersDBAndRegister(user, users, callback);
+				});
+			}
+		});
 	});
+	
 }
 
 function addUserToUsersDBAndRegister(user, users, callback) {

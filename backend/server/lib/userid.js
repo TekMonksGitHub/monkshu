@@ -5,8 +5,12 @@
 
 exports.getUserPath = getUserPath;
 
-function getUserPath(id) {
+function getUserPath(id, callback) {
 	var hashpath = require(CONSTANTS.LIBDIR+"/hashpath.js");
-
-	return CONSTANTS.USERS_DB_PATH + "/" + hashpath.create_valid_hash_path(id) + "/";
+	
+	hashpath.create_valid_hash_path(id, function(hash) {
+		if (hash == null) hash = id; 	// error!
+		
+		callback(CONSTANTS.USERS_DB_PATH + "/" + hash + "/");
+	});
 }
