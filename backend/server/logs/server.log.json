@@ -1,0 +1,6 @@
+{"level":"info","message":"Got request for the url: /login","timestamp":"2015-12-21T14:04:34.109Z"}
+{"level":"info","message":"Looked up service, calling: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\LCAdmin\\monkshu\\backend\\server/lib/s_login_fs.js","timestamp":"2015-12-21T14:04:34.109Z"}
+{"level":"info","message":"Got login request for ID: $2a$10$VFyiln/PpFyZc.ABoi4ppeCIyPn0.8uilBDZYus322lefRl.soJka","timestamp":"2015-12-21T14:04:34.109Z"}
+{"level":"info","message":"Backend path: C:\\Users\\Rohit\\Documents\\AptanaWorkspace\\LCAdmin\\monkshu\\backend\\db\\users/%242a%2410%24VFyiln%2FPpFyZc.ABoi4ppeB8tQNJxnylcdW2lswKVSurIOAYZz9j6/","timestamp":"2015-12-21T14:04:34.939Z"}
+{"level":"info","message":"Login result: true","timestamp":"2015-12-21T14:04:34.940Z"}
+{"level":"info","message":"Got result: {\"result\":true}","timestamp":"2015-12-21T14:04:34.940Z"}
