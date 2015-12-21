@@ -2,11 +2,11 @@
 The Monkshu Project
 Monkshu - The HTML5/REST/JSON/Node.js/API Application Server
 ================================================================
-A complete Enterprise Application Server for Mobile apps (iOS and Android), Responsive HTML 5 Apps, and JSON API services. Consists of web container (called frontend), JSON API container (called backend), and hybrid iOS and Android app frameworks. Utilizing KNEX framework for database access. 
+A complete Enterprise Application Server for Mobile apps (iOS and Android), Responsive HTML 5 Apps, and JSON API services. Consists of web container (called frontend), JSON API container (called backend), and hybrid iOS and Android app frameworks. Utilizing KNEX framework for database SQL query generation (optional). 
 
-The idea is to produce a full Enterprise Application Sever based on Node.js, HTML5, Javascript, Android and iOS apps with a KNEX for database querying. 
+The idea is to produce a full Enterprise Application Sever based on Node.js, HTML5, Javascript, Android and iOS apps with KNEX for database querying. 
 
-Single unified codebase, with minimum external dependencies - currently the only real major dependency is KNEX for DB access.
+Single unified codebase, with minimum external dependencies - currently the only real major dependency is KNEX for DB query generation (if needed, else optional).
 
 HTML5 + Node.js + REST + Mobile (Android/iOS) + Database (MySQL, Oracle, etc. using KNEX) + Globalization (i18n) support.
 
