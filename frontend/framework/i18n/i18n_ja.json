@@ -5,6 +5,7 @@
 "DesiredUserID" : "新しいログイン",
 "Password" : "パスワード",
 "SignIn" : "ログイン",
+"Logout" : "ログアウト",
 "BadLogin" : "不正なログイン",
 "Register" : "登録",
 "LoginTaken" : "ログイン重複",

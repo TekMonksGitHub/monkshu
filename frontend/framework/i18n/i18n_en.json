@@ -5,6 +5,7 @@
 "DesiredUserID" : "Desired User ID",
 "Password" : "Password",
 "SignIn" : "Sign In",
+"Logout" : "Logout",
 "BadLogin" : "Incorrect Login",
 "Register" : "Register",
 "LoginTaken" : "Login ID taken",

@@ -5,6 +5,7 @@
 "DesiredUserID" : "नई आईडी",
 "Password" : "पासवर्ड",
 "SignIn" : "लॉग इन करें",
+"Logout" : "बाहर निकलें",
 "BadLogin" : "गलत लॉग इन",
 "Register" : "रजिस्टर करें",
 "LoginTaken" : "आईडी उपलब्ध नहीं,कुछ और चुनें",
