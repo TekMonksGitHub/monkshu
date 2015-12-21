@@ -9,7 +9,7 @@ $$.doIndexNavigation = function () {
 		$$.refresh();
 	}
 	else {
-		$$.appActiveBefore = true;
+		$$.session().put($$.appActiveBefore, true);
 		$$.__doLoginOrRunMain();			// Either login or run the app
 	}
 };
