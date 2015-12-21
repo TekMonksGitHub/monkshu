@@ -6,6 +6,8 @@ A complete Enterprise Application Server for Mobile apps (iOS and Android), Resp
 
 The idea is to produce a full Enterprise Application Sever based on Node.js, HTML5, Javascript, Android and iOS apps with a KNEX for database querying. 
 
+Single unified codebase, with minimum external dependencies - currently the only real major dependency is KNEX for DB access.
+
 HTML5 + Node.js + REST + Mobile (Android/iOS) + Database (MySQL, Oracle, etc. using KNEX) + Globalization (i18n) support.
 
 Login, logout, cookieless sessions supported out of the box.
