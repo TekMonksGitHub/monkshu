@@ -49,7 +49,7 @@ $$.loginmanager.register = function (regid, pass, callback) {
 };
 
 $$.loginmanager.signout = function() {
-	$$.session().remove($$.S_USERID);
+	$$.session().destroy();
 	
 	$$.doIndexNavigation();
 };

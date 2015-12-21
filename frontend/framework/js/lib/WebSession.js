@@ -53,6 +53,11 @@ $$._WebSession.prototype.remove = function(name) {
 	}
 };
 
+$$._WebSession.prototype.destroy = function(name) {
+	this.session = {};
+	sessionStorage.setObject("lcSession", this.getInternalStorage());
+};
+
 $$._WebSession.prototype.get = function(name) {
 	return this.session[name];
 };
