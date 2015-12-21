@@ -46,13 +46,11 @@ function bootstrap() {
 		 
 	}).listen(conf.port);
 	
-	access.log("Server started on port: " + conf.port);
+	access.info("Server started on port: " + conf.port);
 	console.log("Server started on port: " + conf.port);
 }
 
 function initLogs() {
-	var winston = require("winston");
-
 	/* Init - Server bootup */
 	console.log("Starting...");
 	console.log("Initializing the logs.");
@@ -60,23 +58,9 @@ function initLogs() {
 	/* Init logging */
 	if (!fs.existsSync(conf.logdir)) {fs.mkdirSync(conf.logdir);}
 		
-	access = new (winston.Logger)({
-		transports: [ 
-			new winston.transports.File({ 
-				filename: conf.accesslog,
-				maxsize: 1024 * 1024 * 100 // 100MB
-			})
-		]
-	});
-	
-	error = new (winston.Logger)({
-		transports: [ 
-			new winston.transports.File({ 
-				filename: conf.errorlog,
-				maxsize: 1024 * 1024 * 100 // 100MB
-			})
-		]
-	});
+	var logger = require(conf.libdir+"/Logger.js");	
+	access = new logger.Logger(conf.accesslog, 100*1024*1024);
+	error = new logger.Logger(conf.errorlog, 100*1024*1024);
 }
 
 function sendFile(fileRequested, res) {

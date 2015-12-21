@@ -2,6 +2,7 @@
 "port" : 8080,
 "webroot" : "./../",
 "logdir" : "./logs",
+"libdir" : "./lib",
 "accesslog" : "./logs/access.log.json",
 "errorlog" : "./logs/error.log.json",
 "indexfile" : "index.html",
