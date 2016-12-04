@@ -12,16 +12,13 @@ var http = require("http");
 var url = require("url");
 var access; var error;
 
-/* Configuration - Can change ports, webroot etc. here */
-var conf = require(__dirname + "/conf/httpd.json");
-conf.webroot = path.resolve(conf.webroot);	// normalize webroot path
-
 exports.bootstrap = bootstrap;
 
 // support starting in stand-alone config
 if (require("cluster").isMaster == true) bootstrap();	
 
 function bootstrap() {
+	initConf();
 	initLogs();
 
 	/* Start http server */
@@ -48,6 +45,15 @@ function bootstrap() {
 	
 	access.info("Server started on port: " + conf.port);
 	console.log("Server started on port: " + conf.port);
+}
+
+function initConf() {
+	global.conf = require(__dirname + "/conf/httpd.json");
+	conf.webroot = path.resolve(conf.webroot);	// normalize webroot path
+	conf.logdir = path.resolve(conf.logdir);	// normalize logdir path
+	conf.libdir = path.resolve(conf.libdir);	// normalize libdir path
+	conf.accesslog = path.resolve(conf.accesslog);	// normalize accesslog path
+	conf.errorlog = path.resolve(conf.errorlog);	// normalize errorlog path
 }
 
 function initLogs() {

@@ -5,3 +5,10 @@
 {"ts":"2016:12:04:10:10:30","level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\"\r\n}\r\n"}
 {"ts":"2016:12:04:10:10:30","level":"info","message":"Attaching socket listener on port: 3800"}
 {"ts":"2016:12:04:10:10:30","level":"info","message":"Server started on port: 3800"}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"*************************************"}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"*************************************"}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"Logging subsystem initialized."}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"Initializing the service registry."}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"Read service registry: {\r\n\"/login\" : \"/lib/s_login_fs.js\",\r\n\"/register\" : \"/lib/s_register_fs.js\"\r\n}\r\n"}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"Attaching socket listener on port: 9090"}
+{"ts":"2016:12:04:10:17:07","level":"info","message":"Server started on port: 9090"}

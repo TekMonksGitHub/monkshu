@@ -14,5 +14,5 @@
 	    ".js" : "text/javascript",
 	    ".otf" : "application/x-font-opentype",
 	    ".ttf" : "application/x-font-truetype"
-}
+	}
 }
