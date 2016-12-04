@@ -56,19 +56,19 @@ function handleRequest(req, res) {
 	var fileRequested = path.resolve(conf.webroot) + "/" + url.parse(req.url).pathname;
 	
 	fs.access(fileRequested, fs.constants.R_OK, function(err) {
-		if (err) sendError(res, 404, "Path Not Found.");
+		if (err) sendError(req, res, 404, "Path Not Found.");
 		else {
 			if (fs.stat(fileRequested, function(err, stats) {
 				if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
-				sendFile(fileRequested, res);
+				sendFile(fileRequested, req, res);
 			}));
 		}
 	});
 }
 
-function sendFile(fileRequested, res) {
+function sendFile(fileRequested, req, res) {
 	fs.readFile(fileRequested, "binary", function(err, data) {
-		if (err) sendError(res, 500, err);
+		if (err) sendError(req, res, 500, err);
 		else {
 			access.info("Sending: " + fileRequested);
 			var headers = {};
@@ -81,7 +81,7 @@ function sendFile(fileRequested, res) {
 	});
 }
 
-function sendError(res, code, message) {
+function sendError(req, res, code, message) {
 	error.error(code + ": " + req.url);
 	res.writeHead(code, {"Content-Type": "text/plain"});
 	res.write(code + " " + message + "\n");
