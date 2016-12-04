@@ -7,8 +7,8 @@ $$._signin = function() {
 	$$._registerClickHandlers();
 	$$.session().put("org_monkshu_login_signInOrRegisterClicked", true);
 	
-	var id = document.getElementById("userid").value;
-	var pass = document.getElementById("pass").value;
+	var id = $$.elID("userid").value;
+	var pass = $$.elID("pass").value;
 		
 	$$.loginmanager.signin(id, pass, $$._handleLoginResult);
 };
@@ -17,16 +17,14 @@ $$._register = function() {
 	$$._registerClickHandlers();
 	$$.session().put("org_monkshu_login_signInOrRegisterClicked", true);
 	
-	var regpass = document.getElementById("regpass").value;
+	var regpass = $$.elID("regpass").value;
 	if (regpass.length < $$.N_MIN_PASS_LENGTH) {
 		var resp = {}; resp["result"] = false;
 		$$._handleRegistrationResult(resp,true);
 		return;
 	}
-	
-	var regid = document.getElementById("regid").value;
 		
-	$$.loginmanager.register(regid, regpass, $$._handleRegistrationResult);
+	$$.loginmanager.register($$.elID("regid").value, regpass, $$._handleRegistrationResult);
 };
 
 $$._signinIfEnterPressed = function (e) {
@@ -42,13 +40,10 @@ $$._handleLoginResult = function (resp) {
 		$$._deregisterClickHandlers();
 		Application.main();
 	} else {
-		var divError = document.getElementById("divsigninerror");
-		divError.style.visibility = "visible";
+		$$.elID("divsigninerror").style.visibility = "visible";
 
-		var inputBox = document.getElementById("userid");
-		inputBox.className = "errorbox";
-		inputBox = document.getElementById("pass");
-		inputBox.className = "errorbox";
+		$$.elID("userid").className = "errorbox";
+		$$.elID("pass").className = "errorbox";
 	}
 };
 
@@ -58,17 +53,13 @@ $$._handleRegistrationResult = function (resp, passtooshort) {
 		Application.main();
 	} else {
 		if (passtooshort) {
-			var divError = document.getElementById("registererror_pass");
-			divError.style.visibility = "visible";
+			$$.elID("registererror_pass").style.visibility = "visible";
 	
-			var inputBox = document.getElementById("regpass");
-			inputBox.className = "errorbox";
+			$$.elID("regpass").className = "errorbox";
 		} else {
-			var divError = document.getElementById("registererror_id");
-			divError.style.visibility = "visible";
+			$$.elID("registererror_id").style.visibility = "visible";
 	
-			var inputBox = document.getElementById("regid");
-			inputBox.className = "errorbox";
+			$$.elID("regid").className = "errorbox";
 		}		
 	}
 };

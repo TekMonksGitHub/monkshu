@@ -34,6 +34,10 @@ $$.getElementsByClassName = function (theClass,node)
     return classElms;
 };
 
+$$.elID = function(id) {
+    return document.getElementById(id);
+}
+
 if (!Array.prototype.forEach) {
     Array.prototype.forEach = function (fn, scope) {
         var i, len;
