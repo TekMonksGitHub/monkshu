@@ -22,6 +22,8 @@ button {
     font-size: 16px;
     padding: 4.8% 15px;
     margin: 15px;
+	width: 80%;
+	height: 100%;
 }
  
 button:disabled:hover{
@@ -69,6 +71,7 @@ button:active {
 	left: 102%;
 	top: -14px;
 	white-space:nowrap;
+	width: 30%;
 }
 
 .register_button {
@@ -76,6 +79,7 @@ button:active {
 	left: 102%;
 	top: -14px;
 	white-space:nowrap;
+	width: 30%;
 }
 
 .signinerror {

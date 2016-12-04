@@ -14,6 +14,10 @@ $$.doIndexNavigation = function () {
 	}
 };
 
+$$.goHome = function() {
+	Application.main();
+}
+
 $$.doErrorNavigation = function () {
 	$$.loadthtml($$.S_ERROR_THTML);
 };
