@@ -22,26 +22,7 @@ function bootstrap() {
 	initLogs();
 
 	/* Start http server */
-	var httpd = http.createServer(function(req, res) {
-		access.info("GET: " + req.url);
-		
-		var fileRequested = path.resolve(conf.webroot) + "/" + url.parse(req.url).pathname;
-		
-		fs.exists(fileRequested, function(exists) {
-		    if(!exists) {
-		    	error.error("404: " + req.url);
-		    	res.writeHead(404, {"Content-Type": "text/plain"});
-		    	res.write("404 Path Not Found.\n");
-		    	res.end();
-		    	return;
-		    }
-		
-			if (fs.statSync(fileRequested).isDirectory()) fileRequested += "/" + conf.indexfile;
-		 
-			sendFile(fileRequested, res);
-		});
-		 
-	}).listen(conf.port);
+	var httpd = http.createServer(function(req, res) {handleRequest(req, res);}).listen(conf.port);
 	
 	access.info("Server started on port: " + conf.port);
 	console.log("Server started on port: " + conf.port);
@@ -69,22 +50,41 @@ function initLogs() {
 	error = new logger.Logger(conf.errorlog, 100*1024*1024);
 }
 
+function handleRequest(req, res) {
+	access.info("GET: " + req.url);
+		
+	var fileRequested = path.resolve(conf.webroot) + "/" + url.parse(req.url).pathname;
+	
+	fs.access(fileRequested, fs.constants.R_OK, function(err) {
+		if (err) sendError(res, 404, "Path Not Found.");
+		else {
+			if (fs.stat(fileRequested, function(err, stats) {
+				if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
+				sendFile(fileRequested, res);
+			}));
+		}
+	});
+}
+
 function sendFile(fileRequested, res) {
-	fs.readFile(fileRequested, "binary", function(err, file) {
-		if(err) {
-			error.error("500: " + err);
-  			res.writeHead(500, {"Content-Type": "text/plain"});
-    		res.write(err + "\n");
-    		res.end();
-    		return;
-  		}
-  	
-      	access.info("Sending: " + fileRequested);
-      	var headers = {};
-      	var mime = conf.mimeTypes[path.extname(fileRequested)];
-      	if (mime) headers["Content-Type"] = mime;
-      	res.writeHead(200, headers);
-      	res.write(file, "binary");
-      	res.end();
-    });
+	fs.readFile(fileRequested, "binary", function(err, data) {
+		if (err) sendError(res, 500, err);
+		else {
+			access.info("Sending: " + fileRequested);
+			var headers = {};
+			var mime = conf.mimeTypes[path.extname(fileRequested)];
+			if (mime) headers["Content-Type"] = mime;
+			res.writeHead(200, headers);
+			res.write(data, "binary");
+			res.end();
+		}
+	});
+}
+
+function sendError(res, code, message) {
+	error.error(code + ": " + req.url);
+	res.writeHead(code, {"Content-Type": "text/plain"});
+	res.write(code + " " + message + "\n");
+	res.end();
+	return;
 }
