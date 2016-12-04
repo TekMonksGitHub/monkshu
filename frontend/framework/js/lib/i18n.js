@@ -5,24 +5,30 @@
 
 $$.lang = function(lang, doRefresh) {
 	$$.session().put($$.LANGUAGE, lang);
-	$$._initI18N();
-	
-	if ((doRefresh != null) && (!doRefresh)) return;
-	else $$.refresh();
+	$$._initI18N(function() {
+		if ((doRefresh != null) && (!doRefresh)) return;
+		else $$.refresh();
+	});
 };
 
-$$._initI18N = function () {
+$$._initI18N = function (callback) {
 	
 	if ($$.session().get($$.LANGUAGE) == null)
 		$$.session().put($$.LANGUAGE, "en");
 		
 	var lang = $$.session().get($$.LANGUAGE);
 	
-	var json = $$.get_sync($$.S_I18N_FRAMEWORK_PREFIX+lang+$$.S_I18N_EXTENSION);
-	if (json !== undefined) var i18nFR = JSON.parse(json);
-	json = $$.get_sync($$.S_I18N_APP_PREFIX+lang+$$.S_I18N_EXTENSION);
-	if (json !== undefined) var i18nAR = JSON.parse(json);
-	
+	$$.get($$.S_I18N_FRAMEWORK_PREFIX+lang+$$.S_I18N_EXTENSION, function(json){
+		if (json !== undefined) var i18nFR = JSON.parse(json);
+		$$.get($$.S_I18N_APP_PREFIX+lang+$$.S_I18N_EXTENSION, function(json){
+			if (json !== undefined) var i18nAR = JSON.parse(json);
+			addi18NVariables(i18nFR, i18nAR);
+			callback();
+		});
+	});
+}
+
+function addi18NVariables(i18nFR, i18nAR) {
 	if (i18nFR !== undefined) {
 		var i18nFramework = {};
 		i18nFramework["i18n"] = {};
@@ -43,4 +49,4 @@ $$._initI18N = function () {
 	} else if (i18nApp !== undefined) {
 		$$.S_I18N_VAR = i18nApp;
 	}
-};
+}

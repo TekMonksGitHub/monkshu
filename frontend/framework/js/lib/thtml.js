@@ -49,7 +49,7 @@ $$._thtmlloadhtml = function(html) {
 	document.documentElement.innerHTML = html;
  
 	// Including script files (as innerHTML does not execute the script and css included)
-	var scriptToInclude = document.getElementsByTagName('script');
+	var scriptToInclude = document.getElementsByTagName("script");
 	for (var n = 0; n < scriptToInclude.length; n++) {
 		if (scriptToInclude[n].src !== "") $$.get(scriptToInclude[n].src, function(src) {
 	  		if (src !== undefined) window.eval(src); });
@@ -58,7 +58,7 @@ $$._thtmlloadhtml = function(html) {
   	}
  
 	// Including css files
-   	var styleToInclude = document.getElementsByTagName('link');
+   	var styleToInclude = document.getElementsByTagName("link");
    	for (var n = 0; n < styleToInclude.length; n++)
    		document.head.appendChild(styleToInclude[n]);
 
