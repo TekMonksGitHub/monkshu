@@ -21,7 +21,7 @@
 	<div class="signinerror" id="divsigninerror">{{i18n.BadLogin}}</div>
 </div>
 
-<div class="regbox">
+<div class="regbox" id="regbox">
 	<input id="regid" type="text" size="20" placeholder="{{i18n.DesiredUserID}}" 
 		onkeypress="$$._registerIfEnterPressed(event)" class="inputbox">
 	<input id="regpass" type="password" size="20" placeholder="{{i18n.Password}}" 

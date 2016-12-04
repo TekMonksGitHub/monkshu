@@ -3,6 +3,14 @@
  * License: MIT - see enclosed license.txt file.
  */
 
+init();
+
+function init() {
+	if (!$$.S_SUPPORTS_REGISTRATION) {
+		$$.elID("regbox").style.visibility = "hidden";
+	}
+}
+
 $$._signin = function() {
 	$$._registerClickHandlers();
 	$$.session().put("org_monkshu_login_signInOrRegisterClicked", true);

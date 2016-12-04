@@ -24,6 +24,20 @@ $$.refresh = function() {
 		$$.session().get("$$__thtml_last_obj"));
 };
 
+$$.render = function(html, obj) {
+	Mustache.parse(html);
+	return Mustache.render(html, obj);
+};
+
+$$.restRender = function(html, url, req, callback) {
+	$$.rest(url, req, function(json) {
+		if (json) {
+			Mustache.parse(html);
+			callback(Mustache.render(html, json));
+		} else callback(html);
+	});
+};
+
 ////////////////////////////////////////////////
 // Private functions
 ////////////////////////////////////////////////  
