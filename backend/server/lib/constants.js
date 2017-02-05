@@ -23,3 +23,7 @@ exports.APACHE_CRT 			= '/etc/apache2/ssl/apache.crt';
 exports.SALT_PW = '$2a$10$VFyiln/PpFyZc.ABoi4ppf';
 exports.USERS_DB_PATH = path.resolve(rootdir+"/../db/users");
 exports.USERS_FILE = path.resolve(rootdir+"/../db/users/users.json");
+
+/* Result objects */
+exports.FALSE_RESULT = {"result":false};
+exports.TRUE_RESULT = {"result":true};
