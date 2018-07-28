@@ -27,3 +27,7 @@ exports.USERS_FILE = path.resolve(rootdir+"/../db/users/users.json");
 /* Result objects */
 exports.FALSE_RESULT = {"result":false};
 exports.TRUE_RESULT = {"result":true};
+
+/* Encryption constants */
+exports.CRPT_ALGO = "aes-256-ctr";
+exports.CRYPT_PASS = "92457kwq2941low438938jwkj3029rqqox";

@@ -5,6 +5,8 @@
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
+var crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
+var urlMod = require("url");
 
 exports.bootstrap = bootstrap;
 
@@ -52,7 +54,9 @@ function initAndRunTransportLoop() {
 				if (respObj) {
 					log.info("Got result: " + log.truncate(JSON.stringify(respObj)));
 					res.writeHead(200, {"Content-Type" : "application/json"});
-					res.write(JSON.stringify(respObj));
+					if (serviceregistry.isEncrypted(urlMod.parse(req.url).pathname))
+						res.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}");
+					else res.write(JSON.stringify(respObj));
 					res.end();
 				} else {
 					log.info("Sending 404 for: " + req.url);
@@ -68,13 +72,19 @@ function initAndRunTransportLoop() {
 function doService(url, data, callback) {
 	log.info("Got request for the url: " + url);
 	
-	var service = serviceregistry.getService(url);
+	var endPoint = urlMod.parse(url, true).pathname;
+	var query = urlMod.parse(url, true).query;
+	var service = serviceregistry.getService(endPoint);
 	log.info("Looked up service, calling: " + service);
 	
 	if (service) {
 		var jsonObj;
 		try {
-			jsonObj = JSON.parse(data);
+			if (serviceregistry.isGet(endPoint) && serviceregistry.isEncrypted(endPoint)) 
+				jsonObj = query.data ? urlMod.parse(endPoint+"?"+crypt.decrypt(query.data)).query : {};
+			else if (serviceregistry.isGet(endPoint) && !serviceregistry.isEncrypted(endPoint)) jsonObj = query;
+			else if (serviceregistry.isEncrypted(endPoint)) jsonObj = JSON.parse(crypt.decrypt(data));
+			else jsonObj = JSON.parse(data);
 		} catch (err) {
 			log.info("Input JSON parser error: " + err);
 			log.info("Bad JSON input, calling with empty object: " + url);
