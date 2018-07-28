@@ -3,8 +3,8 @@
  * License: MIT - see enclosed LICENSE file.
  */
 
-var fs = require('fs');
-var urlMod = require('url');
+var fs = require("fs");
+var urlMod = require("url");
 var servreg;
 
 function initSync() {
@@ -21,12 +21,26 @@ function getService(url) {
 }
 
 function isEncrypted(url) {
-	if (servreg[url]) return urlMod.parse(servreg[url], true).query.encrypted;
+	if (servreg[url]) {
+		var query = urlMod.parse(servreg[url], true).query;
+		return (query.encrypted && (query.encrypted.toLowerCase() === "true"));
+	}
 	else return false;
 }
 
 function isGet(url) {
-	if (servreg[url]) return urlMod.parse(servreg[url], true).query.get;
+	if (servreg[url]) {
+		var query = urlMod.parse(servreg[url], true).query;
+		return (query.get && (query.get.toLowerCase() === "true"));
+	}
+	else return false;
+}
+
+function checkKey(url,req) {
+	if (servreg[url]) {
+		let keyExpected = urlMod.parse(servreg[url], true).query.key;
+		return (keyExpected == req.key);
+	}
 	else return false;
 }
 
@@ -61,6 +75,7 @@ module.exports = {
 	getService : getService,
 	isEncrypted : isEncrypted,
 	isGet : isGet,
+	checkKey : checkKey,
 	addAPI : addAPI,
 	deleteAPI : deleteAPI,
 	listServices : listServices

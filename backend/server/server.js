@@ -2,10 +2,12 @@
  * Node.js, Main server bootstrap file.
  * 
  * (C) 2015, 2016 TekMonks. All rights reserved.
+ * License: MIT - see enclosed LICENSE file.
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
 var crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
+var utils = require(CONSTANTS.LIBDIR+"/utils.js");
 var urlMod = require("url");
 
 exports.bootstrap = bootstrap;
@@ -81,16 +83,18 @@ function doService(url, data, callback) {
 		var jsonObj;
 		try {
 			if (serviceregistry.isGet(endPoint) && serviceregistry.isEncrypted(endPoint)) 
-				jsonObj = query.data ? urlMod.parse(endPoint+"?"+crypt.decrypt(query.data)).query : {};
+				jsonObj = query.data ? utils.queryToObject(crypt.decrypt(query.data)) : {};
 			else if (serviceregistry.isGet(endPoint) && !serviceregistry.isEncrypted(endPoint)) jsonObj = query;
-			else if (serviceregistry.isEncrypted(endPoint)) jsonObj = JSON.parse(crypt.decrypt(data));
+			else if (serviceregistry.isEncrypted(endPoint)) jsonObj = JSON.parse(crypt.decrypt(JSON.parse(data).data));
 			else jsonObj = JSON.parse(data);
 		} catch (err) {
 			log.info("Input JSON parser error: " + err);
 			log.info("Bad JSON input, calling with empty object: " + url);
 			jsonObj = {};
 		}
-		require(service).doService(jsonObj, callback);
+
+		if (!serviceregistry.checkKey(endPoint, jsonObj)) {log.error("Bad API key: "+url); callback(CONSTANTS.FALSE_RESULT);}
+		else require(service).doService(jsonObj, callback);
 	}
 	else {
 		log.info("Service not found: " + url);

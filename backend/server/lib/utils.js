@@ -20,6 +20,20 @@ function copyFile(source, target, cb) {
 	}
 }
 
+function queryToObject(query) {
+    let jsObj = {};
+    let pairs = query.split("&");
+    pairs.forEach((pair) => {
+        let keyVal = pair.split("=");
+        if (jsObj[keyVal[0]]) {
+            if (jsObj[keyVal[0]].constructor == Array) jsObj[keyVal[0]].push(decodeURIComponent(keyVal[1]));
+            else jsObj[keyVal[0]] = [jsObj[keyVal[0]], decodeURIComponent(keyVal[1])];
+        } else jsObj[keyVal[0]] = decodeURIComponent(keyVal[1]);
+    });
+
+    return jsObj;
+}
+
 function getDateTime() {
 
     var date = new Date();
@@ -47,5 +61,6 @@ function getDateTime() {
 
 module.exports = {
 	copyFile : copyFile,
-	getDateTime : getDateTime
+    getDateTime : getDateTime,
+    queryToObject : queryToObject
 };
