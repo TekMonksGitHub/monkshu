@@ -39,7 +39,9 @@ function isGet(url) {
 function checkKey(url,req) {
 	if (servreg[url]) {
 		let keyExpected = urlMod.parse(servreg[url], true).query.key;
-		return (keyExpected == req.key);
+		let retVal = (keyExpected == req[CONSTANTS.APIKEY]);
+		delete req[CONSTANTS.APIKEY];
+		return retVal;
 	}
 	else return false;
 }
