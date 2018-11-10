@@ -11,7 +11,7 @@ create_valid_hash_path : function(data, callback) {
 
 	bcrypt.hash(data, SALT_PW, function(err, path_hash) {
 		
-		if (err) callback();
+		if (err) {callback(); return;}
 		
 		// URL encoding removes characters which are illegal for paths, like "\" or "/" etc.
 		var encoded_hash = encodeURIComponent(path_hash);
