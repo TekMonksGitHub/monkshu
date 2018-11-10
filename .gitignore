@@ -5,4 +5,4 @@ backend/server/services
 backend/server/conf/service_registry.json
 frontend/app
 .project
-.dummy
+!.dummy
