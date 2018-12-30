@@ -7,10 +7,10 @@ var http = require("http");
 
 exports.init = init;
 
-function init(port) {
+function init(port, host="::") {
 	/* create HTTP server */
-	log.info("Attaching socket listener on port: " + port);
-	exports.connection = http.createServer(function(req, res) {
+	LOG.info(`Attaching socket listener on ${host}:${port}`);
+	exports.connection = http.createServer((_req, res) => {
 		res.setHeader("Access-Control-Allow-Origin", "*");
-	}).listen(port);
+	}).listen(port, host);
 }

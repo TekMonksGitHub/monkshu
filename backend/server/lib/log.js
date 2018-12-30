@@ -3,39 +3,63 @@
  * License: MIT - see enclosed LICENSE file.
  */
 
-var fs = require("fs");
-var utils = require(CONSTANTS.LIBDIR+"/utils.js");
+const fs = require("fs");
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
+const log_conf = require(CONSTANTS.LOGSCONF);
 
-function initGlobalLogger() {
+function initGlobalLogger(logName) {
 	/* create the logger */
-	if (!fs.existsSync(CONSTANTS.LOGSDIR)) {fs.mkdirSync(CONSTANTS.LOGSDIR);}
+	if (!fs.existsSync(CONSTANTS.LOGDIR)) {fs.mkdirSync(CONSTANTS.LOGDIR);}
+	let filewriter = 
+		require(`${CONSTANTS.LIBDIR}/FileWriter.js`).createFileWriter(logName,log_conf.closeTimeOut,"utf8");
 	
-	global.log = new Logger(CONSTANTS.ACCESSLOG, 100*1024*1024);	// 100 MB log max
+	global.LOG = new Logger(logName, log_conf.max_log_mb*1024*1024, filewriter);	// 100 MB log max
 	
-	log.info("*************************************");
-	log.info("*************************************");
-	log.info("Logging subsystem initialized.");
+	LOG.info("*************************************", true);
+	LOG.info("*************************************", true);
+	LOG.info("Logging subsystem initialized.", true);
 }
 
 exports.initGlobalLogger = initGlobalLogger;
 
-Logger = function(path, maxsize) {
+Logger = function(path, maxsize, filewriter) {
 	this.path = path;
 	this.maxsize = maxsize;
+	this.filewriter = filewriter;
 };
 
-Logger.prototype.info = function(s, sync) {Logger.writeFile("info", this.path, s, sync);};
+Logger.prototype.info = function(s, sync) {this.writeFile("info", s, sync);}
 
-Logger.prototype.debug = function(s, sync) {Logger.writeFile("debug", this.path, s, sync);};
+Logger.prototype.debug = function(s, sync) {if (log_conf.debug) this.writeFile("debug", s, sync);}
 
-Logger.prototype.error = function(s, sync) {Logger.writeFile("error", this.path, s, sync);};
+Logger.prototype.error = function(s, sync) {this.writeFile("error", s, sync);}
 
 Logger.prototype.truncate = function(s) {return s.length > CONSTANTS.MAX_LOG ? s.substring(0, CONSTANTS.MAX_LOG) : s;}
 
+Logger.prototype.console = function(s) {
+	this.origLog(s?s.trim():s);						// send to console or debug console, trimmed
+	this.oldStdoutWrite.call(process.stdout, s);	// send to process' STDOUT
+}
+
 Logger.prototype.overrideConsole = function() {
-	global.console.log = function() {log.info(
-		"[console] " + require("util").format.apply(null, arguments)); 
+	this.origLog = global.console.log;
+	this.oldStdoutWrite = process.stdout.write;
+	this.oldStderrWrite = process.stderr.write;
+
+	global.console.log = function() {
+		LOG.info(`[console] ${arguments[0]}`); 
 	};
+	process.stdout.write = function() {
+		LOG.info(`[stdout] ${arguments[0]}`);
+	}
+	process.stderr.write = function() {
+		LOG.error(`[stderr] ${arguments[0]}`);
+	}
+	process.on('uncaughtException', function(err) {
+		LOG.error(err && err.stack ? err.stack : err, true);
+		this.oldStderrWrite.call(process.stderr, "EXIT ON CRITICAL ERROR!!! Check Logs.");
+		process.exit(1);
+	});
 };
 
 Logger.prototype.getLogContents = function(callback) {
@@ -45,21 +69,25 @@ Logger.prototype.getLogContents = function(callback) {
 	});
 };
 
-Logger.writeFile = function(level, path, s, sync) {
-	var msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+JSON.stringify(s)+'}\n';
+Logger.prototype.writeFile = function(level, s, sync) {
+	let msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+JSON.stringify(s)+'}\n';
 	
 	if (sync === undefined) {
-		fs.appendFile(path, msg, function(err) {
+		this.filewriter.writeFile(msg, err => {
 			if (err) { 
-				console.log("Logger error!");
-				console.log(msg);
+				this.origLog("Logger error!");
+				this.origLog(msg);
+				this.oldStderrWrite.call(process.stderr, "Logger error!\n");
+				this.oldStderrWrite.call(process.stderr, msg);
 			}
 		});
 	} else {
-		try {fs.appendFileSync(path, msg);}
+		try {fs.appendFileSync(this.path, msg);}
 		catch (err){
-			console.log("Logger error!");
-			console.log(msg);
+			(this.origLog||console.log)("Logger error!");
+			(this.origLog||console.log)(msg);
+			(this.oldStderrWrite||process.stderr.write).call(process.stderr, "Logger error!\n");
+			(this.oldStderrWrite||process.stderr.write).call(process.stderr, msg);
 		};
 	}
 };

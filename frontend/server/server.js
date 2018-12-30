@@ -1,16 +1,16 @@
 /* 
- * A very simple, static http GET server. Do not use in production.
+ * A very simple, static http GET server. Suggest to not use in production.
  * 
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  */
 
 /* Modules required */
-var fs = require("fs");
-var path = require("path");
-var http = require("http");
-var url = require("url");
-var access; var error;
+const fs = require("fs");
+const path = require("path");
+const http = require("http");
+const url = require("url");
+let access; let error;
 
 exports.bootstrap = bootstrap;
 
@@ -18,18 +18,20 @@ exports.bootstrap = bootstrap;
 if (require("cluster").isMaster == true) bootstrap();	
 
 function bootstrap() {
-	initConf();
-	initLogs();
+	initConfSync();
+	initLogsSync();
 
 	/* Start http server */
-	var httpd = http.createServer(function(req, res) {handleRequest(req, res);}).listen(conf.port);
+	let httpd = http.createServer((req, res) => handleRequest(req, res));
+	httpd.setTimeout(conf.timeout);
+	httpd.listen(conf.port, conf.host||"::");
 	
-	access.info("Server started on port: " + conf.port);
-	console.log("Server started on port: " + conf.port);
+	access.info(`Server started on ${conf.host||"::"}:${conf.port}`);
+	console.log(`Server started on ${conf.host||"::"}:${conf.port}`);
 }
 
-function initConf() {
-	global.conf = require(__dirname + "/conf/httpd.json");
+function initConfSync() {
+	global.conf = require(`${__dirname}/conf/httpd.json`);
 	conf.webroot = path.resolve(conf.webroot);	// normalize webroot path
 	conf.logdir = path.resolve(conf.logdir);	// normalize logdir path
 	conf.libdir = path.resolve(conf.libdir);	// normalize libdir path
@@ -37,7 +39,7 @@ function initConf() {
 	conf.errorlog = path.resolve(conf.errorlog);	// normalize errorlog path
 }
 
-function initLogs() {
+function initLogsSync() {
 	/* Init - Server bootup */
 	console.log("Starting...");
 	console.log("Initializing the logs.");
@@ -45,24 +47,30 @@ function initLogs() {
 	/* Init logging */
 	if (!fs.existsSync(conf.logdir)) {fs.mkdirSync(conf.logdir);}
 		
-	var logger = require(conf.libdir+"/Logger.js");	
-	access = new logger.Logger(conf.accesslog, 100*1024*1024);
-	error = new logger.Logger(conf.errorlog, 100*1024*1024);
+	let Logger = require(conf.libdir+"/Logger.js").Logger;	
+	access = new Logger(conf.accesslog, 100*1024*1024);
+	error = new Logger(conf.errorlog, 100*1024*1024);
 }
 
 function handleRequest(req, res) {
-	access.info("GET: " + req.url);
-		
-	var fileRequested = path.resolve(conf.webroot) + "/" + url.parse(req.url).pathname;
+	access.info(`GET: ${req.url}`);
+
+	let pathname = url.parse(req.url).pathname;
+	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
+
+	// don't allow reading the server tree, if requested
+	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) 
+		{sendError(req, res, 404, "Path Not Found."); return;}
 	
 	fs.access(fileRequested, fs.constants.R_OK, function(err) {
-		if (err) sendError(req, res, 404, "Path Not Found.");
-		else {
-			if (fs.stat(fileRequested, function(err, stats) {
-				if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
-				sendFile(fileRequested, req, res);
-			}));
-		}
+		if (err) {sendError(req, res, 404, "Path Not Found."); return;}
+
+		fs.stat(fileRequested, function(err, stats) {
+			if (err) {sendError(req, res, 404, "Path Not Found.");  return;}
+			
+			if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
+			sendFile(fileRequested, req, res);
+		});
 	});
 }
 
@@ -70,9 +78,9 @@ function sendFile(fileRequested, req, res) {
 	fs.readFile(fileRequested, "binary", function(err, data) {
 		if (err) sendError(req, res, 500, err);
 		else {
-			access.info("Sending: " + fileRequested);
-			var headers = {};
-			var mime = conf.mimeTypes[path.extname(fileRequested)];
+			access.info(`Sending: ${fileRequested}`);
+			let headers = {};
+			let mime = conf.mimeTypes[path.extname(fileRequested)];
 			if (mime) headers["Content-Type"] = mime;
 			res.writeHead(200, headers);
 			res.write(data, "binary");
@@ -82,9 +90,18 @@ function sendFile(fileRequested, req, res) {
 }
 
 function sendError(req, res, code, message) {
-	error.error(code + ": " + req.url);
+	error.error(`${code}: ${req.url}`);
 	res.writeHead(code, {"Content-Type": "text/plain"});
-	res.write(code + " " + message + "\n");
+	res.write(`${code} ${message}\n`);
 	res.end();
-	return;
+}
+
+function isSubdirectory(child, parent) { // from: https://stackoverflow.com/questions/37521893/determine-if-a-path-is-subdirectory-of-another-in-node-js
+	child = path.resolve(child); parent = path.resolve(parent);
+
+	if (parent.toLowerCase() == child.toLowerCase()) return true;	// a directory is its own subdirectory (remember ./)
+
+	const relative = path.relative(parent, child);
+	const isSubdir = !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+	return isSubdir;
 }

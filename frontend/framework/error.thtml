@@ -15,7 +15,7 @@ License: MIT - see enclosed license.txt file.
 </head>
 
 <body>
-<script>document.title = $$.S_I18N_VAR.i18n.Title + " - Error";</script>
+<script>document.title = {{i18n.Title}} + " - Error";</script>
 
 <div id="navbar">
 	<span id="navitemlefttight" onclick="$$.doIndexNavigation()"><img src="/app/img/back.png"></span>

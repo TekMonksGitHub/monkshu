@@ -1,8 +1,6 @@
-backend/server/logs
-frontend/server/logs
-backend/db
-backend/server/services
-backend/server/conf/service_registry.json
-frontend/app
-.project
-!.dummy
+backend/server/logs/*
+frontend/server/logs/*
+backend/apps/*
+frontend/apps/*
+!backend/apps/.dummy
+!frontend/apps/.dummy

@@ -2,8 +2,8 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
-var fs = require("fs");
-var utils = require(conf.libdir+"/utils.js");
+const fs = require("fs");
+const utils = require(conf.libdir+"/utils.js");
 
 Logger = function(path, maxsize) {
 	this.path = path;

@@ -3,14 +3,14 @@
  * License: MIT - see enclosed LICENSE file.
  */
 
-var fs = require("fs");
+const fs = require("fs");
 
 function copyFile(source, target, cb) {
-	var cbCalled = false;
+	let cbCalled = false;
 
-	var rd = fs.createReadStream(source);
+	let rd = fs.createReadStream(source);
 	rd.on("error", function(err) {done(err);});
-	var wr = fs.createWriteStream(target);
+	let wr = fs.createWriteStream(target);
 	wr.on("error", function(err) {done(err);});
 	wr.on("close", function(ex) {done();});
 	rd.pipe(wr);
@@ -36,31 +36,37 @@ function queryToObject(query) {
 
 function getDateTime() {
 
-    var date = new Date();
+    let date = new Date();
 
-    var hour = date.getHours();
+    let hour = date.getHours();
     hour = (hour < 10 ? "0" : "") + hour;
 
-    var min  = date.getMinutes();
+    let min  = date.getMinutes();
     min = (min < 10 ? "0" : "") + min;
 
-    var sec  = date.getSeconds();
+    let sec  = date.getSeconds();
     sec = (sec < 10 ? "0" : "") + sec;
 
-    var year = date.getFullYear();
+    let year = date.getFullYear();
 
-    var month = date.getMonth() + 1;
+    let month = date.getMonth() + 1;
     month = (month < 10 ? "0" : "") + month;
 
-    var day  = date.getDate();
+    let day  = date.getDate();
     day = (day < 10 ? "0" : "") + day;
 
     return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
 
 }
 
+function getTimeStamp() {
+    let hrTime = process.hrtime();
+    return hrTime[0] * 1000000000 + hrTime[1];
+}
+
 module.exports = {
 	copyFile : copyFile,
     getDateTime : getDateTime,
-    queryToObject : queryToObject
+    queryToObject : queryToObject,
+    getTimeStamp : getTimeStamp
 };

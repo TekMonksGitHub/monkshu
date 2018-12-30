@@ -1,31 +1,32 @@
 /* 
- * (C) 2015 TekMonks. All rights reserved.
+ * (C) 2015 - 2018 TekMonks. All rights reserved.
  */
-var crypto = require("crypto");
+if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
-function encrypt(text) {
-	var iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0,16);
-	var password_hash = crypto.createHash("md5").update(CONSTANTS.CRYPT_PASS, "utf-8").digest("hex").toUpperCase();
-  var cipher = crypto.createCipheriv(CONSTANTS.CRPT_ALGO, password_hash, iv);
-  var crypted = cipher.update(text,"utf8","hex");
-  crypted += cipher.final("hex");
-  return crypted+iv;
+const crypto = require("crypto");
+const crypt = require(CONSTANTS.CRYPTCONF);
+
+function encrypt(text, key = crypt.key) {
+	let iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0,16);
+	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
+	let cipher = crypto.createCipheriv(crypt.crypt_algo, password_hash, iv);
+	let crypted = cipher.update(text,"utf8","hex");
+	crypted += cipher.final("hex");
+	return crypted+iv;
 }
  
-function decrypt(text) {
-	var iv = text.slice(text.length-16, text.length);
+function decrypt(text, key = crypt.key) {
+	let iv = text.slice(text.length-16, text.length);
 	text = text.substring(0, text.length-16);
-	var password_hash = crypto.createHash("md5").update(CONSTANTS.CRYPT_PASS, "utf-8").digest("hex").toUpperCase();
-  var decipher = crypto.createDecipheriv(CONSTANTS.CRPT_ALGO, password_hash, iv);
-  var decrypted = decipher.update(text, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
+	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
+	let decipher = crypto.createDecipheriv(crypt.crypt_algo, password_hash, iv);
+	let decrypted = decipher.update(text, "hex", "utf8");
+	decrypted += decipher.final("utf8");
+	return decrypted;
 }
 
 if (require.main === module) {
-	global.CONSTANTS = require(__dirname + "/constants.js");
-	
-	var args = process.argv.slice(2);
+	let args = process.argv.slice(2);
 	
 	if (args.length < 2) {
 		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt>");
