@@ -9,19 +9,31 @@ import {i18n} from "/framework/js/i18n.mjs";
 
 const DOM_PARSER = new DOMParser();
 
-async function loadPage(url, language = "en", dataModels = {}) {
+async function loadPage(url, dataModels={}) {
+	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
+	let history = session.get("__org_monkshu_router_history"); let hash;
+
 	try {
-		loadComponent(url, document.documentElement, language, dataModels);
-		session.set("__org_monkshu_router_last_page", [url, language, dataModels]);
+		if (url.indexOf('#') == -1) {
+			hash = btoa(url);
+			window.history.pushState(null, null, new URL(window.location.href).pathname+"#"+hash);
+			history[hash] = [url, dataModels];
+			session.set("__org_monkshu_router_history", history);
+		} else {
+			hash = url.substring(url.indexOf('#')+1);
+			url = atob(hash);
+			if (!history[hash]) history[hash] = [url,"en",{}];
+		}
+		
+		loadComponent(history[hash][0], document.documentElement, history[hash][1]);
 	} catch (err) {throw err}
 }
 
-async function loadComponent(url, element, language = "en", dataModels) {
+async function loadComponent(url, element, dataModels={}) {
 	try {
 		url = new URL(url, window.location).href;        // Normalize
-
 		let [html,_, i18nObj] = await Promise.all([
-			xhr.get(url), $$.require("/framework/3p/mustache.min.js"), i18n.getI18NObject(language)]);
+			xhr.get(url), $$.require("/framework/3p/mustache.min.js"), i18n.getI18NObject(session.get(APP_CONSTANTS.LANG_ID))]);
 		dataModels["i18n"] = i18nObj;
 		
 		Mustache.parse(html);
@@ -43,7 +55,16 @@ async function loadComponent(url, element, language = "en", dataModels) {
 	} catch (err) {throw err}
 }
 
-const reload = (language = session.get("__org_monkshu_router_last_page")[1]) => loadPage(session.get("__org_monkshu_router_last_page")[0], 
-	language, session.get("__org_monkshu_router_last_page")[2]);
+function isInHistory(url) {
+	let history = session.get("__org_monkshu_router_history");
+	if (!history) return false;
 
-export const router = {loadPage, loadComponent, reload};
+	if (url.indexOf('#') == -1) return false;
+	
+	let hash = url.substring(url.indexOf('#')+1);
+	if (!history[hash]) return false; else return true;
+}
+
+function reload() {loadPage(window.location.href);}
+
+export const router = {reload, loadPage, loadComponent, isInHistory};
