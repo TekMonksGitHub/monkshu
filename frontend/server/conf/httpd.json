@@ -18,6 +18,5 @@
 		".ttf" : "application/x-font-truetype"
 	},
 	"timeout": 120000,
-	"restrictServerTree": true,
-	"fileIOBuffer": 102400
+	"restrictServerTree": true
 }
