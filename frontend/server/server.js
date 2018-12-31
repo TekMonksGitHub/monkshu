@@ -75,16 +75,17 @@ function handleRequest(req, res) {
 }
 
 function sendFile(fileRequested, req, res) {
-	fs.readFile(fileRequested, "binary", function(err, data) {
+	fs.open(fileRequested, "r", (err, fd) => {	
 		if (err) sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
-			let headers = {};
 			let mime = conf.mimeTypes[path.extname(fileRequested)];
-			if (mime) headers["Content-Type"] = mime;
-			res.writeHead(200, headers);
-			res.write(data, "binary");
-			res.end();
+			res.writeHead(200, mime ? {"Content-Type":mime} : {});
+
+			fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true})
+			.on("data", chunk => res.write(chunk, "binary"))
+			.on("error", err => {res.end(); error.error(`500: ${req.url}, Server error: ${err}`);})
+			.on("end", _ => res.end());
 		}
 	});
 }
