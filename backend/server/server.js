@@ -21,7 +21,7 @@ function bootstrap() {
 	
 	/* Init the logs */
 	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/LOG.js").initGlobalLogger(CONSTANTS.LOGMAIN);
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLogger(CONSTANTS.LOGMAIN);
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
