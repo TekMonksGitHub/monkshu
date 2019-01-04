@@ -2,12 +2,8 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  */
-
-import {xhr} from "/framework/js/xhr.mjs";
 import {session} from "/framework/js/session.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
-
-const DOM_PARSER = new DOMParser();
 
 async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
@@ -25,37 +21,46 @@ async function loadPage(url, dataModels={}) {
 			if (!history[hash]) history[hash] = [url,"en",{}];
 		}
 		
-		loadComponent(history[hash][0], document.documentElement, history[hash][1]);
+		let html = await loadHTML(url, dataModels);
+		document.open("text/html");
+		document.write(html);
+		document.close();
 	} catch (err) {throw err}
 }
 
-async function loadComponent(url, element, dataModels={}) {
+async function loadHTML(url, dataModels) {
 	try {
 		url = new URL(url, window.location).href;        // Normalize
 		let [html,_, i18nObj] = await Promise.all([
-			xhr.get(url), $$.require("/framework/3p/mustache.min.js"), i18n.getI18NObject(session.get(APP_CONSTANTS.LANG_ID))]);
+			fetch(url, {mode: "no-cors"}).then(response => response.text()), $$.require("/framework/3p/mustache.min.js"), 
+			i18n.getI18NObject(session.get(APP_CONSTANTS.LANG_ID))]);
+
 		dataModels["i18n"] = i18nObj;
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
 
-		// Including script files (as innerHTML does not execute the script included)
-		let scriptsToInclude = Array.from(DOM_PARSER.parseFromString(html, "text/html").getElementsByTagName("script"));
-		if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
-			if (scriptThis.src && scriptThis.src !== "") await $$.require(scriptThis.src);
-			else {
-				let script = document.createElement("script");
-				script.type = scriptThis.type;
-				script.text = `${scriptThis.innerText}\n//# sourceURL=${url}`;
-				document.head.appendChild(script).parentNode.removeChild(script);
-			}
-		});
-
-		element.innerHTML = html;
+		return html;
 	} catch (err) {throw err}
+} 
+
+function runShadowJSScripts(sourceDom, targetDocument) {
+	// Including script files (as innerHTML does not execute the script included)
+	let scriptsToInclude = Array.from(sourceDom.getElementsByTagName("script"));
+	if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
+		let scriptText;
+		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src)).text();
+		else scriptText = scriptThis.innerText;
+
+		let script = document.createElement("script");
+		script.type = scriptThis.type;
+		script.text = `${scriptText}\n//# sourceURL=${scriptThis.src||window.location.href}`;
+
+		eval(`let document = ${targetDocument}\n${script.text}`);
+	});
 }
 
-function isInHistory(url) {
+function isInHistory(url) {``
 	let history = session.get("__org_monkshu_router_history");
 	if (!history) return false;
 
@@ -67,4 +72,4 @@ function isInHistory(url) {
 
 function reload() {loadPage(window.location.href);}
 
-export const router = {reload, loadPage, loadComponent, isInHistory};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts};

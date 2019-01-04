@@ -19,26 +19,22 @@ $$.import = async (url, scope = window) => {
 }
 
 $$.__loadedJS = {};
-$$.require = url => {
+$$.require = async (url, targetDocument = document) => {
     url = new URL(url, window.location).href;        // Normalize
 
     if (Object.keys($$.__loadedJS).includes(url)) { // already loaded
         let script = document.createElement("script");
         script.text = $$.__loadedJS[url];
-        document.head.appendChild(script).parentNode.removeChild(script);
-        return Promise.resolve();   
-    }
-
-    return new Promise( (resolve, reject) => import("/framework/js/xhr.mjs").
-    then(result => result.xhr.get(url)).
-    then(js => {
+        let scriptNode = script.cloneNode(true);
+        targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
+    } else try {
+        let js = await (await fetch(url, {mode:"no-cors"})).text();
         let script = document.createElement("script");
         script.text = `${js}\n//# sourceURL=${url}`;
         $$.__loadedJS[url] = script.text; 
-        document.head.appendChild(script).parentNode.removeChild(script);
-        resolve();
-    }).
-    catch(err => reject(err)) );
+        let scriptNode = script.cloneNode(true);
+        targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
+    } catch (err) {throw err};
 }
 
 $$.__loadedCSS = [];
@@ -59,14 +55,15 @@ $$.requireCSS = url => {
 }
 
 $$.__loadedJSON = {};
-$$.requireJSON = url => {
+$$.requireJSON = async url => {
     url = new URL(url, window.location).href;        // Normalize
-    if (Object.keys($$.__loadedJSON).includes(url)) return Promise.resolve(JSON.parse($$.__loadedJSON[url]));   // already loaded
 
-    return new Promise( (resolve, reject) => import("/framework/js/xhr.mjs").
-    then(result => result.xhr.get(url)).
-    then(json => {$$.__loadedJSON[url]=json; resolve(JSON.parse(json))}).
-    catch(err => reject(err)) );
+    if (Object.keys($$.__loadedJSON).includes(url)) return $$.__loadedJSON[url];   // already loaded
+    else try {
+        let json = await (await fetch(url, {mode:"no-cors"})).json();
+        $$.__loadedJSON[url]=json; 
+        return json;
+    } catch (err) {throw err};
 }
 
 $$.__loadedPlugins = [];
