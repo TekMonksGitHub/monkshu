@@ -44,9 +44,9 @@ async function loadHTML(url, dataModels) {
 	} catch (err) {throw err}
 } 
 
-function runShadowJSScripts(sourceDom, targetDocument) {
+function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 	// Including script files (as innerHTML does not execute the script included)
-	let scriptsToInclude = Array.from(sourceDom.getElementsByTagName("script"));
+	let scriptsToInclude = Array.from(sourceDocument.querySelectorAll("script"));
 	if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
 		let scriptText;
 		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src)).text();
@@ -56,7 +56,8 @@ function runShadowJSScripts(sourceDom, targetDocument) {
 		script.type = scriptThis.type;
 		script.text = `${scriptText}\n//# sourceURL=${scriptThis.src||window.location.href}`;
 
-		eval(`let document = ${targetDocument}\n${script.text}`);
+		let whereToAppend = documentToRunScriptOn.querySelector("head")
+		whereToAppend.appendChild(script).parentNode.removeChild(script);
 	});
 }
 

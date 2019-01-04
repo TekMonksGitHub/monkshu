@@ -8,7 +8,7 @@ import {router} from "/framework/js/router.mjs";
 function register(name, htmlTemplate, module) {
     module.bindData = data => {
         module.data = data; 
-        module.element.render();
+        module.element.render(false);
     }
 
     // register the web component
@@ -26,29 +26,29 @@ function register(name, htmlTemplate, module) {
             dd.apply(oldDom, diff);
         }
 
-        async render(initialRender = false) {
+        async render(initialRender) {
             let componentHTML = await router.loadHTML(htmlTemplate,module.data||{});
             let templateContent = new DOMParser().parseFromString(componentHTML, "text/html");
             let dom = templateContent.documentElement;
             
             if (module.trueWebComponentMode) {
-                if (initialRender) this.attachShadow({mode: "open"}).appendChild(dom);
+                if (initialRender) {
+                    this.attachShadow({mode: "open"}).appendChild(dom);
+                    router.runShadowJSScripts(this.shadowRoot, this.shadowRoot);
+                    module.shadowRoot = this.shadowRoot;
+                }
                 else if (this.shadowRoot.firstChild) this.constructor._diffApplyDom(this.shadowRoot.firstChild, dom);
-                
-                this.shadowRoot.head = this.shadowRoot.firstChild.firstChild;   // setup head element, just like a real document
-                router.runShadowJSScripts(dom, this.shadowRoot);
-                module.shadowRoot = this.shadowRoot;
             }
             else {  
-                if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, dom);
-                else this.appendChild(dom);
-                module.shadowRoot = document;
+                if (initialRender) {
+                    this.appendChild(dom); 
+                    router.runShadowJSScripts(document, document);
+                    module.shadowRoot = document;
+                } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, dom);
             }
         }
 
-        connectedCallback() {
-            this.render(true); 
-        }
+        connectedCallback() {this.render(true)}
     });
 
     // insert into namespace
