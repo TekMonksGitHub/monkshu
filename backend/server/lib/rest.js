@@ -78,7 +78,7 @@ function putHttps(host, port, path, headers, req, callback) {
 }
 
 function get(host, port, path, headers, req, callback) {
-    if (req) path += "?" + querystring.stringify(req);
+    if (req) path += "?" + (typeof (req) == "object" ? + querystring.stringify(req):req);
 
     let optionsget = {
         host : host,
@@ -92,7 +92,7 @@ function get(host, port, path, headers, req, callback) {
 }
 
 function getHttps(host, port, path, headers, req, callback) {
-    if (req) path += "?" + querystring.stringify(req);
+    if (req) path += "?" + (typeof (req) == "object" ? + querystring.stringify(req):req);
 
     let optionsget = {
         host : host,

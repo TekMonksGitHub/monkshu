@@ -48,7 +48,14 @@ function register(name, htmlTemplate, module) {
             }
         }
 
-        connectedCallback() {this.render(true)}
+        connectedCallback() {
+            this.render(true); 
+            if (this.hasAttribute("onload")) eval(this.getAttribute("onload"));
+        }
+
+        disconnectedCallback() {
+            module.data = null;
+        }
     });
 
     // insert into namespace

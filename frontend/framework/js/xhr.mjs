@@ -1,6 +1,10 @@
 /* 
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
+ * 
+ * *************
+ * * WARNING: Deprecated, use fetch API instead
+ * *************
  */
 
 async function rest(url, type, params) {
