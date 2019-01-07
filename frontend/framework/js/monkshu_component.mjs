@@ -50,7 +50,7 @@ function register(name, htmlTemplate, module, roles) {
             else {  
                 if (initialRender) {
                     this.appendChild(dom); 
-                    router.runShadowJSScripts(document, document);
+                    router.runShadowJSScripts(dom, document);
                     module.shadowRoot = document;
                 } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, dom);
             }
