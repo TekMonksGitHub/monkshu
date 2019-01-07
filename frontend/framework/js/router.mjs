@@ -1,9 +1,10 @@
 /* 
- * (C) 2015 TekMonks. All rights reserved.
+ * (C) 2018 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  */
 import {session} from "/framework/js/session.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
+import { securityguard } from "/framework/js/securityguard.mjs";
 
 async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
@@ -29,8 +30,10 @@ async function loadPage(url, dataModels={}) {
 }
 
 async function loadHTML(url, dataModels) {
+	url = new URL(url, window.location).href;       // Normalize
+	if (!securityguard.isAllowed(url)) return "";	// security block
+
 	try {
-		url = new URL(url, window.location).href;        // Normalize
 		let [html, _, i18nObj] = await Promise.all([
 			fetch(url, {mode: "no-cors"}).then(response => response.text()), 
 			$$.require("/framework/3p/mustache.min.js"), 

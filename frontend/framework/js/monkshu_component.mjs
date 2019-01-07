@@ -4,8 +4,16 @@
  */
 
 import {router} from "/framework/js/router.mjs";
+import {securityguard} from "/framework/js/securityguard.mjs";
 
-function register(name, htmlTemplate, module) {
+function register(name, htmlTemplate, module, roles) {
+    // setup security policies
+    roles.forEach(role => securityguard.addPermission(htmlTemplate, role));
+
+    // check security policy
+    if (!securityguard.isAllowed(htmlTemplate)) return;
+
+    // allow binding of data and dynamic DOM updates
     module.bindData = data => {
         module.data = data; 
         module.element.render(false);
