@@ -7,11 +7,11 @@
 // Cookieless HTML5 Session Support
 ////////////////////////////////////////////////    
 
-const set = (key, item) => sessionStorage.setItem(key, item ? JSON.stringify(item) : null);
-const get = key => sessionStorage.getItem(key) ? JSON.parse(sessionStorage.getItem(key)) : null;
+const set = (key, item) => sessionStorage.setItem(key, item ? JSON.stringify(item) : undefined);
+const get = key => sessionStorage.getItem(key) ? JSON.parse(sessionStorage.getItem(key)) : undefined;
 const remove = key => sessionStorage.removeItem(key);
 const destroy = _ => sessionStorage.clear();
-const contains = key => get(key)!=null;
+const contains = key => get(key)?true:false;
 const keys = _ => Object.keys(sessionStorage);
 
 export const session = {set, get, remove, destroy, contains, keys};

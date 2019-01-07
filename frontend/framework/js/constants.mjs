@@ -4,6 +4,6 @@
  */
 
 const ERROR_THTML = "/framework/error.thtml";
-const LANGUAGE = "com_lc_lang";
+const LANG_ID = "com_monkshu_lang";
 
-export const CONSTANTS = {ERROR_THTML, LANGUAGE};
+export const MONKSHU_CONSTANTS = {ERROR_THTML, LANG_ID};

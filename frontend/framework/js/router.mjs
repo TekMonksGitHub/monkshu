@@ -31,9 +31,10 @@ async function loadPage(url, dataModels={}) {
 async function loadHTML(url, dataModels) {
 	try {
 		url = new URL(url, window.location).href;        // Normalize
-		let [html,_, i18nObj] = await Promise.all([
-			fetch(url, {mode: "no-cors"}).then(response => response.text()), $$.require("/framework/3p/mustache.min.js"), 
-			i18n.getI18NObject(session.get(APP_CONSTANTS.LANG_ID))]);
+		let [html, _, i18nObj] = await Promise.all([
+			fetch(url, {mode: "no-cors"}).then(response => response.text()), 
+			$$.require("/framework/3p/mustache.min.js"), 
+			i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID))]);
 
 		dataModels["i18n"] = i18nObj;
 		

@@ -19,11 +19,11 @@ async function get(key, language="en", refresh=false) {
 
 async function getI18NObject(language="en", refresh=false) {
 	if (!i18nCached[language] || refresh) {
-		let result = await to(import(`${appPath}/i18n/i18n_${language}.mjs`));
-		if (!result.err) i18nCached[language] = result.data.i18n; else throw result.err;
+		try {i18nCached[language] = await import(`${appPath}/i18n/i18n_${language}.mjs`);}
+		catch(err) {throw err}
 	} 
 	
-	return i18nCached[language];
+	return i18nCached[language].i18n;
 }
 
 export const i18n = {init, get, getI18NObject};

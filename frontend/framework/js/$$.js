@@ -7,11 +7,7 @@
 // The global namespace
 ////////////////////////////////////////////////
 
-function to(promise) {
-    return promise.then(data => {return {data}}).catch(err => {return {err}});
-}
-
-function $$() {};
+window.$$ = {};
 
 $$.import = async (url, scope = window) => {
     let result = await import(url);

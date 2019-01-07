@@ -4,8 +4,10 @@
  */
 
 import {i18n} from "/framework/js/i18n.mjs";
+import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 
 export async function bootstrap(appPath) {
+	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS;
 	i18n.init(appPath);
 	window.monkshu_env = {"components":{}};
 
