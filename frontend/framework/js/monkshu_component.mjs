@@ -14,17 +14,26 @@ function register(name, htmlTemplate, module, roles) {
     if (!securityguard.isAllowed(htmlTemplate)) return;
 
     // allow binding of data and dynamic DOM updates
-    module.bindData = data => {
-        module.data = data; 
-        module.element.render(false);
+    module.bindData = (data, id) => {
+        if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
+        else module.data = data; 
+
+        if (id && module.elements[id]) module.elements[id].render(false);
+        else module.element.render(false);
     }
 
+    module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
+
+    module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
+    module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
+
     // register the web component
-    customElements.define(name, class extends HTMLElement {
+    if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
         constructor() {
             super();
-            module.element = this;
+            if (this.id) {if (!module.elements) module.elements = {}; module.elements[this.id] = this;}
+            else module.element = this;
         }
 
         static async _diffApplyDom(oldDom, newDom) {
@@ -35,24 +44,27 @@ function register(name, htmlTemplate, module, roles) {
         }
 
         async render(initialRender) {
-            let componentHTML = await router.loadHTML(htmlTemplate,module.data||{});
-            let templateContent = new DOMParser().parseFromString(componentHTML, "text/html");
-            let dom = templateContent.documentElement;
+            let componentHTML = await router.loadHTML(htmlTemplate,this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{});
+            let templateDocument = new DOMParser().parseFromString(componentHTML, "text/html");
+            let templateRoot = templateDocument.documentElement;
             
             if (module.trueWebComponentMode) {
                 if (initialRender) {
-                    this.attachShadow({mode: "open"}).appendChild(dom);
+                    this.attachShadow({mode: "open"}).appendChild(templateRoot);
                     router.runShadowJSScripts(this.shadowRoot, this.shadowRoot);
-                    module.shadowRoot = this.shadowRoot;
+                    if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=this.shadowRoot;}
+                    else module.shadowRoot = this.shadowRoot;
                 }
-                else if (this.shadowRoot.firstChild) this.constructor._diffApplyDom(this.shadowRoot.firstChild, dom);
+                else if (this.shadowRoot.firstChild) this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot);
             }
             else {  
                 if (initialRender) {
-                    this.appendChild(dom); 
-                    router.runShadowJSScripts(dom, document);
-                    module.shadowRoot = document;
-                } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, dom);
+                    this.appendChild(templateRoot); 
+                    router.runShadowJSScripts(templateRoot, document);
+                    templateRoot.getElementById = id => templateRoot.querySelector(`#${id}`);
+                    if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=templateRoot;}
+                    else module.shadowRoot = templateRoot;
+                } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
         }
 
@@ -62,7 +74,8 @@ function register(name, htmlTemplate, module, roles) {
         }
 
         disconnectedCallback() {
-            module.data = null;
+            delete module.data;
+            delete module.datas;
         }
     });
 
