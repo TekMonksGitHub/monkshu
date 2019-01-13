@@ -14,9 +14,13 @@ async function rest(url, type, params) {
             return e.join("=")
         }).join('&')
         if (params) url += `?${params}`;
-        return JSON.parse(await get(url));
+        try {return JSON.parse(await get(url))}
+        catch (e) {return {result:false, reason:e}}
     }
-    else return JSON.parse(await post(url, JSON.stringify(params)));
+    else {
+        try {return JSON.parse(await post(url, JSON.stringify(params)));}
+        catch (e) {return {result:false, reason:e}}
+    }
 }
 
 function get(url) {
