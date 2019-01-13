@@ -15,3 +15,8 @@ Cookieless sessions supported out of the box.
 
 Mustache.js logicless templates used, as they work with JSON objects to inflate views in a non-complicated manner,
 and also allow full HTML5+CSS3 design capabilites instead of coming up with a more complicated widget framework.
+
+* Full support for Web Components, out of the box. https://developer.mozilla.org/en-US/docs/Web/Web_Components
+* Full support for ECMA 6 standards
+* Full support for REST API based backend
+* Unified server - API runtime plus HTML5 Web Component frontend.
