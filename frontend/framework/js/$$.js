@@ -9,6 +9,15 @@
 
 window.$$ = {};
 
+$$.ready = callback => {
+    // in case the document is already rendered
+    if (document.readyState!='loading') callback();
+    // modern browsers
+    else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+    // IE <= 8
+    else document.attachEvent('onreadystatechange', _ => {if (document.readyState=='complete') callback();});
+}
+
 $$.import = async (url, scope = window) => {
     let result = await import(url);
     Object.keys(result).forEach(key => scope[key] = result[key]);
