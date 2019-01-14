@@ -9,7 +9,7 @@ const log_conf = require(CONSTANTS.LOGSCONF);
 
 function initGlobalLogger(logName) {
 	/* create the logger */
-	if (!fs.existsSync(CONSTANTS.LOGDIR)) {fs.mkdirSync(CONSTANTS.LOGDIR);}
+	if (!fs.existsSync(CONSTANTS.LOGDIR)) fs.mkdirSync(CONSTANTS.LOGDIR);
 	let filewriter = 
 		require(`${CONSTANTS.LIBDIR}/FileWriter.js`).createFileWriter(logName,log_conf.closeTimeOut,"utf8");
 	
