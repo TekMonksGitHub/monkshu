@@ -9,7 +9,7 @@ The plan is to produce a full Enterprise Application Sever based on Node.js, HTM
 
 Single unified codebase, with minimum external dependencies - currently the only real major dependency is Mustache for HTML5 templating.
 
-HTML5 + Node.js + REST + Mobile (Android/iOS) + Database (MySQL, Oracle, etc. using KNEX) + Globalization (i18n) support.
+HTML5 + Node.js + REST + Mobile (Android/iOS) + Database (MySQL, Oracle, etc.) + Globalization (i18n) support.
 
 Cookieless sessions supported out of the box.
 
