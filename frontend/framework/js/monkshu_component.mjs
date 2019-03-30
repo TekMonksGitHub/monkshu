@@ -44,8 +44,9 @@ function register(name, htmlTemplate, module, roles) {
         }
 
         async render(initialRender) {
-            let componentHTML = await router.loadHTML(htmlTemplate,this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{});
-            let templateDocument = new DOMParser().parseFromString(componentHTML, "text/html");
+            if (!this.componentHTML) this.componentHTML = await router.loadHTML(htmlTemplate,
+                this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{});
+            let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;
             
             if (module.trueWebComponentMode) {
@@ -69,8 +70,10 @@ function register(name, htmlTemplate, module, roles) {
         }
 
         connectedCallback() {
-            this.render(true); 
             if (this.hasAttribute("onload")) eval(this.getAttribute("onload"));
+            if (module.elementConnected) module.elementConnected(this);
+            
+            this.render(true); 
         }
 
         disconnectedCallback() {
