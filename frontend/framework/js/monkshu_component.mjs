@@ -6,13 +6,7 @@
 import {router} from "/framework/js/router.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
-function register(name, htmlTemplate, module, roles) {
-    // setup security policies
-    roles.forEach(role => securityguard.addPermission(htmlTemplate, role));
-
-    // check security policy
-    if (!securityguard.isAllowed(htmlTemplate)) return;
-
+function register(name, htmlTemplate, module) {
     // allow binding of data and dynamic DOM updates
     module.bindData = (data, id) => {
         if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
@@ -44,8 +38,11 @@ function register(name, htmlTemplate, module, roles) {
         }
 
         async render(initialRender) {
+            // check security policy
+            if (!securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
+
             if (!this.componentHTML) this.componentHTML = await router.loadHTML(htmlTemplate,
-                this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{});
+                this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
             let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;
             
@@ -72,10 +69,12 @@ function register(name, htmlTemplate, module, roles) {
         connectedCallback() {
             if (this.hasAttribute("onload")) eval(this.getAttribute("onload"));
             if (module.elementConnected) module.elementConnected(this);
+            if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
+                securityguard.addPermission(this.id ? name+this.id : name, role));
             
             this.render(true); 
         }
-
+        
         disconnectedCallback() {
             delete module.data;
             delete module.datas;

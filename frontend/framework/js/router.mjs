@@ -29,9 +29,9 @@ async function loadPage(url, dataModels={}) {
 	} catch (err) {throw err}
 }
 
-async function loadHTML(url, dataModels) {
+async function loadHTML(url, dataModels, checkSecurity = true) {
 	url = new URL(url, window.location).href;       // Normalize
-	if (!securityguard.isAllowed(url)) return "";	// security block
+	if (checkSecurity && !securityguard.isAllowed(url)) return "";	// security block
 
 	try {
 		let [html, _, i18nObj] = await Promise.all([
