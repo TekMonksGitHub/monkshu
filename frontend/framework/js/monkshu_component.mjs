@@ -39,7 +39,7 @@ function register(name, htmlTemplate, module) {
 
         async render(initialRender) {
             // check security policy
-            if (!securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
+            if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
 
             if (!this.componentHTML) this.componentHTML = await router.loadHTML(htmlTemplate,
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
