@@ -66,9 +66,9 @@ function register(name, htmlTemplate, module) {
             }
         }
 
-        connectedCallback() {
-            if (this.hasAttribute("onload")) eval(this.getAttribute("onload"));
-            if (module.elementConnected) module.elementConnected(this);
+        async connectedCallback() {
+            if (this.hasAttribute("onload")) await eval(this.getAttribute("onload"));
+            if (module.elementConnected) await module.elementConnected(this);
             if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
                 securityguard.addPermission(this.id ? name+this.id : name, role));
             
