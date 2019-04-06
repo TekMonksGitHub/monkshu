@@ -66,6 +66,19 @@ function initAndRunTransportLoop() {
 			}
 		});
 	});
+
+	server.connection.on("upgrade", async (req, socket) => {
+
+		// Check if upgrade event corresponds to websocket
+		if (req.headers["upgrade"] !== "websocket") {
+			socket.end("HTTP/1.1 400 Bad Request");
+			LOG.info("Invalid upgrade request");
+			return;
+		}
+
+		// TODO: Establish handshake for incoming websocket requests
+		// TODO: Extend websockets for differentr apps
+	});
 }
 
 async function doService(url, data) {
