@@ -25,6 +25,9 @@ function bootstrap() {
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR + "/apiregistry.js").initSync();
+	/* Init the socket service registry */
+	LOG.info("Initializing the socket service registry.");
+	require(CONSTANTS.LIBDIR + "/socketserviceregistry.js").initSync();
 
 	/* Run the server */
 	initAndRunTransportLoop();
@@ -79,7 +82,14 @@ function initAndRunTransportLoop() {
 		// Establish handshake for incoming websocket requests
 		establishWebSocketHandshake(req, socket);
 
-		// TODO: Extend websockets for different apps
+		// Extend websockets to resigter and execute services
+		let socketRegistered = await extendWS(req.url, socket);
+		if (socketRegistered) {
+			LOG.info("Socket service successfully registered.");
+		} else {
+			LOG.info("Service not configured.");
+			socket.end("Service not configured.");
+		}
 	});
 }
 
@@ -133,3 +143,17 @@ function establishWebSocketHandshake(req, socket) {
 	socket.write(responseHeaders.join("\r\n") + "\r\n\r\n");
 }
 
+async function extendWS(url, socket) {
+	LOG.info("Got request for the url: " + url);
+
+	let endPoint = urlMod.parse(url, true).pathname;
+	let socketservice = socketserviceregistry.getSocketService(endPoint);
+	LOG.info("Looked up service, calling: " + socketservice);
+
+	if (!socketservice) {
+		LOG.info("Socket Service not found: " + url);
+		return;
+	}
+
+	return await require(socketservice).registerSocket(socket);
+}
