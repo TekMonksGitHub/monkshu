@@ -12,6 +12,7 @@ exports.LIBDIR = rootdir + "/lib";
 exports.LOGDIR = rootdir + "/logs";
 exports.ACCESSLOG = rootdir + "/logs/server.log.ndjson";
 exports.API_REGISTRY = rootdir + "/conf/apiregistry.json";
+exports.SOCKET_SERVICE_REGISTRY = rootdir + "/conf/socketserviceregistry.json";
 exports.TRANSPORT = rootdir + "/conf/transport.json";
 exports.CLUSTERCONF = rootdir + "/conf/cluster.json";
 exports.LOGSCONF = rootdir + "/conf/log.json";

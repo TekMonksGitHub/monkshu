@@ -25,6 +25,9 @@ function bootstrap() {
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR + "/apiregistry.js").initSync();
+	/* Init the socket service registry */
+	LOG.info("Initializing the socket service registry.");
+	require(CONSTANTS.LIBDIR + "/socketserviceregistry.js").initSync();
 
 	/* Run the server */
 	initAndRunTransportLoop();
@@ -66,6 +69,28 @@ function initAndRunTransportLoop() {
 			}
 		});
 	});
+
+	server.connection.on("upgrade", async (req, socket) => {
+
+		// Check if upgrade event corresponds to websocket
+		if (req.headers["upgrade"] !== "websocket") {
+			socket.end("HTTP/1.1 400 Bad Request");
+			LOG.info("Invalid upgrade request");
+			return;
+		}
+
+		// Establish handshake for incoming websocket requests
+		establishWebSocketHandshake(req, socket);
+
+		// Extend websockets to resigter and execute services
+		let socketRegistered = await extendWS(req.url, socket);
+		if (socketRegistered) {
+			LOG.info("Socket service successfully registered.");
+		} else {
+			LOG.info("Service not configured.");
+			socket.end("Service not configured.");
+		}
+	});
 }
 
 async function doService(url, data) {
@@ -95,3 +120,40 @@ async function doService(url, data) {
 	else LOG.info("API not found: " + url);
 }
 
+function establishWebSocketHandshake(req, socket) {
+	LOG.info(`Received ${req.headers["upgrade"]} upgrade request.`);
+
+	const acceptKey = req.headers["sec-websocket-key"];
+	const hash = crypt.generateWebSocketAcceptValue(acceptKey);
+	const responseHeaders = ["HTTP/1.1 101 Web Socket Protocol Handshake", "Upgrade: WebSocket", "Connection: Upgrade", `Sec-WebSocket-Accept: ${hash}`];
+	const protocol = req.headers["sec-websocket-protocol"];
+	const protocols = !protocol ? [] : protocol.split(",").map(s => s.trim());
+
+	// Tell the client that we agree to communicate with JSON data
+	if (protocols.includes("json")) {
+		LOG.info("Switching to JSON protocol for communication.");
+		responseHeaders.push(`Sec-WebSocket-Protocol: json`);
+	}
+	else if (protocols.length !== 0) {
+		LOG.error("Non JSON protocol recieved");
+	}
+
+	// Establishing handshake
+	LOG.info("Establishing handshake for new websocket upgrade.");
+	socket.write(responseHeaders.join("\r\n") + "\r\n\r\n");
+}
+
+async function extendWS(url, socket) {
+	LOG.info("Got request for the url: " + url);
+
+	let endPoint = urlMod.parse(url, true).pathname;
+	let socketservice = socketserviceregistry.getSocketService(endPoint);
+	LOG.info("Looked up service, calling: " + socketservice);
+
+	if (!socketservice) {
+		LOG.info("Socket Service not found: " + url);
+		return;
+	}
+
+	return await require(socketservice).registerSocket(socket);
+}
