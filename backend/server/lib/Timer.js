@@ -18,4 +18,4 @@ class Timer {
     }
 }
 
-exports.createTimer = (time, onTimeout) => {return new Timer(time, onTimeout);} 
+exports.createTimer = (time, onTimeout) => { return new Timer(time, onTimeout); } 

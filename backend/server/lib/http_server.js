@@ -7,7 +7,7 @@ var http = require("http");
 
 exports.init = init;
 
-function init(port, host="::") {
+function init(port, host = "::") {
 	/* create HTTP server */
 	LOG.info(`Attaching socket listener on ${host}:${port}`);
 	exports.connection = http.createServer((_req, res) => {

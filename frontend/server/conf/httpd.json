@@ -1,21 +1,21 @@
 {
-	"port" : 8080,
-	"host" : "::",
-	"webroot" : "./../",
-	"logdir" : "./logs",
-	"libdir" : "./lib",
-	"accesslog" : "./logs/access.log.json",
-	"errorlog" : "./logs/error.log.json",
-	"indexfile" : "index.html",
-	"mimeTypes" : {
-		".html" : "text/html",
-		".htm" : "text/html",
-		".thtml" : "text/html",
-		".css" : "text/css",
-		".js" : "text/javascript",
-		".mjs" : "text/javascript",
-		".otf" : "application/x-font-opentype",
-		".ttf" : "application/x-font-truetype"
+	"port": 8080,
+	"host": "::",
+	"webroot": "./../",
+	"logdir": "./logs",
+	"libdir": "./lib",
+	"accesslog": "./logs/access.log.json",
+	"errorlog": "./logs/error.log.json",
+	"indexfile": "index.html",
+	"mimeTypes": {
+		".html": "text/html",
+		".htm": "text/html",
+		".thtml": "text/html",
+		".css": "text/css",
+		".js": "text/javascript",
+		".mjs": "text/javascript",
+		".otf": "application/x-font-opentype",
+		".ttf": "application/x-font-truetype"
 	},
 	"timeout": 120000,
 	"restrictServerTree": true

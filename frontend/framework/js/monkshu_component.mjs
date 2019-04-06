@@ -3,14 +3,14 @@
  * License: MIT - see enclosed license.txt file.
  */
 
-import {router} from "/framework/js/router.mjs";
-import {securityguard} from "/framework/js/securityguard.mjs";
+import { router } from "/framework/js/router.mjs";
+import { securityguard } from "/framework/js/securityguard.mjs";
 
 function register(name, htmlTemplate, module) {
     // allow binding of data and dynamic DOM updates
     module.bindData = (data, id) => {
-        if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
-        else module.data = data; 
+        if (id) { if (!module.datas) module.datas = {}; module.datas[id] = data; }
+        else module.data = data;
 
         if (id && module.elements[id]) module.elements[id].render(false);
         else module.element.render(false);
@@ -26,7 +26,7 @@ function register(name, htmlTemplate, module) {
 
         constructor() {
             super();
-            if (this.id) {if (!module.elements) module.elements = {}; module.elements[this.id] = this;}
+            if (this.id) { if (!module.elements) module.elements = {}; module.elements[this.id] = this; }
             else module.element = this;
         }
 
@@ -39,28 +39,28 @@ function register(name, htmlTemplate, module) {
 
         async render(initialRender) {
             // check security policy
-            if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
+            if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name + this.id)) return;
 
             if (!this.componentHTML) this.componentHTML = await router.loadHTML(htmlTemplate,
-                this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
+                this.id ? (module.datas ? module.datas[this.id] || {} : {}) : module.data || {}, false);
             let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;
-            
+
             if (module.trueWebComponentMode) {
                 if (initialRender) {
-                    this.attachShadow({mode: "open"}).appendChild(templateRoot);
+                    this.attachShadow({ mode: "open" }).appendChild(templateRoot);
                     router.runShadowJSScripts(this.shadowRoot, this.shadowRoot);
-                    if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=this.shadowRoot;}
+                    if (this.id) { if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id] = this.shadowRoot; }
                     else module.shadowRoot = this.shadowRoot;
                 }
                 else if (this.shadowRoot.firstChild) this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot);
             }
-            else {  
+            else {
                 if (initialRender) {
-                    this.appendChild(templateRoot); 
+                    this.appendChild(templateRoot);
                     router.runShadowJSScripts(templateRoot, document);
                     templateRoot.getElementById = id => templateRoot.querySelector(`#${id}`);
-                    if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=templateRoot;}
+                    if (this.id) { if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id] = templateRoot; }
                     else module.shadowRoot = templateRoot;
                 } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
@@ -69,12 +69,12 @@ function register(name, htmlTemplate, module) {
         async connectedCallback() {
             if (this.hasAttribute("onload")) await eval(this.getAttribute("onload"));
             if (module.elementConnected) await module.elementConnected(this);
-            if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
-                securityguard.addPermission(this.id ? name+this.id : name, role));
-            
-            this.render(true); 
+            if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role =>
+                securityguard.addPermission(this.id ? name + this.id : name, role));
+
+            this.render(true);
         }
-        
+
         disconnectedCallback() {
             delete module.data;
             delete module.datas;
@@ -85,4 +85,4 @@ function register(name, htmlTemplate, module) {
     window.monkshu_env.components[name] = module;
 }
 
-export const monkshu_component = {register}
+export const monkshu_component = { register }

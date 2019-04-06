@@ -14,38 +14,40 @@
     top: 0;
     width: 100%;
     z-index: 12;
-    filter:alpha(opacity=90); opacity:0.9;
-    background: #45484d; /* Old browsers */
+    filter: alpha(opacity=90);
+    opacity: 0.9;
+    background: #45484d;
+    /* Old browsers */
 }
 
 #navitemlefttight {
-	position: relative;
-	float: left;
-	padding: 2px 15px;
-	text-decoration: none;
-	font-family: Sans-Serif;
-	color: #FFFFFF; 
-	cursor: pointer;
+    position: relative;
+    float: left;
+    padding: 2px 15px;
+    text-decoration: none;
+    font-family: Sans-Serif;
+    color: #FFFFFF;
+    cursor: pointer;
 }
 
 #navitemright {
-	position: relative;
-	float: right;
-	padding: 6px 10px;
-	text-decoration: none;
-	font-family: corbert;
-	color: #FFFFFF; 
-	cursor: pointer;
+    position: relative;
+    float: right;
+    padding: 6px 10px;
+    text-decoration: none;
+    font-family: corbert;
+    color: #FFFFFF;
+    cursor: pointer;
 }
 
 #maincontent {
-	width: 992px;
-	top: 55px;
-	left: 0;
+    width: 992px;
+    top: 55px;
+    left: 0;
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    position: absolute;    
+    position: absolute;
 }
 
 .error {

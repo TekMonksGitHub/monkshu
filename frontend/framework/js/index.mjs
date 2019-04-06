@@ -7,5 +7,5 @@ export async function getDefaultRedirect() {
 	try {
 		let defaultApp = await $$.requireJSON("/framework/conf/default_app.json");
 		if (defaultApp) return `./apps/${defaultApp}/index.html`; else return null;
-	} catch (err) {return null};
+	} catch (err) { return null };
 }

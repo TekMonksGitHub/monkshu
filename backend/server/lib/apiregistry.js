@@ -19,7 +19,7 @@ function initSync() {
 			LOG.info("Read App API registry: " + apiRegistryRaw);
 			let regThis = JSON.parse(regThisRaw);
 			Object.keys(regThis).forEach(key => regThis[key] = (`../apps/${app}/${regThis[key]}`));
-			apireg = {...apireg, ...regThis};
+			apireg = { ...apireg, ...regThis };
 		}
 	});
 
@@ -47,7 +47,7 @@ function isGet(url) {
 	else return false;
 }
 
-function checkKey(url,req) {
+function checkKey(url, req) {
 	if (apireg[url]) {
 		let keyExpected = urlMod.parse(apireg[url], true).query.key;
 		let retVal = (keyExpected == req[CONSTANTS.APIKEY]);
@@ -59,16 +59,16 @@ function checkKey(url,req) {
 
 function listAPIs() {
 	let list = Object.keys(apireg);
-	let retList = []; 
-	list.forEach( srv => {if (!srv.startsWith("/admin")) retList.push(srv);} );
+	let retList = [];
+	list.forEach(srv => { if (!srv.startsWith("/admin")) retList.push(srv); });
 	return retList;
 }
 
 module.exports = {
-	initSync : initSync,
-	getAPI : getAPI,
-	isEncrypted : isEncrypted,
-	isGet : isGet,
-	checkKey : checkKey,
-	listAPIs : listAPIs
+	initSync: initSync,
+	getAPI: getAPI,
+	isEncrypted: isEncrypted,
+	isGet: isGet,
+	checkKey: checkKey,
+	listAPIs: listAPIs
 };

@@ -19,7 +19,7 @@ async function doService(req) {
         let httpReq = caller.request(req.url, res => {
             res.setEncoding("utf8");
             res.on("data", d => responseString += d);
-            res.on("end", _ => resolve({"result":true,"data":responseString}));
+            res.on("end", _ => resolve({ "result": true, "data": responseString }));
             res.on("error", _ => resolve(CONSTANTS.FALSE_RESULT));
         });
         httpReq.write();

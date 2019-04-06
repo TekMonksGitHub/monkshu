@@ -11,11 +11,11 @@ window.$$ = {};
 
 $$.ready = callback => {
     // in case the document is already rendered
-    if (document.readyState!='loading') callback();
+    if (document.readyState != 'loading') callback();
     // modern browsers
     else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
     // IE <= 8
-    else document.attachEvent('onreadystatechange', _ => {if (document.readyState=='complete') callback();});
+    else document.attachEvent('onreadystatechange', _ => { if (document.readyState == 'complete') callback(); });
 }
 
 $$.import = async (url, scope = window) => {
@@ -33,13 +33,13 @@ $$.require = async (url, targetDocument = document) => {
         let scriptNode = script.cloneNode(true);
         targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
     } else try {
-        let js = await (await fetch(url, {mode:"no-cors"})).text();
+        let js = await (await fetch(url, { mode: "no-cors" })).text();
         let script = document.createElement("script");
         script.text = `${js}\n//# sourceURL=${url}`;
-        $$.__loadedJS[url] = script.text; 
+        $$.__loadedJS[url] = script.text;
         let scriptNode = script.cloneNode(true);
         targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
-    } catch (err) {throw err};
+    } catch (err) { throw err };
 }
 
 $$.__loadedCSS = [];
@@ -65,10 +65,10 @@ $$.requireJSON = async url => {
 
     if (Object.keys($$.__loadedJSON).includes(url)) return $$.__loadedJSON[url];   // already loaded
     else try {
-        let json = await (await fetch(url, {mode:"no-cors"})).json();
-        $$.__loadedJSON[url]=json; 
+        let json = await (await fetch(url, { mode: "no-cors" })).json();
+        $$.__loadedJSON[url] = json;
         return json;
-    } catch (err) {throw err};
+    } catch (err) { throw err };
 }
 
 $$.__loadedPlugins = [];
@@ -77,9 +77,9 @@ $$.importPlugin = url => {
     url = new URL(url, window.location).href;        // Normalize
     if ($$.__loadedPlugins.includes(url)) return Promise.resolve();   // already loaded
 
-    return new Promise( (resolve, reject) => {
-        import (url).then(exported => {
-            let moduleName = url.lastIndexOf("/") != -1 ? url.substring(url.lastIndexOf("/")+1) : url;
+    return new Promise((resolve, reject) => {
+        import(url).then(exported => {
+            let moduleName = url.lastIndexOf("/") != -1 ? url.substring(url.lastIndexOf("/") + 1) : url;
             moduleName = moduleName.lastIndexOf(".") != -1 ? moduleName.substring(0, moduleName.lastIndexOf(".")) : moduleName;
             $$[moduleName] = exported;
             $$.__loadedPlugins.push(url);
@@ -89,6 +89,6 @@ $$.importPlugin = url => {
 }
 
 $$.boot = async appPath => {
-    let {bootstrap} = await import("/framework/js/bootstrap.mjs");
+    let { bootstrap } = await import("/framework/js/bootstrap.mjs");
     bootstrap(appPath);
 }

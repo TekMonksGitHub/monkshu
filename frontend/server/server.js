@@ -15,7 +15,7 @@ let access; let error;
 exports.bootstrap = bootstrap;
 
 // support starting in stand-alone config
-if (require("cluster").isMaster == true) bootstrap();	
+if (require("cluster").isMaster == true) bootstrap();
 
 function bootstrap() {
 	initConfSync();
@@ -24,10 +24,10 @@ function bootstrap() {
 	/* Start http server */
 	let httpd = http.createServer((req, res) => handleRequest(req, res));
 	httpd.setTimeout(conf.timeout);
-	httpd.listen(conf.port, conf.host||"::");
-	
-	access.info(`Server started on ${conf.host||"::"}:${conf.port}`);
-	console.log(`Server started on ${conf.host||"::"}:${conf.port}`);
+	httpd.listen(conf.port, conf.host || "::");
+
+	access.info(`Server started on ${conf.host || "::"}:${conf.port}`);
+	console.log(`Server started on ${conf.host || "::"}:${conf.port}`);
 }
 
 function initConfSync() {
@@ -43,13 +43,13 @@ function initLogsSync() {
 	/* Init - Server bootup */
 	console.log("Starting...");
 	console.log("Initializing the logs.");
-	
+
 	/* Init logging */
-	if (!fs.existsSync(conf.logdir)) {fs.mkdirSync(conf.logdir);}
-		
-	let Logger = require(conf.libdir+"/Logger.js").Logger;	
-	access = new Logger(conf.accesslog, 100*1024*1024);
-	error = new Logger(conf.errorlog, 100*1024*1024);
+	if (!fs.existsSync(conf.logdir)) { fs.mkdirSync(conf.logdir); }
+
+	let Logger = require(conf.libdir + "/Logger.js").Logger;
+	access = new Logger(conf.accesslog, 100 * 1024 * 1024);
+	error = new Logger(conf.errorlog, 100 * 1024 * 1024);
 }
 
 function handleRequest(req, res) {
@@ -59,15 +59,14 @@ function handleRequest(req, res) {
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
 
 	// don't allow reading the server tree, if requested
-	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) 
-		{sendError(req, res, 404, "Path Not Found."); return;}
-	
-	fs.access(fileRequested, fs.constants.R_OK, function(err) {
-		if (err) {sendError(req, res, 404, "Path Not Found."); return;}
+	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) { sendError(req, res, 404, "Path Not Found."); return; }
 
-		fs.stat(fileRequested, function(err, stats) {
-			if (err) {sendError(req, res, 404, "Path Not Found.");  return;}
-			
+	fs.access(fileRequested, fs.constants.R_OK, function (err) {
+		if (err) { sendError(req, res, 404, "Path Not Found."); return; }
+
+		fs.stat(fileRequested, function (err, stats) {
+			if (err) { sendError(req, res, 404, "Path Not Found."); return; }
+
 			if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
 			sendFile(fileRequested, req, res);
 		});
@@ -75,24 +74,24 @@ function handleRequest(req, res) {
 }
 
 function sendFile(fileRequested, req, res) {
-	fs.open(fileRequested, "r", (err, fd) => {	
+	fs.open(fileRequested, "r", (err, fd) => {
 		if (err) sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
 			let mime = conf.mimeTypes[path.extname(fileRequested)];
-			res.writeHead(200, mime ? {"Content-Type":mime} : {});
+			res.writeHead(200, mime ? { "Content-Type": mime } : {});
 
-			fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true})
-			.on("data", chunk => res.write(chunk, "binary"))
-			.on("error", err => {res.end(); error.error(`500: ${req.url}, Server error: ${err}`);})
-			.on("end", _ => res.end());
+			fs.createReadStream(null, { "flags": "r", "fd": fd, "autoClose": true })
+				.on("data", chunk => res.write(chunk, "binary"))
+				.on("error", err => { res.end(); error.error(`500: ${req.url}, Server error: ${err}`); })
+				.on("end", _ => res.end());
 		}
 	});
 }
 
 function sendError(req, res, code, message) {
 	error.error(`${code}: ${req.url}`);
-	res.writeHead(code, {"Content-Type": "text/plain"});
+	res.writeHead(code, { "Content-Type": "text/plain" });
 	res.write(`${code} ${message}\n`);
 	res.end();
 }
