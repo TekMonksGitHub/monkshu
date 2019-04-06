@@ -76,8 +76,10 @@ function initAndRunTransportLoop() {
 			return;
 		}
 
-		// TODO: Establish handshake for incoming websocket requests
-		// TODO: Extend websockets for differentr apps
+		// Establish handshake for incoming websocket requests
+		establishWebSocketHandshake(req, socket);
+
+		// TODO: Extend websockets for different apps
 	});
 }
 
@@ -106,5 +108,28 @@ async function doService(url, data) {
 		else return await require(api).doService(jsonObj);
 	}
 	else LOG.info("API not found: " + url);
+}
+
+function establishWebSocketHandshake(req, socket) {
+	LOG.info(`Received ${req.headers["upgrade"]} upgrade request.`);
+
+	const acceptKey = req.headers["sec-websocket-key"];
+	const hash = crypt.generateWebSocketAcceptValue(acceptKey);
+	const responseHeaders = ["HTTP/1.1 101 Web Socket Protocol Handshake", "Upgrade: WebSocket", "Connection: Upgrade", `Sec-WebSocket-Accept: ${hash}`];
+	const protocol = req.headers["sec-websocket-protocol"];
+	const protocols = !protocol ? [] : protocol.split(",").map(s => s.trim());
+
+	// Tell the client that we agree to communicate with JSON data
+	if (protocols.includes("json")) {
+		LOG.info("Switching to JSON protocol for communication.");
+		responseHeaders.push(`Sec-WebSocket-Protocol: json`);
+	}
+	else if (protocols.length !== 0) {
+		LOG.error("Non JSON protocol recieved");
+	}
+
+	// Establishing handshake
+	LOG.info("Establishing handshake for new websocket upgrade.");
+	socket.write(responseHeaders.join("\r\n") + "\r\n\r\n");
 }
 
