@@ -11,7 +11,7 @@ const Timer = require(`${CONSTANTS.LIBDIR}/Timer.js`);
 
 class FileWriter {
     constructor(path, writeCloseTimeout, encoding, overwrite = false) {
-        this.path = path;     
+        this.path = path;
         this.writeCloseTimeout = writeCloseTimeout;
         this.encoding = encoding;
         this.overwrite = overwrite;
@@ -29,32 +29,32 @@ class FileWriter {
 
     _resetInternalEnv() {
         if (this._env) delete this._env;
-        this._env = {"bufferedWrites":[], "writesPending": 0, "fd":null, "isFileToBeOpened": true};
+        this._env = { "bufferedWrites": [], "writesPending": 0, "fd": null, "isFileToBeOpened": true };
     }
-    
+
     // callback(err)
     writeFile(data, callback) {
         if (this._env.fd) { this._writeToFile(data, callback); return; }
-    
+
         let env = this._env;
-        env.bufferedWrites.push({data, callback}); 
+        env.bufferedWrites.push({ data, callback });
 
         if (!env.isFileToBeOpened) return; // file is being opened, just buffer it
         env.isFileToBeOpened = false;
-    
-        fs.open(this.path, this.overwrite?"w":"a", (err, fd) => {
-            if (err) {callback(err); env.isFileToBeOpened = true; return;}
-    
-            env.fd = fd; 
-    
-            env.timer = Timer.createTimer(this.writeCloseTimeout, _ => { 
+
+        fs.open(this.path, this.overwrite ? "w" : "a", (err, fd) => {
+            if (err) { callback(err); env.isFileToBeOpened = true; return; }
+
+            env.fd = fd;
+
+            env.timer = Timer.createTimer(this.writeCloseTimeout, _ => {
                 if (env.writesPending) env.timer.reset(); // don't close if we have pending writes
                 else {
-                    fs.close(env.fd, _ => {});     // error here, can't do much. file closed failed
+                    fs.close(env.fd, _ => { });     // error here, can't do much. file closed failed
                     this._resetInternalEnv();
                 }
             });
-    
+
             env.bufferedWrites.forEach(obj => this._writeToFile(obj.data, obj.callback));
             env.bufferedWrites = [];
         });

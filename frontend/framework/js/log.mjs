@@ -7,4 +7,4 @@ const debug = s => console.log(`[DEBUG] ${s}`);
 const info = s => console.log(`[INFO] ${s}`);
 const error = s => console.log(`[ERROR] ${s}`);
 
-export const LOG = {debug, info, error};
+export const LOG = { debug, info, error };

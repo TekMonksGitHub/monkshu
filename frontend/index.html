@@ -5,14 +5,14 @@ The Monkshu Framework
 -->
 <!doctype html>
 <html>
-	
+
 <head>
 	<!-- Include the monkshu framework -->
 	<script type="text/javascript" src="/framework/js/$$.js"></script>
 
 	<!-- Start the default app -->
 	<script type="module">
-		import {getDefaultRedirect} from "./framework/js/index.mjs";
+		import { getDefaultRedirect } from "./framework/js/index.mjs";
 		const redirect = async _ => {
 			let defaultApp = await getDefaultRedirect();
 			if (defaultApp) window.location.href = defaultApp;
@@ -20,7 +20,9 @@ The Monkshu Framework
 		redirect();
 	</script>
 </head>
+
 <body>
 	<h1>Monkshu is running, but not configured.</h1>
 </body>
+
 </html>
