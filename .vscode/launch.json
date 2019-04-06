@@ -16,14 +16,14 @@
             "type": "node",
             "request": "launch",
             "name": "Launch HTTPD",
-            "cwd": "${workspaceFolder}/frontend\\server",
-            "program": "${workspaceFolder}/frontend\\server\\server.js"
+            "cwd": "${workspaceFolder}/frontend/server",
+            "program": "${workspaceFolder}/frontend/server/server.js"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Backend",
-            "program": "${workspaceFolder}/backend\\server\\server.js"
+            "program": "${workspaceFolder}/backend/server/server.js"
         }
     ]
 }
