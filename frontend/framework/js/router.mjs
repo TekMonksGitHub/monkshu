@@ -10,28 +10,26 @@ async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
 	let history = session.get("__org_monkshu_router_history"); let hash;
 
-	try {
-		if (url.indexOf('#') == -1) {
-			hash = btoa(url);
-			window.history.pushState(null, null, new URL(window.location.href).pathname+"#"+hash);
-			history[hash] = [url, dataModels];
-			session.set("__org_monkshu_router_history", history);
-		} else {
-			hash = url.substring(url.indexOf('#')+1);
-			url = atob(hash);
-			if (!history[hash]) history[hash] = [url,"en",{}];
-		}
-		
-		let html = await loadHTML(url, dataModels);
-		document.open("text/html");
-		document.write(html);
-		document.close();
-	} catch (err) {throw err}
+	if (url.indexOf('#') == -1) {
+		hash = btoa(url);
+		window.history.pushState(null, null, new URL(window.location.href).pathname+"#"+hash);
+		history[hash] = [url, dataModels];
+		session.set("__org_monkshu_router_history", history);
+	} else {
+		hash = url.substring(url.indexOf('#')+1);
+		url = atob(hash);
+		if (!history[hash]) history[hash] = [url,"en",{}];
+	}
+	
+	let html = await loadHTML(url, dataModels);
+	document.open("text/html");
+	document.write(html);
+	document.close();
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
 	url = new URL(url, window.location).href;       // Normalize
-	if (checkSecurity && !securityguard.isAllowed(url)) return "";	// security block
+	if (checkSecurity && !securityguard.isAllowed(url)) throw "Not allowed: Security Exception";	// security block
 
 	try {
 		let [html, _, i18nObj] = await Promise.all([

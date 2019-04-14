@@ -12,18 +12,24 @@ License: MIT - see enclosed license.txt file.
 	
 	<title>Monkshu Framework - Error</title>
 	<link rel="stylesheet" type="text/css" href="/framework/css/error.css">
+
+	<!-- Include the monkshu framework -->
+	<script type="text/javascript" src="/framework/js/$$.js"></script>
+
+	<script type="module">
+		import {getDefaultRedirect} from "/framework/js/index.mjs";
+		window.goToDefaultApp = async _ => {
+			let defaultApp = await getDefaultRedirect();
+			if (defaultApp) window.location.href = defaultApp;
+		}
+	</script>
 </head>
 
 <body>
-<script>document.title = {{i18n.Title}} + " - Error";</script>
-
-<div id="navbar">
-	<span id="navitemlefttight" onclick="$$.doIndexNavigation()"><img src="/app/img/back.png"></span>
-	<span id="navitemleft" onclick="$$.doIndexNavigation()">{{i18n.Home}}</span>
-</div>
+<!-- Start the default app -->
 
 <div class="maincontent" id="maincontent">
-	<div class="error">{{error}}</div>
+	<div class="error" style="cursor: pointer;" onclick="goToDefaultApp()">Unhandled Error - Click here to go home</div>
 	<div align="center"><img src="/framework/img/logo_512.png"></div>
 </div>
 </body>
