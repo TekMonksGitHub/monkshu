@@ -4,7 +4,7 @@
  */
 import {session} from "/framework/js/session.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
-import { securityguard } from "/framework/js/securityguard.mjs";
+import {securityguard} from "/framework/js/securityguard.mjs";
 
 async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
