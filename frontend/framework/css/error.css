@@ -8,6 +8,7 @@
     src: url(/framework/fonts/Corbert-Regular.otf);
 }
 
+<<<<<<< HEAD
 #navbar {
     left: 0;
     position: fixed;
@@ -40,6 +41,8 @@
     cursor: pointer;
 }
 
+=======
+>>>>>>> 9428254d4c722e30248515155dabae813caa0e9e
 #maincontent {
     width: 992px;
     top: 55px;
