@@ -64,6 +64,8 @@ function register(name, htmlTemplate, module) {
                     else module.shadowRoot = templateRoot;
                 } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
+
+            if (module.elementRendered) module.elementRendered(this);
         }
 
         async connectedCallback() {
