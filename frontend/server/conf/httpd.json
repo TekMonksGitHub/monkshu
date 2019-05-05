@@ -18,5 +18,5 @@
 		".ttf" : "application/x-font-truetype"
 	},
 	"timeout": 120000,
-	"restrictServerTree": true
+	"server": "Monkshu HTTPD"
 }
