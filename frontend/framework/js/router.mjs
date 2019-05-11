@@ -20,6 +20,8 @@ async function loadPage(url, dataModels={}) {
 		url = atob(hash);
 		if (!history[hash]) history[hash] = [url,"en",{}];
 	}
+
+	session.set($$.MONKSHU_CONSTANTS.PAGE_URL, url);
 	
 	let html = await loadHTML(url, dataModels);
 	document.open("text/html");
@@ -32,12 +34,11 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 	if (checkSecurity && !securityguard.isAllowed(url)) throw "Not allowed: Security Exception";	// security block
 
 	try {
-		let [html, _, i18nObj] = await Promise.all([
+		let [html, _] = await Promise.all([
 			fetch(url, {mode: "no-cors"}).then(response => response.text()), 
-			$$.require("/framework/3p/mustache.min.js"), 
-			i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID))]);
+			$$.require("/framework/3p/mustache.min.js")]);
 
-		dataModels["i18n"] = i18nObj;
+		dataModels = await getPageData(url, dataModels);
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
@@ -45,6 +46,25 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 		return html;
 	} catch (err) {throw err}
 } 
+
+async function expandPageData(text, url, dataModels) {
+	dataModels = await getPageData(url, dataModels);
+
+	Mustache.parse(text);
+	let rendered = Mustache.render(text,dataModels);
+
+	return rendered;
+}
+
+async function getPageData(url, dataModels) {
+	let i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
+	dataModels["i18n"] = i18nObj; 
+	
+	dataModels["url"] = {url};
+	new URL(url).searchParams.forEach((name, value) => dataModels["url"][name] = value);
+
+	return dataModels;
+}
 
 function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 	// Including script files (as innerHTML does not execute the script included)
@@ -75,4 +95,4 @@ function isInHistory(url) {``
 
 function reload() {loadPage(window.location.href);}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData};

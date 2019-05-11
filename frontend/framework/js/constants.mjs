@@ -5,5 +5,6 @@
 
 const ERROR_HTML = "/framework/error.html";
 const LANG_ID = "com_monkshu_lang";
+const PAGE_URL = "__org_monkshu_router_url";
 
-export const MONKSHU_CONSTANTS = {ERROR_HTML, LANG_ID};
+export const MONKSHU_CONSTANTS = {ERROR_HTML, LANG_ID, PAGE_URL};
