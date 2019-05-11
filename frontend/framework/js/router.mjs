@@ -22,6 +22,7 @@ async function loadPage(url, dataModels={}) {
 	}
 
 	session.set($$.MONKSHU_CONSTANTS.PAGE_URL, url);
+	session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, dataModels);
 	
 	let html = await loadHTML(url, dataModels);
 	document.open("text/html");
@@ -93,6 +94,11 @@ function isInHistory(url) {``
 	if (!history[hash]) return false; else return true;
 }
 
-function reload() {loadPage(window.location.href);}
+function decodeURL(url) {
+	if (url.indexOf('#') == -1) return url; 
+	let decoded = atob(url.substring(url.indexOf('#')+1)); return decoded;
+}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData};
+function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
+
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL};
