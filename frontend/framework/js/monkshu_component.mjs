@@ -8,7 +8,9 @@ import {securityguard} from "/framework/js/securityguard.mjs";
 
 function register(name, htmlTemplate, module) {
     // allow binding of data and dynamic DOM updates
-    module.bindData = (data, id) => {
+    module.bindData = async (data, id) => {
+        if (module.dataBound) data = await module.dataBound(id?module.elements[id]:module.element, data);
+
         if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
         else module.data = data; 
 
@@ -41,7 +43,7 @@ function register(name, htmlTemplate, module) {
             // check security policy
             if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
 
-            if (!this.componentHTML) this.componentHTML = await router.loadHTML(htmlTemplate,
+            this.componentHTML = await router.loadHTML(htmlTemplate,
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
             let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;
