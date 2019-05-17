@@ -7,7 +7,7 @@ const fs = require("fs");
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const log_conf = require(CONSTANTS.LOGSCONF);
 
-function initGlobalLogger(logName) {
+function initGlobalLoggerSync(logName) {
 	/* create the logger */
 	if (!fs.existsSync(CONSTANTS.LOGDIR)) fs.mkdirSync(CONSTANTS.LOGDIR);
 	let filewriter = 
