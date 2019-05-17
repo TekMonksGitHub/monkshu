@@ -12,9 +12,9 @@ const options = {
     cert: fs.readFileSync(sslConf.certPath)
 };
 
-exports.init = init;
+exports.initSync = initSync;
 
-function init(port, host = "::") {
+function initSync(port, host = "::") {
     /* create HTTPS server */
     LOG.info(`Attaching socket listener on ${host}:${port}`);
     exports.connection = https.createServer(options, (_req, res) => {
