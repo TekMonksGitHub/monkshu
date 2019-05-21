@@ -99,6 +99,11 @@ function decodeURL(url) {
 	let decoded = atob(url.substring(url.indexOf('#')+1)); return decoded;
 }
 
+function encodeURL(url) {
+	let encodedURL = new URL(window.location.href).pathname+"#"+btoa(url);
+	return encodedURL;
+}
+
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL};
