@@ -1,0 +1,4 @@
+{
+    "keyPath": "<path to Key (.key) File>",
+    "certPath": "<path to Certificate (.crt) file>"
+}
