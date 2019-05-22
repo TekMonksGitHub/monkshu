@@ -66,11 +66,7 @@ async function getPageData(url, dataModels) {
 	dataModels["url"] = {url};
 	new URL(url).searchParams.forEach((value, name) => dataModels["url"][name] = value);
 
-	dataModels["makeLink"] = function() {
-		return function(text, render) {
-			return router.encodeURL(render(text));
-		}
-	}
+	dataModels["makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 
 	return dataModels;
 }
