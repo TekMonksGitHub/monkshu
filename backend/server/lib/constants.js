@@ -17,6 +17,7 @@ exports.CLUSTERCONF = rootdir+"/conf/cluster.json";
 exports.LOGSCONF = rootdir+"/conf/log.json";
 exports.LOGMAIN = rootdir+"/logs/server.log.ndjson";
 exports.CRYPTCONF = rootdir+"/conf/crypt.json";
+exports.SSLCONF = rootdir + "/conf/ssl.json";
 exports.MAX_LOG = 1024;
 
 /* Result objects */
