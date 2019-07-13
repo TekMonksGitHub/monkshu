@@ -2,5 +2,6 @@
 "servertype" : "http_server",
 "host" : "0.0.0.0",
 "port" : 9090,
-"access_control" : "*"
+"access_control" : "*",
+"timeout": 120000
 }

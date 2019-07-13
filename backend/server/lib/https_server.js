@@ -19,7 +19,7 @@ function initSync(access_control, port, host = "::") {
 
     /* create HTTPS server */
     LOG.info(`Attaching socket listener on ${host}:${port}`);
-    exports.connection = https.createServer(options, (_req, res) => {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-    }).listen(port, host);
+    let server = https.createServer(options, (_req, res) => {res.setHeader("Access-Control-Allow-Origin", "*");});
+    server.timeout = timeout;
+	exports.connection = server.listen(port, host);
 };
