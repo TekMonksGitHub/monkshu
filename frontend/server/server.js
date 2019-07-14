@@ -74,17 +74,22 @@ function handleRequest(req, res) {
 	});
 }
 
+function getServerHeaders(headers) {
+	if (conf.server) headers.Server = conf.server;
+	return headers;
+}
+
 function sendFile(fileRequested, req, res) {
 	fs.open(fileRequested, "r", (err, fd) => {	
 		if (err) sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
 			let mime = conf.mimeTypes[path.extname(fileRequested)];
-			res.writeHead(200, mime ? {"Content-Type":mime} : {});
+			res.writeHead(200, mime ? getServerHeaders({"Content-Type":mime}) : getServerHeaders({}));
 
 			fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true})
 			.on("data", chunk => res.write(chunk, "binary"))
-			.on("error", err => {res.end(); error.error(`500: ${req.url}, Server error: ${err}`);})
+			.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
 			.on("end", _ => res.end());
 		}
 	});
@@ -92,7 +97,7 @@ function sendFile(fileRequested, req, res) {
 
 function sendError(req, res, code, message) {
 	error.error(`${code}: ${req.url}`);
-	res.writeHead(code, {"Content-Type": "text/plain"});
+	res.writeHead(code, getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();
 }

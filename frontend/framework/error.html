@@ -1,0 +1,39 @@
+<!-- 
+(C) 2015 TekMonks. All rights reserved.
+License: MIT - see enclosed license.txt file.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="-1">
+	
+	<title>Monkshu Framework - Error</title>
+	<link rel="stylesheet" type="text/css" href="/framework/css/error.css">
+
+	<!-- Include the monkshu framework -->
+	<script type="text/javascript" src="/framework/js/$$.js"></script>
+
+	<script type="module">
+		import {getDefaultRedirect} from "/framework/js/index.mjs";
+		window.goToDefaultApp = async _ => {
+			let defaultApp = await getDefaultRedirect();
+			if (defaultApp) window.location.href = defaultApp;
+		}
+	</script>
+</head>
+
+<body>
+<!-- Start the default app -->
+
+<div class="maincontent" id="maincontent">
+	<div class="error" style="cursor: pointer;" onclick="goToDefaultApp()">Unhandled Error - Click here to go home</div>
+	<div align="center"><img src="/framework/img/logo_512.png"></div>
+	<!-- Actual Error Follows -->
+	<!-- {{error}} -->
+</div>
+</body>
+
+</html>
