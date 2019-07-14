@@ -1,13 +1,23 @@
+const { wsBuffer } = require(`${CONSTANTS.LIBDIR}/wsBuffer.js`);
+
 exports.registerSocket = async (socket) => {
 
     socket.on("data", (buffer) => {
         LOG.info("[INCOMING SOCKET DATA]");
-        LOG.info(data);
 
-        // TODO:
-        // Accumulate and unmask the incoming data buffer
-        // Feed the unmasked data to the socket, creating an echo service
-        // Making use of socker.write("...")
+        try {
+            const message = wsBuffer.parse(buffer);
+            if (!message) return;
+
+            LOG.info(message);
+
+            // Creating an echo service
+            const response = wsBuffer.construct(message);
+            socket.write(response);
+        } catch (error) {
+            LOG.error(error);
+            socket.destroy();
+        }
     });
 
     socket.on("end", _ => {
