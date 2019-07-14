@@ -7,17 +7,17 @@ const crypto = require("crypto");
 const crypt = require(CONSTANTS.CRYPTCONF);
 
 function encrypt(text, key = crypt.key) {
-	let iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0,16);
+	let iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0, 16);
 	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
 	let cipher = crypto.createCipheriv(crypt.crypt_algo, password_hash, iv);
-	let crypted = cipher.update(text,"utf8","hex");
+	let crypted = cipher.update(text, "utf8", "hex");
 	crypted += cipher.final("hex");
-	return crypted+iv;
+	return crypted + iv;
 }
- 
+
 function decrypt(text, key = crypt.key) {
-	let iv = text.slice(text.length-16, text.length);
-	text = text.substring(0, text.length-16);
+	let iv = text.slice(text.length - 16, text.length);
+	text = text.substring(0, text.length - 16);
 	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
 	let decipher = crypto.createDecipheriv(crypt.crypt_algo, password_hash, iv);
 	let decrypted = decipher.update(text, "hex", "utf8");
@@ -25,18 +25,17 @@ function decrypt(text, key = crypt.key) {
 	return decrypted;
 }
 
+const generateWebSocketAcceptValue = (acceptKey) => crypto.createHash("sha1").update(acceptKey + crypt.ws_guid, "binary").digest("base64");
+
 if (require.main === module) {
 	let args = process.argv.slice(2);
-	
+
 	if (args.length < 2) {
 		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt>");
 		process.exit(1);
 	}
-	
+
 	console.log(eval(args[0])(args[1]));
 }
 
-module.exports = {
-	encrypt : encrypt,
-	decrypt : decrypt
-};
+module.exports = { encrypt, decrypt, generateWebSocketAcceptValue };
