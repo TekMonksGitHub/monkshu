@@ -14,7 +14,7 @@ const options = {
 
 exports.initSync = initSync;
 
-function initSync(access_control, port, host = "::") {
+function initSync(access_control, port, host = "::", timeout) {
     access_control?access_control:"*";
 
     /* create HTTPS server */
