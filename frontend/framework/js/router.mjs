@@ -6,18 +6,20 @@ import {session} from "/framework/js/session.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
+const HS = "?.=";
+
 async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
 	let history = session.get("__org_monkshu_router_history"); let hash;
 
-	if (url.indexOf('#') == -1) {
+	if (url.indexOf(HS) == -1) {
 		hash = btoa(url);
-		window.history.pushState(null, null, new URL(window.location.href).pathname+"#"+hash);
+		window.history.pushState(null, null, new URL(window.location.href).pathname+HS+hash);
 		history[hash] = [url, dataModels];
 		session.set("__org_monkshu_router_history", history);
 	} else {
-		hash = url.substring(url.indexOf('#')+1);
-		url = atob(hash);
+		hash = url.substring(url.indexOf(HS)+HS.length);
+		url = new URL(atob(hash), window.location).href;
 		if (!history[hash]) history[hash] = [url,"en",{}];
 	}
 
@@ -31,7 +33,7 @@ async function loadPage(url, dataModels={}) {
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
-	url = new URL(url, window.location).href;       // Normalize
+	let urlParsed = new URL(url);	url = urlParsed.origin + urlParsed.pathname; 	// Parse
 	if (checkSecurity && !securityguard.isAllowed(url)) throw "Not allowed: Security Exception";	// security block
 
 	try {
@@ -39,7 +41,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 			fetch(url, {mode: "no-cors"}).then(response => response.text()), 
 			$$.require("/framework/3p/mustache.min.js")]);
 
-		dataModels = await getPageData(url, dataModels);
+		dataModels = await getPageData(urlParsed.href, dataModels);
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
@@ -60,9 +62,13 @@ async function expandPageData(text, url, dataModels) {
 async function getPageData(url, dataModels) {
 	let i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
 	dataModels["i18n"] = i18nObj; 
+
+	dataModels["lang"] = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
 	
 	dataModels["url"] = {url};
-	new URL(url).searchParams.forEach((name, value) => dataModels["url"][name] = value);
+	new URL(url).searchParams.forEach((value, name) => dataModels["url"][name] = value);
+
+	dataModels["makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 
 	return dataModels;
 }
@@ -88,17 +94,23 @@ function isInHistory(url) {``
 	let history = session.get("__org_monkshu_router_history");
 	if (!history) return false;
 
-	if (url.indexOf('#') == -1) return false;
+	if (url.indexOf(HS) == -1) return false;
 	
-	let hash = url.substring(url.indexOf('#')+1);
+	let hash = url.substring(url.indexOf(HS)+HS.length);
 	if (!history[hash]) return false; else return true;
 }
 
 function decodeURL(url) {
-	if (url.indexOf('#') == -1) return url; 
-	let decoded = atob(url.substring(url.indexOf('#')+1)); return decoded;
+	if (url.indexOf(HS) == -1) return url; 
+	let decoded = atob(url.substring(url.indexOf(HS)+HS.length)); return decoded;
+}
+
+function encodeURL(url) {
+	url = new URL(url, window.location).href;
+	let encodedURL = new URL(window.location.href).pathname+HS+btoa(url);
+	return encodedURL;
 }
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL};

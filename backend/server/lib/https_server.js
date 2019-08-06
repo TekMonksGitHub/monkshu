@@ -14,10 +14,12 @@ const options = {
 
 exports.initSync = initSync;
 
-function initSync(port, host = "::") {
+function initSync(access_control, port, host = "::") {
+    access_control?access_control:"*";
+
     /* create HTTPS server */
     LOG.info(`Attaching socket listener on ${host}:${port}`);
-    exports.connection = https.createServer(options, (_req, res) => {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-    }).listen(port, host);
+    let server = https.createServer(options, (_req, res) => {res.setHeader("Access-Control-Allow-Origin", "*");});
+    server.timeout = timeout;
+	exports.connection = server.listen(port, host);
 };

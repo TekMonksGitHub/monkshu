@@ -34,7 +34,7 @@ function initAndRunTransportLoop() {
 	/* Init the transport */
 	let transport = require(CONSTANTS.TRANSPORT);
 	let server = require(CONSTANTS.LIBDIR+"/"+transport.servertype+".js");
-	server.initSync(transport.port, transport.host||"::");
+	server.initSync(transport.access_control, transport.port, transport.host||"::", transport.timeout);
 	
 	console.log(`Server started on ${transport.host||"::"}:${transport.port}`);
 	LOG.info(`Server started on ${transport.host||"::"}:${transport.port}`);

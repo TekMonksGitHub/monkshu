@@ -43,7 +43,7 @@ function register(name, htmlTemplate, module) {
             // check security policy
             if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
 
-            this.componentHTML = await router.loadHTML(htmlTemplate,
+            if (htmlTemplate) this.componentHTML = await router.loadHTML(htmlTemplate,
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
             let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;

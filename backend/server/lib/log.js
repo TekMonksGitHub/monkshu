@@ -20,7 +20,7 @@ function initGlobalLoggerSync(logName) {
 	LOG.info("Logging subsystem initialized.", true);
 }
 
-exports.initGlobalLogger = initGlobalLogger;
+exports.initGlobalLoggerSync = initGlobalLoggerSync;
 
 Logger = function(path, maxsize, filewriter) {
 	this.path = path;
