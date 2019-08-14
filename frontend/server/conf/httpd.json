@@ -7,6 +7,14 @@
 	"accesslog" : "./logs/access.log.json",
 	"errorlog" : "./logs/error.log.json",
 	"indexfile" : "index.html",
+	"httpdHeaders": {
+		"Server": "Monkshu HTTPD",
+		"X-Frame-Options": "deny",
+		"X-Content-Type-Options": "nosniff",
+		"Cache-Control": "no-cache, no-store, must-revalidate",
+		"Pragma": "no-cache",
+		"X-XSS-Protection": 1
+	},
 	"mimeTypes" : {
 		".html" : "text/html",
 		".htm" : "text/html",
@@ -17,6 +25,5 @@
 		".otf" : "application/x-font-opentype",
 		".ttf" : "application/x-font-truetype"
 	},
-	"timeout": 120000,
-	"server": "Monkshu HTTPD"
+	"timeout": 120000
 }
