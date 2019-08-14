@@ -7,6 +7,13 @@
 	"accesslog" : "./logs/access.log.json",
 	"errorlog" : "./logs/error.log.json",
 	"indexfile" : "index.html",
+	"httpdHeaders": {
+		"X-Frame-Options": "deny",
+		"X-Content-Type-Options": "nosniff",
+		"Cache-Control": "no-cache, no-store, must-revalidate",
+		"Pragma": "no-cache",
+		"X-XSS-Protection": 1
+	},
 	"mimeTypes" : {
 		".html" : "text/html",
 		".htm" : "text/html",

@@ -76,6 +76,7 @@ function handleRequest(req, res) {
 
 function getServerHeaders(headers) {
 	if (conf.server) headers.Server = conf.server;
+	if (conf.httpdHeaders) Object.assign(headers, conf.httpdHeaders);
 	return headers;
 }
 
