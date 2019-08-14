@@ -21,7 +21,7 @@ function bootstrap() {
 	
 	/* Init the logs */
 	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLogger(CONSTANTS.LOGMAIN);
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
@@ -34,7 +34,7 @@ function initAndRunTransportLoop() {
 	/* Init the transport */
 	let transport = require(CONSTANTS.TRANSPORT);
 	let server = require(CONSTANTS.LIBDIR+"/"+transport.servertype+".js");
-	server.init(transport.port, transport.host||"::");
+	server.initSync(transport.access_control, transport.port, transport.host||"::", transport.timeout);
 	
 	console.log(`Server started on ${transport.host||"::"}:${transport.port}`);
 	LOG.info(`Server started on ${transport.host||"::"}:${transport.port}`);

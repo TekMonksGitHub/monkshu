@@ -1,0 +1,4 @@
+{
+    "pfxPath": "<path to PFX (.key) File>",
+    "pfxPassphrase": "<passphrase for the pfx file>"
+}
