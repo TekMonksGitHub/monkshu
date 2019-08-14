@@ -8,6 +8,7 @@
 	"errorlog" : "./logs/error.log.json",
 	"indexfile" : "index.html",
 	"httpdHeaders": {
+		"server": "Monkshu HTTPD",
 		"X-Frame-Options": "deny",
 		"X-Content-Type-Options": "nosniff",
 		"Cache-Control": "no-cache, no-store, must-revalidate",
@@ -24,6 +25,5 @@
 		".otf" : "application/x-font-opentype",
 		".ttf" : "application/x-font-truetype"
 	},
-	"timeout": 120000,
-	"server": "Monkshu HTTPD"
+	"timeout": 120000
 }
