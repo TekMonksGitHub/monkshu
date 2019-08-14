@@ -8,7 +8,7 @@
 	"errorlog" : "./logs/error.log.json",
 	"indexfile" : "index.html",
 	"httpdHeaders": {
-		"server": "Monkshu HTTPD",
+		"Server": "Monkshu HTTPD",
 		"X-Frame-Options": "deny",
 		"X-Content-Type-Options": "nosniff",
 		"Cache-Control": "no-cache, no-store, must-revalidate",
