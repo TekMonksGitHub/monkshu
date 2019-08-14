@@ -1,4 +1,4 @@
 {
-    "keyPath": "<path to Key (.key) File>",
-    "certPath": "<path to Certificate (.crt) file>"
+    "pfxPath": "<path to PFX (.key) File>",
+    "pfxPassphrase": "<passphrase for the pfx file>"
 }
