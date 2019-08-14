@@ -8,13 +8,13 @@ const fs = require("fs");
 
 const sslConf = require(`${CONSTANTS.SSLCONF}`);
 const options = {
-    key: fs.readFileSync(sslConf.keyPath),
-    cert: fs.readFileSync(sslConf.certPath)
+    pfx: fs.readFileSync(sslConf.pfxPath),
+    passphrase: sslConf.pfxPassphrase
 };
 
 exports.initSync = initSync;
 
-function initSync(access_control, port, host = "::") {
+function initSync(access_control, port, host = "::", timeout) {
     access_control?access_control:"*";
 
     /* create HTTPS server */
