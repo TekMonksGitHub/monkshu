@@ -25,5 +25,6 @@
 		".otf" : "application/x-font-opentype",
 		".ttf" : "application/x-font-truetype"
 	},
+	"restrictServerTree": true,
 	"timeout": 120000
 }
