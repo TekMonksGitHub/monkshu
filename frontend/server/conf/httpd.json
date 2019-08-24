@@ -13,7 +13,7 @@
 		"X-Content-Type-Options": "nosniff",
 		"Cache-Control": "no-cache, no-store, must-revalidate",
 		"Pragma": "no-cache",
-		"Content-Security-Policy": "default-src 'self'",
+		"Content-Security-Policy": "default-src 'self' localhost:8080; script-src 'unsafe-inline' localhost:8080; font-src *",
 		"X-XSS-Protection": 1
 	},
 	"mimeTypes" : {
