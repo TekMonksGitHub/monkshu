@@ -7,6 +7,9 @@
 	"accesslog" : "./logs/access.log.json",
 	"errorlog" : "./logs/error.log.json",
 	"indexfile" : "index.html",
+	"ssl": false,
+	"pfxPath": "<path to PFX (.key) File>",
+	"pfxPassphrase": "<passphrase for the pfx file>",
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
 		"X-Frame-Options": "deny",

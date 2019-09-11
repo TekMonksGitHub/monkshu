@@ -1,0 +1,10 @@
+{
+"access_control" : "*",
+"timeout": 120000,
+"ssl": false,
+"headers": {
+    "Access-Control-Allow-Origin":"*"
+},
+"pfxPath": "<path to PFX (.key) File>",
+"pfxPassphrase": "<passphrase for the pfx file>"
+}

@@ -4,14 +4,17 @@
  */
 
 const http = require("http");
+const conf = require(`${CONSTANTS.HTTPDCONF}`);
 
 exports.initSync = initSync;
 
-function initSync(access_control, port, host="::", timeout) {
-	/* create HTTP server */
+function initSync(port, host="::") {
+	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
+	
+	/* create HTTP/S server */
 	LOG.info(`Attaching socket listener on ${host}:${port}`);
-	let server = http.createServer((_req, res) => 
-		res.setHeader("Access-Control-Allow-Origin", access_control?access_control:"*"));
-	server.timeout = timeout;
+	let server = http.createServer(options, (_req, res) => 
+		Object.keys(conf.headers).forEach(header => res.setHeader(header, conf.headers[header])));
+	server.timeout = conf.timeout;
 	exports.connection = server.listen(port, host);
 }
