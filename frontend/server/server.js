@@ -58,6 +58,10 @@ function handleRequest(req, res) {
 	let pathname = url.parse(req.url).pathname;
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
 
+	// don't allow reading outside webroot
+	if (!isSubdirectory(fileRequested, conf.webroot))
+		{sendError(req, res, 404, "Path Not Found."); return;}
+
 	// don't allow reading the server tree, if requested
 	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) 
 		{sendError(req, res, 404, "Path Not Found."); return;}
@@ -81,7 +85,7 @@ function getServerHeaders(headers) {
 
 function sendFile(fileRequested, req, res) {
 	fs.open(fileRequested, "r", (err, fd) => {	
-		if (err) sendError(req, res, 500, err);
+		if (err) (err.code === "ENOENT") ? sendError(req, res, 404, "Path Not Found.") : sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
 			let mime = conf.mimeTypes[path.extname(fileRequested)];
