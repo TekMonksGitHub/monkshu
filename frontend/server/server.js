@@ -5,7 +5,6 @@
  * License: MIT - see enclosed license.txt file.
  */
 
-/* Modules required */
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
@@ -32,20 +31,21 @@ function bootstrap() {
 
 function initConfSync() {
 	global.conf = require(`${__dirname}/conf/httpd.json`);
-	conf.webroot = path.resolve(conf.webroot);	// normalize webroot path
-	conf.logdir = path.resolve(conf.logdir);	// normalize logdir path
-	conf.libdir = path.resolve(conf.libdir);	// normalize libdir path
-	conf.accesslog = path.resolve(conf.accesslog);	// normalize accesslog path
-	conf.errorlog = path.resolve(conf.errorlog);	// normalize errorlog path
+
+	// normalize paths
+	conf.webroot = path.resolve(conf.webroot);	
+	conf.logdir = path.resolve(conf.logdir);	
+	conf.libdir = path.resolve(conf.libdir);
+	conf.accesslog = path.resolve(conf.accesslog);
+	conf.errorlog = path.resolve(conf.errorlog);
 }
 
 function initLogsSync() {
-	/* Init - Server bootup */
 	console.log("Starting...");
 	console.log("Initializing the logs.");
 	
-	/* Init logging */
-	if (!fs.existsSync(conf.logdir)) {fs.mkdirSync(conf.logdir);}
+	// Init logging 
+	if (!fs.existsSync(conf.logdir)) fs.mkdirSync(conf.logdir);
 		
 	let Logger = require(conf.libdir+"/Logger.js").Logger;	
 	access = new Logger(conf.accesslog, 100*1024*1024);
@@ -66,7 +66,7 @@ function handleRequest(req, res) {
 	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) 
 		{sendError(req, res, 404, "Path Not Found."); return;}
 	
-	fs.access(fileRequested, fs.constants.R_OK, function(err) {
+	fs.access(fileRequested, fs.constants.R_OK, err => {
 		if (err) {sendError(req, res, 404, "Path Not Found."); return;}
 
 		fs.stat(fileRequested, function(err, stats) {
