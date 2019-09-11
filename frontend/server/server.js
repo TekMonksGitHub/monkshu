@@ -101,7 +101,7 @@ function sendFile(fileRequested, req, res) {
 }
 
 function sendError(req, res, code, message) {
-	error.error(`${code}: ${req.url}`);
+	error.error(`${code}: ${req.url} - ${message}`);
 	res.writeHead(code, getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();
