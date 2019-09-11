@@ -21,8 +21,9 @@ function bootstrap() {
 	initLogsSync();
 
 	/* Start http server */
+	let listener = (req, res) => handleRequest(req, res);
 	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
-	let httpd = http.createServer(options, (req, res) => handleRequest(req, res));
+	let httpd = options ? http.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
