@@ -1,5 +1,4 @@
 {
-"access_control" : "*",
 "timeout": 120000,
 "ssl": false,
 "headers": {
