@@ -9,12 +9,13 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 const url = require("url");
+const zlib = require("zlib");
 let access; let error;
 
 exports.bootstrap = bootstrap;
 
 // support starting in stand-alone config
-if (require("cluster").isMaster == true) bootstrap();	
+if (require("cluster").isMaster == true) bootstrap();
 
 function bootstrap() {
 	initConfSync();
@@ -22,21 +23,21 @@ function bootstrap() {
 
 	/* Start http server */
 	let listener = (req, res) => handleRequest(req, res);
-	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
+	let options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase } : null;
 	let httpd = options ? http.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
-	httpd.listen(conf.port, conf.host||"::");
-	
-	access.info(`Server started on ${conf.host||"::"}:${conf.port}`);
-	console.log(`Server started on ${conf.host||"::"}:${conf.port}`);
+	httpd.listen(conf.port, conf.host || "::");
+
+	access.info(`Server started on ${conf.host || "::"}:${conf.port}`);
+	console.log(`Server started on ${conf.host || "::"}:${conf.port}`);
 }
 
 function initConfSync() {
 	global.conf = require(`${__dirname}/conf/httpd.json`);
 
 	// normalize paths
-	conf.webroot = path.resolve(conf.webroot);	
-	conf.logdir = path.resolve(conf.logdir);	
+	conf.webroot = path.resolve(conf.webroot);
+	conf.logdir = path.resolve(conf.logdir);
 	conf.libdir = path.resolve(conf.libdir);
 	conf.accesslog = path.resolve(conf.accesslog);
 	conf.errorlog = path.resolve(conf.errorlog);
@@ -45,13 +46,13 @@ function initConfSync() {
 function initLogsSync() {
 	console.log("Starting...");
 	console.log("Initializing the logs.");
-	
+
 	// Init logging 
 	if (!fs.existsSync(conf.logdir)) fs.mkdirSync(conf.logdir);
-		
-	let Logger = require(conf.libdir+"/Logger.js").Logger;	
-	access = new Logger(conf.accesslog, 100*1024*1024);
-	error = new Logger(conf.errorlog, 100*1024*1024);
+
+	let Logger = require(conf.libdir + "/Logger.js").Logger;
+	access = new Logger(conf.accesslog, 100 * 1024 * 1024);
+	error = new Logger(conf.errorlog, 100 * 1024 * 1024);
 }
 
 function handleRequest(req, res) {
@@ -61,19 +62,17 @@ function handleRequest(req, res) {
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
 
 	// don't allow reading outside webroot
-	if (!isSubdirectory(fileRequested, conf.webroot))
-		{sendError(req, res, 404, "Path Not Found."); return;}
+	if (!isSubdirectory(fileRequested, conf.webroot)) { sendError(req, res, 404, "Path Not Found."); return; }
 
 	// don't allow reading the server tree, if requested
-	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) 
-		{sendError(req, res, 404, "Path Not Found."); return;}
-	
-	fs.access(fileRequested, fs.constants.R_OK, err => {
-		if (err) {sendError(req, res, 404, "Path Not Found."); return;}
+	if (conf.restrictServerTree && isSubdirectory(path.dirname(fileRequested), __dirname)) { sendError(req, res, 404, "Path Not Found."); return; }
 
-		fs.stat(fileRequested, function(err, stats) {
-			if (err) {sendError(req, res, 404, "Path Not Found.");  return;}
-			
+	fs.access(fileRequested, fs.constants.R_OK, err => {
+		if (err) { sendError(req, res, 404, "Path Not Found."); return; }
+
+		fs.stat(fileRequested, function (err, stats) {
+			if (err) { sendError(req, res, 404, "Path Not Found."); return; }
+
 			if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
 			sendFile(fileRequested, req, res);
 		});
@@ -86,24 +85,32 @@ function getServerHeaders(headers) {
 }
 
 function sendFile(fileRequested, req, res) {
-	fs.open(fileRequested, "r", (err, fd) => {	
+	fs.open(fileRequested, "r", (err, fd) => {
 		if (err) (err.code === "ENOENT") ? sendError(req, res, 404, "Path Not Found.") : sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
-			let mime = conf.mimeTypes[path.extname(fileRequested)];
-			res.writeHead(200, mime ? getServerHeaders({"Content-Type":mime}) : getServerHeaders({}));
+			const mime = conf.mimeTypes[path.extname(fileRequested)];
+			const rawStream = fs.createReadStream(fileRequested, { "flags": "r", "fd": fd, "autoClose": true });
+			const acceptEncodingHeader = (req.headers['accept-encoding']) ? req.headers['accept-encoding'] : "";
 
-			fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true})
-			.on("data", chunk => res.write(chunk, "binary"))
-			.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
-			.on("end", _ => res.end());
+			if (conf.gzip && acceptEncodingHeader.split(", ").includes("gzip") && mime) {
+				res.writeHead(200, mime ? getServerHeaders({ "Content-Encoding": "gzip", "Content-Type": mime }) : getServerHeaders({}));
+				rawStream.pipe(zlib.createGzip()).pipe(res)
+					.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
+					.on("end", _ => res.end());
+			} else {
+				res.writeHead(200, mime ? getServerHeaders({ "Content-Type": mime }) : getServerHeaders({}));
+				rawStream.on("data", chunk => res.write(chunk, "binary"))
+					.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
+					.on("end", _ => res.end());
+			}
 		}
 	});
 }
 
 function sendError(req, res, code, message) {
 	error.error(`${code}: ${req.url} - ${message}`);
-	res.writeHead(code, getServerHeaders({"Content-Type": "text/plain"}));
+	res.writeHead(code, getServerHeaders({ "Content-Type": "text/plain" }));
 	res.write(`${code} ${message}\n`);
 	res.end();
 }
