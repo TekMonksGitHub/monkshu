@@ -1,9 +1,11 @@
 # monkshu
 The Monkshu Project
 
-Monkshu - The HTML5/REST/JSON/Node.js/API Enterprise Application Server
-=======================================================================
+Monkshu - The HTML5/REST/JSON/Node.js/API Enterprise Application Server - JAMStack Compliant
+=============================================================================================
 A complete Enterprise Application Server for Mobile apps (iOS and Android), Responsive HTML 5 Apps, and JSON API services. Consists of web container (called frontend), JSON API container (called backend), and hybrid iOS and Android app frameworks. 
+
+Monkshu is 100% compliant with [JAMStack](https://jamstack.org) standards for modern web development. 
 
 The plan is to produce a full Enterprise Application Sever based on Node.js, HTML5, Javascript, Android and iOS apps.
 
