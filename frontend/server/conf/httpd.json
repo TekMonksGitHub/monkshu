@@ -1,13 +1,14 @@
 {
-	"port" : 8080,
-	"host" : "::",
-	"webroot" : "./../",
-	"logdir" : "./logs",
-	"libdir" : "./lib",
-	"accesslog" : "./logs/access.log.json",
-	"errorlog" : "./logs/error.log.json",
-	"indexfile" : "index.html",
+	"port": 8080,
+	"host": "::",
+	"webroot": "./../",
+	"logdir": "./logs",
+	"libdir": "./lib",
+	"accesslog": "./logs/access.log.json",
+	"errorlog": "./logs/error.log.json",
+	"indexfile": "index.html",
 	"ssl": false,
+	"enableGZIPEncoding": false,
 	"pfxPath": "<path to PFX (.key) File>",
 	"pfxPassphrase": "<passphrase for the pfx file>",
 	"httpdHeaders": {
@@ -19,15 +20,15 @@
 		"Content-Security-Policy": "default-src 'self' 'unsafe-inline'; font-src 'self' 'unsafe-inline' fonts.gstatic.com; connect-src 'self' http://localhost:9090/ ws://localhost:9090/;",
 		"X-XSS-Protection": 1
 	},
-	"mimeTypes" : {
-		".html" : "text/html",
-		".htm" : "text/html",
-		".thtml" : "text/html",
-		".css" : "text/css",
-		".js" : "text/javascript",
-		".mjs" : "text/javascript",
-		".otf" : "application/x-font-opentype",
-		".ttf" : "application/x-font-truetype"
+	"mimeTypes": {
+		".html": "text/html",
+		".htm": "text/html",
+		".thtml": "text/html",
+		".css": "text/css",
+		".js": "text/javascript",
+		".mjs": "text/javascript",
+		".otf": "application/x-font-opentype",
+		".ttf": "application/x-font-truetype"
 	},
 	"restrictServerTree": true,
 	"timeout": 120000
