@@ -9,6 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 const url = require("url");
+const zlib = require("zlib");
 let access; let error;
 
 exports.bootstrap = bootstrap;
@@ -90,13 +91,21 @@ function sendFile(fileRequested, req, res) {
 		if (err) (err.code === "ENOENT") ? sendError(req, res, 404, "Path Not Found.") : sendError(req, res, 500, err);
 		else {
 			access.info(`Sending: ${fileRequested}`);
-			let mime = conf.mimeTypes[path.extname(fileRequested)];
-			res.writeHead(200, mime ? getServerHeaders({"Content-Type":mime}) : getServerHeaders({}));
+			const mime = conf.mimeTypes[path.extname(fileRequested)];
+			const rawStream = fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true});
+			const acceptEncodingHeader = req.headers["accept-encoding"] || "";
 
-			fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true})
-			.on("data", chunk => res.write(chunk, "binary"))
-			.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
-			.on("end", _ => res.end());
+			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime) {
+				res.writeHead(200, getServerHeaders({ "Content-Type": mime, "Content-Encoding": "gzip" }));
+				rawStream.pipe(zlib.createGzip()).pipe(res)
+				.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
+				.on("end", _ => res.end());
+			} else {
+				res.writeHead(200, mime ? getServerHeaders({"Content-Type":mime}) : getServerHeaders({}));
+				rawStream.on("data", chunk => res.write(chunk, "binary"))
+					.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
+					.on("end", _ => res.end());
+			}
 		}
 	});
 }
