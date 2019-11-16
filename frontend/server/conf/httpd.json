@@ -34,7 +34,8 @@
 		".jpg":		["image/jpeg", false],
 		".jpeg":	["image/jpeg", false],
 		".gif":		["image/gif", false],
-		".md":		["text/markdown", true]
+		".md":		["text/markdown", true],
+		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
 	},
 	"restrictServerTree": true,
 	"timeout": 120000
