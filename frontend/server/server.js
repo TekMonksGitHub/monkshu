@@ -95,13 +95,13 @@ function sendFile(fileRequested, req, res) {
 			const rawStream = fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true});
 			const acceptEncodingHeader = req.headers["accept-encoding"] || "";
 
-			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime) {
-				res.writeHead(200, getServerHeaders({ "Content-Type": mime, "Content-Encoding": "gzip" }));
+			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && (!Array.isArray(mime) || Array.isArray(mime) && mime[1]) ) {
+				res.writeHead(200, getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }));
 				rawStream.pipe(zlib.createGzip()).pipe(res)
 				.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
 				.on("end", _ => res.end());
 			} else {
-				res.writeHead(200, mime ? getServerHeaders({"Content-Type":mime}) : getServerHeaders({}));
+				res.writeHead(200, mime ? getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}) : getServerHeaders({}));
 				rawStream.on("data", chunk => res.write(chunk, "binary"))
 					.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
 					.on("end", _ => res.end());

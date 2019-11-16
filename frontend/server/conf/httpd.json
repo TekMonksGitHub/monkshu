@@ -8,7 +8,7 @@
 	"errorlog": "./logs/error.log.json",
 	"indexfile": "index.html",
 	"ssl": false,
-	"enableGZIPEncoding": false,
+	"enableGZIPEncoding": true,
 	"pfxPath": "<path to PFX (.key) File>",
 	"pfxPassphrase": "<passphrase for the pfx file>",
 	"httpdHeaders": {
@@ -26,14 +26,15 @@
 		".css":		"text/css",
 		".js":		"text/javascript",
 		".mjs":		"text/javascript",
+		".page":	"text/plain",
 		".otf":		"application/x-font-opentype",
 		".ttf":		"application/x-font-truetype",
 		".pdf":		"application/pdf",
-		".png":		"image/png",
-		".jpg":		"image/jpeg",
-		".jpeg":	"image/jpeg",
-		".gif":		"image/gif",
-		".md":		"text/markdown"
+		".png":		["image/png", false],
+		".jpg":		["image/jpeg", false],
+		".jpeg":	["image/jpeg", false],
+		".gif":		["image/gif", false],
+		".md":		["text/markdown", true]
 	},
 	"restrictServerTree": true,
 	"timeout": 120000
