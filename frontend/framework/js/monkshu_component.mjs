@@ -1,6 +1,13 @@
 /* 
  * (C) 2018 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
+ * 
+ * Web component support. All Monkshu components must call the register function. 
+ * Supports both true web component mode or simulated web components (not recommended).
+ * 
+ * Access to the element's javascript module is via monkshu_env.components[name]
+ * 
+ * Dynamic data binding is then via monkshu_env.components[name].bindData(data, id).
  */
 
 import {router} from "/framework/js/router.mjs";
