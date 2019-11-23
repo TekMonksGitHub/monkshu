@@ -7,7 +7,7 @@ A complete Enterprise Application Server for Mobile apps (iOS and Android), Resp
 
 Monkshu is 100% compliant with [JAMStack](https://jamstack.org) standards for modern web development. 
 
-##Monkshu's JAMStack
+## Monkshu's JAMStack
 Javascript - Monkshu frontend is simple ES6 JS modules
 Api - Monkshu Backend is a feature rich and easy to use API framework
 Markup - Monkshu uses WebComponents and Mustache templates for easy HTML Markup.
