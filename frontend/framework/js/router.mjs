@@ -34,7 +34,7 @@ async function loadPage(url, dataModels={}) {
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
 	let urlParsed = new URL(url);	url = urlParsed.origin + urlParsed.pathname; 	// Parse
-	if (checkSecurity && !securityguard.isAllowed(url)) throw "Not allowed: Security Exception";	// security block
+	if (checkSecurity && !securityguard.isAllowed(url)) throw new Error("Not allowed: Security Exception");	// security block
 
 	try {
 		let [html, _] = await Promise.all([
