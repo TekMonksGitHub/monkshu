@@ -26,4 +26,10 @@ function getFunctionFromString(string) {
     return scope[scopeSplit[scopeSplit.length - 1]];
 }
 
-export const util = {getCSSRule, getFunctionFromString}
+function replaceURLParamValue(url, name, value) {
+    url = new URL(url, window.location);
+    url.searchParams.set(name, value);
+    return url.href;
+}
+
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue}
