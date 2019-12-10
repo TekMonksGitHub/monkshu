@@ -32,4 +32,9 @@ function replaceURLParamValue(url, name, value) {
     return url.href;
 }
 
-export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue}
+function parseBoolean(value) {
+    if (!value) return false;
+    return String(value).toLowerCase() == "true";
+}
+
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean}
