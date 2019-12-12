@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const crypt = require(CONSTANTS.CRYPTCONF);
 
 function encrypt(text, key = crypt.key) {
-	let iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0,16);
+	let iv = Buffer.from(crypto.randomBytes(16)).toString("hex").slice(0, 16);
 	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
 	let cipher = crypto.createCipheriv(crypt.crypt_algo, password_hash, iv);
 	let crypted = cipher.update(text,"utf8","hex");
