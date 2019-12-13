@@ -50,8 +50,12 @@ function register(name, htmlTemplate, module) {
             // check security policy
             if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
 
+            // if it has template, or if the component already provided some HTML then honor it,
+            // else make it an invisible component, as it has no HTML (case: pure JS components).
             if (htmlTemplate) this.componentHTML = await router.loadHTML(htmlTemplate,
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
+            else if (!this.componentHTML) this.componentHTML = '<body style="margin: 0px; padding: 0px; height: 0px; display: none">';
+
             let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
             let templateRoot = templateDocument.documentElement;
             
