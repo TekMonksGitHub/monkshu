@@ -8,6 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
+const https = require("https");
 const url = require("url");
 const zlib = require("zlib");
 let access; let error;
@@ -21,10 +22,10 @@ function bootstrap() {
 	initConfSync();
 	initLogsSync();
 
-	/* Start http server */
+	/* Start HTTP/S server */
 	let listener = (req, res) => handleRequest(req, res);
 	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
-	let httpd = options ? http.createServer(options, listener) : http.createServer(listener);
+	let httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
