@@ -90,7 +90,7 @@ async function doService(url, data) {
 		}
 
 		if (!apiregistry.checkKey(endPoint, jsonObj)) {LOG.error("Bad API key: "+url); return CONSTANTS.FALSE_RESULT;}
-		else return await require(api).doService(jsonObj);
+		else try{return await require(api).doService(jsonObj);} catch (err) {LOG.debug(`API error: ${err}`); return CONSTANTS.FALSE_RESULT;}
 	}
 	else LOG.info("API not found: " + url);
 }
