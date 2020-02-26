@@ -8,11 +8,11 @@ const fs = require("fs");
 function copyFile(source, target, cb) {
 	let cbCalled = false;
 
-	let rd = fs.createReadStream(source);
+	const rd = fs.createReadStream(source);
 	rd.on("error", function(err) {done(err);});
-	let wr = fs.createWriteStream(target);
+	const wr = fs.createWriteStream(target);
 	wr.on("error", function(err) {done(err);});
-	wr.on("close", function(ex) {done();});
+	wr.on("close", function(_ex) {done();});
 	rd.pipe(wr);
 	
 	function done(err) {
@@ -20,9 +20,14 @@ function copyFile(source, target, cb) {
 	}
 }
 
+function parseBoolean(value) {
+    if (!value) return false;
+    return String(value).toLowerCase() == "true";
+}
+
 function queryToObject(query) {
     let jsObj = {};
-    let pairs = query.split("&");
+    const pairs = query.split("&");
     pairs.forEach((pair) => {
         let keyVal = pair.split("=");
         if (jsObj[keyVal[0]]) {
@@ -36,7 +41,7 @@ function queryToObject(query) {
 
 function getDateTime() {
 
-    let date = new Date();
+    const date = new Date();
 
     let hour = date.getHours();
     hour = (hour < 10 ? "0" : "") + hour;
@@ -47,7 +52,7 @@ function getDateTime() {
     let sec  = date.getSeconds();
     sec = (sec < 10 ? "0" : "") + sec;
 
-    let year = date.getFullYear();
+    const year = date.getFullYear();
 
     let month = date.getMonth() + 1;
     month = (month < 10 ? "0" : "") + month;
@@ -60,13 +65,8 @@ function getDateTime() {
 }
 
 function getTimeStamp() {
-    let hrTime = process.hrtime();
+    const hrTime = process.hrtime();
     return hrTime[0] * 1000000000 + hrTime[1];
 }
 
-module.exports = {
-	copyFile : copyFile,
-    getDateTime : getDateTime,
-    queryToObject : queryToObject,
-    getTimeStamp : getTimeStamp
-};
+module.exports = {copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp};

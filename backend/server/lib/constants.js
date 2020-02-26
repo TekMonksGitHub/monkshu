@@ -18,6 +18,7 @@ exports.LOGSCONF = rootdir+"/conf/log.json";
 exports.LOGMAIN = rootdir+"/logs/server.log.ndjson";
 exports.CRYPTCONF = rootdir+"/conf/crypt.json";
 exports.HTTPDCONF = rootdir + "/conf/httpd.json";
+exports.TOKENMANCONF = rootdir + "/conf/apitoken.json";
 exports.MAX_LOG = 1024;
 
 /* Result objects */
@@ -25,4 +26,4 @@ exports.FALSE_RESULT = {"result":false};
 exports.TRUE_RESULT = {"result":true};
 
 /* Key name */
-exports.APIKEY = "org_monkshu_apikey";
+exports.APIKEYS = ["X-API-Key", "org_monkshu_apikey"];

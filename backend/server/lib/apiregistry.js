@@ -6,10 +6,12 @@
 const fs = require("fs");
 const urlMod = require("url");
 const path = require("path");
+const utils = require(CONSTANTS.LIBDIR+"/utils.js");
+const tokenManager = require(CONSTANTS.LIBDIR+"/apitokenmanager.js");
 let apireg;
 
 function initSync() {
-	let apiRegistryRaw = fs.readFileSync(CONSTANTS.API_REGISTRY);
+	const apiRegistryRaw = fs.readFileSync(CONSTANTS.API_REGISTRY);
 	LOG.info("Read API registry: " + apiRegistryRaw);
 	apireg = JSON.parse(apiRegistryRaw);
 
@@ -33,7 +35,7 @@ function getAPI(url) {
 
 function isEncrypted(url) {
 	if (apireg[url]) {
-		let query = urlMod.parse(apireg[url], true).query;
+		const query = urlMod.parse(apireg[url], true).query;
 		return (query.encrypted && (query.encrypted.toLowerCase() === "true"));
 	}
 	else return false;
@@ -41,20 +43,46 @@ function isEncrypted(url) {
 
 function isGet(url) {
 	if (apireg[url]) {
-		let query = urlMod.parse(apireg[url], true).query;
+		const query = urlMod.parse(apireg[url], true).query;
 		return (query.get && (query.get.toLowerCase() === "true"));
 	}
 	else return false;
 }
 
-function checkKey(url,req) {
+function checkSecurity(url, req, headers) {
+	return _checkAPIKey(url, req, headers) && _checkAPIToken(url, headers);
+}
+
+function _checkAPIKey(url, req, headers) {
 	if (apireg[url]) {
-		let keyExpected = urlMod.parse(apireg[url], true).query.key;
-		let retVal = (keyExpected == req[CONSTANTS.APIKEY]);
-		delete req[CONSTANTS.APIKEY];
-		return retVal;
+		const keyExpected = urlMod.parse(apireg[url], true).query.key;
+		if (!keyExpected) return true; else for (const apiKeyHeaderName of CONSTANTS.APIKEYS) {
+			if (req[apiKeyHeaderName] == keyExpected) {delete req[apiKeyHeaderName]; return true;}
+			if (headers[apiKeyHeaderName] == keyExpected) {delete headers[apiKeyHeaderName]; return true;}
+		} 
 	}
-	else return false;
+	
+	return false;	// bad URL or API check failed
+}
+
+function _checkAPIToken(url, headers) {
+	if (apireg[url]) {
+		if (!utils.parseBoolean(urlMod.parse(apireg[url], true).query.needsToken)) return true;	// no token needed
+
+		const token_splits = headers.Authorization?headers.Authorization.split(" "):[];
+		if (token_splits.length == 2) return tokenManager.checkToken(token_splits[1]); 
+		else return false;	// missing or badly formatted token
+
+	} else return false;	// bad URL
+}
+
+function doesApiInjectToken(url, response) {
+	return (apireg[url] && urlMod.parse(apireg[url], true).query.addsToken && response.result);
+}
+
+function getToken(url, response) {
+	if (doesApiInjectToken(url, response)) return tokenManager.getToken(urlMod.parse(apireg[url], true).query.addsToken);
+	else return "";
 }
 
 function listAPIs() {
@@ -64,11 +92,4 @@ function listAPIs() {
 	return retList;
 }
 
-module.exports = {
-	initSync : initSync,
-	getAPI : getAPI,
-	isEncrypted : isEncrypted,
-	isGet : isGet,
-	checkKey : checkKey,
-	listAPIs : listAPIs
-};
+module.exports = {initSync, getAPI, isEncrypted, isGet, checkSecurity, listAPIs, doesApiInjectToken, getToken};

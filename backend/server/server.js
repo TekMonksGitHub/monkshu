@@ -22,9 +22,14 @@ function bootstrap() {
 	/* Init the logs */
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
+
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
+
+	/* Init the API Token Manager */
+	LOG.info("Initializing the API Token Manager.");
+	require(CONSTANTS.LIBDIR+"/apitokenmanager.js").initSync();
 
 	/* Run the server */
 	initAndRunTransportLoop();
@@ -50,10 +55,15 @@ function initAndRunTransportLoop() {
 		req.on("data", chunk => data+=chunk);
 		
 		req.on("end", async _ => {
-			let respObj = await doService(req.url, data);
+			let respObj = await doService(req.url, data, req.headers);
 			if (respObj) {
 				LOG.info("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-				res.writeHead(200, {"Content-Type" : "application/json"});
+				let headers = {"Content-Type" : "application/json"};
+				if (apiregistry.doesApiInjectToken(req.url, respObj)) {
+					headers.access_token = apiregistry.getToken(req.url, respObj); respObj.access_token = headers.access_token;
+					headers.token_type = "bearer"; respObj.token_type = headers.token_type;
+				}
+				res.writeHead(200, headers);
 				if (apiregistry.isEncrypted(urlMod.parse(req.url).pathname))
 					res.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}");
 				else res.write(JSON.stringify(respObj));
@@ -68,7 +78,7 @@ function initAndRunTransportLoop() {
 	});
 }
 
-async function doService(url, data) {
+async function doService(url, data, headers) {
 	LOG.info("Got request for the url: " + url);
 	
 	let endPoint = urlMod.parse(url, true).pathname;
@@ -89,7 +99,7 @@ async function doService(url, data) {
 			LOG.info("Bad JSON input, calling with empty object: " + url);
 		}
 
-		if (!apiregistry.checkKey(endPoint, jsonObj)) {LOG.error("Bad API key: "+url); return CONSTANTS.FALSE_RESULT;}
+		if (!apiregistry.checkSecurity(endPoint, jsonObj, headers)) {LOG.error("API security check failed: "+url); return CONSTANTS.FALSE_RESULT;}
 		else try{return await require(api).doService(jsonObj);} catch (err) {LOG.debug(`API error: ${err}`); return CONSTANTS.FALSE_RESULT;}
 	}
 	else LOG.info("API not found: " + url);
