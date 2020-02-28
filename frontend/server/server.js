@@ -8,6 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
+const https = require("https");
 const url = require("url");
 const zlib = require("zlib");
 let access; let error;
@@ -21,10 +22,10 @@ function bootstrap() {
 	initConfSync();
 	initLogsSync();
 
-	/* Start http server */
+	/* Start HTTP/S server */
 	let listener = (req, res) => handleRequest(req, res);
 	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
-	let httpd = options ? http.createServer(options, listener) : http.createServer(listener);
+	let httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
@@ -72,21 +73,25 @@ function handleRequest(req, res) {
 	fs.access(fileRequested, fs.constants.R_OK, err => {
 		if (err) {sendError(req, res, 404, "Path Not Found."); return;}
 
-		fs.stat(fileRequested, function(err, stats) {
-			if (err) {sendError(req, res, 404, "Path Not Found.");  return;}
+		fs.stat(fileRequested, (err, stats) => {
+			if (err) {sendError(req, res, 404, "Path Not Found."); return;}
 			
 			if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
-			sendFile(fileRequested, req, res);
+			sendFile(fileRequested, req, res, stats);
 		});
 	});
 }
 
-function getServerHeaders(headers) {
+function getServerHeaders(headers, stats) {
 	if (conf.httpdHeaders) headers = { ...headers, ...conf.httpdHeaders };
+	if (stats) {
+		headers["Last-Modified"] = stats.mtime.toGMTString();
+		headers["ETag"] = `${stats.ino}-${stats.mtimeMs}-${stats.size}`;
+	}
 	return headers;
 }
 
-function sendFile(fileRequested, req, res) {
+function sendFile(fileRequested, req, res, stats) {
 	fs.open(fileRequested, "r", (err, fd) => {	
 		if (err) (err.code === "ENOENT") ? sendError(req, res, 404, "Path Not Found.") : sendError(req, res, 500, err);
 		else {
@@ -96,12 +101,12 @@ function sendFile(fileRequested, req, res) {
 			const acceptEncodingHeader = req.headers["accept-encoding"] || "";
 
 			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && (!Array.isArray(mime) || Array.isArray(mime) && mime[1]) ) {
-				res.writeHead(200, getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }));
+				res.writeHead(200, getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }, stats));
 				rawStream.pipe(zlib.createGzip()).pipe(res)
 				.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
 				.on("end", _ => res.end());
 			} else {
-				res.writeHead(200, mime ? getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}) : getServerHeaders({}));
+				res.writeHead(200, mime ? getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}, stats) : getServerHeaders({}, stats));
 				rawStream.on("data", chunk => res.write(chunk, "binary"))
 					.on("error", err => sendError(req, res, 500, `500: ${req.url}, Server error: ${err}`))
 					.on("end", _ => res.end());
