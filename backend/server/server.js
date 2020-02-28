@@ -37,45 +37,35 @@ function bootstrap() {
 
 function initAndRunTransportLoop() {
 	/* Init the transport */
-	let transport = require(CONSTANTS.TRANSPORT);
-	let server = require(CONSTANTS.LIBDIR+"/"+transport.servertype+".js");
-	server.initSync(transport.port, transport.host||"::");
-	
-	console.log(`Server started on ${transport.host||"::"}:${transport.port}`);
-	LOG.info(`Server started on ${transport.host||"::"}:${transport.port}`);
+	let server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
+	server.initSync();
 	
 	/* Override the console now - to our log file*/
 	LOG.overrideConsole();
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
-	server.connection.on("request", (req, res) => {
-		let data = "";
-	
-		req.on("data", chunk => data+=chunk);
-		
-		req.on("end", async _ => {
-			let respObj = await doService(req.url, data, req.headers);
-			if (respObj) {
-				LOG.info("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-				let headers = {"Content-Type" : "application/json"};
-				if (apiregistry.doesApiInjectToken(req.url, respObj)) {
-					headers.access_token = apiregistry.getToken(req.url, respObj); respObj.access_token = headers.access_token;
-					headers.token_type = "bearer"; respObj.token_type = headers.token_type;
-				}
-				res.writeHead(200, headers);
-				if (apiregistry.isEncrypted(urlMod.parse(req.url).pathname))
-					res.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}");
-				else res.write(JSON.stringify(respObj));
-				res.end();
-			} else {
-				LOG.info("Sending 404 for: " + req.url);
-				res.writeHead(404, {"Content-Type": "text/plain"});
-				res.write("404 Not Found\n");
-				res.end();
+	server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
+	server.onReqEnd = async (url, headers, servObject) => {
+		let respObj = await doService(url, servObject.env.data, headers);
+		if (respObj) {
+			LOG.info("Got result: " + LOG.truncate(JSON.stringify(respObj)));
+			let respHeaders = {"Content-Type" : "application/json"};
+			if (apiregistry.doesApiInjectToken(url, respObj)) {
+				respHeaders.access_token = apiregistry.getToken(url, respObj); respObj.access_token = respHeaders.access_token;
+				respHeaders.token_type = "bearer"; respObj.token_type = respHeaders.token_type;
 			}
-		});
-	});
+			server.statusOK(respHeaders, servObject);
+			if (apiregistry.isEncrypted(urlMod.parse(url).pathname))
+				await server.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}", servObject);
+			else await server.write(JSON.stringify(respObj), servObject);
+			server.end(servObject);
+		} else {
+			LOG.info("Sending Not Found for: " + url);
+			server.statusNotFound(servObject);
+			server.end(servObject);
+		}
+	}
 }
 
 async function doService(url, data, headers) {

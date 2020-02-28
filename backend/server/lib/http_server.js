@@ -6,41 +6,50 @@
 const http = require("http");
 const https = require("https");
 const fs = require("fs");
+const gzipAsync = require("util").promisify(require("zlib").gzip);
 const conf = require(`${CONSTANTS.HTTPDCONF}`);
 
-exports.initSync = initSync;
-
-function initSync(port, host = "::") {
+function initSync() {
 	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase } : null;
 
 	/* create HTTP/S server */
-	LOG.info(`Attaching socket listener on ${host}:${port}`);
+	let host = conf.host || "::";
+	LOG.info(`Attaching socket listener on ${host}:${conf.port}`);
 	const listener = (req, res) => {
-		Object.keys(conf.headers).forEach(header => res.setHeader(header, conf.headers[header]));
-		const acceptEncodingHeader = req.headers["accept-encoding"] || "";
-		if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip")) { enableGZIPEncoding(req, res); }
+		if (req.method.toUpperCase() == "OPTIONS") {
+			res.writeHead(200, conf.headers);
+			res.end();
+		} else {
+			const servObject = {req, res, env:{}};
+			req.on("data", data => module.exports.onData(data, servObject));
+			req.on("end", _ => module.exports.onReqEnd(req.url, req.headers, servObject));
+		}
 	};
 	const server = options ? https.createServer(options, listener) : http.createServer(listener);
 	server.timeout = conf.timeout;
-	exports.connection = server.listen(port, host);
+	server.listen(conf.port, host);
+
+	console.log(`Server started on ${host}:${conf.port}`);
+	LOG.info(`Server started on ${host}:${conf.port}`);
 }
 
-const enableGZIPEncoding = (_req, res) => {
-	const zlib = require("zlib");
+function onData(_data, _servObject) {}
+function onReqEnd(servObject) {statusNotFound(servObject); end(servObject);}
 
-	/* bind response methods */
-	const _writeHead = res.writeHead.bind(res);
-	const _write = res.write.bind(res);
-	const _end = res.end.bind(res);
+function statusNotFound(servObject) {
+	servObject.res.writeHead(404, {"Content-Type": "text/plain"});
+	servObject.res.write("404 Not Found\n");
+}
 
-	/* override response methods */
-	res.writeHead = (statusCode, headers) => _writeHead.apply(res, [statusCode, { ...headers, "Content-Encoding": "gzip" }]);
-	res.write = (data) => {
-		zlib.gzip(data, (error, encodedData) => {
-			if (error) { LOG.error(error); return; }		// do not end response; allow timeout
-			_write.apply(res, [encodedData]);
-			_end.apply(res);
-		})
-	};
-	res.end = () => undefined;		// prevent premature res.end call
-};
+function statusOK(headers, servObject) {
+	servObject.res.writeHead(200, {...conf.headers, ...headers, "Content-Encoding":conf.enableGZIPEncoding?"gzip":"identity"});
+}
+
+async function write(data, servObject) {
+	if (conf.enableGZIPEncoding) data = await gzipAsync(data);
+	servObject.res.write(data);
+}
+
+function end(servObject) {servObject.res.end();}
+
+module.exports = {initSync, onData, onReqEnd, statusNotFound, statusOK, write, end}
