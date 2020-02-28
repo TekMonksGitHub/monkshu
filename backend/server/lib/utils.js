@@ -69,4 +69,9 @@ function getTimeStamp() {
     return hrTime[0] * 1000000000 + hrTime[1];
 }
 
-module.exports = {copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp};
+function getObjectKeyValueCaseInsensitive(obj, key) {
+    for (const keyThis of Object.keys(obj)) if (keyThis.toUpperCase() == key.toUpperCase()) return obj[keyThis];
+    return null;
+}
+
+module.exports = {copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive};

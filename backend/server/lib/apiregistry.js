@@ -57,19 +57,20 @@ function _checkAPIKey(url, req, headers) {
 	if (apireg[url]) {
 		const keyExpected = urlMod.parse(apireg[url], true).query.key;
 		if (!keyExpected) return true; else for (const apiKeyHeaderName of CONSTANTS.APIKEYS) {
-			if (req[apiKeyHeaderName] == keyExpected) {delete req[apiKeyHeaderName]; return true;}
-			if (headers[apiKeyHeaderName] == keyExpected) {delete headers[apiKeyHeaderName]; return true;}
+			if (utils.getObjectKeyValueCaseInsensitive(req,apiKeyHeaderName) == keyExpected) {delete req[apiKeyHeaderName]; return true;}
+			if (utils.getObjectKeyValueCaseInsensitive(headers,apiKeyHeaderName) == keyExpected) {delete headers[apiKeyHeaderName]; return true;}
 		} 
 	}
 	
-	return false;	// bad URL or API check failed
+	return false;	// bad URL 
 }
 
 function _checkAPIToken(url, headers) {
 	if (apireg[url]) {
 		if (!utils.parseBoolean(urlMod.parse(apireg[url], true).query.needsToken)) return true;	// no token needed
 
-		const token_splits = headers.Authorization?headers.Authorization.split(" "):[];
+		const incomingToken = utils.getObjectKeyValueCaseInsensitive(headers, "Authorization");
+		const token_splits = incomingToken?incomingToken.split(" "):[];
 		if (token_splits.length == 2) return tokenManager.checkToken(token_splits[1]); 
 		else return false;	// missing or badly formatted token
 
