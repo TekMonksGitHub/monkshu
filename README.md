@@ -27,4 +27,4 @@ and also allow full HTML5+CSS3 design capabilites instead of coming up with a mo
 * Full support for ECMA 6 standards
 * Full support for REST API based backend
 * Unified server - API runtime plus HTML5 Web Component frontend.
-* JST and API keys supported natively with a built in API Manager. Don't get hacked! APIs are now 20% of all cyberattacks. Monkshu makes it easy to write 100% secure Web applications and APIs.
+* JST and API keys supported natively with a built in API Manager. Don't get hacked! API attacks now comprise 20% of all cyberattacks. Monkshu makes it easy to write 100% secure Web applications and APIs.
