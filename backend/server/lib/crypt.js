@@ -25,6 +25,8 @@ function decrypt(text, key = crypt.key) {
 	return decrypted;
 }
 
+const generateWebSocketAcceptValue = (acceptKey) => crypto.createHash("sha1").update(acceptKey + crypt.ws_guid, "binary").digest("base64");
+
 if (require.main === module) {
 	const args = process.argv.slice(2);
 
@@ -36,4 +38,4 @@ if (require.main === module) {
 	console.log(eval(args[0])(args[1]));
 }
 
-module.exports = { encrypt, decrypt };
+module.exports = { encrypt, decrypt, generateWebSocketAcceptValue };
