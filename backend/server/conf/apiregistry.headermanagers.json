@@ -1,0 +1,5 @@
+{
+    "jwtTokenManager": 1, 
+    "jsonresponseheaderinjector": 1, 
+    "customresponseheaderinjector": 1
+}

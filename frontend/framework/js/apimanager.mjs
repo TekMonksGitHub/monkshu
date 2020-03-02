@@ -49,8 +49,9 @@ async function rest(url, type, req, sendToken, extractToken) {
     const response = await fetch(url, fetchInit);
     if (response.ok) {
         const respObj = await response.json();
+        const headersBack = {}; for (const headerBack of response.headers) headersBack[headerBack[0]] = headerBack[1];
         if (extractToken && respObj.access_token) _extractAddToken(respObj.access_token, urlHost);
-        else if (extractToken && response.headers.access_token) _extractAddToken(response.headers.access_token, urlHost);
+        else if (extractToken && headersBack.access_token) _extractAddToken(headersBack.access_token, urlHost);
         return respObj;
     } else return null;
 }

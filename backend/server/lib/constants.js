@@ -18,12 +18,15 @@ exports.LOGSCONF = rootdir+"/conf/log.json";
 exports.LOGMAIN = rootdir+"/logs/server.log.ndjson";
 exports.CRYPTCONF = rootdir+"/conf/crypt.json";
 exports.HTTPDCONF = rootdir + "/conf/httpd.json";
-exports.TOKENMANCONF = rootdir + "/conf/apitoken.json";
 exports.MAX_LOG = 1024;
 
 /* Result objects */
 exports.FALSE_RESULT = {"result":false};
 exports.TRUE_RESULT = {"result":true};
 
-/* Key name */
-exports.APIKEYS = ["X-API-Key", "org_monkshu_apikey"];
+/* API Manager Constants */
+exports.API_MANAGER_HEADERS_KEY = "__org_monkshu_apimanager_headers"
+exports.API_MANAGER_DECODERS_CONF = rootdir + "/conf/apiregistry.decoders.json";
+exports.API_MANAGER_ENCODERS_CONF = rootdir + "/conf/apiregistry.encoders.json";
+exports.API_MANAGER_SECURITYCHECKERS_CONF = rootdir + "/conf/apiregistry.securitycheckers.json";
+exports.API_MANAGER_HEADERMANAGERS_CONF = rootdir + "/conf/apiregistry.headermanagers.json";
