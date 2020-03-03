@@ -8,16 +8,17 @@
 const fs = require("fs");
 const path = require("path");
 const urlMod = require("url");
-const decoders = _loadSortedConfOjbects(CONSTANTS.API_MANAGER_DECODERS_CONF);
-const encoders = _loadSortedConfOjbects(CONSTANTS.API_MANAGER_ENCODERS_CONF);
-const headermanagers = _loadSortedConfOjbects(CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF);
-const securitycheckers = _loadSortedConfOjbects(CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF);
-let apireg;
+let decoders, encoders, headermanagers, securitycheckers, apireg;
 
 function initSync() {
 	const apiRegistryRaw = fs.readFileSync(CONSTANTS.API_REGISTRY);
 	LOG.info("Read API registry: " + apiRegistryRaw);
 	apireg = JSON.parse(apiRegistryRaw);
+
+	let decoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	let encoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	let headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	let securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 
 	fs.readdirSync(CONSTANTS.APPROOTDIR).forEach(app => {
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
@@ -27,11 +28,27 @@ function initSync() {
 			Object.keys(regThis).forEach(key => regThis[key] = (`../apps/${app}/${regThis[key]}`));
 			apireg = {...apireg, ...regThis};
 		}
+
+		const appRoot = `${CONSTANTS.APPROOTDIR}/${app}`;
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`)) decoderPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`)) encoderPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`)) headermanagersPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`)) securitycheckersPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: appRoot});
 	});
+
+	decoders = _loadSortedConfOjbects(decoderPathAndRoots);
+	encoders = _loadSortedConfOjbects(encoderPathAndRoots);
+	headermanagers = _loadSortedConfOjbects(headermanagersPathAndRoots);
+	securitycheckers = _loadSortedConfOjbects(securitycheckersPathAndRoots);
 
 	for (const decoderThis of decoders) if (decoderThis.initSync) decoderThis.initSync(apireg);
 	for (const securitycheckerThis of securitycheckers) if (securitycheckerThis.initSync) securitycheckerThis.initSync(apireg);
 	for (const headermanagerThis of headermanagers) if (headermanagerThis.initSync) headermanagerThis.initSync(apireg);
+	for (const encoderThis of encoders) if (encoderThis.initSync) encoderThis.initSync(apireg);
 
 	global.apiregistry = this;
 }
@@ -87,12 +104,15 @@ function listAPIs() {
 	return retList;
 }
 
-function _loadSortedConfOjbects(path) {
-	let rawObject = require(path);
+function _loadSortedConfOjbects(pathAndRoots) {
 	let sortedConfObjects = []; 
+	for (const {path, root} of pathAndRoots) {
+		const rawObject = require(path);
 
-	for (const key of Object.keys(rawObject)) sortedConfObjects.push(
-		{"module":`${CONSTANTS.LIBDIR}/apiregistry_extensions/${key.toLowerCase()}.js`, "priority":rawObject[key]});
+		for (const key of Object.keys(rawObject)) sortedConfObjects.push(
+			{"module":`${root}/lib/apiregistry_extensions/${key.toLowerCase()}.js`, "priority":rawObject[key]} );
+	}
+	
 	sortedConfObjects.sort((a,b) => (a.priority < b.priority) ? -1 : (a.priority > b.priority) ? 1 : 0);
 
 	for (const [i, confObject] of sortedConfObjects.entries()) sortedConfObjects[i] = require(confObject.module);

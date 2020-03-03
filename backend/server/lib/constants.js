@@ -26,7 +26,7 @@ exports.TRUE_RESULT = {"result":true};
 
 /* API Manager Constants */
 exports.API_MANAGER_HEADERS_KEY = "__org_monkshu_apimanager_headers"
-exports.API_MANAGER_DECODERS_CONF = rootdir + "/conf/apiregistry.decoders.json";
-exports.API_MANAGER_ENCODERS_CONF = rootdir + "/conf/apiregistry.encoders.json";
-exports.API_MANAGER_SECURITYCHECKERS_CONF = rootdir + "/conf/apiregistry.securitycheckers.json";
-exports.API_MANAGER_HEADERMANAGERS_CONF = rootdir + "/conf/apiregistry.headermanagers.json";
+exports.API_MANAGER_DECODERS_CONF = "/conf/apiregistry.decoders.json";
+exports.API_MANAGER_ENCODERS_CONF = "/conf/apiregistry.encoders.json";
+exports.API_MANAGER_SECURITYCHECKERS_CONF = "/conf/apiregistry.securitycheckers.json";
+exports.API_MANAGER_HEADERMANAGERS_CONF = "/conf/apiregistry.headermanagers.json";
