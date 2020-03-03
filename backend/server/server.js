@@ -70,7 +70,7 @@ async function doService(url, data, headers) {
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
-		let jsonObj = {}; jsonObj[CONSTANTS.API_MANAGER_HEADERS_KEY] = headers;
+		let jsonObj = {}; 
 
 		try { jsonObj = apiregistry.decodeIncomingData(url, data, headers); } catch (error) {
 			LOG.info("APIRegistry error: " + error); return ({code: 500, respObj: {result: false, error}}); }
