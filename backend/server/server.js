@@ -1,14 +1,11 @@
 /* 
  * Main server bootstrap file for the API server.
  * 
- * (C) 2015, 2016, 2017, 2018 TekMonks. All rights reserved.
+ * (C) 2015, 2016, 2017, 2018, 2019, 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
-const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
-const utils = require(CONSTANTS.LIBDIR+"/utils.js");
-const urlMod = require("url");
 
 exports.bootstrap = bootstrap;
 
@@ -27,10 +24,6 @@ function bootstrap() {
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
 
-	/* Init the API Token Manager */
-	LOG.info("Initializing the API Token Manager.");
-	require(CONSTANTS.LIBDIR+"/apitokenmanager.js").initSync();
-
 	/* Run the server */
 	initAndRunTransportLoop();
 }
@@ -47,51 +40,46 @@ function initAndRunTransportLoop() {
 	/* send request to the service mentioned in url*/
 	server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
 	server.onReqEnd = async (url, headers, servObject) => {
-		let respObj = await doService(url, servObject.env.data, headers);
-		if (respObj) {
-			LOG.info("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-			let respHeaders = {"Content-Type" : "application/json"};
-			if (apiregistry.doesApiInjectToken(url, respObj)) {
-				respHeaders.access_token = apiregistry.getToken(url, respObj); respObj.access_token = respHeaders.access_token;
-				respHeaders.token_type = "bearer"; respObj.token_type = respHeaders.token_type;
-			}
-			server.statusOK(respHeaders, servObject);
-			if (apiregistry.isEncrypted(urlMod.parse(url).pathname))
-				await server.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}", servObject);
-			else await server.write(JSON.stringify(respObj), servObject);
-			server.end(servObject);
-		} else {
+		const send500 = error => {
+			LOG.info(`Sending Internal Error for: ${url}, due to ${error}`);
+			server.statusInternalError(servObject, error); server.end(servObject);
+		}
+		
+		let {code, respObj} = await doService(url, servObject.env.data, headers);
+		if (code == 200) {
+			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
+			let respHeaders = {}; apiregistry.injectResponseHeaders(url, respObj, headers, respHeaders);
+
+			try {
+				server.statusOK(respHeaders, servObject);
+				await server.write(apiregistry.encodeResponse(url, respObj, headers, respHeaders), servObject);
+				server.end(servObject);
+			} catch (err) {send500(err)}
+		} else if (code == 404) {
 			LOG.info("Sending Not Found for: " + url);
 			server.statusNotFound(servObject);
-			server.end(servObject);
-		}
+			server.end(servObject, respObj.error);
+		} else if (code == 500) send500(respObj.error);
 	}
 }
 
 async function doService(url, data, headers) {
 	LOG.info("Got request for the url: " + url);
 	
-	let endPoint = urlMod.parse(url, true).pathname;
-	let query = urlMod.parse(url, true).query;
-	let api = apiregistry.getAPI(endPoint);
+	const api = apiregistry.getAPI(url);
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
-		let jsonObj = {};
-		try {
-			if (apiregistry.isGet(endPoint) && apiregistry.isEncrypted(endPoint)) 
-				jsonObj = query.data ? utils.queryToObject(crypt.decrypt(query.data)) : {};
-			else if (apiregistry.isGet(endPoint) && !apiregistry.isEncrypted(endPoint)) jsonObj = query;
-			else if (apiregistry.isEncrypted(endPoint)) jsonObj = JSON.parse(crypt.decrypt(JSON.parse(data).data));
-			else jsonObj = JSON.parse(data);
-		} catch (err) {
-			LOG.info("Input JSON parser error: " + err);
-			LOG.info("Bad JSON input, calling with empty object: " + url);
-		}
+		let jsonObj = {}; 
 
-		if (!apiregistry.checkSecurity(endPoint, jsonObj, headers)) {LOG.error("API security check failed: "+url); return CONSTANTS.FALSE_RESULT;}
-		else try{return await require(api).doService(jsonObj);} catch (err) {LOG.debug(`API error: ${err}`); return CONSTANTS.FALSE_RESULT;}
-	}
-	else LOG.info("API not found: " + url);
+		try { jsonObj = apiregistry.decodeIncomingData(url, data, headers); } catch (error) {
+			LOG.info("APIRegistry error: " + error); return ({code: 500, respObj: {result: false, error}}); }
+
+		if (!apiregistry.checkSecurity(url, jsonObj, headers)) {
+			LOG.error("API security check failed: "+url); return ({code: 500, respObj: {result: false, error: "Security check failed."}}); }
+
+		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {
+			LOG.debug(`API error: ${error}`); return ({code: 500, respObj: {result: false, error}}); }
+	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 

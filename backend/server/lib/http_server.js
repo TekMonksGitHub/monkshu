@@ -3,12 +3,12 @@
  * License: MIT - see enclosed LICENSE file.
  */
 
+const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const fs = require("fs");
-const gzipAsync = require("util").promisify(require("zlib").gzip);
 const conf = require(`${CONSTANTS.HTTPDCONF}`);
 const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
+const gzipAsync = require("util").promisify(require("zlib").gzip);
 
 function initSync() {
 	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase } : null;
@@ -98,13 +98,19 @@ function registerUpgraded(url, socket) {
 	else require(ws_api).register(socket);
 }
 
-function statusNotFound(servObject) {
+function statusNotFound(servObject, _error) {
 	servObject.res.writeHead(404, {"Content-Type": "text/plain"});
 	servObject.res.write("404 Not Found\n");
 }
 
+function statusInternalError(servObject, _error) {
+	servObject.res.writeHead(500, {"Content-Type": "text/plain"});
+	servObject.res.write("Internal error\n");
+}
+
 function statusOK(headers, servObject) {
-	servObject.res.writeHead(200, {...conf.headers, ...headers, "Content-Encoding":conf.enableGZIPEncoding?"gzip":"identity"});
+	const respHeaders = {...conf.headers, ...headers, "Content-Encoding":conf.enableGZIPEncoding?"gzip":"identity"};
+	servObject.res.writeHead(200, respHeaders);
 }
 
 async function write(data, servObject) {
@@ -114,4 +120,4 @@ async function write(data, servObject) {
 
 function end(servObject) {servObject.res.end();}
 
-module.exports = { initSync, onData, onReqEnd, onConnectionUpgrade, establishHandshake, registerUpgraded, statusNotFound, statusOK, write, end }
+module.exports = { initSync, onData, onReqEnd, onConnectionUpgrade, establishHandshake, registerUpgraded, statusNotFound, statusInternalError, statusOK, write, end }
