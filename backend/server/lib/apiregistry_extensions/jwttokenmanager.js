@@ -21,7 +21,7 @@ function initSync() {
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
 
-function checkSecurity(apiregentry, _url, _req, headers) {
+function checkSecurity(apiregentry, _url, _req, headers, _servObject) {
     if (!utils.parseBoolean(apiregentry.query.needsToken)) return true;	// no token needed
 
     const incomingToken = utils.getObjectKeyValueCaseInsensitive(headers, "Authorization");
@@ -41,7 +41,7 @@ function _checkToken(token) {
     }
 }
 
-function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, responseHeaders) {
+function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, responseHeaders, _servObject) {
     if (!apiregentry.query.addsToken || !response.result) return;   // nothing to do
 
     const tokenCreds = apiregentry.query.addsToken;

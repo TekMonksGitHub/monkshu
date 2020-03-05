@@ -59,42 +59,42 @@ function getAPI(url) {
 	else return;
 }
 
-function decodeIncomingData(url, data, headers) {
+function decodeIncomingData(url, data, headers, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	let decoded = data;
-	for (const decoderThis of decoders) decoded = decoderThis.decodeIncomingData(apiregentry, url, decoded, headers);
+	for (const decoderThis of decoders) decoded = decoderThis.decodeIncomingData(apiregentry, url, decoded, headers, servObject);
 
 	return decoded;
 }
 
-function encodeResponse(url, respObj, reqHeaders, respHeaders) {
+function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	let encoded = respObj;
-	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, endPoint, encoded, reqHeaders, respHeaders);
+	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, endPoint, encoded, reqHeaders, respHeaders, servObject);
 
 	return encoded;
 }
 
-function checkSecurity(url, req, headers) {
+function checkSecurity(url, req, headers, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	for (const securitycheckerThis of securitycheckers) 
-		if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers)) return false;
+		if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject)) return false;
 
 	return true;
 }
 
-function injectResponseHeaders(url, response, requestHeaders, responseHeaders) {
+function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	for (const headermanagerThis of headermanagers) 
-		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders);
+		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders, servObject);
 }
 
 function listAPIs() {

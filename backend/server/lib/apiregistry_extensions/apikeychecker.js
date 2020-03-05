@@ -7,7 +7,7 @@
 const APIKEYS = ["X-API-Key", "org_monkshu_apikey"];
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
-function checkSecurity(apiregentry, _url, _req, headers) {
+function checkSecurity(apiregentry, _url, _req, headers, _servObject) {
     const keyExpected = apiregentry.query.key;
     if (!keyExpected) return true; 
     else for (const apiKeyHeaderName of APIKEYS) 

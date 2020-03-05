@@ -45,14 +45,14 @@ function initAndRunTransportLoop() {
 			server.statusInternalError(servObject, error); server.end(servObject);
 		}
 		
-		let {code, respObj} = await doService(url, servObject.env.data, headers);
+		let {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-			let respHeaders = {}; apiregistry.injectResponseHeaders(url, respObj, headers, respHeaders);
+			let respHeaders = {}; apiregistry.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
 
 			try {
 				server.statusOK(respHeaders, servObject);
-				await server.write(apiregistry.encodeResponse(url, respObj, headers, respHeaders), servObject);
+				await server.write(apiregistry.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
 				server.end(servObject);
 			} catch (err) {send500(err)}
 		} else if (code == 404) {
@@ -63,7 +63,7 @@ function initAndRunTransportLoop() {
 	}
 }
 
-async function doService(url, data, headers) {
+async function doService(url, data, headers, servObject) {
 	LOG.info("Got request for the url: " + url);
 	
 	const api = apiregistry.getAPI(url);
@@ -72,10 +72,10 @@ async function doService(url, data, headers) {
 	if (api) {
 		let jsonObj = {}; 
 
-		try { jsonObj = apiregistry.decodeIncomingData(url, data, headers); } catch (error) {
+		try { jsonObj = apiregistry.decodeIncomingData(url, data, headers, servObject); } catch (error) {
 			LOG.info("APIRegistry error: " + error); return ({code: 500, respObj: {result: false, error}}); }
 
-		if (!apiregistry.checkSecurity(url, jsonObj, headers)) {
+		if (!apiregistry.checkSecurity(url, jsonObj, headers, servObject)) {
 			LOG.error("API security check failed: "+url); return ({code: 500, respObj: {result: false, error: "Security check failed."}}); }
 
 		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {

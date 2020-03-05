@@ -131,14 +131,17 @@ function deleteHttps(host, port, path, headers, _req, callback) {
 }
 
 function doCall(reqStr, options, secure, callback) {
-    let caller = secure ? https : http;
-    let responseString = "";
-    let req = caller.request(options, (res) => {
-        res.on("data", d => responseString += d);
+    const caller = secure ? https : http;
+    let resp, ignoreEvents = false;
+    const req = caller.request(options, res => {
+        res.on("data", d => {if (!ignoreEvents) resp = resp?d:resp+d;});
 
-        res.on("end", function() {
-            let status = this.statusCode;
-            try {callback(null, JSON.parse(responseString), status)} catch (e) {callback("Bad JSON Response", null)}
+        res.on("error", error => {callback(error, null); ignoreEvents = true;});
+
+        res.on("end", () => {
+            if (ignoreEvents) return;
+            const status = res.statusCode; const resHeaders = res.getHeaders();
+            try {callback(null, JSON.parse(resp), status, resHeaders)} catch (e) {callback(`Bad JSON Response: ${resp}, error: ${e}`, null)}
         });
     });
  
@@ -156,12 +159,4 @@ if (require.main === module) {
     });
 }
 
-exports.get = get;
-exports.post = post;
-exports.put = put;
-exports.delete = deleteHttp;
-
-exports.getHttps = getHttps;
-exports.postHttps = postHttps;
-exports.putHttps = putHttps;
-exports.deleteHttps = deleteHttps;
+module.exports = {get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps};
