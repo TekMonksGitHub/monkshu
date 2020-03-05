@@ -8,7 +8,8 @@
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 function decodeIncomingData(apiregentry, _url, data, headers) {
-    if (utils.getObjectKeyValueCaseInsensitive(headers,"Content-Type").toLowerCase() != "application/json" || 
+    if (!utils.getObjectKeyValueCaseInsensitive(headers,"Content-Type") ||
+        utils.getObjectKeyValueCaseInsensitive(headers,"Content-Type").toLowerCase() != "application/json" || 
         apiregentry.query.notRESTAPI) return data;   // can't handle or query based
 
     try{return JSON.parse(data);} 
