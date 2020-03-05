@@ -20,10 +20,10 @@ function initSync() {
 	let headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 	let securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 
-	fs.readdirSync(CONSTANTS.APPROOTDIR).forEach(app => {
+	for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
 			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`);
-			LOG.info("Read App API registry: " + apiRegistryRaw);
+			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
 			Object.keys(regThis).forEach(key => regThis[key] = (`../apps/${app}/${regThis[key]}`));
 			apireg = {...apireg, ...regThis};
@@ -38,7 +38,7 @@ function initSync() {
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: appRoot});
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`)) securitycheckersPathAndRoots.push(
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: appRoot});
-	});
+	}
 
 	decoders = _loadSortedConfOjbects(decoderPathAndRoots);
 	encoders = _loadSortedConfOjbects(encoderPathAndRoots);
