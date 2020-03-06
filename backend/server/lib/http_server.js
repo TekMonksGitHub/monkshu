@@ -24,6 +24,7 @@ function initSync() {
 			const servObject = {req, res, env:{}};
 			req.on("data", data => module.exports.onData(data, servObject));
 			req.on("end", _ => module.exports.onReqEnd(req.url, req.headers, servObject));
+			req.on("error", error => module.exports.onReqError(req.url, req.headers, error, servObject));
 		}
 	};
 	const server = options ? https.createServer(options, listener) : http.createServer(listener);
@@ -34,8 +35,9 @@ function initSync() {
 	LOG.info(`Server started on ${host}:${conf.port}`);
 }
 
-function onData(_data, _servObject) {}
-function onReqEnd(servObject) {statusNotFound(servObject); end(servObject);}
+function onData(_,_) {}
+function onReqError(_,_,error,servObject) {statusInternalError(servObject, error); end(servObject);}
+function onReqEnd(_,_,servObject) {statusNotFound(servObject); end(servObject);}
 
 function statusNotFound(servObject, _error) {
 	servObject.res.writeHead(404, HEADER_ERROR);
@@ -80,4 +82,4 @@ function _shouldWeGZIP(servObject) {
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
 
 
-module.exports = {initSync, onData, onReqEnd, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end}
+module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end}
