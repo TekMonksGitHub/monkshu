@@ -5,7 +5,9 @@
  */
 
 const http = require("http");
+const zlib = require("zlib");
 const https = require("https");
+const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 const querystring = require("querystring");
 
@@ -78,7 +80,7 @@ function putHttps(host, port, path, headers, req, callback) {
 }
 
 function get(host, port, path, headers, req, callback) {
-    if (req) path += "?" + (typeof (req) == "object" ? + querystring.stringify(req):req);
+    if (req) path += "?" + (typeof req == "object" ? querystring.stringify(req):req);
 
     let optionsget = {
         host : host,
@@ -132,16 +134,23 @@ function deleteHttps(host, port, path, headers, _req, callback) {
 
 function doCall(reqStr, options, secure, callback) {
     const caller = secure ? https : http;
-    let resp, ignoreEvents = false;
+    let resp, ignoreEvents = false, resPiped;
     const req = caller.request(options, res => {
-        res.on("data", d => {if (!ignoreEvents) resp = resp?d:resp+d;});
+        const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";
+        if (encoding.toLowerCase() == "gzip") {resPiped = zlib.createGunzip(); res.pipe(resPiped);}  else resPiped = res;
 
-        res.on("error", error => {callback(error, null); ignoreEvents = true;});
+        resPiped.on("data", d => {if (!ignoreEvents) resp = resp ? resp+d : d});
 
-        res.on("end", () => {
+        const sendError = error => {callback(error, null); ignoreEvents = true;};
+        res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
+
+        resPiped.on("end", () => {
             if (ignoreEvents) return;
-            const status = res.statusCode; const resHeaders = res.getHeaders();
-            try {callback(null, JSON.parse(resp), status, resHeaders)} catch (e) {callback(`Bad JSON Response: ${resp}, error: ${e}`, null)}
+            const status = res.statusCode, resHeaders = {...res.headers};
+            const statusOK = Math.trunc(status/200) == 1 && status %200 < 100;
+
+            if (!statusOK) callback(`Bad status: ${status}`, null, status, resHeaders);
+            else try {callback(null, JSON.parse(resp), status, resHeaders)} catch (e) {callback(`Bad JSON Response: ${resp}, error: ${e}`, null, status, resHeaders)}
         });
     });
  

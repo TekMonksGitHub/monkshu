@@ -59,7 +59,15 @@ function initAndRunTransportLoop() {
 			LOG.info("Sending Not Found for: " + url);
 			server.statusNotFound(servObject);
 			server.end(servObject, respObj.error);
-		} else if (code == 500) send500(respObj.error);
+		} else if (code == 403 || code == 401) {
+			LOG.info("Sending Unauthorized for: " + url);
+			server.statusUnauthorized(servObject);
+			server.end(servObject, respObj.error);
+		} else if (code == 429) {
+			LOG.info("Sending Throttled for: " + url);
+			server.statusThrottled(servObject);
+			server.end(servObject, respObj.error);
+		} else send500(respObj.error);
 	}
 }
 
@@ -76,10 +84,10 @@ async function doService(url, data, headers, servObject) {
 			LOG.info("APIRegistry error: " + error); return ({code: 500, respObj: {result: false, error}}); }
 
 		if (!apiregistry.checkSecurity(url, jsonObj, headers, servObject)) {
-			LOG.error("API security check failed: "+url); return ({code: 500, respObj: {result: false, error: "Security check failed."}}); }
+			LOG.error("API security check failed: "+url); return ({code: 401, respObj: {result: false, error: "Security check failed."}}); }
 
 		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {
-			LOG.debug(`API error: ${error}`); return ({code: 500, respObj: {result: false, error}}); }
+			LOG.debug(`API error: ${error}`); return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); }
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 

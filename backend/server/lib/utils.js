@@ -74,4 +74,9 @@ function getObjectKeyValueCaseInsensitive(obj, key) {
     return null;
 }
 
-module.exports = {copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive};
+function getObjectKeyNameCaseInsensitive(obj, key) {
+    for (const keyThis of Object.keys(obj)) if (keyThis.toUpperCase() == key.toUpperCase()) return keyThis;
+    return null;
+}
+
+module.exports = {copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive};

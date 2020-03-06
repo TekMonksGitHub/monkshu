@@ -8,6 +8,7 @@ const http = require("http");
 const https = require("https");
 const conf = require(`${CONSTANTS.HTTPDCONF}`);
 const gzipAsync = require("util").promisify(require("zlib").gzip);
+const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
 
 function initSync() {
 	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase } : null;
@@ -16,7 +17,7 @@ function initSync() {
 	let host = conf.host || "::";
 	LOG.info(`Attaching socket listener on ${host}:${conf.port}`);
 	const listener = (req, res) => {
-		if (req.method.toUpperCase() == "OPTIONS") {
+		if (req.method.toLowerCase() == "options") {
 			res.writeHead(200, conf.headers);
 			res.end();
 		} else {
@@ -37,25 +38,46 @@ function onData(_data, _servObject) {}
 function onReqEnd(servObject) {statusNotFound(servObject); end(servObject);}
 
 function statusNotFound(servObject, _error) {
-	servObject.res.writeHead(404, {"Content-Type": "text/plain"});
+	servObject.res.writeHead(404, HEADER_ERROR);
 	servObject.res.write("404 Not Found\n");
 }
 
+function statusUnauthorized(servObject, _error) {
+	servObject.res.writeHead(403, HEADER_ERROR);
+	servObject.res.write("403 Unauthorized or forbidden\n");
+}
+
+function statusThrottled(servObject, _error) {
+	servObject.res.writeHead(429, HEADER_ERROR);
+	servObject.res.write("429 Too many requests\n");
+}
+
 function statusInternalError(servObject, _error) {
-	servObject.res.writeHead(500, {"Content-Type": "text/plain"});
+	servObject.res.writeHead(500, HEADER_ERROR);
 	servObject.res.write("Internal error\n");
 }
 
 function statusOK(headers, servObject) {
-	const respHeaders = {...conf.headers, ...headers, "Content-Encoding":conf.enableGZIPEncoding?"gzip":"identity"};
+	const confHeaders = _cloneLowerCase(conf.headers);
+	const headersIn = _cloneLowerCase(headers);
+
+	const respHeaders = {...headersIn, ...confHeaders, "content-encoding":_shouldWeGZIP(servObject)?"gzip":"identity"};
 	servObject.res.writeHead(200, respHeaders);
 }
 
 async function write(data, servObject) {
-	if (conf.enableGZIPEncoding) data = await gzipAsync(data);
+	if (_shouldWeGZIP(servObject)) data = await gzipAsync(data);
 	servObject.res.write(data);
 }
 
 function end(servObject) {servObject.res.end();}
 
-module.exports = {initSync, onData, onReqEnd, statusNotFound, statusInternalError, statusOK, write, end}
+function _shouldWeGZIP(servObject) {
+	const acceptEncoding = _cloneLowerCase(servObject.req.headers)["accept-encoding"] || "identity";
+	return conf.enableGZIPEncoding && acceptEncoding.toLowerCase().includes("gzip");
+}
+
+const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
+
+
+module.exports = {initSync, onData, onReqEnd, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end}
