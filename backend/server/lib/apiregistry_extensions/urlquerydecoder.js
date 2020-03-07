@@ -4,12 +4,14 @@
  * 
  * Query data decoder
  */
+
 const urlMod = require("url");
+const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 function decodeIncomingData(apiregentry, url, data, headers, _servObject) {
-    if (!(apiregentry.query.get) || !(apiregentry.query.get.toLowerCase() == "true")) return data;  // not query based
+    if (!utils.parseBoolean(apiregentry.query.get)) return data;  // not query based
 
-    headers["Content-Type"] = "application/json";   // we always convert query to JSON string
+    headers["content-type"] = "application/json";   // we always convert query to JSON string
 
     return JSON.stringify(urlMod.parse(url, true).query);
 }
