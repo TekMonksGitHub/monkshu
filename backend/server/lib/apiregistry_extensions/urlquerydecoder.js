@@ -7,7 +7,7 @@
 const urlMod = require("url");
 
 function decodeIncomingData(apiregentry, url, data, headers, _servObject) {
-    if (!apiregentry.query.get || !apiregentry.query.get.toLowerCase() === "true") return data;  // not query based
+    if (!(apiregentry.query.get) || !(apiregentry.query.get.toLowerCase() == "true")) return data;  // not query based
 
     headers["Content-Type"] = "application/json";   // we always convert query to JSON string
 

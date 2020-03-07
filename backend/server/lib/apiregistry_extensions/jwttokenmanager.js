@@ -24,7 +24,7 @@ function initSync() {
 function checkSecurity(apiregentry, _url, _req, headers, _servObject) {
     if (!utils.parseBoolean(apiregentry.query.needsToken)) return true;	// no token needed
 
-    const incomingToken = utils.getObjectKeyValueCaseInsensitive(headers, "Authorization");
+    const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(" "):[];
     if (token_splits.length == 2) return _checkToken(token_splits[1]); 
     else return false;	// missing or badly formatted token
