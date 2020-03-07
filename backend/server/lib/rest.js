@@ -80,7 +80,8 @@ function putHttps(host, port, path, headers, req, callback) {
 }
 
 function get(host, port, path, headers, req, callback) {
-    if (req) path += "?" + (typeof req == "object" ? querystring.stringify(req):req);
+    if (req && typeof req == "object") req = querystring.stringify(req);
+    if (req && req.trim() !== "") path += `?${req}`;
 
     let optionsget = {
         host : host,
@@ -94,7 +95,8 @@ function get(host, port, path, headers, req, callback) {
 }
 
 function getHttps(host, port, path, headers, req, callback) {
-    if (req) path += "?" + (typeof (req) == "object" ? + querystring.stringify(req):req);
+    if (req && typeof req == "object") req = querystring.stringify(req);
+    if (req && req.trim() !== "") path += `?${req}`;
 
     let optionsget = {
         host : host,
@@ -133,7 +135,7 @@ function deleteHttps(host, port, path, headers, _req, callback) {
 }
 
 function doCall(reqStr, options, secure, callback) {
-    const caller = secure ? https : http;
+    const caller = secure ? https : http; 
     let resp, ignoreEvents = false, resPiped;
     const req = caller.request(options, res => {
         const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";

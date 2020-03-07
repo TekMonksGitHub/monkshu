@@ -21,7 +21,11 @@ function initSync() {
 			res.writeHead(200, conf.headers);
 			res.end();
 		} else {
-			const servObject = {req, res, env:{}};
+			const servObject = {req, res, env:{}}; 
+			for (const header of Object.keys(req.headers)) {
+				const saved = req.headers[header]; delete req.headers[header]; 
+				req.headers[header.toLowerCase()] = saved;
+			}
 			req.on("data", data => module.exports.onData(data, servObject));
 			req.on("end", _ => module.exports.onReqEnd(req.url, req.headers, servObject));
 			req.on("error", error => module.exports.onReqError(req.url, req.headers, error, servObject));
@@ -68,6 +72,7 @@ function statusOK(headers, servObject) {
 }
 
 async function write(data, servObject) {
+	if (typeof data != "string" && !Buffer.isBuffer(data) && data !== "") throw ("Can't write data, not serializable.");
 	if (_shouldWeGZIP(servObject)) data = await gzipAsync(data);
 	servObject.res.write(data);
 }
