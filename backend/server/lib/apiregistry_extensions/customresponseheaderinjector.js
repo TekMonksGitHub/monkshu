@@ -7,7 +7,7 @@
 
 function injectResponseHeaders(apiregentry, _url, _response, _requestHeaders, responseHeaders, _servObject) {
     if (!apiregentry.query.customContentType) return;   // nothing to do
-    responseHeaders["Content-Type"] = decodeURIComponent(apiregentry.query.customContentType);
+    responseHeaders["content-type"] = decodeURIComponent(apiregentry.query.customContentType);
 }
 
 module.exports = {injectResponseHeaders};

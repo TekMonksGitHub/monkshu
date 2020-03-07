@@ -7,7 +7,7 @@
 
 function injectResponseHeaders(apiregentry, _url, _response, _requestHeaders, responseHeaders, _servObject) {
     if (apiregentry.query.notRESTAPI) return;   // nothing to do
-    responseHeaders["Content-Type"] = "application/json";
+    responseHeaders["content-type"] = "application/json";
 }
 
 module.exports = {injectResponseHeaders};
