@@ -8,12 +8,13 @@
 const fs = require("fs");
 const path = require("path");
 const urlMod = require("url");
-let decoders, encoders, headermanagers, securitycheckers, apireg;
+const API_REG_DISTM_KEY = "__org_monkshu_apiregistry";
+let decoders, encoders, headermanagers, securitycheckers;
 
 function initSync() {
-	const apiRegistryRaw = fs.readFileSync(CONSTANTS.API_REGISTRY);
-	LOG.info("Read API registry: " + apiRegistryRaw);
-	apireg = JSON.parse(apiRegistryRaw);
+	let apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY) || JSON.parse(fs.readFileSync(CONSTANTS.API_REGISTRY));
+	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
+	if (!DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY)) DISTRIBUTED_MEMORY.set(API_REG_DISTM_KEY, apireg);
 
 	let decoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 	let encoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
@@ -40,6 +41,8 @@ function initSync() {
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: appRoot});
 	}
 
+	DISTRIBUTED_MEMORY.set(API_REG_DISTM_KEY, apireg);
+
 	decoders = _loadSortedConfOjbects(decoderPathAndRoots);
 	encoders = _loadSortedConfOjbects(encoderPathAndRoots);
 	headermanagers = _loadSortedConfOjbects(headermanagersPathAndRoots);
@@ -50,17 +53,19 @@ function initSync() {
 	for (const headermanagerThis of headermanagers) if (headermanagerThis.initSync) headermanagerThis.initSync(apireg);
 	for (const encoderThis of encoders) if (encoderThis.initSync) encoderThis.initSync(apireg);
 
-	global.apiregistry = this;
+	global.APIREGISTRY = this;
 }
 
 function getAPI(url) {
 	const endPoint = urlMod.parse(url, true).pathname;
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	if (apireg[endPoint]) return path.resolve(`${CONSTANTS.ROOTDIR}/${urlMod.parse(apireg[endPoint], true).pathname}`);
 	else return;
 }
 
 function decodeIncomingData(url, data, headers, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	let decoded = data;
@@ -71,6 +76,7 @@ function decodeIncomingData(url, data, headers, servObject) {
 
 function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	let encoded = respObj;
@@ -81,6 +87,7 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 
 function checkSecurity(url, req, headers, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	for (const securitycheckerThis of securitycheckers) 
@@ -91,6 +98,7 @@ function checkSecurity(url, req, headers, servObject) {
 
 function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject) {
 	const endPoint = urlMod.parse(url, true).pathname;
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	for (const headermanagerThis of headermanagers) 
@@ -98,6 +106,7 @@ function injectResponseHeaders(url, response, requestHeaders, responseHeaders, s
 }
 
 function listAPIs() {
+	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let list = Object.keys(apireg);
 	let retList = []; 
 	list.forEach( srv => {if (!srv.startsWith("/admin")) retList.push(srv);} );

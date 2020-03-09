@@ -20,6 +20,10 @@ function bootstrap() {
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
 
+	/* Init the distributed memory */
+	LOG.info("Initializing the distribued memory.");
+	require(CONSTANTS.LIBDIR+"/distributedmemory.js").init();
+
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
@@ -48,11 +52,11 @@ function initAndRunTransportLoop() {
 		let {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-			let respHeaders = {}; apiregistry.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
+			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
 
 			try {
 				server.statusOK(respHeaders, servObject);
-				await server.write(apiregistry.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
+				await server.write(APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
 				server.end(servObject);
 			} catch (err) {send500(err)}
 		} else if (code == 404) {
@@ -74,16 +78,16 @@ function initAndRunTransportLoop() {
 async function doService(url, data, headers, servObject) {
 	LOG.info("Got request for the url: " + url);
 	
-	const api = apiregistry.getAPI(url);
+	const api = APIREGISTRY.getAPI(url);
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
 		let jsonObj = {}; 
 
-		try { jsonObj = apiregistry.decodeIncomingData(url, data, headers, servObject); } catch (error) {
-			LOG.info("APIRegistry error: " + error); return ({code: 500, respObj: {result: false, error}}); }
+		try { jsonObj = APIREGISTRY.decodeIncomingData(url, data, headers, servObject); } catch (error) {
+			LOG.info("APIREGISTRY error: " + error); return ({code: 500, respObj: {result: false, error}}); }
 
-		if (!apiregistry.checkSecurity(url, jsonObj, headers, servObject)) {
+		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject)) {
 			LOG.error("API security check failed: "+url); return ({code: 401, respObj: {result: false, error: "Security check failed."}}); }
 
 		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {
