@@ -23,7 +23,8 @@ function initSync() {
 	let securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 
 	const apps = app.getApps();
-	for (const app of Object.keys(apps)) {
+	for (const appObj of apps) {
+		const app = Object.keys(appObj)[0];
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
 			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`);
 			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
