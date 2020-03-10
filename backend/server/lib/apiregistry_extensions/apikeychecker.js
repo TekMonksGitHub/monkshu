@@ -14,4 +14,9 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject) {
     return false;   // key not found in the headers
 }
 
-module.exports = {checkSecurity};
+function getIncomingAPIKey(headers) {
+    for (const apiKeyHeaderName of APIKEYS) if (headers[apiKeyHeaderName]) return headers[apiKeyHeaderName];
+    return null;
+}
+
+module.exports = {checkSecurity, getIncomingAPIKey};

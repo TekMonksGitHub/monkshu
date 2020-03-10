@@ -24,6 +24,10 @@ function bootstrap() {
 	LOG.info("Initializing the distribued memory.");
 	require(CONSTANTS.LIBDIR+"/distributedmemory.js").init();
 
+	/* Init the apps */
+	LOG.info("Initializing the apps.");
+	require(CONSTANTS.LIBDIR+"/app.js").initSync();
+
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();

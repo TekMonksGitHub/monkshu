@@ -16,7 +16,6 @@ function initSync() {
     try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
     conf.expiryTime = conf.expiryTime || 600000; conf.tokenGCInterval = conf.tokenGCInterval || 1800000;
-    if (!conf.secret) {LOG.error("Missing SHA-256 secret in API token config. Not secure!!"); conf.secret = "jfkoewu89rufioj9322";}
 
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
@@ -57,7 +56,7 @@ function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, res
     const headerB64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
     const tokenClaimHeader = claimB64+"."+headerB64;
 
-    const sig64 = crypto.createHmac("sha256", conf.secret).update(tokenClaimHeader).digest("hex");
+    const sig64 = crypto.createHmac("sha256", crypto.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
     const token = `${claimB64}.${headerB64}.${sig64}`;
     activeTokens[token] = Date.now();

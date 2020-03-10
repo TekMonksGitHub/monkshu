@@ -8,6 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const urlMod = require("url");
+const app = require(`${CONSTANTS.LIBDIR}/app.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry";
 let decoders, encoders, headermanagers, securitycheckers;
 
@@ -21,7 +22,8 @@ function initSync() {
 	let headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 	let securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 
-	for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
+	const apps = app.getApps();
+	for (const app of Object.keys(apps)) {
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
 			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`);
 			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
@@ -30,7 +32,7 @@ function initSync() {
 			apireg = {...apireg, ...regThis};
 		}
 
-		const appRoot = `${CONSTANTS.APPROOTDIR}/${app}`;
+		const appRoot = apps[app];
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`)) decoderPathAndRoots.push(
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: appRoot});
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`)) encoderPathAndRoots.push(
