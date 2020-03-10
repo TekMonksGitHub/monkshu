@@ -33,7 +33,7 @@ function initSync() {
 			apireg = {...apireg, ...regThis};
 		}
 
-		const appRoot = apps[app];
+		const appRoot = appObj[app];
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`)) decoderPathAndRoots.push(
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: appRoot});
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`)) encoderPathAndRoots.push(
