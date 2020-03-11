@@ -20,13 +20,13 @@ function initSync() {
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
 
-function checkSecurity(apiregentry, _url, _req, headers, _servObject) {
+function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
     if (!utils.parseBoolean(apiregentry.query.needsToken)) return true;	// no token needed
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(" "):[];
     if (token_splits.length == 2) return _checkToken(token_splits[1]); 
-    else return false;	// missing or badly formatted token
+    else {reason.reason = "JWT Token Error"; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
 function _checkToken(token) {

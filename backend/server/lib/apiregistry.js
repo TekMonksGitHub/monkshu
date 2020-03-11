@@ -88,13 +88,13 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	return encoded;
 }
 
-function checkSecurity(url, req, headers, servObject) {
+function checkSecurity(url, req, headers, servObject, reason) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	const apireg = DISTRIBUTED_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
 
 	for (const securitycheckerThis of securitycheckers) 
-		if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject)) return false;
+		if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject, reason)) return false;
 
 	return true;
 }

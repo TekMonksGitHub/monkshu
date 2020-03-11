@@ -91,8 +91,9 @@ async function doService(url, data, headers, servObject) {
 		try { jsonObj = APIREGISTRY.decodeIncomingData(url, data, headers, servObject); } catch (error) {
 			LOG.info("APIREGISTRY error: " + error); return ({code: 500, respObj: {result: false, error}}); }
 
-		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject)) {
-			LOG.error("API security check failed: "+url); return ({code: 401, respObj: {result: false, error: "Security check failed."}}); }
+		let reason = {};
+		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason)) {
+			LOG.error(`API security check failed for ${url}, reason: ${reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}}); }
 
 		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {
 			LOG.debug(`API error: ${error}`); return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); }
