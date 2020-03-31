@@ -33,3 +33,7 @@ Fully Secure Backend APIs and Frontend Web Apps
 JWT tokens and API keys are supported natively with a built in API Manager. Don't get hacked! API attacks now comprise 20% of all cyberattacks. Monkshu makes it easy to write 100% secure Web applications and APIs.
 
 Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based attacks.
+
+License
+==========
+See enclised file LICENSE. (C) TekMonks.
