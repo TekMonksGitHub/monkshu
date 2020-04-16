@@ -63,30 +63,26 @@ function statusInternalError(servObject, _error) {
 	servObject.res.write("Internal error\n");
 }
 
-function statusOK(headers, servObject) {
+function statusOK(headers, servObject, dontGZIP) {
 	const confHeaders = _cloneLowerCase(conf.headers);
 	const headersIn = _cloneLowerCase(headers);
 
-	const respHeaders = {...headersIn, ...confHeaders, "content-encoding":_shouldWeGZIP(servObject)?"gzip":"identity"};
+	const respHeaders = {...headersIn, ...confHeaders, "content-encoding":_shouldWeGZIP(servObject, dontGZIP)?"gzip":"identity"};
 	servObject.res.writeHead(200, respHeaders);
 }
 
-async function write(data, servObject) {
+async function write(data, servObject, dontGZIP) {
 	if (typeof data != "string" && !Buffer.isBuffer(data) && data !== "") throw ("Can't write data, not serializable.");
-	if (_shouldWeGZIP(servObject)) data = await gzipAsync(data);
-	if (!servObject.res_queue_depth) servObject.res_queue_depth = 0;
-	servObject.res_queue_depth++; servObject.res.write(data, _=>{
-		servObject.res_queue_depth--;
-		if (servObject.res_waiting_listener && servObject.res_queue_depth == 0) servObject.res_waiting_listener();
-	});
+	if (_shouldWeGZIP(servObject, dontGZIP)) data = await gzipAsync(data);
+	servObject.res.write(data);
 }
 
 function end(servObject) {
-	if (servObject.res_queue_depth == 0) servObject.res.end();
-	else servObject.res_waiting_listener = _=>servObject.res.end();
+	servObject.res.end();
 }
 
-function _shouldWeGZIP(servObject) {
+function _shouldWeGZIP(servObject, dontGZIP) {
+	if (dontGZIP) return false;
 	const acceptEncoding = _cloneLowerCase(servObject.req.headers)["accept-encoding"] || "identity";
 	return conf.enableGZIPEncoding && acceptEncoding.toLowerCase().includes("gzip");
 }
