@@ -75,7 +75,7 @@ function initAndRunTransportLoop() {
 			LOG.info("Sending Throttled for: " + url);
 			server.statusThrottled(servObject);
 			server.end(servObject, respObj.error);
-		} else send500(respObj.error);
+		} else if (code == 999) {/*special do nothing code*/} else send500(respObj.error);
 	}
 }
 
@@ -95,8 +95,14 @@ async function doService(url, data, headers, servObject) {
 		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason)) {
 			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}}); }
 
-		try { return ({code: 200, respObj: await require(api).doService(jsonObj)}); } catch (error) {
-			LOG.debug(`API error: ${error}`); return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); }
+		try { 
+			const apiModule = require(api);
+			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(url, jsonObj, headers, servObject); return ({code: 999});}
+			else return ({code: 200, respObj: await apiModule.doService(jsonObj)}); 
+		} catch (error) {
+			LOG.debug(`API error: ${error}`); 
+			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
+		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 

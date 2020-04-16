@@ -21,7 +21,7 @@ function initSync() {
 			res.writeHead(200, conf.headers);
 			res.end();
 		} else {
-			const servObject = {req, res, env:{}}; 
+			const servObject = {req, res, env:{}, server: module.exports}; 
 			for (const header of Object.keys(req.headers)) {
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;
@@ -74,10 +74,17 @@ function statusOK(headers, servObject) {
 async function write(data, servObject) {
 	if (typeof data != "string" && !Buffer.isBuffer(data) && data !== "") throw ("Can't write data, not serializable.");
 	if (_shouldWeGZIP(servObject)) data = await gzipAsync(data);
-	servObject.res.write(data);
+	if (!servObject.res_queue_depth) servObject.res_queue_depth = 0;
+	servObject.res_queue_depth++; servObject.res.write(data, _=>{
+		servObject.res_queue_depth--;
+		if (servObject.res_waiting_listener && servObject.res_queue_depth == 0) servObject.res_waiting_listener();
+	});
 }
 
-function end(servObject) {servObject.res.end();}
+function end(servObject) {
+	if (servObject.res_queue_depth == 0) servObject.res.end();
+	else servObject.res_waiting_listener = _=>servObject.res.end();
+}
 
 function _shouldWeGZIP(servObject) {
 	const acceptEncoding = _cloneLowerCase(servObject.req.headers)["accept-encoding"] || "identity";

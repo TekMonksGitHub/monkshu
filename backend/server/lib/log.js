@@ -6,6 +6,7 @@
 const fs = require("fs");
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const log_conf = require(CONSTANTS.LOGSCONF);
+let origLog;
 
 function initGlobalLoggerSync(logName) {
 	/* create the logger */
@@ -42,22 +43,19 @@ Logger.prototype.console = function(s) {
 }
 
 Logger.prototype.overrideConsole = function() {
-	this.origLog = global.console.log;
-	this.oldStdoutWrite = process.stdout.write;
-	this.oldStderrWrite = process.stderr.write;
-
+	origLog = global.console.log;
 	global.console.log = function() {
-		LOG.info(`[console] ${arguments[0]}`); 
+		LOG.info("[console] " + require("util").format.apply(null, arguments)); 
 	};
 	process.stdout.write = function() {
-		LOG.info(`[stdout] ${arguments[0]}`);
+		LOG.info("[stdout] " + require("util").format.apply(null, arguments));
 	}
 	process.stderr.write = function() {
-		LOG.error(`[stderr] ${arguments[0]}`);
+		LOG.error("[stderr] " + require("util").format.apply(null, arguments));
 	}
 	process.on('uncaughtException', function(err) {
 		LOG.error(err && err.stack ? err.stack : err, true);
-		this.oldStderrWrite.call(process.stderr, "EXIT ON CRITICAL ERROR!!! Check Logs.");
+		origLog("EXIT ON CRITICAL ERROR!!! Check Logs.");
 		process.exit(1);
 	});
 };
