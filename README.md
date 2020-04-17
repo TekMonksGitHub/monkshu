@@ -34,6 +34,11 @@ JWT tokens and API keys are supported natively with a built in API Manager. Don'
 
 Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based attacks.
 
+NPMs needed
+===========
+(1) None if using custom authentication
+(2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms
+
 License
 ==========
 See enclised file LICENSE. (C) TekMonks.
