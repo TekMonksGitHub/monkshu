@@ -36,8 +36,8 @@ Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based at
 
 NPMs needed
 ===========
-(1) None if using custom authentication
-(2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms
+(1) None if using custom authentication.  
+(2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms.
 
 License
 ==========
