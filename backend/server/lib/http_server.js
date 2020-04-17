@@ -71,10 +71,10 @@ function statusOK(headers, servObject, dontGZIP) {
 	servObject.res.writeHead(200, respHeaders);
 }
 
-async function write(data, servObject, dontGZIP) {
+async function write(data, servObject, encoding, dontGZIP) {
 	if (typeof data != "string" && !Buffer.isBuffer(data) && data !== "") throw ("Can't write data, not serializable.");
 	if (_shouldWeGZIP(servObject, dontGZIP)) data = await gzipAsync(data);
-	servObject.res.write(data);
+	servObject.res.write(data, encoding?encoding:"utf-8");
 }
 
 function end(servObject) {
