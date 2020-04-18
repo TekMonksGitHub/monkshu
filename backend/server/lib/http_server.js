@@ -44,22 +44,22 @@ function onReqError(_,_,error,servObject) {statusInternalError(servObject, error
 function onReqEnd(_,_,servObject) {statusNotFound(servObject); end(servObject);}
 
 function statusNotFound(servObject, _error) {
-	servObject.res.writeHead(404, HEADER_ERROR);
+	servObject.res.writeHead(404, {...HEADER_ERROR, ...conf.headers});
 	servObject.res.write("404 Not Found\n");
 }
 
 function statusUnauthorized(servObject, _error) {
-	servObject.res.writeHead(403, HEADER_ERROR);
+	servObject.res.writeHead(403, {...HEADER_ERROR, ...conf.headers});
 	servObject.res.write("403 Unauthorized or forbidden\n");
 }
 
 function statusThrottled(servObject, _error) {
-	servObject.res.writeHead(429, HEADER_ERROR);
+	servObject.res.writeHead(429, {...HEADER_ERROR, ...conf.headers});
 	servObject.res.write("429 Too many requests\n");
 }
 
 function statusInternalError(servObject, _error) {
-	servObject.res.writeHead(500, HEADER_ERROR);
+	servObject.res.writeHead(500, {...HEADER_ERROR, ...conf.headers});
 	servObject.res.write("Internal error\n");
 }
 
