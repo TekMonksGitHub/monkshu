@@ -1,10 +1,16 @@
 {
     "timeout": 120000,
     "ssl": false,
-    "enableGZIPEncoding": false,
+    "enableGZIPEncoding": true,
     "headers": {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Expose-Headers": "*",
+        "Access-Control-Max-Age": 86400
     },
     "pfxPath": "<path to PFX (.key) File>",
-    "pfxPassphrase": "<passphrase for the pfx file>"
+    "pfxPassphrase": "<passphrase for the pfx file>",
+    "host" : "0.0.0.0",
+    "port" : 9090
 }

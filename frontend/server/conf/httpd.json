@@ -13,11 +13,10 @@
 	"pfxPassphrase": "<passphrase for the pfx file>",
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
+		"X-XSS-Protection": 1,
 		"X-Frame-Options": "deny",
 		"X-Content-Type-Options": "nosniff",
-		"Cache-Control": "no-cache, no-store, must-revalidate",
-		"Pragma": "no-cache",
-		"X-XSS-Protection": 1
+		"Cache-Control": "max-age=157680000, public, must-revalidate"
 	},
 	"mimeTypes" : {
 		".html":	"text/html",

@@ -7,36 +7,33 @@ const crypto = require("crypto");
 const crypt = require(CONSTANTS.CRYPTCONF);
 
 function encrypt(text, key = crypt.key) {
-	let iv = (new Buffer(crypto.randomBytes(16))).toString("hex").slice(0,16);
-	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
-	let cipher = crypto.createCipheriv(crypt.crypt_algo, password_hash, iv);
-	let crypted = cipher.update(text,"utf8","hex");
+	const iv = Buffer.from(crypto.randomBytes(16)).toString("hex").slice(0, 16);
+	const password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
+	const cipher = crypto.createCipheriv(crypt.crypt_algo, password_hash, iv);
+	let crypted = cipher.update(text, "utf8", "hex");
 	crypted += cipher.final("hex");
-	return crypted+iv;
+	return crypted + iv;
 }
- 
+
 function decrypt(text, key = crypt.key) {
-	let iv = text.slice(text.length-16, text.length);
-	text = text.substring(0, text.length-16);
-	let password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
-	let decipher = crypto.createDecipheriv(crypt.crypt_algo, password_hash, iv);
+	const iv = text.slice(text.length - 16, text.length);
+	text = text.substring(0, text.length - 16);
+	const password_hash = crypto.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
+	const decipher = crypto.createDecipheriv(crypt.crypt_algo, password_hash, iv);
 	let decrypted = decipher.update(text, "hex", "utf8");
 	decrypted += decipher.final("utf8");
 	return decrypted;
 }
 
 if (require.main === module) {
-	let args = process.argv.slice(2);
-	
+	const args = process.argv.slice(2);
+
 	if (args.length < 2) {
 		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt>");
 		process.exit(1);
 	}
-	
+
 	console.log(eval(args[0])(args[1]));
 }
 
-module.exports = {
-	encrypt : encrypt,
-	decrypt : decrypt
-};
+module.exports = { encrypt, decrypt };

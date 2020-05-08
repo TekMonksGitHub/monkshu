@@ -2,6 +2,8 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  * 
+ * DEPRECATED: Use apimanager.mjs instead
+ * 
  */
 
 async function rest(url, type, params) {

@@ -7,6 +7,8 @@ A complete Enterprise Application Server for Mobile apps (iOS and Android), Resp
 
 Monkshu is 100% compliant with [JAMStack](https://jamstack.org) standards for modern web development. 
 
+Fully independent - Monkshu is built ground up to not require any other dependencies other than base Node.js. Includes embedded HTTP servers as well.
+
 ## Monkshu's JAMStack
 * Javascript - Monkshu frontend is simple ES6 JS modules  
 * Api - Monkshu Backend is a feature rich and easy to use API framework  
@@ -27,3 +29,18 @@ and also allow full HTML5+CSS3 design capabilites instead of coming up with a mo
 * Full support for ECMA 6 standards
 * Full support for REST API based backend
 * Unified server - API runtime plus HTML5 Web Component frontend.
+ 
+Fully Secure Backend APIs and Frontend Web Apps
+================================================
+JWT tokens and API keys are supported natively with a built in API Manager. Don't get hacked! API attacks now comprise 20% of all cyberattacks. Monkshu makes it easy to write 100% secure Web applications and APIs.
+
+Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based attacks.
+
+NPMs needed
+===========
+(1) None if using custom authentication.  
+(2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms.
+
+License
+==========
+See enclised file LICENSE. (C) TekMonks.

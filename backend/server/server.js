@@ -1,14 +1,11 @@
 /* 
  * Main server bootstrap file for the API server.
  * 
- * (C) 2015, 2016, 2017, 2018 TekMonks. All rights reserved.
+ * (C) 2015, 2016, 2017, 2018, 2019, 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
-const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
-const utils = require(CONSTANTS.LIBDIR+"/utils.js");
-const urlMod = require("url");
 
 exports.bootstrap = bootstrap;
 
@@ -23,13 +20,17 @@ function bootstrap() {
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
 
+	/* Init the distributed memory */
+	LOG.info("Initializing the distribued memory.");
+	require(CONSTANTS.LIBDIR+"/distributedmemory.js").init();
+
+	/* Init the apps */
+	LOG.info("Initializing the apps.");
+	require(CONSTANTS.LIBDIR+"/app.js").initSync();
+
 	/* Init the API registry */
 	LOG.info("Initializing the API registry.");
 	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
-
-	/* Init the API Token Manager */
-	LOG.info("Initializing the API Token Manager.");
-	require(CONSTANTS.LIBDIR+"/apitokenmanager.js").initSync();
 
 	/* Run the server */
 	initAndRunTransportLoop();
@@ -37,71 +38,71 @@ function bootstrap() {
 
 function initAndRunTransportLoop() {
 	/* Init the transport */
-	let transport = require(CONSTANTS.TRANSPORT);
-	let server = require(CONSTANTS.LIBDIR+"/"+transport.servertype+".js");
-	server.initSync(transport.port, transport.host||"::");
-	
-	console.log(`Server started on ${transport.host||"::"}:${transport.port}`);
-	LOG.info(`Server started on ${transport.host||"::"}:${transport.port}`);
+	let server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
+	server.initSync();
 	
 	/* Override the console now - to our log file*/
 	LOG.overrideConsole();
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
-	server.connection.on("request", (req, res) => {
-		let data = "";
-	
-		req.on("data", chunk => data+=chunk);
+	server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
+	server.onReqEnd = async (url, headers, servObject) => {
+		const send500 = error => {
+			LOG.info(`Sending Internal Error for: ${url}, due to ${error}`);
+			server.statusInternalError(servObject, error); server.end(servObject);
+		}
 		
-		req.on("end", async _ => {
-			let respObj = await doService(req.url, data, req.headers);
-			if (respObj) {
-				LOG.info("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-				let headers = {"Content-Type" : "application/json"};
-				if (apiregistry.doesApiInjectToken(req.url, respObj)) {
-					headers.access_token = apiregistry.getToken(req.url, respObj); respObj.access_token = headers.access_token;
-					headers.token_type = "bearer"; respObj.token_type = headers.token_type;
-				}
-				res.writeHead(200, headers);
-				if (apiregistry.isEncrypted(urlMod.parse(req.url).pathname))
-					res.write("{\"data\":\""+crypt.encrypt(JSON.stringify(respObj))+"\"}");
-				else res.write(JSON.stringify(respObj));
-				res.end();
-			} else {
-				LOG.info("Sending 404 for: " + req.url);
-				res.writeHead(404, {"Content-Type": "text/plain"});
-				res.write("404 Not Found\n");
-				res.end();
-			}
-		});
-	});
+		let {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
+		if (code == 200) {
+			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
+			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
+
+			try {
+				server.statusOK(respHeaders, servObject);
+				await server.write(APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
+				server.end(servObject);
+			} catch (err) {send500(err)}
+		} else if (code == 404) {
+			LOG.info("Sending Not Found for: " + url);
+			server.statusNotFound(servObject);
+			server.end(servObject, respObj.error);
+		} else if (code == 403 || code == 401) {
+			LOG.info("Sending Unauthorized for: " + url);
+			server.statusUnauthorized(servObject);
+			server.end(servObject, respObj.error);
+		} else if (code == 429) {
+			LOG.info("Sending Throttled for: " + url);
+			server.statusThrottled(servObject);
+			server.end(servObject, respObj.error);
+		} else if (code == 999) {/*special do nothing code*/} else send500(respObj.error);
+	}
 }
 
-async function doService(url, data, headers) {
+async function doService(url, data, headers, servObject) {
 	LOG.info("Got request for the url: " + url);
 	
-	let endPoint = urlMod.parse(url, true).pathname;
-	let query = urlMod.parse(url, true).query;
-	let api = apiregistry.getAPI(endPoint);
+	const api = APIREGISTRY.getAPI(url);
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
-		let jsonObj = {};
-		try {
-			if (apiregistry.isGet(endPoint) && apiregistry.isEncrypted(endPoint)) 
-				jsonObj = query.data ? utils.queryToObject(crypt.decrypt(query.data)) : {};
-			else if (apiregistry.isGet(endPoint) && !apiregistry.isEncrypted(endPoint)) jsonObj = query;
-			else if (apiregistry.isEncrypted(endPoint)) jsonObj = JSON.parse(crypt.decrypt(JSON.parse(data).data));
-			else jsonObj = JSON.parse(data);
-		} catch (err) {
-			LOG.info("Input JSON parser error: " + err);
-			LOG.info("Bad JSON input, calling with empty object: " + url);
-		}
+		let jsonObj = {}; 
 
-		if (!apiregistry.checkSecurity(endPoint, jsonObj, headers)) {LOG.error("API security check failed: "+url); return CONSTANTS.FALSE_RESULT;}
-		else try{return await require(api).doService(jsonObj);} catch (err) {LOG.debug(`API error: ${err}`); return CONSTANTS.FALSE_RESULT;}
-	}
-	else LOG.info("API not found: " + url);
+		try { jsonObj = APIREGISTRY.decodeIncomingData(url, data, headers, servObject); } catch (error) {
+			LOG.info("APIREGISTRY error: " + error); return ({code: 500, respObj: {result: false, error}}); }
+
+		let reason = {};
+		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason)) {
+			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}}); }
+
+		try { 
+			const apiModule = require(api);
+			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(url, jsonObj, headers, servObject); return ({code: 999});}
+			else return ({code: 200, respObj: await apiModule.doService(jsonObj)}); 
+		} catch (error) {
+			LOG.debug(`API error: ${error}`); 
+			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
+		}
+	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 
