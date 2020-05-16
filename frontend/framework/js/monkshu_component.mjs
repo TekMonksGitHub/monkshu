@@ -30,14 +30,12 @@ function register(name, htmlTemplate, module) {
     module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
     module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
 
+    module.getMemory = (id="__org_monkshu_element_no_id") => {
+        if (!module.memory) module.memory = {}; if (!module.memory[id]) module.memory[id] = {}; return module.memory[id];
+    }
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
-
-        constructor() {
-            super();
-            if (this.id) {if (!module.elements) module.elements = {}; module.elements[this.id] = this;}
-            else module.element = this;
-        }
 
         static async _diffApplyDom(oldDom, newDom) {
             await $$.require("/framework/3p/diffDOM.js");
@@ -78,10 +76,14 @@ function register(name, htmlTemplate, module) {
                 } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
 
+            if (module.initialRender && initialRender) module.initialRender(this);
             if (module.elementRendered) module.elementRendered(this);
         }
 
         async connectedCallback() {
+            if (this.id) {if (!module.elements) module.elements = {}; module.elements[this.id] = this;}
+            else module.element = this;
+
             if (this.hasAttribute("onload")) await eval(this.getAttribute("onload"));
             if (module.elementConnected) await module.elementConnected(this);
             if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
