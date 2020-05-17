@@ -15,22 +15,31 @@ if (require("cluster").isMaster == true) bootstrap();
 function bootstrap() {
 	/* Init - Server bootup */
 	console.log("Starting...");
-	
+
 	/* Init the logs */
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
 
-	/* Init the distributed memory */
-	LOG.info("Initializing the distribued memory.");
-	require(CONSTANTS.LIBDIR+"/distributedmemory.js").init();
+	/* Init the cluster memory */
+	LOG.info("Initializing the cluster memory.");
+	require(CONSTANTS.LIBDIR+"/clustermemory.js").init();
 
 	/* Init the apps */
 	LOG.info("Initializing the apps.");
 	require(CONSTANTS.LIBDIR+"/app.js").initSync();
 
 	/* Init the API registry */
+	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
 	LOG.info("Initializing the API registry.");
-	require(CONSTANTS.LIBDIR+"/apiregistry.js").initSync();
+	apireg.initSync();
+
+	/* Init the built in blackboard server */
+	LOG.info("Initializing the distributed blackboard.");
+	require(CONSTANTS.LIBDIR+"/blackboard.js").init();
+
+	/* Init the global memory */
+	LOG.info("Initializing the global memory.");
+	require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
 
 	/* Run the server */
 	initAndRunTransportLoop();
@@ -53,7 +62,7 @@ function initAndRunTransportLoop() {
 			server.statusInternalError(servObject, error); server.end(servObject);
 		}
 		
-		let {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
+		const {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
 			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
