@@ -37,4 +37,10 @@ function parseBoolean(value) {
     return String(value).toLowerCase() == "true";
 }
 
-export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean}
+function escapeHTML(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML}

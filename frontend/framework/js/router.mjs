@@ -10,7 +10,7 @@ const HS = "?.=";
 
 async function loadPage(url, dataModels={}) {
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
-	let history = session.get("__org_monkshu_router_history"); let hash;
+	const history = session.get("__org_monkshu_router_history"); let hash;
 
 	if (url.indexOf(HS) == -1) {
 		hash = btoa(url);
@@ -26,14 +26,17 @@ async function loadPage(url, dataModels={}) {
 	session.set($$.MONKSHU_CONSTANTS.PAGE_URL, url);
 	session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, dataModels);
 	
-	let html = await loadHTML(url, dataModels);
+	const html = await loadHTML(url, dataModels);
 	document.open("text/html");
 	document.write(html);
 	document.close();
+
+	// notify those who want to know that a new page was loaded
+	if (window.monkshu_env.onRouterLoadPage) for (const func of window.monkshu_env.onRouterLoadPage) func();
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
-	let urlParsed = new URL(url);	url = urlParsed.origin + urlParsed.pathname; 	// Parse
+	const urlParsed = new URL(url); url = urlParsed.origin + urlParsed.pathname; 	// Parse
 	if (checkSecurity && !securityguard.isAllowed(url)) throw new Error("Not allowed: Security Exception");	// security block
 
 	try {
@@ -55,13 +58,13 @@ async function expandPageData(text, url, dataModels) {
 	dataModels = await getPageData(url, dataModels);
 
 	Mustache.parse(text);
-	let rendered = Mustache.render(text,dataModels);
+	const rendered = Mustache.render(text,dataModels);
 
 	return rendered;
 }
 
 async function getPageData(url, dataModels) {
-	let i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
+	const i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
 	dataModels["i18n"] = i18nObj; 
 
 	dataModels["lang"] = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
@@ -76,23 +79,23 @@ async function getPageData(url, dataModels) {
 
 function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 	// Including script files (as innerHTML does not execute the script included)
-	let scriptsToInclude = Array.from(sourceDocument.querySelectorAll("script"));
+	const scriptsToInclude = Array.from(sourceDocument.querySelectorAll("script"));
 	if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
 		let scriptText;
 		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src)).text();
 		else scriptText = scriptThis.innerText;
 
-		let script = document.createElement("script");
+		const script = document.createElement("script");
 		script.type = scriptThis.type;
 		script.text = `${scriptText}\n//# sourceURL=${scriptThis.src||window.location.href}`;
 
-		let whereToAppend = documentToRunScriptOn.querySelector("head")
+		const whereToAppend = documentToRunScriptOn.querySelector("head")
 		whereToAppend.appendChild(script).parentNode.removeChild(script);
 	});
 }
 
 function isInHistory(url) {``
-	let history = session.get("__org_monkshu_router_history");
+	const history = session.get("__org_monkshu_router_history");
 	if (!history) return false;
 
 	if (url.indexOf(HS) == -1) return false;
@@ -103,15 +106,24 @@ function isInHistory(url) {``
 
 function decodeURL(url) {
 	if (url.indexOf(HS) == -1) return url; 
-	let decoded = atob(url.substring(url.indexOf(HS)+HS.length)); return decoded;
+	const decoded = atob(url.substring(url.indexOf(HS)+HS.length)); return decoded;
 }
 
 function encodeURL(url) {
 	url = new URL(url, window.location).href;
-	let encodedURL = new URL(window.location.href).pathname+HS+btoa(url);
-	return encodedURL;
+	const encodedURL = new URL(window.location.href).pathname+HS+btoa(url); return encodedURL;
+}
+
+function addOnLoadPage(func) {
+	if (!window.monkshu_env.onRouterLoadPage) window.monkshu_env.onRouterLoadPage = [];
+	if (!window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.push(func);
+}
+
+function removeOnLoadPage(func) {
+	if (!window.monkshu_env.onRouterLoadPage) window.monkshu_env.onRouterLoadPage = [];
+	if (window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.splice(window.monkshu_env.onRouterLoadPage.indexOf(func),1);
 }
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage};

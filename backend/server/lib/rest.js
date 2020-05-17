@@ -16,6 +16,7 @@ function post(host, port, path, headers, req, callback) {
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
+    headers["Accept"] = "application/json";
     
     let optionspost = {
         host : host,
@@ -33,6 +34,7 @@ function postHttps(host, port, path, headers, req, callback) {
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
+    headers["Accept"] = "application/json";
     
     let optionspost = {
         host : host,
@@ -50,6 +52,7 @@ function put(host, port, path, headers, req, callback) {
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
+    headers["Accept"] = "application/json";
     
     let optionsput = {
         host : host,
@@ -67,6 +70,7 @@ function putHttps(host, port, path, headers, req, callback) {
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
+    headers["Accept"] = "application/json";
     
     let optionsput = {
         host : host,
@@ -83,6 +87,8 @@ function get(host, port, path, headers, req, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
+    headers["Accept"] = "application/json";
+
     let optionsget = {
         host : host,
         port : port,
@@ -98,6 +104,8 @@ function getHttps(host, port, path, headers, req, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
+    headers["Accept"] = "application/json";
+
     let optionsget = {
         host : host,
         port : port,
@@ -110,6 +118,7 @@ function getHttps(host, port, path, headers, req, callback) {
 }
 
 function deleteHttp(host, port, path, headers, _req, callback) {
+    headers["Accept"] = "application/json";
     let optionsdelete = {
         host : host,
         port : port,
@@ -122,7 +131,7 @@ function deleteHttp(host, port, path, headers, _req, callback) {
 }
 
 function deleteHttps(host, port, path, headers, _req, callback) {
-
+    headers["Accept"] = "application/json";
     let optionsdelete = {
         host : host,
         port : port,

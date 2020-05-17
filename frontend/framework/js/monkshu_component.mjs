@@ -34,13 +34,15 @@ function register(name, htmlTemplate, module) {
         if (!module.memory) module.memory = {}; if (!module.memory[id]) module.memory[id] = {}; return module.memory[id];
     }
 
+    module.getMemoryByContainedElement = element => module.getMemory(module.getHostElementID(element));
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
         static async _diffApplyDom(oldDom, newDom) {
             await $$.require("/framework/3p/diffDOM.js");
-            let dd = new diffDOM();
-            let diff = dd.diff(oldDom, newDom);
+            const dd = new diffDOM();
+            const diff = dd.diff(oldDom, newDom);
             dd.apply(oldDom, diff);
         }
 
@@ -54,8 +56,7 @@ function register(name, htmlTemplate, module) {
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
             else if (!this.componentHTML) this.componentHTML = '<body style="margin: 0px; padding: 0px; height: 0px; display: none">';
 
-            let templateDocument = new DOMParser().parseFromString(this.componentHTML, "text/html");
-            let templateRoot = templateDocument.documentElement;
+            const templateRoot = new DOMParser().parseFromString(this.componentHTML, "text/html").documentElement;
             
             if (module.trueWebComponentMode) {
                 if (initialRender) {
