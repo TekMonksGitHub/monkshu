@@ -107,7 +107,7 @@ async function doService(url, data, headers, servObject) {
 		try { 
 			const apiModule = require(api);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(url, jsonObj, headers, servObject); return ({code: 999});}
-			else return ({code: 200, respObj: await apiModule.doService(jsonObj)}); 
+			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject)}); 
 		} catch (error) {
 			LOG.debug(`API error: ${error}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
