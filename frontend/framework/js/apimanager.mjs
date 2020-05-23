@@ -43,7 +43,7 @@ async function rest(url, type, req, sendToken, extractToken) {
     if (storage.keys[url] || storage.keys["*"]) 
         headers[storage.keyHeader] = storage.keys[url] ? storage.keys[url] : storage.keys["*"];
 
-    let fetchInit = { method: type, credentials: "omit",    // we will send token if needed
+    const fetchInit = { method: type, credentials: "omit",    // we will send token if needed
         headers, redirect: "follow", referrerPolicy: "origin"};
     if (jsonReq) fetchInit.body =  jsonReq;
     const response = await fetch(url, fetchInit);

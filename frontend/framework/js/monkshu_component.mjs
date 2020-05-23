@@ -25,6 +25,7 @@ function register(name, htmlTemplate, module) {
         else module.element.render(false);
     }
 
+    module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
     module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
 
     module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
