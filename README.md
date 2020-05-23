@@ -43,4 +43,4 @@ NPMs needed
 
 License
 ==========
-See enclised file LICENSE. (C) TekMonks.
+See enclosed file LICENSE. (C) TekMonks.
