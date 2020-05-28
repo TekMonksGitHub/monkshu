@@ -31,7 +31,8 @@ function register(name, htmlTemplate, module) {
     module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
     module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
 
-    module.getMemory = (id="__org_monkshu_element_no_id") => {
+    module.getMemory = (id) => {
+        id = !id || id == "" ? "__org_monkshu_element_no_id" : id;
         if (!module.memory) module.memory = {}; if (!module.memory[id]) module.memory[id] = {}; return module.memory[id];
     }
 
