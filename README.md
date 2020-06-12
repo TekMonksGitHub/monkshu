@@ -36,7 +36,7 @@ JWT tokens and API keys are supported natively with a built in API Manager. Don'
 
 Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based attacks.
 
-Built Internet Scale Applications
+Build Internet Scale Applications
 ==================================
 Monkshu includes a global distributed memory framework, which allows building SAS applications that scale as wide as the Internet, with a distributed memory that spans clusters, countries, multiple clould providers and data centers. You can now easily buid applications at the same global scale as Facebook or Google. 
 
