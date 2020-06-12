@@ -9,6 +9,8 @@ import {securityguard} from "/framework/js/securityguard.mjs";
 const HS = "?.=";
 
 async function loadPage(url, dataModels={}) {
+	url = new URL(url, window.location.href).href;	// normalize
+
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
 	const history = session.get("__org_monkshu_router_history"); let hash;
 
