@@ -108,8 +108,9 @@ function isInHistory(url) {``
 }
 
 function decodeURL(url) {
-	if (url.indexOf(HS) == -1) return url; 
-	const decoded = atob(url.substring(url.indexOf(HS)+HS.length)); return decoded;
+	const retURL = new URL(url, window.location.href).href;	// normalize
+	if (retURL.indexOf(HS) == -1) return retURL; 
+	const decoded = atob(retURL.substring(retURL.indexOf(HS)+HS.length)); return decoded;
 }
 
 function encodeURL(url) {
