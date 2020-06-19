@@ -35,7 +35,7 @@ async function rest(url, type, req, sendToken, extractToken) {
     let jsonReq;
     if (type.toUpperCase() == "GET" && req) {
         for (const key of Object.keys(req)) jsonReq = jsonReq ? jsonReq+`&${_getKeyValAsURLParam(key, req[key])}`:`${_getKeyValAsURLParam(key, req[key])}`;
-        url += `?${jsonReq}`; jsonReq = null;
+        if (jsonReq) {url += `?${jsonReq}`; jsonReq = null;}
     } else jsonReq = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     const headers = {"Accept":"application/json"}; if (type.toUpperCase() != "GET" && type.toUpperCase() != "DELETE") headers["Content-type"] = "application/json";

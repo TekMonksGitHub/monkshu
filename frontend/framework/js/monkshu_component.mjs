@@ -31,9 +31,14 @@ function register(name, htmlTemplate, module) {
     module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
     module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
 
-    module.getMemory = (id) => {
+    module.getMemory = id => {
         id = !id || id == "" ? "__org_monkshu_element_no_id" : id;
         if (!module.memory) module.memory = {}; if (!module.memory[id]) module.memory[id] = {}; return module.memory[id];
+    }
+
+    module.clearMemory = id => {
+        id = !id || id == "" ? "__org_monkshu_element_no_id" : id;
+        if (module.memory) delete module.memory[id];
     }
 
     module.getMemoryByContainedElement = element => module.getMemory(module.getHostElementID(element));
@@ -88,6 +93,7 @@ function register(name, htmlTemplate, module) {
             else module.element = this;
 
             if (this.hasAttribute("onload")) await eval(this.getAttribute("onload"));
+            module.clearMemory(this.id);
             if (module.elementConnected) await module.elementConnected(this);
             if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
                 securityguard.addPermission(this.id ? name+this.id : name, role));
