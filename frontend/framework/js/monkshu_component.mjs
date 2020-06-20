@@ -21,8 +21,8 @@ function register(name, htmlTemplate, module) {
         if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
         else module.data = data; 
 
-        if (id && module.elements[id]) module.elements[id].render(false);
-        else module.element.render(false);
+        if (id && module.elements[id]) await module.elements[id].render(false);
+        else await module.element.render(false);
     }
 
     module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
