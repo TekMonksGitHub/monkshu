@@ -47,7 +47,8 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 			$$.require("/framework/3p/mustache.min.js")]);
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
-		if (window.monkshu_env.pageload_funcs[urlParsed.href]) window.monkshu_env.pageload_funcs[urlParsed.href](dataModels);
+		const baseURL = urlParsed.search?urlParsed.href.substring(0, urlParsed.href.length-urlParsed.search.length):urlParsed.href;
+		if (window.monkshu_env.pageload_funcs[baseURL]) await window.monkshu_env.pageload_funcs[baseURL](dataModels);
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
