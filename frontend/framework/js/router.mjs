@@ -129,7 +129,7 @@ function removeOnLoadPage(func) {
 	if (window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.splice(window.monkshu_env.onRouterLoadPage.indexOf(func),1);
 }
 
-const getCurrentURL = _ => new URL(window.location.href);
+const getCurrentURL = _ => router.decodeURL(window.location.href);
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
