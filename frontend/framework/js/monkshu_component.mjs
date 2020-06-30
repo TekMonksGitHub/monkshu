@@ -43,6 +43,13 @@ function register(name, htmlTemplate, module) {
 
     module.getMemoryByContainedElement = element => module.getMemory(module.getHostElementID(element));
 
+    module.getAllElementInstances = _ => {
+        const allInstances = []; 
+        if (module.elements) for (const key of Object.keys(module.elements)) allInstances.push(module.elements[key]); 
+        else if (module.element) allInstances.push(module.element);
+        return allInstances;
+    }
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
@@ -84,8 +91,8 @@ function register(name, htmlTemplate, module) {
                 } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
 
-            if (module.initialRender && initialRender) module.initialRender(this);
-            if (module.elementRendered) module.elementRendered(this);
+            if (module.initialRender && initialRender) await module.initialRender(this);
+            if (module.elementRendered) await module.elementRendered(this);
         }
 
         async connectedCallback() {

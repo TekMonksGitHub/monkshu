@@ -2,8 +2,8 @@
  * (C) 2018 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  */
-import {session} from "/framework/js/session.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
+import {session} from "/framework/js/session.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
 const HS = "?.=";
@@ -129,6 +129,8 @@ function removeOnLoadPage(func) {
 	if (window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.splice(window.monkshu_env.onRouterLoadPage.indexOf(func),1);
 }
 
+const getCurrentURL = _ => new URL(window.location.href);
+
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, getCurrentURL};
