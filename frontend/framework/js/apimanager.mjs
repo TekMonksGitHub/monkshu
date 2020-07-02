@@ -67,9 +67,11 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
 }
 
 function _getKeyValAsURLParam(key, val) {
+    const encodeValue = val => (typeof val === 'string' || val instanceof String)?encodeURIComponent(val):encodeURIComponent(JSON.stringify(val));
+
     let retVal; 
-    if (Array.isArray(val)) for (const valThis of val) retVal = retVal ? `&${key}=${encodeURIComponent(valThis)}`:`${key}=${encodeURIComponent(valThis)}`;
-    else retVal = `${key}=${encodeURIComponent(val)}`;
+    if (Array.isArray(val)) for (const valThis of val) retVal = retVal ? `&${key}=${encodeValue(valThis)}`:`${key}=${encodeValue(valThis)}`;
+    else retVal = `${key}=${encodeValue(val)}`;
 
     return retVal;
 }

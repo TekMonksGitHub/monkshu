@@ -34,7 +34,7 @@ async function loadPage(url, dataModels={}) {
 	document.close();
 
 	// notify those who want to know that a new page was loaded
-	if (window.monkshu_env.onRouterLoadPage) for (const func of window.monkshu_env.onRouterLoadPage) func();
+	if (window.monkshu_env.onRouterLoadPage) for (const func of window.monkshu_env.onRouterLoadPage) func(dataModels);
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
