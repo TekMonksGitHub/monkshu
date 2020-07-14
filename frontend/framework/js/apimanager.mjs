@@ -103,7 +103,6 @@ function _setAPIManagerStorage(storage) {
 function _modifyAPIManagerStorage(key, value) {
     const storage = _getAPIManagerStorage();
     storage[key] = value;
-    session.set(APIMANAGER_SESSIONKEY, storage);
 }
 
 export const apimanager = {rest, registerAPIKeys};

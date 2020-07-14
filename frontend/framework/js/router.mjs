@@ -18,7 +18,6 @@ async function loadPage(url, dataModels={}) {
 		hash = btoa(url);
 		window.history.pushState(null, null, new URL(window.location.href).pathname+HS+hash);
 		history[hash] = [url, dataModels];
-		session.set("__org_monkshu_router_history", history);
 	} else {
 		hash = url.substring(url.indexOf(HS)+HS.length);
 		url = new URL(atob(hash), window.location).href;

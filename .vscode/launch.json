@@ -4,13 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
-            "type": "chrome",
-            "request": "launch",
             "name": "Launch Frontend",
+            "request": "launch",
+            "type": "pwa-chrome",
             "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}/frontend"
+            "webRoot": "${workspaceFolder}/frontend",
+            "runtimeArgs": ["--disk-cache-dir=null", "--disk-cache-size=1", "--media-cache-size=1"]
         },
         {
             "type": "node",

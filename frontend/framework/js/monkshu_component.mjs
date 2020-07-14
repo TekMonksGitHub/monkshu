@@ -11,6 +11,7 @@
  */
 
 import {router} from "/framework/js/router.mjs";
+import {session} from "/framework/js/session.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
 function register(name, htmlTemplate, module) {
@@ -39,6 +40,19 @@ function register(name, htmlTemplate, module) {
     module.clearMemory = id => {
         id = !id || id == "" ? "__org_monkshu_element_no_id" : id;
         if (module.memory) delete module.memory[id];
+    }
+
+    module.getSessionMemory = id => {
+        if (!session.get(`__org_monkshu_element_${name}_memory`)) session.set(`__org_monkshu_element_${name}_memory`, {});
+        const memory = session.get(`__org_monkshu_element_${name}_memory`);
+        id = !id || id == "" ? "__org_monkshu_element_no_id" : id; if (!memory[id]) memory[id] = {}; 
+        return memory[id];
+    }
+
+    module.clearSessionMemory = id => {
+        const memory = session.get(`__org_monkshu_element_${name}_memory`) || {};
+        id = !id || id == "" ? "__org_monkshu_element_no_id" : id;
+        if (memory[id]) delete memory[id]; session.set(`__org_monkshu_element_${name}_memory`, memory);
     }
 
     module.getMemoryByContainedElement = element => module.getMemory(module.getHostElementID(element));
