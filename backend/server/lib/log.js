@@ -47,19 +47,20 @@ Logger.prototype.console = function(s) {
 }
 
 Logger.prototype.overrideConsole = function() {
+	const parentLogObject = this;
 	global.console.log = function() {
-		LOG.info(`[console] ${arguments[0]}`); 
+		parentLogObject.info(`[console] ${arguments[0]}`); 
 	};
 	process.stdout.write = function() {
-		LOG.info(`[stdout] ${arguments[0]}`);
+		parentLogObject.info(`[stdout] ${arguments[0]}`);
 	}
 	process.stderr.write = function() {
-		LOG.error(`[stderr] ${arguments[0]}`);
+		parentLogObject.error(`[stderr] ${arguments[0]}`);
 	}
 	process.on('uncaughtException', function(err) {
-		LOG.error(err && err.stack ? err.stack : err, true);
-		LOG.error("EXIT ON CRITICAL ERROR!!!", true);
-		this._oldStderrWrite.call(process.stderr, "EXIT ON CRITICAL ERROR!!! Check Logs.");
+		parentLogObject.error(err && err.stack ? err.stack : err, true);
+		parentLogObject.error("EXIT ON CRITICAL ERROR!!!", true);
+		parentLogObject._oldStderrWrite.call(process.stderr, "EXIT ON CRITICAL ERROR!!! Check Logs.");
 		process.exit(1);
 	});
 }

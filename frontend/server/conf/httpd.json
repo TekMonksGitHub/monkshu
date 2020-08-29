@@ -16,7 +16,7 @@
 		"X-XSS-Protection": 1,
 		"X-Frame-Options": "deny",
 		"X-Content-Type-Options": "nosniff",
-		"Cache-Control": "max-age=157680000, public, must-revalidate"
+		"Cache-Control": "max-age=31536000, public"
 	},
 	"mimeTypes" : {
 		".html":	"text/html",

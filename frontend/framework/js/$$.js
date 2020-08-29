@@ -33,7 +33,7 @@ $$.require = async (url, targetDocument = document) => {
         let scriptNode = script.cloneNode(true);
         targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
     } else try {
-        let js = await (await fetch(url, {mode:"no-cors"})).text();
+        let js = await (await fetch(url, {mode:"no-cors", cache: "default"})).text();
         let script = document.createElement("script");
         script.text = `${js}\n//# sourceURL=${url}`;
         $$.__loadedJS[url] = script.text; 
@@ -65,7 +65,7 @@ $$.requireJSON = async url => {
 
     if (Object.keys($$.__loadedJSON).includes(url)) return $$.__loadedJSON[url];   // already loaded
     else try {
-        let json = await (await fetch(url, {mode:"no-cors"})).json();
+        let json = await (await fetch(url, {mode:"no-cors", cache: "default"})).json();
         $$.__loadedJSON[url]=json; 
         return json;
     } catch (err) {throw err};

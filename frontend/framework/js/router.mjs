@@ -42,7 +42,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 
 	try {
 		let [html, _] = await Promise.all([
-			fetch(url, {mode: "no-cors"}).then(response => response.text()), 
+			fetch(url, {mode: "no-cors", cache: "default"}).then(response => response.text()), 
 			$$.require("/framework/3p/mustache.min.js")]);
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
@@ -85,7 +85,7 @@ function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 	const scriptsToInclude = Array.from(sourceDocument.querySelectorAll("script"));
 	if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
 		let scriptText;
-		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src)).text();
+		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src, {mode: "no-cors", cache: "default"})).text();
 		else scriptText = scriptThis.innerText;
 
 		const script = document.createElement("script");
