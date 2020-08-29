@@ -25,12 +25,16 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * @param req {object} Javascript/JSON object to send
  * @param sendToken {object|boolean} Optional: {type: "access" or other types}, if set to true then access is assumed
  * @param extractToken {boolean} Optional: true or false to extract incoming tokens as a result of the API call
+ * @param canUseCache {boolean} Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
  * 
  * @return {Object} Javascript result object or null on error
  */
-async function rest(url, type, req, sendToken, extractToken) {
+async function rest(url, type, req, sendToken, extractToken, canUseCache) {
     type = type || "GET"; const urlHost = new URL(url).host; 
     const storage = _getAPIManagerStorage();
+
+    const apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
+    if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
     let jsonReq;
     if (type.toUpperCase() == "GET" && req) {
@@ -52,7 +56,8 @@ async function rest(url, type, req, sendToken, extractToken) {
         const headersBack = {}; for (const headerBack of response.headers) headersBack[headerBack[0]] = headerBack[1];
         if (extractToken && respObj.access_token) _extractAddToken(respObj.access_token, urlHost);
         else if (extractToken && headersBack.access_token) _extractAddToken(headersBack.access_token, urlHost);
-        return respObj;
+        
+        if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; return respObj;   // cache response if allowed and return
     } else return null;
 }
 
@@ -92,7 +97,7 @@ function _extractAddToken(token, host) {
 
 function _getAPIManagerStorage() {
     if (!session.get(APIMANAGER_SESSIONKEY)) 
-        session.set(APIMANAGER_SESSIONKEY, {tokenManager:{}, keys:{}, keyHeader:"org_monkshu_apikey"}); 
+        session.set(APIMANAGER_SESSIONKEY, {tokenManager:{}, keys:{}, keyHeader:"org_monkshu_apikey", apiResponseCache: {}}); 
     return session.get(APIMANAGER_SESSIONKEY);
 }
 
