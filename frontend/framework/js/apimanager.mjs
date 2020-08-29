@@ -22,10 +22,10 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * 
  * @param {string} url The URL to call
  * @param {string} type  Can we GET, POST, DELETE etc.
- * @param req {object} Javascript/JSON object to send
- * @param sendToken {object|boolean} Optional: {type: "access" or other types}, if set to true then access is assumed
- * @param extractToken {boolean} Optional: true or false to extract incoming tokens as a result of the API call
- * @param canUseCache {boolean} Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
+ * @param {object} req Javascript/JSON object to send
+ * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed
+ * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call
+ * @param {boolean} canUseCache Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
  * 
  * @return {Object} Javascript result object or null on error
  */
