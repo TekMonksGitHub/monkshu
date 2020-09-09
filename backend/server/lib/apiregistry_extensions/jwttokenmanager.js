@@ -4,7 +4,7 @@
  * 
  * Tokens are in JWT format.
  */
-const crypto = require("crypto");
+const cryptmod = require("crypto");
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
@@ -45,7 +45,7 @@ function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, res
 
     const tokenCreds = apiregentry.query.addsToken;
     const tuples = tokenCreds.split(",");
-    const claims = {iss: "Monkshu", iat: Date.now(), jti: crypto.randomBytes(16).toString("hex")}; 
+    const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex")}; 
     for (const tuple of tuples) {
         const keyVal = tuple.split(":"); 
         if (keyVal.length != 2) {LOG.error(`Bad token credential: ${tuple}, skipping.`); continue;}
@@ -56,7 +56,7 @@ function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, res
     const headerB64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
     const tokenClaimHeader = claimB64+"."+headerB64;
 
-    const sig64 = crypto.createHmac("sha256", crypto.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
+    const sig64 = cryptmod.createHmac("sha256", cryptmod.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
     const token = `${claimB64}.${headerB64}.${sig64}`;
     activeTokens[token] = Date.now();

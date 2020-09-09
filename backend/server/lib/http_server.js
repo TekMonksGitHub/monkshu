@@ -39,9 +39,9 @@ function initSync() {
 	LOG.info(`Server started on ${host}:${conf.port}`);
 }
 
-function onData(_,_) {}
-function onReqError(_,_,error,servObject) {statusInternalError(servObject, error); end(servObject);}
-function onReqEnd(_,_,servObject) {statusNotFound(servObject); end(servObject);}
+function onData(_data, _servObject) { }
+function onReqError(_url, _headers, error, servObject) { statusInternalError(servObject, error); end(servObject); }
+function onReqEnd(_url, _headers, servObject) { statusNotFound(servObject); end(servObject); }
 
 function statusNotFound(servObject, _error) {
 	servObject.res.writeHead(404, {...HEADER_ERROR, ...conf.headers});
