@@ -4,29 +4,27 @@
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
-var cluster = require("cluster");
+
+const cluster = require("cluster");
 
 if (cluster.isMaster) {
-	var conf = require(__dirname + "/conf/cluster.json");
+	let conf = require(`${__dirname}/conf/cluster.json`);
 	
 	// Figure out number of workers.
-	var numWorkers = conf.workers;
+	let numWorkers = conf.workers;
 	if (numWorkers == 0) {
-		var numCPUs = require("os").cpus().length;
+		let numCPUs = require("os").cpus().length;
 		if (numCPUs < conf.min_workers) numWorkers = conf.min_workers;	
 		else numWorkers = numCPUs;
 	}
 	
 	// Fork workers.
-	console.log("Starting " + numWorkers + " workers.");
-	for (var i = 0; i < numWorkers; i++) cluster.fork();
+	console.log(`Starting ${numWorkers} workers.`);
+	for (let i = 0; i < numWorkers; i++) cluster.fork();
 	
-	cluster.on("exit", function(server, code, signal) {
-		console.log("Worker server with PID: " + server.process.pid + " died.");
+	cluster.on("exit", (server, _code, _signal) => {
+		console.log(`Worker server with PID: ${server.process.pid} died.`);
 		console.log("Forking a new process to compensate.");
 		cluster.fork();
 	});
-} else {
-	var server = require(__dirname + "/server.js");
-	server.bootstrap();
-}
+} else require(`${__dirname}/server.js`).bootstrap();

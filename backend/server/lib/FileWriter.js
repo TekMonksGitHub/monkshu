@@ -9,7 +9,7 @@
 const fs = require("fs");
 const Timer = require(`${CONSTANTS.LIBDIR}/Timer.js`);
 
-class FileWriter {
+class FastFileWriter {
     constructor(path, writeCloseTimeout, encoding, overwrite = false) {
         this.path = path;     
         this.writeCloseTimeout = writeCloseTimeout;
@@ -62,5 +62,5 @@ class FileWriter {
 }
 
 exports.createFileWriter = (path, writeCloseTimeout, encoding) => {
-    return new FileWriter(path, writeCloseTimeout, encoding);
+    return new FastFileWriter(path, writeCloseTimeout, encoding);
 }

@@ -32,7 +32,7 @@ Logger.prototype.getLogContents = function(callback) {
 };
 
 Logger.writeFile = function(level, path, s, sync) {
-	var msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+JSON.stringify(s)+'}\n';
+	const msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+JSON.stringify(s)+'}\n';
 	
 	if (sync === undefined) {
 		fs.appendFile(path, msg, function(err) {
