@@ -9,8 +9,10 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:8080",
+            "userDataDir": "false",
             "webRoot": "${workspaceFolder}/frontend",
-            "runtimeArgs": ["--disk-cache-dir=null", "--disk-cache-size=1", "--media-cache-size=1"]
+            "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1"],
+            "smartStep": true
         },
         {
             "type": "node",

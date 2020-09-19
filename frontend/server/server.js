@@ -1,16 +1,16 @@
-/* 
- * A very simple, static http GET server. Suggest to not use in production.
+/** 
+ * A simple, static http GET server. 
  * 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed file.
  */
 
 const fs = require("fs");
+const url = require("url");
+const zlib = require("zlib");
 const path = require("path");
 const http = require("http");
 const https = require("https");
-const url = require("url");
-const zlib = require("zlib");
 let access; let error;
 
 exports.bootstrap = bootstrap;
@@ -23,9 +23,9 @@ function bootstrap() {
 	initLogsSync();
 
 	/* Start HTTP/S server */
-	let listener = (req, res) => handleRequest(req, res);
-	let options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
-	let httpd = options ? https.createServer(options, listener) : http.createServer(listener);
+	const listener = (req, res) => { try{handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); sendError(req,res,500,e);} }
+	const options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
+	const httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
@@ -51,15 +51,15 @@ function initLogsSync() {
 	// Init logging 
 	if (!fs.existsSync(conf.logdir)) fs.mkdirSync(conf.logdir);
 		
-	let Logger = require(conf.libdir+"/Logger.js").Logger;	
+	const Logger = require(conf.libdir+"/Logger.js").Logger;	
 	access = new Logger(conf.accesslog, 100*1024*1024);
 	error = new Logger(conf.errorlog, 100*1024*1024);
 }
 
 function handleRequest(req, res) {
-	access.info(`GET: ${req.url}`);
+	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
 
-	let pathname = url.parse(req.url).pathname;
+	const pathname = url.parse(req.url).pathname;
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
 
 	// don't allow reading outside webroot
@@ -116,7 +116,7 @@ function sendFile(fileRequested, req, res, stats) {
 }
 
 function sendError(req, res, code, message) {
-	error.error(`${code}: ${req.url} - ${message}`);
+	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}`);
 	res.writeHead(code, getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();
@@ -130,4 +130,10 @@ function isSubdirectory(child, parent) { // from: https://stackoverflow.com/ques
 	const relative = path.relative(parent, child);
 	const isSubdir = !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 	return isSubdir;
+}
+
+function _getReqHost(req) {
+	const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
+	const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
+	return `[${host}]:${port}`;
 }

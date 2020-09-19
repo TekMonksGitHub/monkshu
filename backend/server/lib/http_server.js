@@ -21,7 +21,9 @@ function initSync() {
 			res.writeHead(200, conf.headers);
 			res.end();
 		} else {
-			const servObject = {req, res, env:{}, server: module.exports}; 
+			const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
+			const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
+			const servObject = {req, res, env:{remoteHost:host, remotePort:port, remoteAgent: req.headers["user-agent"]}, server: module.exports}; 
 			for (const header of Object.keys(req.headers)) {
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;
@@ -88,6 +90,5 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 }
 
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
-
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end}

@@ -89,7 +89,7 @@ function initAndRunTransportLoop() {
 }
 
 async function doService(url, data, headers, servObject) {
-	LOG.info("Got request for the url: " + url);
+	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
 	
 	const api = APIREGISTRY.getAPI(url);
 	LOG.info("Looked up service, calling: " + api);
