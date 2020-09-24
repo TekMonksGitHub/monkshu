@@ -39,7 +39,7 @@ Logger.prototype.debug = function(s, sync) {if (log_conf.debug) this.writeFile("
 
 Logger.prototype.error = function(s, sync) {this.writeFile("error", s && s.stack ? s.stack:s, sync);}
 
-Logger.prototype.truncate = function(s) {return s.length > CONSTANTS.MAX_LOG ? s.substring(0, CONSTANTS.MAX_LOG) : s;}
+Logger.prototype.truncate = function(s) {return s && s.length > CONSTANTS.MAX_LOG ? s.substring(0, CONSTANTS.MAX_LOG) : s}
 
 Logger.prototype.console = function(s) {
 	this._origLog(s?s.trim():s);						// send to console or debug console, trimmed

@@ -114,4 +114,3 @@ async function doService(url, data, headers, servObject) {
 		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
-

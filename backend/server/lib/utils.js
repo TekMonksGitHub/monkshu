@@ -1,21 +1,21 @@
-/* 
+/** 
  * (C) 2015 TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  */
 
 const fs = require("fs");
+const path = require("path");
+const mkdirAsync = require("util").promisify(fs.mkdir);
+const lstatAsync = require("util").promisify(fs.lstat);
+const readdirAsync = require("util").promisify(fs.readdir);
+const copyFileAsync = require("util").promisify(fs.copyFile);
 
-function copyFile(source, target, cb) {
-    let cbCalled = false;
-
-    const done = err => { if (!cbCalled) cb(err); cbCalled = true; }
-
-    const rd = fs.createReadStream(source);
-    rd.on("error", err => done(err));
-    const wr = fs.createWriteStream(target);
-    wr.on("error", err => done(err));
-    wr.on("close", _ => done());
-    rd.pipe(wr);
+async function copyFileOrFolder(from, to) {
+    if ((await lstatAsync(from)).isFile()) await copyFileAsync(from, to);
+    else {
+        await mkdirAsync(to);
+        for (const element of await readdirAsync(from)) await copyFileOrFolder(path.join(from, element), path.join(to, element));
+    }
 }
 
 function parseBoolean(value) {
@@ -76,4 +76,7 @@ function getObjectKeyNameCaseInsensitive(obj, key) {
     return null;
 }
 
-module.exports = { copyFile, parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive };
+const getTempFile = ext =>
+    `${os.tmpdir()+"/"+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`;
+
+module.exports = { parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder };
