@@ -6,3 +6,4 @@ frontend/apps/*
 !frontend/apps/.dummy
 frontend/framework/conf/default_app.json
 .chrome
+.DS_Store
