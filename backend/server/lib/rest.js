@@ -11,14 +11,14 @@ const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 const querystring = require("querystring");
 
-function post(host, port, path, headers, req, callback) {
+function post(host, port, path, headers = {}, req, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
     headers["Accept"] = "application/json";
-    
-    let optionspost = {
+
+    const optionspost = {
         host : host,
         port : port,
         path : path,
@@ -29,14 +29,14 @@ function post(host, port, path, headers, req, callback) {
     doCall(jsonStr, optionspost, false, callback);
 }
 
-function postHttps(host, port, path, headers, req, callback) {
+function postHttps(host, port, path, headers = {}, req, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
     headers["Accept"] = "application/json";
-    
-    let optionspost = {
+
+    const optionspost = {
         host : host,
         port : port,
         path : path,
@@ -47,14 +47,14 @@ function postHttps(host, port, path, headers, req, callback) {
     doCall(jsonStr, optionspost, true, callback);
 }
 
-function put(host, port, path, headers, req, callback) {
+function put(host, port, path, headers = {}, req, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
     headers["Accept"] = "application/json";
-    
-    let optionsput = {
+
+    const optionsput = {
         host : host,
         port : port,
         path : path,
@@ -65,14 +65,14 @@ function put(host, port, path, headers, req, callback) {
     doCall(jsonStr, optionsput, false, callback);
 }
 
-function putHttps(host, port, path, headers, req, callback) {
+function putHttps(host, port, path, headers = {}, req, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
     headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
     headers["Accept"] = "application/json";
-    
-    let optionsput = {
+
+    const optionsput = {
         host : host,
         port : port,
         path : path,
@@ -83,13 +83,13 @@ function putHttps(host, port, path, headers, req, callback) {
     doCall(jsonStr, optionsput, true, callback);
 }
 
-function get(host, port, path, headers, req, callback) {
+function get(host, port, path, headers = {}, req, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
     headers["Accept"] = "application/json";
 
-    let optionsget = {
+    const optionsget = {
         host : host,
         port : port,
         path : path,
@@ -100,13 +100,13 @@ function get(host, port, path, headers, req, callback) {
     doCall(null, optionsget, false, callback);
 }
 
-function getHttps(host, port, path, headers, req, callback) {
+function getHttps(host, port, path, headers = {}, req, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
     headers["Accept"] = "application/json";
 
-    let optionsget = {
+    const optionsget = {
         host : host,
         port : port,
         path : path,
@@ -117,9 +117,9 @@ function getHttps(host, port, path, headers, req, callback) {
     doCall(null, optionsget, true, callback);
 }
 
-function deleteHttp(host, port, path, headers, _req, callback) {
+function deleteHttp(host, port, path, headers = {}, _req, callback) {
     headers["Accept"] = "application/json";
-    let optionsdelete = {
+    const optionsdelete = {
         host : host,
         port : port,
         path : path,
@@ -130,9 +130,9 @@ function deleteHttp(host, port, path, headers, _req, callback) {
     doCall(null, optionsdelete, false, callback);
 }
 
-function deleteHttps(host, port, path, headers, _req, callback) {
+function deleteHttps(host, port, path, headers = {}, _req, callback) {
     headers["Accept"] = "application/json";
-    let optionsdelete = {
+    const optionsdelete = {
         host : host,
         port : port,
         path : path,
@@ -179,4 +179,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = {get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps};
+module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps };
