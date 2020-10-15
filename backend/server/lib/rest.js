@@ -173,8 +173,8 @@ function doCall(reqStr, options, secure, callback) {
 if (require.main === module) {
 	let args = process.argv.slice(2);
 	
-    if (args.length == 0) console.log("Usage: rest <host> <port> <path> <json>");
-    else post(args[0], args[1], args[2], JSON.parse(args[3]), (e, data) => { 
+    if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json>");
+    else post(args[0], args[1], args[2], args[3] ? JSON.parse(args[3]) : {}, JSON.parse(args[4]), (e, data) => { 
         if (!e) console.log(JSON.stringify(data)); else console.log(e); 
     });
 }
