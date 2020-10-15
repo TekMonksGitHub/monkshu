@@ -3,6 +3,7 @@
  * 
  * callback format -> callback(error, data)
  */
+if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
 const http = require("http");
 const zlib = require("zlib");
@@ -192,8 +193,8 @@ function _getFileContents(filepath) {
 if (require.main === module) {
 	let args = process.argv.slice(2);
 	
-    if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json>");
-    else post(args[0], args[1], args[2], args[3] ? JSON.parse(args[3]) : {}, JSON.parse(args[4]), null, (e, data) => { 
+    if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json-body> [ssl-options]");
+    else post(args[0], args[1], args[2], JSON.parse(args[3]), JSON.parse(args[4]), args[5], (e, data) => { 
         if (!e) console.log(JSON.stringify(data)); else console.log(e); 
     });
 }
