@@ -194,7 +194,7 @@ if (require.main === module) {
 	let args = process.argv.slice(2);
 	
     if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json-body> [ssl-options]");
-    else post(args[0], args[1], args[2], JSON.parse(args[3]), JSON.parse(args[4]), args[5], (e, data) => { 
+    else post(args[0], args[1], args[2], JSON.parse(args[3]), JSON.parse(args[4]), args[5] ? JSON.parse(args[5]) : null, (e, data) => { 
         if (!e) console.log(JSON.stringify(data)); else console.log(e); 
     });
 }
