@@ -8,10 +8,12 @@ const http = require("http");
 const zlib = require("zlib");
 const https = require("https");
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
+const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
 
+const fs = require("fs");
 const querystring = require("querystring");
 
-function post(host, port, path, headers = {}, req, callback) {
+function post(host, port, path, headers = {}, req, sslObj, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
@@ -26,10 +28,10 @@ function post(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(jsonStr, optionspost, false, callback);
+    doCall(jsonStr, optionspost, false, sslObj, callback);
 }
 
-function postHttps(host, port, path, headers = {}, req, callback) {
+function postHttps(host, port, path, headers = {}, req, sslObj, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
@@ -44,10 +46,10 @@ function postHttps(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(jsonStr, optionspost, true, callback);
+    doCall(jsonStr, optionspost, true, sslObj, callback);
 }
 
-function put(host, port, path, headers = {}, req, callback) {
+function put(host, port, path, headers = {}, req, sslObj, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
@@ -62,10 +64,10 @@ function put(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(jsonStr, optionsput, false, callback);
+    doCall(jsonStr, optionsput, false, sslObj, callback);
 }
 
-function putHttps(host, port, path, headers = {}, req, callback) {
+function putHttps(host, port, path, headers = {}, req, sslObj, callback) {
     let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
 
     headers["Content-Type"] = "application/json";
@@ -80,10 +82,10 @@ function putHttps(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(jsonStr, optionsput, true, callback);
+    doCall(jsonStr, optionsput, true, sslObj, callback);
 }
 
-function get(host, port, path, headers = {}, req, callback) {
+function get(host, port, path, headers = {}, req, sslObj, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
@@ -97,10 +99,10 @@ function get(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(null, optionsget, false, callback);
+    doCall(null, optionsget, false, sslObj, callback);
 }
 
-function getHttps(host, port, path, headers = {}, req, callback) {
+function getHttps(host, port, path, headers = {}, req, sslObj, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
     if (req && req.trim() !== "") path += `?${req}`;
 
@@ -114,10 +116,10 @@ function getHttps(host, port, path, headers = {}, req, callback) {
         headers : headers
     };
 
-    doCall(null, optionsget, true, callback);
+    doCall(null, optionsget, true, sslObj, callback);
 }
 
-function deleteHttp(host, port, path, headers = {}, _req, callback) {
+function deleteHttp(host, port, path, headers = {}, _req, sslObj, callback) {
     headers["Accept"] = "application/json";
     const optionsdelete = {
         host : host,
@@ -127,10 +129,10 @@ function deleteHttp(host, port, path, headers = {}, _req, callback) {
         headers : headers
     };
 
-    doCall(null, optionsdelete, false, callback);
+    doCall(null, optionsdelete, false, sslObj, callback);
 }
 
-function deleteHttps(host, port, path, headers = {}, _req, callback) {
+function deleteHttps(host, port, path, headers = {}, _req, sslObj, callback) {
     headers["Accept"] = "application/json";
     const optionsdelete = {
         host : host,
@@ -140,12 +142,13 @@ function deleteHttps(host, port, path, headers = {}, _req, callback) {
         headers : headers
     };
 
-    doCall(null, optionsdelete, true, callback);
+    doCall(null, optionsdelete, true, sslObj, callback);
 }
 
-function doCall(reqStr, options, secure, callback) {
+function doCall(reqStr, options, secure, sslObj, callback) {
     const caller = secure ? https : http; 
     let resp, ignoreEvents = false, resPiped;
+    if (sslObj & typeof sslObj == "object") _addSecureOptions(options, sslObj);
     const req = caller.request(options, res => {
         const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";
         if (encoding.toLowerCase() == "gzip") {resPiped = zlib.createGunzip(); res.pipe(resPiped);}  else resPiped = res;
@@ -170,11 +173,27 @@ function doCall(reqStr, options, secure, callback) {
     req.on("error", e => callback(e, null));
 }
 
+function _addSecureOptions(options, sslObj) {
+    if (sslObj.pfxPath && sslObj.encryptedPassphrase) { 
+        options.pfx = _getFileContents(sslObj.pfxPath);
+        options.passphrase = crypt.decrypt(sslObj.encryptedPassphrase, sslObj.encryptionKey);
+    } else if (sslObj.certPath && sslObj.encryptedKeyPath) {
+        options.cert = _getFileContents(ssl.certPath);
+        options.key = crypt.decrypt(_getFileContents(ssl.encryptedKeyPath), sslObj.encryptionKey);
+    } 
+}
+
+const _fileContents = {};
+function _getFileContents(filepath) {
+    try {if (!_fileContents[filepath]) _fileContents[filepath] = fs.readFileSync(filepath); return _fileContents[filepath];}
+    catch (error) {console.error(error); return;}
+}
+
 if (require.main === module) {
 	let args = process.argv.slice(2);
 	
     if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json>");
-    else post(args[0], args[1], args[2], args[3] ? JSON.parse(args[3]) : {}, JSON.parse(args[4]), (e, data) => { 
+    else post(args[0], args[1], args[2], args[3] ? JSON.parse(args[3]) : {}, JSON.parse(args[4]), null, (e, data) => { 
         if (!e) console.log(JSON.stringify(data)); else console.log(e); 
     });
 }
