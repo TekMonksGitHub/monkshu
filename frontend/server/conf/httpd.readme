@@ -1,0 +1,46 @@
+{
+	"port": 8080, <-- The port to listen to
+	"host": "::", <-- The host name or IP to listen to, 0.0.0.0 means all IPv4 and :: means all IPv4 and IPv6
+	"server_redirect": "http://telemeet.teleworkr.com/", <-- Will send 302 all the time. If this is a proper URL then 
+														the redirect will be to that URL. If this is just host name then
+														will replace server with that hostname, and rest of URL like path and
+														search will be reused and redirected.
+	"webroot": "./../", <-- The directory to serve from
+	"logdir": "./logs", <-- The logs directory
+	"libdir": "./lib", <-- The lib directory
+	"accesslog": "./logs/access.log.json", <-- The access log file name
+	"errorlog": "./logs/error.log.json", <-- The error log file name
+	"indexfile": "index.html", <-- The index file name
+	"ssl": false, <-- Set to true for HTTPS
+	"enableGZIPEncoding": true, <-- Everything will be gzip encoded if MIME supports it (see mime section)
+	"pfxPath": "<path to PFX (.key) File>", <-- For HTTPS the path to the certificate PFX file
+	"pfxPassphrase": "<passphrase for the pfx file>", <-- For HTTPS the passphrase for certificate PFX file
+	"httpdHeaders": { <-- Hardcode these headers in every response
+		"Server": "Monkshu HTTPD",
+		"X-XSS-Protection": 1,
+		"X-Frame-Options": "deny",
+		"X-Content-Type-Options": "nosniff",
+		"Cache-Control": "max-age=31536000, public"
+	},
+	"mimeTypes" : { <-- Mime types, extensions and their types, add true if they can be compressed
+		".html":	"text/html",
+		".htm":		"text/html",
+		".thtml":	"text/html",
+		".css":		"text/css",
+		".js":		"text/javascript",
+		".mjs":		"text/javascript",
+		".page":	"text/plain",
+		".otf":		"application/x-font-opentype",
+		".ttf":		"application/x-font-truetype",
+		".pdf":		"application/pdf",
+		".png":		["image/png", false],
+		".jpg":		["image/jpeg", false],
+		".jpeg":	["image/jpeg", false],
+		".gif":		["image/gif", false],
+		".md":		["text/markdown", true],
+		".svg":		"image/svg+xml",
+		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
+	},
+	"restrictServerTree": true, <-- Don't serve anything outside webroot
+	"timeout": 120000 <-- Server timeout waiting for response
+}
