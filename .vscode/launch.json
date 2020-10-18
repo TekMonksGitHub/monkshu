@@ -11,20 +11,22 @@
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}/frontend",
             "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1"],
-            "smartStep": true
+            "smartStep": true,
+            "userDataDir": "${workspaceFolder}/.chrome",
+            "preLaunchTask": "Delete Chrome Profile"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch HTTPD",
-            "cwd": "${workspaceFolder}/frontend\\server",
-            "program": "${workspaceFolder}/frontend\\server\\server.js"
+            "cwd": "${workspaceFolder}/frontend/server",
+            "program": "${workspaceFolder}/frontend/server/server.js"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Backend",
-            "program": "${workspaceFolder}/backend\\server\\server.js"
+            "program": "${workspaceFolder}/backend/server/server.js"
         }
     ]
 }
