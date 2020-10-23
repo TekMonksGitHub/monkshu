@@ -6,7 +6,9 @@
         {
             "label": "Delete Chrome Profile",
             "type": "shell",
-            "command": "rm -rf ${workspaceFolder}/.chrome"
+            "linux": {"command": "rm -rf ${workspaceFolder}/.chrome"},
+            "osx": {"command": "rm -rf ${workspaceFolder}/.chrome"},
+            "windows": {"command": "cmd.exe /c \"rmdir /s /q \"\"${workspaceFolder}\\.chrome\"\"\""}
         }
     ]
 }
