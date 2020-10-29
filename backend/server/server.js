@@ -109,7 +109,7 @@ async function doService(url, data, headers, servObject) {
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(url, jsonObj, headers, servObject); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject)}); 
 		} catch (error) {
-			LOG.debug(`API error: ${error}`); 
+			LOG.debug(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
 		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
