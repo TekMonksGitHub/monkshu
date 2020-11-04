@@ -123,6 +123,9 @@ function register(name, htmlTemplate, module) {
         }
         
         disconnectedCallback() {
+            if (this.id) delete module.elements[this.id];
+            else delete module.element;
+
             delete module.data;
             delete module.datas;
         }
