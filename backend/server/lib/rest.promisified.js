@@ -65,7 +65,7 @@ function deleteHttp(host, port, path, headers = {}, _req, sslObj) {
 
 function deleteHttps(host, port, path, headers = {}, _req, sslObj) {
     headers["Accept"] = "application/json";
-    const optionsdelete = { host, port, path, method: 'GET', headers };
+    const optionsdelete = { host, port, path, method: 'DELETE', headers };
     return doCall(null, optionsdelete, true, sslObj);
 }
 

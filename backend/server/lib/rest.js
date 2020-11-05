@@ -141,7 +141,7 @@ function deleteHttps(host, port, path, headers = {}, _req, sslObj, callback) {
         host : host,
         port : port,
         path : path,
-        method : 'GET',
+        method : 'DELETE',
         headers : headers
     };
 
