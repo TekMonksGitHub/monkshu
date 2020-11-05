@@ -4,6 +4,7 @@
  * callback format -> callback(error, data)
  */
 if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
+if (!CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"]) CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"] = {};
 
 const http = require("http");
 const zlib = require("zlib");
@@ -12,6 +13,7 @@ const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
 
 const fs = require("fs");
+const path = require("path");
 const querystring = require("querystring");
 
 function post(host, port, path, headers = {}, req, sslObj, callback) {
@@ -184,10 +186,13 @@ function _addSecureOptions(options, sslObj) {
     } 
 }
 
-const _fileContents = {};
 function _getFileContents(filepath) {
-    try {if (!_fileContents[filepath]) _fileContents[filepath] = fs.readFileSync(filepath); return _fileContents[filepath];}
-    catch (error) {console.error(error); return;}
+    try {
+        filepath = path.resolve(filepath);
+        if (!CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath])
+            CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath] = fs.readFileSync(filepath);
+        return CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath];
+    } catch (error) {console.error(error); return;}
 }
 
 if (require.main === module) {
