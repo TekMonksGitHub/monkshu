@@ -1,7 +1,13 @@
-/* 
- * (C) 2018 TekMonks. All rights reserved.
+/** 
+ * (C) 2020 TekMonks. All rights reserved.
+ * 
+ * rest.js - perform REST API calls. Accepts callback.
+ *          Returns promise if callback is not passed.
  * 
  * callback format -> callback(error, data)
+ * promise resolves to -> { data, status, resHeaders, error }
+ * promise rejects -> error
+ * 
  */
 if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 if (!CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"]) CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"] = {};
@@ -9,198 +15,136 @@ if (!CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"]) CONST
 const http = require("http");
 const zlib = require("zlib");
 const https = require("https");
-const utils = require(CONSTANTS.LIBDIR+"/utils.js");
-const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
+const utils = require(CONSTANTS.LIBDIR + "/utils.js");
+const crypt = require(CONSTANTS.LIBDIR + "/crypt.js");
 
 const fs = require("fs");
 const path = require("path");
+const util = require("util");
+const readFileAsync = util.promisify(fs.readFile);
 const querystring = require("querystring");
 
 function post(host, port, path, headers = {}, req, sslObj, callback) {
-    let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
-
-    headers["Content-Type"] = "application/json";
-    headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
-    headers["Accept"] = "application/json";
-
-    const optionspost = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'POST',
-        headers : headers
-    };
-
-    doCall(jsonStr, optionspost, false, sslObj, callback);
+    const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; addHeaders(headers, jsonStr);
+    const optionspost = { host, port, path, method: 'POST', headers };
+    const result = doCall(jsonStr, optionspost, false, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function postHttps(host, port, path, headers = {}, req, sslObj, callback) {
-    let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
-
-    headers["Content-Type"] = "application/json";
-    headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
-    headers["Accept"] = "application/json";
-
-    const optionspost = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'POST',
-        headers : headers
-    };
-
-    doCall(jsonStr, optionspost, true, sslObj, callback);
+    const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; addHeaders(headers, jsonStr);
+    const optionspost = { host, port, path, method: 'POST', headers };
+    const result = doCall(jsonStr, optionspost, true, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function put(host, port, path, headers = {}, req, sslObj, callback) {
-    let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
-
-    headers["Content-Type"] = "application/json";
-    headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
-    headers["Accept"] = "application/json";
-
-    const optionsput = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'PUT',
-        headers : headers
-    };
-
-    doCall(jsonStr, optionsput, false, sslObj, callback);
+    const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; addHeaders(headers, jsonStr);
+    const optionsput = { host, port, path, method: 'PUT', headers };
+    const result = doCall(jsonStr, optionsput, false, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function putHttps(host, port, path, headers = {}, req, sslObj, callback) {
-    let jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;
-
-    headers["Content-Type"] = "application/json";
-    headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
-    headers["Accept"] = "application/json";
-
-    const optionsput = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'PUT',
-        headers : headers
-    };
-
-    doCall(jsonStr, optionsput, true, sslObj, callback);
+    const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; addHeaders(headers, jsonStr);
+    const optionsput = { host, port, path, method: 'PUT', headers };
+    const result = doCall(jsonStr, optionsput, true, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function get(host, port, path, headers = {}, req, sslObj, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
-    if (req && req.trim() !== "") path += `?${req}`;
-
-    headers["Accept"] = "application/json";
-
-    const optionsget = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'GET',
-        headers : headers
-    };
-
-    doCall(null, optionsget, false, sslObj, callback);
+    if (req && req.trim() !== "") path += `?${req}`; headers["Accept"] = "application/json";
+    const optionsget = { host, port, path, method: 'GET', headers };
+    const result = doCall(null, optionsget, false, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function getHttps(host, port, path, headers = {}, req, sslObj, callback) {
     if (req && typeof req == "object") req = querystring.stringify(req);
-    if (req && req.trim() !== "") path += `?${req}`;
-
-    headers["Accept"] = "application/json";
-
-    const optionsget = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'GET',
-        headers : headers
-    };
-
-    doCall(null, optionsget, true, sslObj, callback);
+    if (req && req.trim() !== "") path += `?${req}`; headers["Accept"] = "application/json";
+    const optionsget = { host, port, path, method: 'GET', headers };
+    const result = doCall(null, optionsget, true, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function deleteHttp(host, port, path, headers = {}, _req, sslObj, callback) {
     headers["Accept"] = "application/json";
-    const optionsdelete = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'DELETE',
-        headers : headers
-    };
-
-    doCall(null, optionsdelete, false, sslObj, callback);
+    const optionsdelete = { host, port, path, method: 'DELETE', headers };
+    const result = doCall(null, optionsdelete, false, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
 function deleteHttps(host, port, path, headers = {}, _req, sslObj, callback) {
     headers["Accept"] = "application/json";
-    const optionsdelete = {
-        host : host,
-        port : port,
-        path : path,
-        method : 'DELETE',
-        headers : headers
-    };
-
-    doCall(null, optionsdelete, true, sslObj, callback);
+    const optionsdelete = { host, port, path, method: 'DELETE', headers };
+    const result = doCall(null, optionsdelete, true, sslObj); if (!callback) return result;
+    result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function doCall(reqStr, options, secure, sslObj, callback) {
-    const caller = secure ? https : http; 
-    let resp, ignoreEvents = false, resPiped;
-    if (sslObj & typeof sslObj == "object") _addSecureOptions(options, sslObj);
-    const req = caller.request(options, res => {
-        const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";
-        if (encoding.toLowerCase() == "gzip") {resPiped = zlib.createGunzip(); res.pipe(resPiped);}  else resPiped = res;
+function addHeaders(headers, jsonStr) {
+    headers["Content-Type"] = "application/json";
+    headers["Content-Length"] = Buffer.byteLength(jsonStr, "utf8");
+    headers["Accept"] = "application/json";
+}
 
-        resPiped.on("data", d => {if (!ignoreEvents) resp = resp ? resp+d : d});
+function doCall(reqStr, options, secure, sslObj) {
+    return new Promise(async (resolve, reject) => {
+        const caller = secure ? https : http;
+        let resp, ignoreEvents = false, resPiped;
+        if (sslObj & typeof sslObj == "object") await addSecureOptions(options, sslObj);
+        const req = caller.request(options, res => {
+            const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";
+            if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
 
-        const sendError = error => {callback(error, null); ignoreEvents = true;};
-        res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
+            resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? resp + chunk : chunk });
 
-        resPiped.on("end", () => {
-            if (ignoreEvents) return;
-            const status = res.statusCode, resHeaders = {...res.headers};
-            const statusOK = Math.trunc(status/200) == 1 && status %200 < 100;
+            const sendError = error => { reject(error); ignoreEvents = true; };
+            res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
 
-            if (!statusOK) callback(`Bad status: ${status}`, null, status, resHeaders);
-            else try {callback(null, JSON.parse(resp), status, resHeaders)} catch (e) {callback(`Bad JSON Response: ${resp}, error: ${e}`, null, status, resHeaders)}
+            resPiped.on("end", () => {
+                if (ignoreEvents) return;
+                const status = res.statusCode, resHeaders = { ...res.headers };
+                const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
+
+                if (!statusOK) resolve({ error: `Bad status: ${status}`, data: null, status, resHeaders });
+                else try { resolve({ error: null, data: resp ? JSON.parse(resp) : resp, status, resHeaders }) }
+                catch (e) { resolve({ error: `Bad JSON Response: ${resp}, error: ${e}`, data: null, status, resHeaders }) }
+            });
         });
+
+        if (reqStr) req.write(reqStr);
+        req.end();
+        req.on("error", error => reject(error));
     });
- 
-    if (reqStr) req.write(reqStr);
-    req.end();
-    req.on("error", e => callback(e, null));
 }
 
-function _addSecureOptions(options, sslObj) {
-    if (sslObj.pfxPath && sslObj.encryptedPassphrase) { 
-        options.pfx = _getFileContents(sslObj.pfxPath);
-        options.passphrase = crypt.decrypt(sslObj.encryptedPassphrase, sslObj.encryptionKey);
-    } else if (sslObj.certPath && sslObj.encryptedKeyPath) {
-        options.cert = _getFileContents(ssl.certPath);
-        options.key = crypt.decrypt(_getFileContents(ssl.encryptedKeyPath), sslObj.encryptionKey);
-    } 
+async function addSecureOptions(options, sslObj) {
+    try {
+        if (sslObj.pfxPath && sslObj.encryptedPassphrase) {
+            options.pfx = await _getFileContents(sslObj.pfxPath);
+            options.passphrase = crypt.decrypt(sslObj.encryptedPassphrase, sslObj.encryptionKey);
+        } else if (sslObj.certPath && sslObj.encryptedKeyPath) {
+            options.cert = await _getFileContents(ssl.certPath);
+            options.key = crypt.decrypt(await _getFileContents(ssl.encryptedKeyPath), sslObj.encryptionKey);
+        }
+    } catch (error) { console.error(error); return; }
 }
 
-function _getFileContents(filepath) {
+async function _getFileContents(filepath) {
     try {
         filepath = path.resolve(filepath);
         if (!CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath])
-            CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath] = fs.readFileSync(filepath);
+            CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath] = await readFileAsync(filepath);
         return CONSTANTS.SHARED_PROC_MEMORY["__com_tekmonks_monkshu_rest_ssh_file"][filepath];
-    } catch (error) {console.error(error); return;}
+    } catch (error) { throw error; }
 }
 
 if (require.main === module) {
-	let args = process.argv.slice(2);
-	
+    const args = process.argv.slice(2);
     if (args.length == 0) console.log("Usage: rest <host> <port> <path> <headers> <json-body> [ssl-options]");
-    else post(args[0], args[1], args[2], JSON.parse(args[3]), JSON.parse(args[4]), args[5] ? JSON.parse(args[5]) : null, (e, data) => { 
-        if (!e) console.log(JSON.stringify(data)); else console.log(e); 
+    else post(args[0], args[1], args[2], JSON.parse(args[3]), JSON.parse(args[4]), args[5] ? JSON.parse(args[5]) : null, (err, data) => {
+        (err) ? console.log(err): console.log(JSON.stringify(data))
     });
 }
 
