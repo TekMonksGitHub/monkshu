@@ -29,10 +29,13 @@ if (cluster.isMaster) {
 		_forkAndMapWorker(worker);
 	});
 
+	const _broadcastToAllWorkers = (msg) => { for (let worker of Object.values(clusterMap)) worker.send(msg); }
+
 	function _forkAndMapWorker(prevWorker) {
 		if (prevWorker) delete clusterMap[prevWorker.process.pid];
 		const worker = cluster.fork();
 		clusterMap[worker.process.pid] = worker;
+		worker.on("message", (msg) => _broadcastToAllWorkers(msg))	// need to broadcast to all workers
 	}
 	
 } else require(`${__dirname}/server.js`).bootstrap();
