@@ -9,7 +9,6 @@ const cluster = require("cluster");
 
 if (cluster.isMaster) {
 	const conf = require(`${__dirname}/conf/cluster.json`);
-	const clusterMap = {};
 	
 	// Figure out number of workers.
 	let numWorkers = conf.workers;
@@ -18,24 +17,18 @@ if (cluster.isMaster) {
 		if (numCPUs < conf.min_workers) numWorkers = conf.min_workers;	
 		else numWorkers = numCPUs;
 	}
+
+	const _forkWorker = _ => 
+		cluster.fork().on("message", (msg) => {for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)});
 	
 	// Fork workers.
 	console.log(`Starting ${numWorkers} workers.`);
-	for (let i = 0; i < numWorkers; i++) _forkAndMapWorker();
+	for (let i = 0; i < numWorkers; i++) _forkWorker();
 	
 	cluster.on("exit", (worker, _code, _signal) => {
 		console.log("[TCP] Worker server with PID: " + worker.process.pid + " died.");
 		console.log("[TCP] Forking a new process to compensate.");
-		_forkAndMapWorker(worker);
+		_forkWorker();
 	});
-
-	const _broadcastToAllWorkers = (msg) => { for (let worker of Object.values(clusterMap)) worker.send(msg); }
-
-	function _forkAndMapWorker(prevWorker) {
-		if (prevWorker) delete clusterMap[prevWorker.process.pid];
-		const worker = cluster.fork();
-		clusterMap[worker.process.pid] = worker;
-		worker.on("message", (msg) => _broadcastToAllWorkers(msg))	// need to broadcast to all workers
-	}
 	
 } else require(`${__dirname}/server.js`).bootstrap();
