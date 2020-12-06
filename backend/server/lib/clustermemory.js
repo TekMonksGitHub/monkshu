@@ -6,11 +6,11 @@
  * cluster members (Node.js workers).
  */
 
- const _clusterMemory = {};
+const _clusterMemory = {};
 const SET_MSG = "__org_monkshu_cluster_memory_set";
 
 function init() {
-    process.on(SET_MSG, _processSetMessage);
+    process.on("message", msg => { if (msg.type == SET_MSG) _processSetMessage(msg.obj); });
     global.CLUSTER_MEMORY = this;
 }
 
