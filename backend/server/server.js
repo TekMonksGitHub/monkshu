@@ -2,7 +2,7 @@
  * Main server bootstrap file for the API server.
  * 
  * (C) 2015, 2016, 2017, 2018, 2019, 2020 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");

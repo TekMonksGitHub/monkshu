@@ -1,6 +1,6 @@
 /* 
  * (C) 2020. TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  * 
  * Maintains cluster memory across vertical 
  * cluster members (Node.js workers).

@@ -2,7 +2,7 @@
  * Cluster.js, Cluster manager
  * 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  */
 
 const cluster = require("cluster");
@@ -19,7 +19,7 @@ if (cluster.isMaster) {
 	}
 
 	const _forkWorker = _ => 
-		cluster.fork().on("message", (msg) => {for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)});
+		cluster.fork().on("message", msg => {for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)});
 	
 	// Fork workers.
 	console.log(`Starting ${numWorkers} workers.`);
