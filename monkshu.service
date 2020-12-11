@@ -1,5 +1,5 @@
 [Unit]
-Description=TekMonks Deliveryman service
+Description=Monkshu service
 After=network-online.target
 StartLimitIntervalSec=0
 
