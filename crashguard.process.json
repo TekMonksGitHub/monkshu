@@ -1,0 +1,4 @@
+[
+    {"process": ["/home/tekmonks/monkshu/frontend/server/server.sh"]},
+    {"process": ["/home/tekmonks/monkshu/backend/server/server.sh"]}
+]
