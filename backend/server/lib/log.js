@@ -51,6 +51,9 @@ Logger.prototype.overrideConsole = function() {
 	global.console.log = function() {
 		parentLogObject.info(`[console] ${arguments[0]}`); 
 	};
+	global.console.error = function() {
+		parentLogObject.error(`[stderr] ${arguments[0]}`); 
+	};
 	process.stdout.write = function() {
 		parentLogObject.info(`[stdout] ${arguments[0]}`);
 	}
