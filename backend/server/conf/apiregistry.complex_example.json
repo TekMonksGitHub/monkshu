@@ -1,6 +1,6 @@
 {
-"/getTrades" : "/services/get_trades.js?encrypted=true&get=false&key=fjkw79842ufn4289udej2348&needsToken=false&addsToken=sub:access",
-"/addUser" : "/services/addUser.js?encrypted=true&key=89jfkl09urjq9udj39f8ndeku397rdj&needsToken=true",
-"/updateUser" : "/services/addUser.js?encrypted=true&key=nmdjfheu9if3uiq98948ruejd1u232d10irfc",
-"/deleteUser" : "/services/deleteUser.js?encrypted=true&key=4dnei9eiorjeo13e3ojr98greji3u&notRESTAPI=false"
+"/getTrades" : "/services/get_trades.js?encrypted=true&get=false&keys=fjkw79842ufn4289udej2348&needsToken=false&addsToken=sub:access",
+"/addUser" : "/services/addUser.js?encrypted=true&keys=89jfkl09urjq9udj39f8ndeku397rdj&needsToken=true",
+"/updateUser" : "/services/addUser.js?encrypted=true&keys=nmdjfheu9if3uiq98948ruejd1u232d10irfc",
+"/deleteUser" : "/services/deleteUser.js?encrypted=true&keys=4dnei9eiorjeo13e3ojr98greji3u&notRESTAPI=false"
 }
