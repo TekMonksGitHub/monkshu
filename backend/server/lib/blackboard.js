@@ -36,12 +36,12 @@ async function doService(request) {
     } else return CONSTANTS.FALSE_RESULT;
 }
 
-function publish(topic, payload) {
+async function publish(topic, payload) {
     const poster = conf.secure?rest.postHttps:rest.post;
 
     for (const replica of conf.replicas) {
         const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
-        poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:{topic, payload}}, (err,result) => {
+        await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:{topic, payload}}, (err,result) => {
             if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
         });
     }
