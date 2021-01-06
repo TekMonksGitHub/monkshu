@@ -24,8 +24,8 @@ function bootstrap() {
 	LOG.info("Initializing the cluster memory.");
 	require(CONSTANTS.LIBDIR+"/clustermemory.js").init();
 
-	/* Init the apps */
-	LOG.info("Initializing the apps.");
+	/* Init the list of apps */
+	LOG.info("Initializing the apps list.");
 	require(CONSTANTS.LIBDIR+"/app.js").initSync();
 
 	/* Init the API registry */
@@ -40,6 +40,10 @@ function bootstrap() {
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
 	require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
+	
+	/* Init the apps themselves */
+	LOG.info("Initializing the apps.");
+	require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();
 
 	/* Run the server */
 	initAndRunTransportLoop();

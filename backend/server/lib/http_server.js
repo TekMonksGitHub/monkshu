@@ -29,7 +29,7 @@ function initSync() {
 				req.headers[header.toLowerCase()] = saved;
 			}
 			req.on("data", data => module.exports.onData(data, servObject));
-			req.on("end", _ => module.exports.onReqEnd(req.url, req.headers, servObject));
+			req.on("end", _ => module.exports.onReqEnd(req.url.replace(/\/+/, "/"), req.headers, servObject));
 			req.on("error", error => module.exports.onReqError(req.url, req.headers, error, servObject));
 		}
 	};

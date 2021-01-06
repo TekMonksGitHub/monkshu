@@ -13,7 +13,7 @@
  * built on top of this though.
  */
 
-const _globalmemory = {};
+const _globalmemory = {}, _listeners = {};
 
 function init() {
     global.DISTRIBUTED_MEMORY = this;
@@ -22,7 +22,8 @@ function init() {
 
 const set = (key, value) => BLACKBOARD.publish("__org_monkshu_distribued_memory_set", {key, value});  // publish to all via blackboard, including ourselves
 const get = key => _globalmemory[key];
+const listen = (key, cb) => _listeners[key] = cb;
 
-const _set = obj =>  {_globalmemory[obj.key] = obj.value;};
+const _set = obj =>  {_globalmemory[obj.key] = obj.value; for (const [key, cb] of Object.entries(_listeners)) if (obj.key == key) cb(obj.key, obj.value);}
 
-module.exports = {init, set, get};
+module.exports = {init, set, get, listen};

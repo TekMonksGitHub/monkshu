@@ -10,15 +10,21 @@ const appRoots = [];
 
 function initSync() {
     for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
-        appThis = {}; appThis[app] = `${CONSTANTS.APPROOTDIR}/${app}`; appRoots.push(appThis);
+        appThis = {}; appThis[app] = `${CONSTANTS.APPROOTDIR}/${app}`; 
+        appRoots.push(appThis);
+    }
+}
 
-		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/lib/app.js`)) {
+function initAppsSync() {
+    for (const appEntry of appRoots) {
+        const app = Object.keys(appEntry)[0];
+        if (fs.existsSync(`${appEntry[app]}/lib/app.js`)) {
             LOG.info(`Initializing app: ${app}`);
-            const appThis = require(`${CONSTANTS.APPROOTDIR}/${app}/lib/app.js`); if (appThis.initSync) appThis.initSync(); 
+            const appThis = require(`${appEntry[app]}/lib/app.js`); if (appThis.initSync) appThis.initSync(); 
         }
     }
 }
 
 const getApps = _ => appRoots;
 
-module.exports = {initSync, getApps}
+module.exports = {initSync, getApps, initAppsSync}
