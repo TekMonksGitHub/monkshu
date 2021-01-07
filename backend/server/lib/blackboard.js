@@ -7,10 +7,10 @@
  */
 
 const topics = {}
+let conf = require(CONSTANTS.BLACKBOARDCONF);
 const API_BB_PATH = "/__org_monkshu__blackboard";
 const rest = require(`${CONSTANTS.LIBDIR}/rest.js`);
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg";
-let conf = require(CONSTANTS.BLACKBOARDCONF);
 const CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf";
 const writeFileAsync = require("util").promisify(require("fs").writeFile);
 
