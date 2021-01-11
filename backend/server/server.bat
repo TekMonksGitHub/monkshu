@@ -1,2 +1,2 @@
 @echo off
-start node "%~dp0\server.js" %*
+start "Monkshu Backend" node "%~dp0\server.js" %*

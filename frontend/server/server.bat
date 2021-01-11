@@ -1,5 +1,5 @@
 @echo off
 pushd .
 cd "%~dp0\"
-start node ".\server.js" %*
+start "Monkshu Frontend" node ".\server.js" %*
 popd

@@ -6,3 +6,5 @@ cd %CURPATH%\
 call .\frontend\server\server.bat
 call .\backend\server\server.bat
 popd
+
+echo Done.
