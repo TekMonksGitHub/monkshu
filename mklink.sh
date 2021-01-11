@@ -1,10 +1,10 @@
 #!/bin/sh
 
 CURPATH="$( cd "$( dirname "$0" )" && pwd )"
-pushd .
+pushd . > /dev/null
 cd "$CURPATH/../"
 APP_DIR=$PWD
-popd
+popd > /dev/null
 if [ "$1" == "" ]; then
 	echo Usage: $0 [name of the application]
 	exit 1
