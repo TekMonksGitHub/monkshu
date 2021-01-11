@@ -1,2 +1,2 @@
 @echo off
-node "%~dp0\server.js" %*
+start node "%~dp0\server.js" %*

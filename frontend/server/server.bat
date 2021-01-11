@@ -1,2 +1,5 @@
 @echo off
-node "%~dp0\server.js" %*
+pushd .
+cd "%~dp0\"
+start node ".\server.js" %*
+popd
