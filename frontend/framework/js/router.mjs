@@ -65,7 +65,7 @@ async function expandPageData(text, url, dataModels) {
 	return rendered;
 }
 
-async function getPageData(url, dataModels) {
+async function getPageData(url, dataModels={}) {
 	const i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
 	dataModels["i18n"] = i18nObj; 
 
@@ -128,8 +128,10 @@ function removeOnLoadPage(func) {
 	if (window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.splice(window.monkshu_env.onRouterLoadPage.indexOf(func),1);
 }
 
+const doIndexNavigation = _ => window.location = window.location.origin;
+
 const getCurrentURL = _ => router.decodeURL(window.location.href);
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, getCurrentURL};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, getCurrentURL, doIndexNavigation};
