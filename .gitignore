@@ -7,3 +7,4 @@ frontend/apps/*
 frontend/framework/conf/default_app.json
 .chrome
 .DS_Store
+debug.log
