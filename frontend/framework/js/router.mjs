@@ -33,7 +33,7 @@ async function loadPage(url, dataModels={}) {
 	document.close();
 
 	// notify those who want to know that a new page was loaded
-	if (window.monkshu_env.onRouterLoadPage) for (const func of window.monkshu_env.onRouterLoadPage) func(dataModels, url);
+	if (window.monkshu_env.pageload_funcs[url]) await window.monkshu_env.pageload_funcs[url](dataModels, url);
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
@@ -47,7 +47,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
 		const baseURL = urlParsed.search?urlParsed.href.substring(0, urlParsed.href.length-urlParsed.search.length):urlParsed.href;
-		if (window.monkshu_env.pageload_funcs[baseURL]) await window.monkshu_env.pageload_funcs[baseURL](dataModels);
+		if (window.monkshu_env.pagedata_funcs[baseURL]) await window.monkshu_env.pagedata_funcs[baseURL](dataModels);
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
@@ -65,9 +65,9 @@ async function expandPageData(text, url, dataModels) {
 	return rendered;
 }
 
-async function getPageData(url, dataModels={}) {
+async function getPageData(url, dataModels) {
 	const i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
-	dataModels["i18n"] = i18nObj; 
+	dataModels = dataModels||{}; dataModels["i18n"] = i18nObj; 
 
 	dataModels["lang"] = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
 	
@@ -118,20 +118,22 @@ function encodeURL(url) {
 	const encodedURL = new URL(window.location.href).pathname+HS+btoa(url); return encodedURL;
 }
 
-function addOnLoadPage(func) {
-	if (!window.monkshu_env.onRouterLoadPage) window.monkshu_env.onRouterLoadPage = [];
-	if (!window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.push(func);
-}
+const addOnLoadPage = (url, func) => window.monkshu_env.pageload_funcs[url] = func;
+const addOnLoadPageData = (url, func) => window.monkshu_env.pagedata_funcs[url] = func;
 
-function removeOnLoadPage(func) {
-	if (!window.monkshu_env.onRouterLoadPage) window.monkshu_env.onRouterLoadPage = [];
-	if (window.monkshu_env.onRouterLoadPage.includes(func)) window.monkshu_env.onRouterLoadPage.splice(window.monkshu_env.onRouterLoadPage.indexOf(func),1);
-}
+const removeOnLoadPage = (url) => delete window.monkshu_env.pageload_funcs[url];
+const removeOnLoadPageData = (url) => delete window.monkshu_env.pagedata_funcs[url];
 
 const doIndexNavigation = _ => window.location = window.location.origin;
 
 const getCurrentURL = _ => router.decodeURL(window.location.href);
+const getCurrentPageData = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_DATA);
+const setCurrentPageData = data => session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, data);
+
+const getLastSessionURL = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_URL);
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, getCurrentURL, doIndexNavigation};
+export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, 
+	encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, getCurrentURL, getCurrentPageData, 
+	setCurrentPageData, doIndexNavigation, getLastSessionURL};
