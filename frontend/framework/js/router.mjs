@@ -34,6 +34,7 @@ async function loadPage(url, dataModels={}) {
 
 	// notify those who want to know that a new page was loaded
 	if (window.monkshu_env.pageload_funcs[url]) await window.monkshu_env.pageload_funcs[url](dataModels, url);
+	if (window.monkshu_env.pageload_funcs["*"]) await window.monkshu_env.pageload_funcs["*"](dataModels, url);
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
@@ -48,6 +49,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 		dataModels = await getPageData(urlParsed.href, dataModels);
 		const baseURL = urlParsed.search?urlParsed.href.substring(0, urlParsed.href.length-urlParsed.search.length):urlParsed.href;
 		if (window.monkshu_env.pagedata_funcs[baseURL]) await window.monkshu_env.pagedata_funcs[baseURL](dataModels);
+		if (window.monkshu_env.pagedata_funcs["*"]) await window.monkshu_env.pagedata_funcs["*"](dataModels);
 		
 		Mustache.parse(html);
 		html = Mustache.render(html,dataModels);
