@@ -1,4 +1,4 @@
-/* 
+/**
  * (C) 2018 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
  */
@@ -33,8 +33,8 @@ async function loadPage(url, dataModels={}) {
 	document.close();
 
 	// notify those who want to know that a new page was loaded
-	if (window.monkshu_env.pageload_funcs[url]) await window.monkshu_env.pageload_funcs[url](dataModels, url);
-	if (window.monkshu_env.pageload_funcs["*"]) await window.monkshu_env.pageload_funcs["*"](dataModels, url);
+	if (window.monkshu_env.pageload_funcs[url]) for (const func of window.monkshu_env.pageload_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.pageload_funcs["*"]) for (const func of window.monkshu_env.pageload_funcs["*"]) await func(dataModels, url);
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
@@ -48,11 +48,11 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
 		const baseURL = urlParsed.search?urlParsed.href.substring(0, urlParsed.href.length-urlParsed.search.length):urlParsed.href;
-		if (window.monkshu_env.pagedata_funcs[baseURL]) await window.monkshu_env.pagedata_funcs[baseURL](dataModels);
-		if (window.monkshu_env.pagedata_funcs["*"]) await window.monkshu_env.pagedata_funcs["*"](dataModels);
-		
+		if (window.monkshu_env.pagedata_funcs[baseURL]) for (const func of window.monkshu_env.pagedata_funcs[baseURL]) await func(dataModels, url);
+		if (window.monkshu_env.pagedata_funcs["*"]) for (const func of window.monkshu_env.pagedata_funcs["*"]) await func(dataModels, url);
+
 		Mustache.parse(html);
-		html = Mustache.render(html,dataModels);
+		html = Mustache.render(html, dataModels);
 
 		return html;
 	} catch (err) {throw err}
@@ -120,11 +120,15 @@ function encodeURL(url) {
 	const encodedURL = new URL(window.location.href).pathname+HS+btoa(url); return encodedURL;
 }
 
-const addOnLoadPage = (url, func) => window.monkshu_env.pageload_funcs[url] = func;
-const addOnLoadPageData = (url, func) => window.monkshu_env.pagedata_funcs[url] = func;
+const addOnLoadPage = (url, func) => { if (window.monkshu_env.pageload_funcs[url]) 
+	window.monkshu_env.pageload_funcs[url].push(func); else window.monkshu_env.pageload_funcs[url] = [func]; }
+const addOnLoadPageData = (url, func) => { if (window.monkshu_env.pagedata_funcs[url])
+	window.monkshu_env.pagedata_funcs[url].push(func); else window.monkshu_env.pagedata_funcs[url] = [func]; }
 
-const removeOnLoadPage = (url) => delete window.monkshu_env.pageload_funcs[url];
-const removeOnLoadPageData = (url) => delete window.monkshu_env.pagedata_funcs[url];
+const removeOnLoadPage = (url, func) => { if (window.monkshu_env.pageload_funcs[url] && window.monkshu_env.pageload_funcs[url].indexOf(func)!=-1) 
+	window.monkshu_env.pageload_funcs[url].splice(window.monkshu_env.pageload_funcs[url].indexOf(func)) }
+const removeOnLoadPageData = (url, func) => { if (window.monkshu_env.pagedata_funcs[url] && window.monkshu_env.pagedata_funcs[url].indexOf(func)!=-1) 
+	window.monkshu_env.pagedata_funcs[url].splice(window.monkshu_env.pagedata_funcs[url].indexOf(func)) }
 
 const doIndexNavigation = _ => window.location = window.location.origin;
 
