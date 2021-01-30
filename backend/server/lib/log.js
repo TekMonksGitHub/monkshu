@@ -42,7 +42,8 @@ Logger.prototype.error = function(s, sync) {this.writeFile("error", s && s.stack
 Logger.prototype.truncate = function(s) {return s && s.length > CONSTANTS.MAX_LOG ? s.substring(0, CONSTANTS.MAX_LOG) : s}
 
 Logger.prototype.console = function(s) {
-	this._origLog(s?s.trim():s);						// send to console or debug console, trimmed
+	s = typeof s == "string" ? s : JSON.stringify(s);
+	this._origLog(s?s.trim():s);					// send to console or debug console, trimmed
 	this._oldStdoutWrite.call(process.stdout, s);	// send to process' STDOUT
 }
 
