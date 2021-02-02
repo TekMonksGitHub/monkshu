@@ -4,16 +4,16 @@
  */
 
 const fs = require("fs");
-const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const log_conf = require(CONSTANTS.LOGSCONF);
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
+const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
 
 const logQueue = []; let pendingWrites = false;	// queueing mechanism for synchronous logging, eats memory potentially
 
 function initGlobalLoggerSync(logName) {
 	/* create the logger */
 	if (!fs.existsSync(CONSTANTS.LOGDIR)) {fs.mkdirSync(CONSTANTS.LOGDIR);}
-	let filewriter = 
-		require(`${CONSTANTS.LIBDIR}/FileWriter.js`).createFileWriter(logName,log_conf.closeTimeOut,"utf8");
+	let filewriter = ffs.createFileWriter(logName,log_conf.closeTimeOut,"utf8");
 	
 	global.LOG = new Logger(logName, log_conf.max_log_mb*1024*1024, filewriter);	// 100 MB log max
 	
@@ -70,16 +70,14 @@ Logger.prototype.overrideConsole = function() {
 }
 
 Logger.prototype.getLogContents = function(callback) {
-	fs.readFile(this.path, function(err, data){
+	fs.readFile(this.path, "utf8", function(err, data){
 		if (err) callback("Unable to read the log",null);
-		else callback(null, data);
+		else {const entries = []; for (const entry of data.trim().split("\n")) entries.push(JSON.parse(entry)); callback(null, entries);}
 	});
 }
 
 Logger.prototype.writeFile = function(level, s, sync) {
-	let msg; 
-	try{msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+JSON.stringify(s)+'}\n';} 
-	catch(err) {msg = '{"ts":"'+utils.getDateTime()+'","level":"'+level+'","message":'+s.toString()+'}\n';}
+	const msg = JSON.stringify({ts: utils.getDateTime(), level, message: s})+"\n";
 	
 	if (sync === undefined) {
 		const writeFile = msg => {
@@ -107,4 +105,8 @@ Logger.prototype.writeFile = function(level, s, sync) {
 			this._oldStderrWrite.call(process.stderr, msg);
 		};
 	}
+}
+
+Logger.prototype.flush = function(callback) {
+	const timer = setInterval(_=>{if (!logQueue.length) {clearInterval(timer); callback();}}, 100);
 }
