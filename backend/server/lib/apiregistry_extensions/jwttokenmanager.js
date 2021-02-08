@@ -8,7 +8,7 @@
 const cryptmod = require("crypto");
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
-const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_apitoken";
+const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
 
 let conf, alreadyInit = false;
 
