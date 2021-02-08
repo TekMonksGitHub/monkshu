@@ -1,17 +1,22 @@
-/* 
+/** 
  * (C) 2020 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  * 
  * Tokens are in JWT format.
  */
+
 const cryptmod = require("crypto");
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
+const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_apitoken";
 
-let conf, alreadyInit=false, activeTokens={};
+let conf, alreadyInit = false;
 
 function initSync() {
     if (alreadyInit) return; else alreadyInit = true;
+
+    // Init tokens in Cluster Memory
+    if (!CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY)) CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, {});
 
     try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
@@ -30,12 +35,14 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
 }
 
 function _checkToken(token) {
+    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     const lastAccess = activeTokens[token];
     if (!lastAccess) return false;
 
     const timeDiff = Date.now() - lastAccess;
     if (timeDiff > conf.expiryTime) return false; else {
         activeTokens[token] = Date.now();   // update last access
+        CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
         return true;
     }
 }
@@ -59,14 +66,19 @@ function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, res
     const sig64 = cryptmod.createHmac("sha256", cryptmod.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
     const token = `${claimB64}.${headerB64}.${sig64}`;
+
+    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();
+    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
     
     // inject the JWT token into the response headers
     responseHeaders.access_token = token; responseHeaders.token_type = "bearer";
 }
 
 function _cleanTokens() {
+    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     for (let token of Object.keys(activeTokens)) if (Date.now() - activeTokens[token] > conf.expiryTime) delete activeTokens[token];
+    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
 }
 
-module.exports = {checkSecurity, injectResponseHeaders, initSync};
+module.exports = { checkSecurity, injectResponseHeaders, initSync };
