@@ -9,7 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const urlMod = require("url");
 const app = require(`${CONSTANTS.LIBDIR}/app.js`);
-const API_REG_DISTM_KEY = "__org_monkshu_apiregistry";
+const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
 let decoders, encoders, headermanagers, securitycheckers;
 
 function initSync() {
