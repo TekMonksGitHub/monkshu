@@ -1,10 +1,12 @@
-/* 
- * (C) 2015 - 2018 TekMonks. All rights reserved.
+/**  
+ * (C) 2021 TekMonks. All rights reserved.
+ * 
  */
-if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
+
+if (!global.SHARED_CONSTANTS) global.SHARED_CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
 const cryptmod = require("crypto");
-const crypt = require(CONSTANTS.CRYPTCONF);
+const crypt = require(SHARED_CONSTANTS.CRYPTCONF);
 
 function encrypt(text, key = crypt.key) {
 	const iv = Buffer.from(cryptmod.randomBytes(16)).toString("hex").slice(0, 16);

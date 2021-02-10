@@ -4,7 +4,7 @@
  * 
  * Encrypted data decoder
  */
-const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
+const crypt = require(SHARED_CONSTANTS.LIBDIR+"/crypt.js");
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {

@@ -6,6 +6,9 @@
 const path = require("path");
 const rootdir = path.resolve(__dirname+"/../");
 
+exports.SHARED_LIBDIR = path.resolve(rootdir + "/../../shared/lib");
+if (!global.SHARED_CONSTANTS) global.SHARED_CONSTANTS = require(`${exports.SHARED_LIBDIR}/constants.js`);
+
 exports.ROOTDIR = rootdir;
 exports.APPROOTDIR = rootdir+"/../apps";
 exports.LIBDIR = rootdir+"/lib";
@@ -16,7 +19,6 @@ exports.TRANSPORT = rootdir + "/conf/transport.json";
 exports.CLUSTERCONF = rootdir+"/conf/cluster.json";
 exports.LOGSCONF = rootdir+"/conf/log.json";
 exports.LOGMAIN = rootdir+"/logs/server.log.ndjson";
-exports.CRYPTCONF = rootdir+"/conf/crypt.json";
 exports.HTTPDCONF = rootdir + "/conf/httpd.json";
 exports.BLACKBOARDCONF = rootdir + "/conf/blackboard.json";
 exports.RELEASEFILE = rootdir+"/../../RELEASE";

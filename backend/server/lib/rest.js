@@ -16,7 +16,7 @@ const http = require("http");
 const zlib = require("zlib");
 const https = require("https");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
-const crypt = require(CONSTANTS.LIBDIR + "/crypt.js");
+const crypt = require(SHARED_CONSTANTS.LIBDIR + "/crypt.js");
 
 const fs = require("fs");
 const path = require("path");
