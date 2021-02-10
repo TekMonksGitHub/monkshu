@@ -5,12 +5,15 @@
  * License: See enclosed file.
  */
 
+global.CONSTANTS = require(__dirname + "/lib/constants.js");
+
 const fs = require("fs");
 const url = require("url");
 const zlib = require("zlib");
 const path = require("path");
 const http = require("http");
 const https = require("https");
+const crypt = require(SHARED_CONSTANTS.LIBDIR + "/crypt.js");
 let access; let error;
 
 exports.bootstrap = bootstrap;
@@ -24,7 +27,7 @@ function bootstrap() {
 
 	/* Start HTTP/S server */
 	const listener = (req, res) => { try{_handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
-	const options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase} : null;
+	const options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: crypt.decrypt(conf.pfxPassphrase)} : null;
 	const httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
@@ -34,7 +37,7 @@ function bootstrap() {
 }
 
 function _initConfSync() {
-	global.conf = require(`${__dirname}/conf/httpd.json`);
+	global.conf = require(`${CONSTANTS.CONFDIR}/httpd.json`);
 
 	// normalize paths
 	conf.webroot = path.resolve(conf.webroot);	

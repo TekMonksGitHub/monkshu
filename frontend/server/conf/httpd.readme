@@ -14,7 +14,7 @@
 	"ssl": false, <-- Set to true for HTTPS
 	"enableGZIPEncoding": true, <-- Everything will be gzip encoded if MIME supports it (see mime section)
 	"pfxPath": "<path to PFX (.key) File>", <-- For HTTPS the path to the certificate PFX file
-	"pfxPassphrase": "<passphrase for the pfx file>", <-- For HTTPS the passphrase for certificate PFX file
+	"pfxPassphrase": "<encrypted passphrase for the pfx file>", <-- For HTTPS the encrypted passphrase for certificate PFX file
 	"httpdHeaders": { <-- Hardcode these headers in every response
 		"Server": "Monkshu HTTPD",
 		"X-XSS-Protection": 1,

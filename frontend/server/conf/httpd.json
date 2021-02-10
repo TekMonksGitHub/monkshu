@@ -10,7 +10,7 @@
 	"ssl": false,
 	"enableGZIPEncoding": true,
 	"pfxPath": "<path to PFX (.key) File>",
-	"pfxPassphrase": "<passphrase for the pfx file>",
+	"pfxPassphrase": "<encrypted passphrase for the pfx file>",
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
 		"X-XSS-Protection": 1,
