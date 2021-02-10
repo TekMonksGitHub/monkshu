@@ -6,9 +6,6 @@
 const path = require("path");
 const rootdir = path.resolve(__dirname+"/../");
 
-exports.SHARED_LIBDIR = path.resolve(rootdir + "/../../shared/lib");
-if (!global.SHARED_CONSTANTS) global.SHARED_CONSTANTS = require(`${exports.SHARED_LIBDIR}/constants.js`);
-
 exports.ROOTDIR = rootdir;
 exports.APPROOTDIR = rootdir+"/../apps";
 exports.LIBDIR = rootdir+"/lib";
@@ -26,6 +23,10 @@ exports.MAX_LOG = 1024;
 
 /* Shared namespace */
 exports.SHARED_PROC_MEMORY = {};
+
+/* Shared constants */
+exports.SHARED_LIBDIR = path.resolve(rootdir + "/../../shared/lib");
+if (!global.SHARED_CONSTANTS) global.SHARED_CONSTANTS = require(`${exports.SHARED_LIBDIR}/constants.js`);
 
 /* Result objects */
 exports.FALSE_RESULT = {"result":false};
