@@ -7,11 +7,12 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const conf = require(`${CONSTANTS.HTTPDCONF}`);
+const crypt = require(CONSTANTS.LIBDIR + "/crypt.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
 
 function initSync() {
-	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: conf.pfxPassphrase } : null;
+	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: crypt.decrypt(conf.pfxPassphrase) } : null;
 
 	/* create HTTP/S server */
 	let host = conf.host || "::";
