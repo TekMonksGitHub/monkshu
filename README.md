@@ -47,6 +47,10 @@ NPMs needed
 (1) Mustache if using custom authentication.  
 (2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms.
 
+Documentation
+===========
+Wiki link -> [https://github.com/TekMonksGitHub/monkshu/wiki](https://github.com/TekMonksGitHub/monkshu/wiki)
+
 License
 ==========
 See enclosed file LICENSE. (C) TekMonks.
