@@ -30,11 +30,11 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(" "):[];
-    if (token_splits.length == 2) return _checkToken(token_splits[1]); 
+    if (token_splits.length == 2) return checkToken(token_splits[1]); 
     else {reason.reason = "JWT Token Error"; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
-function _checkToken(token) {
+function checkToken(token) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     const lastAccess = activeTokens[token];
     if (!lastAccess) return false;
@@ -81,4 +81,4 @@ function _cleanTokens() {
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
 }
 
-module.exports = { checkSecurity, injectResponseHeaders, initSync };
+module.exports = { checkSecurity, injectResponseHeaders, initSync, checkToken };

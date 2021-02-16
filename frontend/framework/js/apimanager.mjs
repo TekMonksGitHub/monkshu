@@ -61,7 +61,7 @@ async function blob(url, filename, type, req, sendToken, extractToken) {
         if (extractToken) _extractTokens(response);
         const respBlob = await response.blob();
         const url = window.URL.createObjectURL(respBlob), link = document.createElement("a");
-        link.href = url; link.download = filename;
+        link.style.display = "none"; link.href = url; link.download = filename;
         document.body.appendChild(link); link.click(); link.remove();  
         return true;
     } else return false;
@@ -76,6 +76,13 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
     _modifyAPIManagerStorage("keys", apikeys);
     if (apiKeyHeaderName) _modifyAPIManagerStorage("keyHeader", apiKeyHeaderName);
 }
+
+/**
+ * Returns JWT token for the given URL and token subject.
+ * @param {string} url The URL for which we need the token
+ * @param {string} tokenType The token type, access is assumed if not provided
+ */
+const getJWTToken = (url, tokenType) => _getAPIManagerStorage().tokenManager[`${new URL(url).host}_${tokenType?tokenType:"access"}`];
 
 function _createFetchInit(url, type, req, sendToken, acceptHeader) {
     type = type || "GET"; const urlHost = new URL(url).host; 
@@ -142,4 +149,4 @@ function _modifyAPIManagerStorage(key, value) {
     storage[key] = value;
 }
 
-export const apimanager = {rest, blob, registerAPIKeys};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken};
