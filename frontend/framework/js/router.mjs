@@ -120,7 +120,8 @@ function decodeURL(url) {
 
 function encodeURL(url) {
 	url = new URL(url, window.location).href;
-	const encodedURL = new URL(window.location.href).pathname+HS+btoa(url); return encodedURL;
+	const encodedURL = new URL(new URL(window.location.href).pathname+HS+btoa(url), window.location); 
+	return encodedURL.toString();
 }
 
 const addOnLoadPage = (url, func) => { if (window.monkshu_env.pageload_funcs[url]) 
