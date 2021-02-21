@@ -7,7 +7,10 @@
 // Cookieless HTML5 Session Support
 ////////////////////////////////////////////////    
 
-const set = (key, item) => {if (key && item) sessionStorage.setItem(key, JSON.stringify(item))}
+const set = (key, item) => {
+    const value = JSON.stringify(item);
+    if (key && item) sessionStorage.setItem(key, value);
+}
 const get = key => sessionStorage.getItem(key) ? _getProxy(JSON.parse(sessionStorage.getItem(key)),key) : undefined;
 const remove = key => sessionStorage.removeItem(key);
 const destroy = _ => sessionStorage.clear();

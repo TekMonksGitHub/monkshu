@@ -76,9 +76,6 @@ async function getPageData(url, dataModels) {
 	dataModels["url"] = {url};
 	new URL(url).searchParams.forEach((value, name) => dataModels["url"][name] = value);
 
-	dataModels["session"] = {}; 
-	for (const key of session.keys()) dataModels["session"][key] = session.get(key);
-
 	dataModels["_org_monkshu_makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
 
