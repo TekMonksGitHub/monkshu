@@ -17,7 +17,7 @@ function set(key, value) {
     const obj = {}; obj[key] = value; 
     if (process.send) process.send({type: SET_MSG, obj}) 
     else _processSetMessage(obj);
-};
+}
 
 const get = key => _clusterMemory[key];
 
