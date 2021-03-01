@@ -25,15 +25,15 @@ function decrypt(text, key = crypt.key) {
 	return decrypted;
 }
 
+module.exports = { encrypt, decrypt };
+
 if (require.main === module) {
 	const args = process.argv.slice(2);
 
-	if (args.length < 2) {
+	if (args.length < 2 || !module.exports[args[0]]) {
 		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt>");
 		process.exit(1);
 	}
 
-	console.log(eval(args[0])(args[1]));
+	console.log(module.exports[args[0]](args[1]));
 }
-
-module.exports = { encrypt, decrypt };

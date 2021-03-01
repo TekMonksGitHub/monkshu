@@ -10,7 +10,7 @@
         "Access-Control-Max-Age": 86400
     },
     "pfxPath": "<path to PFX (.key) File>",
-    "pfxPassphrase": "<passphrase for the pfx file>",
+    "pfxPassphrase": "<encrypted passphrase for the pfx file>",
     "host" : "0.0.0.0",
     "port" : 9090
 }
