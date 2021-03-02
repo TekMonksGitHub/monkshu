@@ -96,7 +96,7 @@ function checkSecurity(url, req, headers, servObject, reason) {
 
 	for (const securitycheckerThis of securitycheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
 		req, headers, servObject, reason)) { 
-			reason.reason += `\nFailed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
+			reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
 			return false; 
 	}
 
