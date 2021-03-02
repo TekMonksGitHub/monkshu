@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CURPATH="$( cd "$( dirname "$0" )" && pwd )"
 pushd . > /dev/null

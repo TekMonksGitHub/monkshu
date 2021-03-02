@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 APP_NAME=$1
 if [ -z "$APP_NAME" ]; then
