@@ -11,7 +11,7 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
     if (!keysExpected.length) return true; 
     else for (const apiKeyHeaderName of APIKEYS) if (keysExpected.includes(headers[apiKeyHeaderName])) return true;
     
-    reason = {reason:"API Key Error", code:403}; return false;   // key not found in the headers
+    reason.reason = "API Key Error"; reason.code = 403; return false;   // key not found in the headers
 }
 
 function getIncomingAPIKey(headers) {
