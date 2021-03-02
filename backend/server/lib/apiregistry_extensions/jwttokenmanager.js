@@ -30,17 +30,17 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(" "):[];
-    if (token_splits.length == 2) return checkToken(token_splits[1]); 
-    else {reason.reason = "JWT Token Error"; reason.code = 403; return false;}	// missing or badly formatted token
+    if (token_splits.length == 2) return checkToken(token_splits[1], reason); 
+    else {reason = {reason:"JWT Token Error, bad token", code:403}; return false;}	// missing or badly formatted token
 }
 
-function checkToken(token) {
+function checkToken(token, reason) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     const lastAccess = activeTokens[token];
-    if (!lastAccess) return false;
+    if (!lastAccess) {reason = {reason:"JWT Token Error, no last access found", code:403}; return false;}
 
     const timeDiff = Date.now() - lastAccess;
-    if (timeDiff > conf.expiryTime) return false; else {
+    if (timeDiff > conf.expiryTime) {reason = {reason:"JWT Token Error, expired", code:403}; return false;} else {
         activeTokens[token] = Date.now();   // update last access
         CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
         return true;
