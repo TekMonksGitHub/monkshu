@@ -91,10 +91,14 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 function checkSecurity(url, req, headers, servObject, reason) {
 	const endPoint = urlMod.parse(url, true).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
+	let apiregentry = apireg[endPoint]; if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
+	apiregentry = urlMod.parse(apireg[endPoint], true);
 
-	for (const securitycheckerThis of securitycheckers) 
-		if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject, reason)) return false;
+	for (const securitycheckerThis of securitycheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
+		req, headers, servObject, reason)) { 
+			reason.reason += `\nFailed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
+			return false; 
+	}
 
 	return true;
 }
@@ -127,7 +131,10 @@ function _loadSortedConfOjbects(pathAndRoots) {
 	
 	sortedConfObjects.sort((a,b) => (a.priority < b.priority) ? -1 : (a.priority > b.priority) ? 1 : 0);
 
-	for (const [i, confObject] of sortedConfObjects.entries()) sortedConfObjects[i] = require(confObject.module);
+	for (const [i, confObject] of sortedConfObjects.entries()) {
+		sortedConfObjects[i] = require(confObject.module);
+		sortedConfObjects[i].__org_monkshu_apiregistry_conf_modulename = path.basename(confObject.module);
+	}
 
 	return sortedConfObjects;
 }
