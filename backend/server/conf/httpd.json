@@ -11,6 +11,6 @@
     },
     "pfxPath": "<path to PFX (.key) File>",
     "pfxPassphrase": "<encrypted passphrase for the pfx file>",
-    "host" : "0.0.0.0",
+    "host" : "::",
     "port" : 9090
 }
