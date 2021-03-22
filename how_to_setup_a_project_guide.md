@@ -48,19 +48,19 @@ This is a step by step guide to create a project using Monkshu Framework (versio
 7. Now make symlinks (shortcut) to map this project with Monkshu framework
 a. Go to ​ **my-project/monkshu/backend/apps​** and run below command
 
-```
+```sh
 $ ln -s <path-to-my-project>/sample/backend/apps/sample .
 ```
 
-b. Go to ​ **my-project/monkshu/frontend/apps*​ and run below command
+b. Go to ​ **my-project/monkshu/frontend/apps​** and run below command
 
-```
+```sh
 $ ln -s <path-to-my-project>/sample/frontend/apps/sample .
 ```
 
 8. Run below command in ​ **/sample/backend/apps/sample/3p/​** directory
 
-```
+```sh
 $ ​ npm init
 ```
 
@@ -68,13 +68,13 @@ $ ​ npm init
 a. Create file and copy below text in
        **<my-project>/monkshu/frontend/framework/conf/default_app.json**
 
-```
+```json
 “sample”
 ```
 
 b. Copy below code into file **​ /sample/backend/apps/sample/apis/lib/constants.js​**
 
-```
+```js
 /*
 * (C) 2020 TekMonks. All rights reserved.
 * License: MIT - see enclosed LICENSE file.
@@ -89,9 +89,10 @@ exports​.​LIB_PATH​ = ​path​.​resolve​(​__dirname​ + ​"/../l
 exports​.​API_RESPONSE_TRUE​ = { ​result:​ ​true​ };
 exports​.​API_RESPONSE_FALSE​ = { ​result:​ ​false​ };
 ```
-c. copy below code into file ​**/sample/backend/apps/sample/apis/lib/utils.js​**.
 
-```
+c. Copy below code into file ​**/sample/backend/apps/sample/apis/lib/utils.js​**
+
+```js
 /**
 * (C) 2020 TekMonks. All rights reserved.
 * License: MIT - see enclosed LICENSE file.
@@ -101,50 +102,35 @@ c. copy below code into file ​**/sample/backend/apps/sample/apis/lib/utils.js�
 * Generate random RFC-compliant UUIDs in JavaScript
 * source: https://github.com/kelektiv/node-uuid
 */
-module​.​exports​.​uniqid​ = () ​=>​ ​require​(​__dirname​ +
-"/../../3p/node_modules/uuid/v4"​)();
+module​.​exports​.​uniqid​ = () ​=>​ ​require​(​__dirname​ + "/../../3p/node_modules/uuid/v4"​)();
 
 /** Generate random number using current timestamp */
-module​.​exports​.​randomNumber​ = () ​=>​ ​Math​.​floor​(​Math​.​random​() *
-Date​.​now​() / ​ 1000 ​);
+module​.​exports​.​randomNumber​ = () ​=>​ ​Math​.​floor​(​Math​.​random​() * Date​.​now​() / ​ 1000 ​);
 
 /** Generate random characters can be used as strong password */
-module​.​exports​.​randomCharacters​ = (​length​ = ​ 20 ​, ​wishlist​ =
-"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$"​)
-=>​ ​Array​(​length​).​fill​(​''​).​map​(() ​=>​ ​wishlist​[​Math​.​floor​(​Math​.​random​() *
-
-wishlist​.​length​)]).​join​(​''​);
+module​.​exports​.​randomCharacters​ = (​length​ = ​ 20 ​, ​wishlist​ = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$"​) =>​ 
+    Array​(​length​).​fill​(​''​).​map​(() ​=>​ ​wishlist​[​Math​.​floor​(​Math​.​random​() * wishlist​.​length​)]).​join​(​''​);
 
 /** Enable or disable info logs from here */
-module​.​exports​.​captureInfoLog​ = (​toLog​, ​disableLog​ = ​false​) ​=>
-
-(!​disableLog​)? ​LOG​.​info​(​toLog​) : ​undefined​;
+module​.​exports​.​captureInfoLog​ = (​toLog​, ​disableLog​ = ​false​) ​=> (!​disableLog​)? ​LOG​.​info​(​toLog​) : ​undefined​;
 
 /** Get Unixtimestamp */
-module​.​exports​.​getTimestamp​ = (​date​) ​=>​ (​date​)? ​new
-
-Date​(​date​).​getTime​() : ​new​ ​Date​().​getTime​();
+module​.​exports​.​getTimestamp​ = (​date​) ​=>​ (​date​)? ​new Date​(​date​).​getTime​() : ​new​ ​Date​().​getTime​();
 
 /** String passed string for new line or additional spaces */
-module​.​exports​.​stripString​ = (​inputString​) ​=>​ (​inputString​)?
-
-inputString​.​replace​(​/​(​\r\n​|​\n​|​\r​)​/​gm​, ​""​).​replace​(​/\s​+​/​g​, ​' '​) : ​""​;
+module​.​exports​.​stripString​ = (​inputString​) ​=>​ (​inputString​) ? inputString​.​replace​(​/​(​\r\n​|​\n​|​\r​)​/​gm​, ​""​).​replace​(​/\s​+​/​g​, ​' '​) : ​""​;
 
 /** Returns Array of unique values within the provided Array */
-module​.​exports​.​getUniqueValues​ = (​inputArray​) ​=>
-
-Object​.​values​(​inputArray​).​filter​((​value​, ​index​, ​self​) ​=>
-(​self​.​indexOf​(​value​) === ​index​));
+module​.​exports​.​getUniqueValues​ = (​inputArray​) ​=> Object​.​values​(​inputArray​).​filter​((​value​, ​index​, ​self​) ​=> (​self​.​indexOf​(​value​) === ​index​));
 
 /** Get Current Unix timestamp without milliseconds */
 
-module​.​exports​.​getCurrentUnixTimestamp​ = () ​=>​ (​new​ ​Date​().​getTime​() /
-1000 ​).​toString​().​split​(​'.'​)[​ 0 ​];
+module​.​exports​.​getCurrentUnixTimestamp​ = () ​=>​ (​new​ ​Date​().​getTime​() / 1000 ​).​toString​().​split​(​'.'​)[​ 0 ​];
 ```
 
 d. Copy below code into file ​**/sample/backend/apps/sample/conf/apiregistry.json**.
 
-```
+```json
 {}
 ```
 
@@ -154,13 +140,10 @@ d. Copy below code into file ​**/sample/backend/apps/sample/conf/apiregistry.j
 
 a. Copy below code into file ​ **/sample/backend/apps/sample/conf/apiregistry.json**.
 
-```
+```json
 {
-​"/apis/message"​ :
-"/apis/message.js?needsToken=false&addsToken=sub:access"​,
-​"/apis/random"​ :
-"/apis/random.js?get=true&key=Mk6DAu4beAzqD6I63Z1jRgQ5WTDa6zQO&needsToke
-n=true"
+    ​"/apis/message"​ : "/apis/message.js?needsToken=false&addsToken=sub:access"​,
+    ​"/apis/random"​ : "/apis/random.js?get=true&key=Mk6DAu4beAzqD6I63Z1jRgQ5WTDa6zQO&needsToken=true"
 }
 ```
 b. Create files
@@ -170,44 +153,37 @@ b. Create files
 c. Copy below code in file
 **/sample/backend/apps/sample/apis/message.js**
 
-```
+```js
 /*
 * (C) 2020 TekMonks. All rights reserved.
 * License: MIT - see enclosed LICENSE file.
 */
 
 // Custom modules
-
-const​ ​API_CONSTANTS​ =
-require​(​`​${​CONSTANTS​.​APPROOTDIR​}​/sample/apis/lib/constants`​);
+const​ ​API_CONSTANTS​ = require​(​`​${​CONSTANTS​.​APPROOTDIR​}​/sample/apis/lib/constants`​);
 
 exports​.​doService​ = ​async​ ​jsonReq​ ​=>​ {
 
-​// Validate API request and check mandatory payload required
-​if​ (!​validateRequest​(​jsonReq​)) ​return
-API_CONSTANTS​.​API_INSUFFICIENT_PARAMS​;
+    ​// Validate API request and check mandatory payload required
+    ​if​ (!​validateRequest​(​jsonReq​)) ​return API_CONSTANTS​.​API_INSUFFICIENT_PARAMS​;
 
-​try​ {
-​const​ ​message​ = ​await​ ​getMessage​(​jsonReq​);
-​if​ (!​message​) ​return​ ​API_CONSTANTS​.​API_RESPONSE_FALSE​;
-​return​ { ​result:​ ​true​, ​results:​ { ​message​ } };
+    ​try​ {
+        ​const​ ​message​ = ​await​ ​getMessage​(​jsonReq​);
+        ​if​ (!​message​) ​return​ ​API_CONSTANTS​.​API_RESPONSE_FALSE​;
+        ​return​ { ​result:​ ​true​, ​results:​ { ​message​ } };
 
-} ​catch​ (​error​) {
-​console​.​error​(​error​);
-​return​ ​API_CONSTANTS​.​API_RESPONSE_SERVER_ERROR​;
-}
-
+    } ​catch​ (​error​) {
+        ​console​.​error​(​error​);
+        ​return​ ​API_CONSTANTS​.​API_RESPONSE_SERVER_ERROR​;
+    }
 }
 
 const​ ​getMessage​ = ​async​ (​jsonReq​) ​=>​ {
-​try​ {
-
-​if​(​jsonReq​)
-​return​ ​"This is your first API"​;
-} ​catch​ (​error​) {
-​throw​ ​error​;
-
-}
+    ​try​ { 
+        if​(​jsonReq​) ​return​ ​"This is your first API"​;
+    } ​catch​ (​error​) {
+        ​throw​ ​error​;
+    }
 }
 
 const​ ​validateRequest​ = ​jsonReq​ ​=>​ (​jsonReq​);
@@ -216,43 +192,47 @@ const​ ​validateRequest​ = ​jsonReq​ ​=>​ (​jsonReq​);
 d. Copy below code in file
 **/sample/backend/apps/sample/apis/random.js**
 
-```
+```js
 /*
 * (C) 2020 TekMonks. All rights reserved.
 * License: MIT - see enclosed LICENSE file.
 */
+
 // Custom modules
-const​ ​API_CONSTANTS​ =
-require​(​`​${​CONSTANTS​.​APPROOTDIR​}​/sample/apis/lib/constants`​);
+const​ ​API_CONSTANTS​ = require​(​`​${​CONSTANTS​.​APPROOTDIR​}​/sample/apis/lib/constants`​);
 const​ ​utils​ = ​require​(​`​${​API_CONSTANTS​.​LIB_PATH​}​/utils`​);
+
 exports​.​doService​ = ​async​ ​jsonReq​ ​=>​ {
-​// Validate API request and check mandatory payload required
-​if​ (!​validateRequest​(​jsonReq​)) ​return
-API_CONSTANTS​.​API_INSUFFICIENT_PARAMS​;
-​try​ {
-​const​ ​random​ = ​await​ ​getRandom​(​jsonReq​);
-​if​ (!​random​) ​return​ ​API_CONSTANTS​.​API_RESPONSE_FALSE​;
-​return​ { ​result:​ ​true​, ​results:​ { ​random​ } };
-} ​catch​ (​error​) {
-​console​.​error​(​error​);
-​return​ ​API_CONSTANTS​.​API_RESPONSE_SERVER_ERROR​;
+
+    ​// Validate API request and check mandatory payload required
+    ​if​ (!​validateRequest​(​jsonReq​)) ​return API_CONSTANTS​.​API_INSUFFICIENT_PARAMS​;
+
+    ​try​ {
+        ​const​ ​random​ = ​await​ ​getRandom​(​jsonReq​);
+        ​if​ (!​random​) ​return​ ​API_CONSTANTS​.​API_RESPONSE_FALSE​;
+        ​return​ { ​result:​ ​true​, ​results:​ { ​random​ } };
+
+    } ​catch​ (​error​) {
+        ​console​.​error​(​error​);
+        ​return​ ​API_CONSTANTS​.​API_RESPONSE_SERVER_ERROR​;
+    }
 }
-}
+
 const​ ​getRandom​ = ​async​ (​jsonReq​) ​=>​ {
-​try​ {
-​if​(​jsonReq​)
-​return​ ​utils​.​randomCharacters​();
-} ​catch​ (​error​) {
-​throw​ ​error​;
+    ​try​ {
+    ​   if​(​jsonReq​) ​return​ ​utils​.​randomCharacters​();
+    } ​catch​ (​error​) {
+        ​throw​ ​error​;
+    }
 }
-}
+
 const​ ​validateRequest​ = ​jsonReq​ ​=>​ (​jsonReq​);
 ```
 
 2. Run backend server as below
 a. Open terminal and go to **​<my-project>/monkshu/backend/server/**
 
-```
+```sh
 $ node server
 ```
 3. Open any Rest client application like **“postman”**
@@ -260,12 +240,12 @@ $ node server
 a. Enter url as ​**http://localhost:9090/apis/message**
 You would see the following result in return from server
 
-```
+```json
 {
-​"result"​: ​true​,
-​"results"​: {
-​"message"​: ​"This is your first API"
-}
+    ​"result"​: ​true​,
+    ​"results"​: {
+    ​   "message"​: ​"This is your first API"
+    }
 }
 ```
 You would also get access_token in headers look at it
@@ -286,32 +266,33 @@ subsequent APIs as security practices.
 1. Copy codes to required files
     a. Copy below code to file ​ **/sample/frontend/app/sample/index.html**.
 
-```
+```html
 <!--
 (C) 2020 TekMonks. All rights reserved.
 License: MIT - see enclosed license.txt file.
 -->
 <!​doctype​ ​html​>
 <​html​>
+
 <​head​>
-​<​meta​ ​charset​=​"UTF-8"​>
-​<​meta​ ​http-equiv​=​"pragma"​ ​content​=​"no-cache"​>
-​<​meta​ ​http-equiv​=​"expires"​ ​content​=​"-1"​>
-​<​meta​ ​name​=​viewport​ ​content​=​"width=device-width, initial-scale=1.0,
-minimum-scale=0.5 maximum-scale=1.0"​>
-​<​title​>​Sample​</​title​>
-​<!-- Include the monkshu framework -->
-​<​script​ ​type​=​"text/javascript"​ ​src​=​"/framework/js/$$.js"​></​script​>
-​<!-- And off we go ... -->
-​<​script​ ​type​=​"text/javascript"​>​$$​.​boot​(​new​ ​URL​(​"./"​,
-window​.​location​));​</​script​>
+    ​<​meta​ ​charset​=​"UTF-8"​>
+    ​<​meta​ ​http-equiv​=​"pragma"​ ​content​=​"no-cache"​>
+    ​<​meta​ ​http-equiv​=​"expires"​ ​content​=​"-1"​>
+    ​<​meta​ ​name​=​viewport​ ​content​=​"width=device-width, initial-scale=1.0,
+    minimum-scale=0.5 maximum-scale=1.0"​>
+    ​<​title​>​Sample​</​title​>
+    ​<!-- Include the monkshu framework -->
+    ​<​script​ ​type​=​"text/javascript"​ ​src​=​"/framework/js/$$.js"​></​script​>
+    ​<!-- And off we go ... -->
+    ​<​script​ ​type​=​"text/javascript"​>​$$​.​boot​(​new​ ​URL​(​"./"​,window​.​location​));​</​script​>
 </​head​>
+
 </​html​>
 ```
 
 b. Copy below code to file ​ **/sample/frontend/app/sample/js/application.mjs**.
 
-```
+```js
 /* 
  * (C) 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
@@ -344,7 +325,7 @@ export const application = {init, main};
 
 c. Copy below code to file ​ **/sample/frontend/app/sample/js/constants.mjs**.
 
-```
+```js
 /* 
  * (C) 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
@@ -382,7 +363,7 @@ And API constants​ **API_MESSAGE, API_RANDOM**
 
 d. Copy below code to file ​ **/sample/frontend/apps/sample/i18n/i18n_en.mjs**.
 
-```
+```js
 export​ ​const​ ​i18n​ = {
 "Title"​ :​ ​"Sample"​,
 }
@@ -391,7 +372,7 @@ export​ ​const​ ​i18n​ = {
 2. Create two files for frontend pages as
 a. Copy below code to file ​ **/sample/frontend/apps/sample/message.html**.
 
-```
+```html
 <!doctype html>
 <html>
 
@@ -414,7 +395,7 @@ a. Copy below code to file ​ **/sample/frontend/apps/sample/message.html**.
 
 b. Copy below code to file ​ **/sample/frontend/apps/sample/random.html**.
 
-```
+```html
 <!doctype html>
 <html>
 
@@ -441,7 +422,7 @@ b. Copy below code to file ​ **/sample/frontend/apps/sample/random.html**.
 a. Create file and copy below code
        **/sample/frontend/apps/sample/components/app-message/app-message.html**.
 
-```
+```html
 <​div​ ​id​=​"app-message"​>
 ​<​input​ ​type​=​"text"​ ​name​=​"message"​ ​id​=​"message"​ ​/>
 ​<​input​ ​type​=​"button"​ ​value​=​"Get Message!"​ ​id​=​"get-message"
@@ -451,7 +432,7 @@ onclick​=​'​monkshu_env​.​components​["app-message"].​getMessage�
 b. Create file and copy below code
 **/sample/frontend/apps/sample/components/app-message/app-message.mjs**.
 
-```
+```js
 /* 
  * (C) 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
@@ -482,7 +463,7 @@ export const app_message = { trueWebComponentMode, register, getMessage }
 a. Create file and copy below code
 **/sample/frontend/apps/sample/components/app-random/app-random.html**.
 
-```
+```html
 <​div​ ​id​=​"app-random"​>
 ​<​input​ ​type​=​"text"​ ​name​=​"random"​ ​id​=​"random"​ ​/>
 ​<​input​ ​type​=​"button"​ ​value​=​"Get Random String!"​ ​id​=​"get-random"
@@ -493,7 +474,7 @@ onclick​=​'​monkshu_env​.​components​["app-random"].​getRandomStri
 b. Create file and copy below code
 **/sample/frontend/apps/sample/components/app-random/app-random.mjs**.
 
-```
+```js
 /* 
  * (C) 2020 TekMonks. All rights reserved.
  * License: MIT - see enclosed license.txt file.
@@ -522,10 +503,10 @@ export const app_random = { trueWebComponentMode, register, getRandomString }
 
 **<my-project>/frontend/server/**
 
-```
+```sh
 $ node server
 ```
-4. Now go to browser and hit url as **​http://localhost:8080/**
+4. Now go to browser and hit url as **​`http://localhost:8080/`**
 
 You will see a page having an input box type text with a button.
 
