@@ -110,8 +110,8 @@ async function doService(url, data, headers, servObject) {
 
 		try { 
 			const apiModule = require(api);
-			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(url, jsonObj, headers, servObject); return ({code: 999});}
-			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject)}); 
+			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url); return ({code: 999});}
+			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url)}); 
 		} catch (error) {
 			LOG.debug(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
