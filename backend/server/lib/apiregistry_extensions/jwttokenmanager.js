@@ -6,8 +6,10 @@
  */
 
 const cryptmod = require("crypto");
-const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
+const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
+
+const _jwttokenListeners = [];
 const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
 
 let conf, alreadyInit = false;
@@ -47,7 +49,7 @@ function checkToken(token, reason) {
     }
 }
 
-function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, responseHeaders, _servObject) {
+function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
     if (!apiregentry.query.addsToken || !response.result) return;   // nothing to do
 
     const tokenCreds = apiregentry.query.addsToken;
@@ -73,12 +75,21 @@ function injectResponseHeaders(apiregentry, _url, response, _requestHeaders, res
     
     // inject the JWT token into the response headers
     responseHeaders.access_token = token; responseHeaders.token_type = "bearer";
+    for (const tokenListener of _jwttokenListeners) tokenListener("token_generated", {token, apiregentry, url, response, requestHeaders, responseHeaders, servObject});
 }
+
+const addListener = listener => _jwttokenListeners.push(listener);
+const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) != -1)
+    _jwttokenListeners.splice(_jwttokenListeners.indexOf(listener),1); }
 
 function _cleanTokens() {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
-    for (let token of Object.keys(activeTokens)) if (Date.now() - activeTokens[token] > conf.expiryTime) delete activeTokens[token];
+    for (let token of Object.keys(activeTokens)) if (Date.now() - activeTokens[token] > conf.expiryTime) {
+        delete activeTokens[token];
+        for (const tokenListener of _jwttokenListeners) tokenListener("token_expireed", token);
+    }
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    
 }
 
-module.exports = { checkSecurity, injectResponseHeaders, initSync, checkToken };
+module.exports = { checkSecurity, injectResponseHeaders, initSync, checkToken, addListener, removeListener };
