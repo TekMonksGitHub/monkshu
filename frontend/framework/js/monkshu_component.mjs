@@ -26,6 +26,8 @@ function register(name, htmlTemplate, module) {
         else await module.element.render(false);
     }
 
+    module.getData = id => id?module.datas[id]:module.data;
+
     module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
     module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
 
@@ -62,6 +64,12 @@ function register(name, htmlTemplate, module) {
         if (module.elements) for (const key of Object.keys(module.elements)) allInstances.push(module.elements[key]); 
         else if (module.element) allInstances.push(module.element);
         return allInstances;
+    }
+
+    module.reload = async id => {
+        module.clearMemory(id); 
+        if (module.elementConnected) await module.elementConnected(module.elements[id]); 
+        module.elements[id].render(false);
     }
 
     // register the web component
@@ -128,6 +136,10 @@ function register(name, htmlTemplate, module) {
 
             delete module.data;
             delete module.datas;
+        }
+
+        async attributeChangedCallback(name, oldValue, newValue) {
+            if (module.attributeChanged) await module.attributeChanged(this, name, oldValue, newValue);
         }
     });
 
