@@ -69,7 +69,7 @@ function register(name, htmlTemplate, module) {
     module.reload = async id => {
         module.clearMemory(id); 
         if (module.elementConnected) await module.elementConnected(module.elements[id]); 
-        module.elements[id].render(false);
+        await module.elements[id].render(false);
     }
 
     // register the web component
@@ -97,20 +97,20 @@ function register(name, htmlTemplate, module) {
             if (module.trueWebComponentMode) {
                 if (initialRender) {
                     this.attachShadow({mode: "open"}).appendChild(templateRoot);
-                    router.runShadowJSScripts(this.shadowRoot, this.shadowRoot);
+                    await router.runShadowJSScripts(this.shadowRoot, this.shadowRoot);
                     if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=this.shadowRoot;}
                     else module.shadowRoot = this.shadowRoot;
                 }
-                else if (this.shadowRoot.firstChild) this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot);
+                else if (this.shadowRoot.firstChild) await this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot);
             }
             else {  
                 if (initialRender) {
                     this.appendChild(templateRoot); 
-                    router.runShadowJSScripts(templateRoot, document);
+                    await router.runShadowJSScripts(templateRoot, document);
                     templateRoot.getElementById = id => templateRoot.querySelector(`#${id}`);
                     if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=templateRoot;}
                     else module.shadowRoot = templateRoot;
-                } else if (this.firstChild) this.constructor._diffApplyDom(this.firstChild, templateRoot);
+                } else if (this.firstChild) await this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
 
             if (module.initialRender && initialRender) await module.initialRender(this);

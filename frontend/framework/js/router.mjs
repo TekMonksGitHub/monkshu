@@ -82,10 +82,10 @@ async function getPageData(url, dataModels) {
 	return dataModels;
 }
 
-function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
+async function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 	// Including script files (as innerHTML does not execute the script included)
 	const scriptsToInclude = Array.from(sourceDocument.querySelectorAll("script"));
-	if (scriptsToInclude) scriptsToInclude.forEach(async scriptThis => {
+	if (scriptsToInclude) for(const scriptThis of scriptsToInclude) {
 		let scriptText;
 		if (scriptThis.src && scriptThis.src !== "") scriptText = await(await fetch(scriptThis.src, {mode: "no-cors", cache: "default"})).text();
 		else scriptText = scriptThis.innerText;
@@ -96,7 +96,7 @@ function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 
 		const whereToAppend = documentToRunScriptOn.querySelector("head")
 		whereToAppend.appendChild(script).parentNode.removeChild(script);
-	});
+	}
 }
 
 function isInHistory(url) {``
