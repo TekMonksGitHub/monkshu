@@ -6,7 +6,6 @@
  */
 
 const fs = require("fs");
-const url = require("url");
 const zlib = require("zlib");
 const path = require("path");
 const http = require("http");
@@ -63,7 +62,7 @@ function _handleRequest(req, res) {
 
 	if (conf.server_redirect) {_sendRedirect(req, res); return;}
 
-	const pathname = url.parse(req.url).pathname;
+	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
 
 	// don't allow reading outside webroot
@@ -143,7 +142,7 @@ function _getReqHost(req) {
 }
 
 function _sendRedirect(req, res) {
-	const urlIn = url.parse(req.url), urlServer = url.parse(conf.server_redirect), isRedirectServer = urlServer.host == null;
+	const urlIn = new URL(req.url, `http://${req.headers.host}/`), urlServer = new URL(conf.server_redirect), isRedirectServer = urlServer.host == "";
 
 	const host = isRedirectServer ? conf.server_redirect : urlServer.host;
 	const protocol = !isRedirectServer ? (urlServer.protocol || urlIn.protocol || conf.ssl?"https:":"http:") : 
