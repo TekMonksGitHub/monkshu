@@ -1,6 +1,7 @@
 {
 	"port": 8080, <-- The port to listen to
 	"host": "::", <-- The host name or IP to listen to, 0.0.0.0 means all IPv4 and :: means all IPv4 and IPv6
+	"extensions": ["redirect", "proxy"], <-- Server extensions, order matters as server evaluates them in this order
 	"server_redirect": "http://telemeet.teleworkr.com/", <-- Will send 302 all the time. If this is a proper URL then 
 														the redirect will be to that URL. If this is just host name then
 														will replace server with that hostname, and rest of URL like path and
