@@ -5,6 +5,7 @@
  * License: See enclosed file.
  */
 
+const extensions = [];
 const fs = require("fs");
 const zlib = require("zlib");
 const path = require("path");
@@ -20,6 +21,7 @@ if (require("cluster").isMaster == true) bootstrap();
 function bootstrap() {
 	_initConfSync();
 	_initLogsSync();
+	_initExtensions();
 
 	const crypt = require(`${conf.libdir}/crypt.js`);
 
@@ -57,10 +59,21 @@ function _initLogsSync() {
 	error = new Logger(conf.errorlog, 100*1024*1024);
 }
 
+function _initExtensions() {
+	const extensions_dir = path.resolve(`${__dirname}/extensions`);
+	for (const extension of conf.extensions) {
+		console.log(`Loading extension ${extension}`);
+		const ext = require(`${extensions_dir}/${extension}.js`);  if (ext.initSync) ext.initSync();
+		extensions.push(ext);
+	}
+}
+
 function _handleRequest(req, res) {
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-
-	if (conf.server_redirect) {_sendRedirect(req, res); return;}
+	for (const extension of extensions) if (extension.processRequest(req, res)) {
+		access.info(`Request ${req.url} handled by extension ${extension.name}`);
+		return; // extension handled it
+	}
 
 	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
 	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
@@ -139,19 +152,4 @@ function _getReqHost(req) {
 	const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
 	const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
 	return `[${host}]:${port}`;
-}
-
-function _sendRedirect(req, res) {
-	const urlIn = new URL(req.url, `http://${req.headers.host}/`), urlServer = new URL(conf.server_redirect), isRedirectServer = urlServer.host == "";
-
-	const host = isRedirectServer ? conf.server_redirect : urlServer.host;
-	const protocol = !isRedirectServer ? (urlServer.protocol || urlIn.protocol || conf.ssl?"https:":"http:") : 
-		(urlIn.protocol || conf.ssl?"https:":"http:");
-	if (!isRedirectServer && !conf.server_redirect.endsWith(urlServer.pathname)) urlServer.pathname = null;
-	const pathname = !isRedirectServer ? (urlServer.pathname || urlIn.pathname || "") : (urlIn.pathname || "");
-	const search = !isRedirectServer ? (urlServer.search || urlIn.search || "") : (urlIn.search || "");
-	const redirectURL = `${protocol}//${host}${pathname}${search}`;
-	
-	res.writeHead(302, {"Location": redirectURL});
-	res.end();
 }
