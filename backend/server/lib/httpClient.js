@@ -134,7 +134,9 @@ async function _addSecureOptions(options, sslObj) {
     }
 }
 
-if (require.main === module) {
+if (require.main === module) main();
+
+function main() {
     const args = process.argv.slice(2); if (args[0]) args[0] = args[0].toLowerCase();
     if (args.length == 0) console.error("Usage: httpClient.js <method> <url> <body> <headers> [ssl-options]");
     else {
@@ -149,4 +151,4 @@ if (require.main === module) {
     }
 }
 
-module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps };
+module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, main };

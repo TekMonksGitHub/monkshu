@@ -25,9 +25,8 @@ function decrypt(text, key = crypt.key) {
 	return decrypted;
 }
 
-module.exports = { encrypt, decrypt };
-
-if (require.main === module) {
+if (require.main === module) main();
+function main() {
 	const args = process.argv.slice(2);
 
 	if (args.length < 2 || !module.exports[args[0]]) {
@@ -37,3 +36,5 @@ if (require.main === module) {
 
 	console.log(module.exports[args[0]](args[1]));
 }
+
+module.exports = { encrypt, decrypt, main };
