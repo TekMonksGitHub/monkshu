@@ -6,7 +6,7 @@
  */
 
 exports.name = "redirect";
-exports.processRequest = (req, res) => {
+exports.processRequest = async (req, res, dataSender) => {
     if (!conf.server_redirect) return false;
 
     const urlIn = new URL(req.url, `http://${req.headers.host}/`);
@@ -20,5 +20,5 @@ exports.processRequest = (req, res) => {
 	const search = !isRedirectServer ? (urlServer.search || urlIn.search || "") : (urlIn.search || "");
 	const redirectURL = `${protocol}//${host}${pathname}${search}`;
 	
-	res.writeHead(302, {"Location": redirectURL}); res.end(); return true;
+	dataSender(res, 302, {"Location": redirectURL}, null); return true;
 }

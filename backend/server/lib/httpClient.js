@@ -107,7 +107,7 @@ function _doCall(reqStr, options, secure, sslObj) {
                 const status = res.statusCode, resHeaders = { ...res.headers };
                 const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
 
-                if (!statusOK) resolve({ error: `Bad status: ${status}`, data: null, status, resHeaders });
+                if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
                 else resolve({ error: null, data: resp, status, resHeaders });
             });
         });

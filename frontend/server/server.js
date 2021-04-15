@@ -26,7 +26,7 @@ function bootstrap() {
 	const crypt = require(`${conf.libdir}/crypt.js`);
 
 	/* Start HTTP/S server */
-	const listener = (req, res) => { try{_handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
+	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
 	const options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: crypt.decrypt(conf.pfxPassphrase)} : null;
 	const httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
@@ -68,9 +68,9 @@ function _initExtensions() {
 	}
 }
 
-function _handleRequest(req, res) {
+async function _handleRequest(req, res) {
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-	for (const extension of extensions) if (extension.processRequest(req, res)) {
+	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError)) {
 		access.info(`Request ${req.url} handled by extension ${extension.name}`);
 		return; // extension handled it
 	}
@@ -135,6 +135,12 @@ function _sendError(req, res, code, message) {
 	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}`);
 	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
+	res.end();
+}
+
+function _sendData(res, code, headers, data) {
+	res.writeHead(code||200, _getServerHeaders(headers));
+	if (data) res.write(data);
 	res.end();
 }
 

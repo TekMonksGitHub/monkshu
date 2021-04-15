@@ -41,4 +41,14 @@ function getDateTime() {
     return `${year}:${month}:${day}:${hour}:${min}:${sec}`;
 }
 
-module.exports = { copyFile, getDateTime };
+const getClientIP = req =>
+    (typeof req.headers['x-forwarded-for'] === 'string'
+        && req.headers['x-forwarded-for'].split(',').shift())
+    || req.socket.remoteAddress;
+
+const getClientPort = req =>
+    (typeof req.headers['x-forwarded-port'] === 'string'
+        && req.headers['x-forwarded-port'].split(',').shift())
+    || req.socket.remotePort;
+
+module.exports = { copyFile, getDateTime, getClientIP, getClientPort };

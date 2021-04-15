@@ -7,7 +7,7 @@
 														will replace server with that hostname, and rest of URL like path and
 														search will be reused and redirected.
 	"webroot": "./../", <-- The directory to serve from
-	"proxies": [{"/apps/app_name/proxiedapis/*":"localhost:9090"}], <-- HTTP proxies
+	"proxies": [{"/apps/app_name/proxiedapis/*":"localhost:9090"}], <-- HTTP proxies, if the proxied address is a full URL then protocol replacement is possible
 	"logdir": "./logs", <-- The logs directory
 	"libdir": "./lib", <-- The lib directory
 	"accesslog": "./logs/access.log.json", <-- The access log file name
