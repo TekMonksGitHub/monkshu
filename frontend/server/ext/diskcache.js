@@ -11,7 +11,7 @@
 const cache = {};
 const fs = require("fs");
 const path = require("path");
-const fspromises =fs.promises;
+const fspromises = fs.promises;
 const crypto = require("crypto");
 const SIZE_KEY = "__org_monkshu_httpd_cache_size_key___";
 const gzipAsync = require("util").promisify(require("zlib").gzip);
