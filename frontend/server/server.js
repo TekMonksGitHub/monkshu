@@ -23,7 +23,7 @@ function bootstrap() {
 	_initLogsSync();
 	_initExtensions();
 
-	const crypt = require(`${conf.libdir}/crypt.js`);
+	const crypt = require(`${conf.libdir}/crypt.js`); conf.webroot = path.resolve(conf.webroot);
 
 	/* Start HTTP/S server */
 	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
@@ -60,7 +60,7 @@ function _initLogsSync() {
 }
 
 function _initExtensions() {
-	const extensions_dir = path.resolve(`${__dirname}/extensions`);
+	const extensions_dir = path.resolve(conf.extdir);
 	for (const extension of conf.extensions) {
 		console.log(`Loading extension ${extension}`);
 		const ext = require(`${extensions_dir}/${extension}.js`);  if (ext.initSync) ext.initSync();
@@ -76,7 +76,7 @@ async function _handleRequest(req, res) {
 	}
 
 	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
-	let fileRequested = `${path.resolve(conf.webroot)}/${pathname}`;
+	let fileRequested = path.resolve(conf.webroot+"/"+pathname);
 
 	// don't allow reading outside webroot
 	if (!_isSubdirectory(fileRequested, conf.webroot))
