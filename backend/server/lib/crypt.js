@@ -25,7 +25,7 @@ function decrypt(text, key = crypt.key) {
 	return decrypted;
 }
 
-module.exports = { encrypt, decrypt }
+module.exports = { encrypt, decrypt, main }
 
 if (require.main === module) main();
 function main() {
