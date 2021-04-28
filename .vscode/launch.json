@@ -13,7 +13,8 @@
             "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks"],
             "smartStep": true,
             "userDataDir": "${workspaceFolder}/.chrome",
-            "preLaunchTask": "Delete Chrome Profile"
+            "preLaunchTask": "Delete Chrome Profile",
+            "outFiles": ["${workspaceFolder}/frontend/**/*.js"]
         },
         {
             "type": "node",
@@ -21,14 +22,16 @@
             "name": "Launch HTTPD",
             "cwd": "${workspaceFolder}/frontend/server",
             "program": "${workspaceFolder}/frontend/server/server.js",
-            "runtimeArgs": ["--preserve-symlinks"]
+            "runtimeArgs": ["--preserve-symlinks"],
+            "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"]
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Backend",
             "program": "${workspaceFolder}/backend/server/server.js",
-            "runtimeArgs": ["--preserve-symlinks"]
+            "runtimeArgs": ["--preserve-symlinks"],
+            "outFiles": ["${workspaceFolder}/backend/**/*.js"]
         }
     ]
 }
