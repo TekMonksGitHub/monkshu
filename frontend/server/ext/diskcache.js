@@ -17,9 +17,12 @@ const SIZE_KEY = "__org_monkshu_httpd_cache_size_key___";
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const IGNORE_AFTER_MAX_HITS = conf.diskCache.ignoreAfterMaxHits||10;   // don't keep trying to read disk for 404 files
 
+let uncacheableREs = [];
+
 exports.initSync = _ => {
     if (conf.diskCache && conf.diskCache.refresh != 0) setInterval(_runCachingDeamon, conf.diskCache.refresh||1000, conf.webroot);
     if (conf.diskCache.maxSizeInMB) conf.diskCache.maxSize = conf.diskCache.maxSizeInMB*1024*1024;
+    if (conf.diskCache.dontCache) for (const re of conf.diskCache.dontCache) uncacheableREs.push(new RegExp(re));
     cache[SIZE_KEY] = 0;
 }
 exports.name = "diskcache";
@@ -61,6 +64,7 @@ async function _runCachingDeamon(pathIn) {
 }
 
 async function _cacheThis(pathThis, stats, hits) {
+    for (const re of uncacheableREs) if (pathThis.match(re)) return;    // not cacheable
     try {await fspromises.access(pathThis, fs.constants.R_OK)} catch(err) {return}; // bad path
 
     if (!stats) stats = await fspromises.stat(pathThis); 

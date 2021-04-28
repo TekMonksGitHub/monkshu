@@ -45,6 +45,18 @@ function _initConfSync() {
 	conf.libdir = path.resolve(conf.libdir);
 	conf.accesslog = path.resolve(conf.accesslog);
 	conf.errorlog = path.resolve(conf.errorlog);
+
+	// merge web app conf files into main http server, for app specific configuration directives
+	if (fs.existsSync(`${__dirname}/../apps/`)) for (const app of fs.readdirSync(`${__dirname}/../apps/`)) if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
+		const appHTTPDConf = require(`${__dirname}/../apps/${app}/conf/httpd.json`);
+		for (const confKey of Object.keys(appHTTPDConf)) {
+			const value = appHTTPDConf[confKey];
+			if (!global.conf[confKey]) {global.conf[confKey] = value; continue;}	// not set, then just set it
+			if (Array.isArray(value)) global.conf[confKey] = global.conf[confKey].concat(value);	// merge arrays
+			else if (typeof value === "object" && value !== null) global.conf[confKey] = {...global.conf[confKey], ...value};	// merge objects, app overrides
+			else global.conf[confKey] = value;	// override value
+		}
+	}
 }
 
 function _initLogsSync() {

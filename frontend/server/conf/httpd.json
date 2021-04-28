@@ -1,9 +1,8 @@
 {
 	"port": 8080,
 	"host": "::",
-	"extensions": ["redirect", "proxy", "diskcache"],
+	"extensions": ["redirect", "diskcache"],
 	"webroot": "./../",
-	"proxies": [{"/apps/xbin/proxiedapis/.*":"localhost:9090"}],
 	"logdir": "./logs",
 	"libdir": "./lib",
 	"extdir": "./ext",
@@ -12,7 +11,7 @@
 	"indexfile": "index.html",
 	"ssl": false,
 	"enableGZIPEncoding": true,
-	"diskCache": {"refresh": 1000, "dontCache": ["application/pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2"},
+	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2"},
 	"pfxPath": "<path to PFX (.key) File>",
 	"pfxPassphrase": "<encrypted passphrase for the pfx file>",
 	"httpdHeaders": {
