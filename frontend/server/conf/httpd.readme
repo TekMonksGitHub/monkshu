@@ -16,7 +16,7 @@
 	"indexfile": "index.html", <-- The index file name
 	"ssl": false, <-- Set to true for HTTPS
 	"enableGZIPEncoding": true, <-- Everything will be gzip encoded if MIME supports it (see mime section),
-	"diskCache": {"refresh": 1000, "dontCache": ["application/pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":10}, <-- Cache disk and refresh every second, don't cache PDFs, max 1 GB cache, maxSize can be maxSizeInMB or maxSize (bytes), if file not found after 10 hits, stop trying to cache. If not present disk cache will be disabled 
+	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":10}, <-- Cache disk and refresh every second, don't cache PDFs, max 1 GB cache, maxSize can be maxSizeInMB or maxSize (bytes), if file not found after 10 hits, stop trying to cache. If not present disk cache will be disabled 
 	"pfxPath": "<path to PFX (.key) File>", <-- For HTTPS the path to the certificate PFX file
 	"pfxPassphrase": "<encrypted passphrase for the pfx file>", <-- For HTTPS the encrypted passphrase for certificate PFX file
 	"httpdHeaders": { <-- Hardcode these headers in every response
