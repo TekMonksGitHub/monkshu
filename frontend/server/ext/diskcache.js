@@ -64,7 +64,7 @@ async function _runCachingDeamon(pathIn) {
 }
 
 async function _cacheThis(pathThis, stats, hits) {
-    for (const re of uncacheableREs) if (pathThis.match(re)) return;    // not cacheable
+    for (const re of uncacheableREs) if (path.resolve(pathThis).match(re)) return;    // not cacheable
     try {await fspromises.access(pathThis, fs.constants.R_OK)} catch(err) {return}; // bad path
 
     if (!stats) stats = await fspromises.stat(pathThis); 
