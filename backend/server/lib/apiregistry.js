@@ -7,7 +7,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const urlMod = require("url");
+const querystring = require('querystring');
 const app = require(`${CONSTANTS.LIBDIR}/app.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
 let decoders, encoders, headermanagers, securitycheckers;
@@ -60,16 +60,16 @@ function initSync() {
 }
 
 function getAPI(url) {
-	const endPoint = urlMod.parse(url, true).pathname;
+	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	if (apireg[endPoint]) return path.resolve(`${CONSTANTS.ROOTDIR}/${urlMod.parse(apireg[endPoint], true).pathname}`);
+	if (apireg[endPoint]) return path.resolve(`${CONSTANTS.ROOTDIR}/${_getAPIRegEntryAsURL(apireg[endPoint]).rawpathname}`);
 	else return;
 }
 
 function decodeIncomingData(url, data, headers, servObject) {
-	const endPoint = urlMod.parse(url, true).pathname;
+	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
+	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	let decoded = data;
 	for (const decoderThis of decoders) decoded = decoderThis.decodeIncomingData(apiregentry, url, decoded, headers, servObject);
@@ -78,9 +78,9 @@ function decodeIncomingData(url, data, headers, servObject) {
 }
 
 function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
-	const endPoint = urlMod.parse(url, true).pathname;
+	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = urlMod.parse(apireg[endPoint], true);
+	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	let encoded = respObj;
 	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, endPoint, encoded, reqHeaders, respHeaders, servObject);
@@ -89,10 +89,10 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 }
 
 function checkSecurity(url, req, headers, servObject, reason) {
-	const endPoint = urlMod.parse(url, true).pathname;
+	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
-	apiregentry = urlMod.parse(apireg[endPoint], true);
+	apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	for (const securitycheckerThis of securitycheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
 		req, headers, servObject, reason)) { 
@@ -104,9 +104,9 @@ function checkSecurity(url, req, headers, servObject, reason) {
 }
 
 function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject) {
-	const endPoint = urlMod.parse(url, true).pathname;
+	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = urlMod.parse(apireg[endPoint], true);
+	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	for (const headermanagerThis of headermanagers) 
 		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders, servObject);
@@ -137,6 +137,13 @@ function _loadSortedConfOjbects(pathAndRoots) {
 	}
 
 	return sortedConfObjects;
+}
+
+function _getAPIRegEntryAsURL(endPoint) {
+	const retURL = new URL(endPoint, "http://dummyhost/"); 
+	retURL.query = querystring.parse(retURL.search!=""?retURL.search.substring(1):""); 
+	retURL.rawpathname = retURL.search!=""?endPoint.substring(0, endPoint.indexOf("?")):endPoint;
+	retURL.path = retURL.rawpathname+retURL.search; return retURL;
 }
 
 module.exports = {initSync, getAPI, listAPIs, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse};

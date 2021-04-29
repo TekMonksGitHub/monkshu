@@ -22,6 +22,7 @@ function initSync() {
 			res.writeHead(200, conf.headers);
 			res.end();
 		} else {
+			req.protocol = req.protocol || req.socket.encrypted?"https":"http";
 			const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
 			const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
 			const servObject = {req, res, env:{remoteHost:host, remotePort:port, remoteAgent: req.headers["user-agent"]}, server: module.exports}; 
@@ -30,8 +31,8 @@ function initSync() {
 				req.headers[header.toLowerCase()] = saved;
 			}
 			req.on("data", data => module.exports.onData(data, servObject));
-			req.on("end", _ => module.exports.onReqEnd(req.url.replace(/\/+/, "/"), req.headers, servObject));
-			req.on("error", error => module.exports.onReqError(req.url, req.headers, error, servObject));
+			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, `${req.protocol}://${req.headers.host}`).href, req.headers, servObject));
+			req.on("error", error => module.exports.onReqError(new URL(req.url, `${req.protocol}://${req.headers.host}`).href, req.headers, error, servObject));
 		}
 	};
 	const server = options ? https.createServer(options, listener) : http.createServer(listener);

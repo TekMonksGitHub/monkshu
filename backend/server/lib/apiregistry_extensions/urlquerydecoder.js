@@ -5,7 +5,7 @@
  * Query data decoder
  */
 
-const urlMod = require("url");
+const querystring = require('querystring');
 const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 
 function decodeIncomingData(apiregentry, url, data, headers, _servObject) {
@@ -13,7 +13,8 @@ function decodeIncomingData(apiregentry, url, data, headers, _servObject) {
 
     headers["content-type"] = "application/json";   // we always convert query to JSON string
 
-    return JSON.stringify(urlMod.parse(url, true).query);
+    const urlParsed = new URL(url);
+    return JSON.stringify(querystring.parse(urlParsed.search!=""?urlParsed.search.substring(1):""));
 }
 
 module.exports = {decodeIncomingData}
