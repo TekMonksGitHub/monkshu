@@ -36,7 +36,7 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
     else {reason.reason = "JWT Token Error, bad token"; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
-function checkToken(token, reason) {
+function checkToken(token, reason={}) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     const lastAccess = activeTokens[token];
     if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}

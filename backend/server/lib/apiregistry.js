@@ -120,6 +120,8 @@ function listAPIs() {
 	return retList;
 }
 
+const getExtension = name => require(`${CONSTANTS.LIBDIR}/apiregistry_extensions/${name.toLowerCase()}.js`);
+
 function _loadSortedConfOjbects(pathAndRoots) {
 	let sortedConfObjects = []; 
 	for (const {path, root} of pathAndRoots) {
@@ -146,4 +148,4 @@ function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL
 	retURL.path = retURL.rawpathname+retURL.search; return retURL;
 }
 
-module.exports = {initSync, getAPI, listAPIs, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse};
+module.exports = {initSync, getAPI, listAPIs, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};
