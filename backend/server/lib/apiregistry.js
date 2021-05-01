@@ -139,7 +139,7 @@ function _loadSortedConfOjbects(pathAndRoots) {
 	return sortedConfObjects;
 }
 
-function _getAPIRegEntryAsURL(endPoint) {
+function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL + legacy properties from url.parse we need
 	const retURL = new URL(endPoint, "http://dummyhost/"); 
 	retURL.query = querystring.parse(retURL.search!=""?retURL.search.substring(1):""); 
 	retURL.rawpathname = retURL.search!=""?endPoint.substring(0, endPoint.indexOf("?")):endPoint;
