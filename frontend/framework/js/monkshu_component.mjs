@@ -124,8 +124,8 @@ function register(name, htmlTemplate, module) {
             if (this.hasAttribute("onload")) await eval(this.getAttribute("onload"));
             module.clearMemory(this.id);
             if (module.elementConnected) await module.elementConnected(this);
-            if (this.hasAttribute("roles")) eval(this.getAttribute("roles")).forEach(role => 
-                securityguard.addPermission(this.id ? name+this.id : name, role));
+            if (this.hasAttribute("roles")) for (const role of eval(this.getAttribute("roles"))) 
+                securityguard.addPermission(this.id ? name+this.id : name, role);
             
             this.render(true); 
         }
