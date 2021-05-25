@@ -4,6 +4,7 @@
  */
 
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const mkdirAsync = require("util").promisify(fs.mkdir);
 const lstatAsync = require("util").promisify(fs.lstat);
