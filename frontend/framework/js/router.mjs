@@ -9,7 +9,7 @@ import {securityguard} from "/framework/js/securityguard.mjs";
 const HS = "?.=";
 
 async function loadPage(url, dataModels={}) {
-	url = new URL(url, window.location.href).href;	// normalize
+	const urlParsed = new URL(url, window.location.href), baseURL = urlParsed.origin + urlParsed.pathname; url = urlParsed.href;	// normalize
 
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
 	const history = session.get("__org_monkshu_router_history"); let hash;
@@ -34,6 +34,7 @@ async function loadPage(url, dataModels={}) {
 
 	// notify those who want to know that a new page was loaded
 	if (window.monkshu_env.pageload_funcs[url]) for (const func of window.monkshu_env.pageload_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.pageload_funcs[baseURL]) for (const func of window.monkshu_env.pageload_funcs[baseURL]) await func(dataModels, url);
 	if (window.monkshu_env.pageload_funcs["*"]) for (const func of window.monkshu_env.pageload_funcs["*"]) await func(dataModels, url);
 }
 
@@ -47,8 +48,8 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 			$$.require("/framework/3p/mustache.min.js")]);
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
-		const baseURL = urlParsed.search?urlParsed.href.substring(0, urlParsed.href.length-urlParsed.search.length):urlParsed.href;
-		if (window.monkshu_env.pagedata_funcs[baseURL]) for (const func of window.monkshu_env.pagedata_funcs[baseURL]) await func(dataModels, url);
+		if (window.monkshu_env.pagedata_funcs[urlParsed.href]) for (const func of window.monkshu_env.pagedata_funcs[urlParsed.href]) await func(dataModels, url);
+		if (window.monkshu_env.pagedata_funcs[url]) for (const func of window.monkshu_env.pagedata_funcs[url]) await func(dataModels, url);
 		if (window.monkshu_env.pagedata_funcs["*"]) for (const func of window.monkshu_env.pagedata_funcs["*"]) await func(dataModels, url);
 
 		Mustache.parse(html);
