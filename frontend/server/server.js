@@ -23,11 +23,9 @@ function bootstrap() {
 	_initLogsSync();
 	_initExtensions();
 
-	const crypt = require(`${conf.libdir}/crypt.js`); conf.webroot = path.resolve(conf.webroot);
-
 	/* Start HTTP/S server */
 	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
-	const options = conf.ssl ? {pfx: fs.readFileSync(conf.pfxPath), passphrase: crypt.decrypt(conf.pfxPassphrase)} : null;
+	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
 	const httpd = options ? https.createServer(options, listener) : http.createServer(listener);
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");

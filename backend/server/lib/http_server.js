@@ -12,8 +12,6 @@ const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
 
 function initSync() {
-	const options = conf.ssl ? { pfx: fs.readFileSync(conf.pfxPath), passphrase: crypt.decrypt(conf.pfxPassphrase) } : null;
-
 	/* create HTTP/S server */
 	let host = conf.host || "::";
 	LOG.info(`Attaching socket listener on ${host}:${conf.port}`);
@@ -35,6 +33,7 @@ function initSync() {
 			req.on("error", error => module.exports.onReqError(new URL(req.url, `${req.protocol}://${req.headers.host}`).href, req.headers, error, servObject));
 		}
 	};
+	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
 	const server = options ? https.createServer(options, listener) : http.createServer(listener);
 	server.timeout = conf.timeout;
 	server.listen(conf.port, host);

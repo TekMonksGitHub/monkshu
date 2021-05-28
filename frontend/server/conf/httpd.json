@@ -12,8 +12,8 @@
 	"ssl": false,
 	"enableGZIPEncoding": true,
 	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2"},
-	"pfxPath": "<path to PFX (.key) File>",
-	"pfxPassphrase": "<encrypted passphrase for the pfx file>",
+	"sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem",
+	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem",
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
 		"X-XSS-Protection": 1,
