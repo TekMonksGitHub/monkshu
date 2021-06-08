@@ -11,7 +11,7 @@ if [ "$1" == "" ]; then
 fi
 APP_NAME=$1
 
-ln -s "$APP_DIR/$APP_NAME/backend/apps/$APP_NAME" "$CURPATH/backend/apps/$APP_NAME" 
-ln -s "$APP_DIR/$APP_NAME/frontend/apps/$APP_NAME" "$CURPATH/frontend/apps/$APP_NAME"
+ln -s "$APP_DIR/$APP_NAME/backend/apps" "$CURPATH/backend/apps" 
+ln -s "$APP_DIR/$APP_NAME/frontend/apps" "$CURPATH/frontend/apps"
 
 echo Done.
