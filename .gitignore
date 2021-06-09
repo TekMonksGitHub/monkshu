@@ -1,9 +1,7 @@
 backend/server/logs/*
 frontend/server/logs/*
-backend/apps/*
-frontend/apps/*
-!backend/apps/.dummy
-!frontend/apps/.dummy
+backend/apps
+frontend/apps
 .chrome
 .DS_Store
 debug.log
