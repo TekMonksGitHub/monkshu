@@ -5,7 +5,10 @@
 
 export async function getDefaultRedirect() {
 	try {
-		let defaultApp = await $$.requireJSON("/framework/conf/default_app.json");
-		if (defaultApp) return `/apps/${defaultApp}/index.html`; else return null;
+		const defaultApp = await $$.requireJSON("/framework/conf/default_app.json");
+		if (defaultApp) {
+			try{ return new URL(defaultApp[window.location.host]?defaultApp[window.location.host]:defaultApp).href } 
+			catch (err) { if (typeof defaultApp === "string") return `/apps/${defaultApp}/index.html`; else return null; }
+		} else return null;
 	} catch (err) {return null};
 }

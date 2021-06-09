@@ -1,7 +1,7 @@
 {
 	"port": 8080,
 	"host": "::",
-	"extensions": ["redirect", "diskcache"],
+	"extensions": ["diskcache"],
 	"webroot": "./../",
 	"logdir": "./logs",
 	"libdir": "./lib",

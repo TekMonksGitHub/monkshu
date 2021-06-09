@@ -5,17 +5,16 @@
  * License: See enclosed file.
  */
 
+const mustache = require("mustache");
 const utils = require(`${conf.libdir}/utils.js`);
 const httpClient = require(`${conf.libdir}/httpClient.js`);
 
 exports.name = "proxy";
 exports.processRequest = async (req, res, dataSender, errorSender) => {
     const protocol = req.connection.encrypted ? "https" : "http",
-        proxiedHost = _getProxiedHost(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedHost) return false;
+        proxiedURL = _getProxiedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false;
 
-    let proxiedURL = `${protocol}://${proxiedHost}/`; try{const urlTest = new URL(proxiedHost); if (urlTest.protocol=="http:"||urlTest.protocol=="https:") proxiedURL=proxiedHost;} catch (err) {};
-
-    const url = new URL(req.url, proxiedURL), method = req.method.toLowerCase(),
+    const url = proxiedURL, method = req.method.toLowerCase(),
         host = url.hostname, port = url.port, headers = {...req.headers, "host":url.host, "X-Forwarded-For":utils.getClientIP(req), "X-Forwarded-Port":utils.getClientPort(req), "X-Forwarded-Proto": protocol}, 
         data = req.data, path = url.pathname + (url.search?url.search:""); if (!path.startsWith("/")) path = `/${path}`;
 
@@ -27,8 +26,13 @@ exports.processRequest = async (req, res, dataSender, errorSender) => {
     return true;
 }
 
-function _getProxiedHost(url) {
-    if (!conf.proxies) return null; const path = url.pathname;
-    for (const proxy of conf.proxies) if (path.match(new RegExp(Object.keys(proxy)[0]))) return proxy[Object.keys(proxy)[0]];
-    return null;
+function _getProxiedURL(url) {
+    if (!conf.proxies) return null; // no proxies conigured
+    for (const proxy of conf.proxies) {
+        const match = url.href.match(new RegExp(Object.keys(proxy)[0])); if (match) {
+            const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];
+            return new URL(mustache.render(proxy[Object.keys(proxy)[0]], data));
+        }
+    }
+    return null;    // nothing matched
 }

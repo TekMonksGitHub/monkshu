@@ -51,4 +51,13 @@ const getClientPort = req =>
         && req.headers['x-forwarded-port'].split(',').shift())
     || req.socket.remotePort;
 
-module.exports = { copyFile, getDateTime, getClientIP, getClientPort };
+const union = function() {  // merges two arrays
+    if (arguments.length == 0) return [];    // no union possible
+    
+    const result = [...arguments[0]];
+    for (const array of [...arguments].slice(1)) for (const element of array) if (!result.includes(element)) result.push(element);
+
+    return result;
+}
+    
+module.exports = { copyFile, getDateTime, getClientIP, getClientPort, union };
