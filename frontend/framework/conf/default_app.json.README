@@ -1,0 +1,13 @@
+Default app can be configured in three ways
+
+#1 - As below, this will then route to http(s)://<hostname>:port://apps/appname/index.html
+"appname"
+
+#2 - As below, this will then route to the given URL without any further interpretation
+http(s)://<hostname>:port://apps/appname/my_custom_landing_page.html
+
+#3 - As below, this will then route on a virtual host basis to the given app
+{
+    "test1.monkshu.org:8080":"http://test1.monkshu.org:8080/apps/test1/index.html",
+    "test2.monkshu.org:8080":"http://test2.monkshu.org:8080/apps/test2/index.html"
+}

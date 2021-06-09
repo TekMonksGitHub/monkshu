@@ -4,7 +4,8 @@ backend/apps/*
 frontend/apps/*
 !backend/apps/.dummy
 !frontend/apps/.dummy
-frontend/framework/conf/default_app.json
 .chrome
 .DS_Store
 debug.log
+frontend/framework/conf/default_app.json
+!frontend/framework/conf/default_app.json.README
