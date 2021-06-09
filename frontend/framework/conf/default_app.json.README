@@ -11,3 +11,11 @@ http(s)://<hostname>:port://apps/appname/my_custom_landing_page.html
     "test1.monkshu.org:8080":"http://test1.monkshu.org:8080/apps/test1/index.html",
     "test2.monkshu.org:8080":"http://test2.monkshu.org:8080/apps/test2/index.html"
 }
+
+#4 - As below, this will then route on a virtual host basis to the given app, possibly changing hosts
+{
+    "test1.monkshu.org:8080":"http://localhost.monkshu.org:8080/apps/test1/index.html",
+    "test2.monkshu.org:8080":"http://localhost.monkshu.org:8080/apps/test2/index.html"
+}
+
+All of these are redirects and browser's URL will change. Use proxy extension to manage routing without changing URLs (transparent routing).
