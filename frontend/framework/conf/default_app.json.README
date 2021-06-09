@@ -1,4 +1,4 @@
-Default app can be configured in three ways
+Default app can be configured in multiple ways
 
 #1 - As below, this will then route to http(s)://<hostname>:port://apps/appname/index.html
 "appname"
