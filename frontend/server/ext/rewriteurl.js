@@ -10,10 +10,10 @@ const mustache = require("mustache");
 exports.name = "rewriteurl";
 exports.processRequest = async (req, _res, _dataSender, _errorSender, access) => {
     const protocol = req.connection.encrypted ? "https" : "http",
-        rewrittenURL = _getRewrittenURL(new URL(req.url, `${protocol}://${req.headers.host}/`)),
-        rewrittenPath = rewrittenURL.pathname+rewrittenURL.search;
+        rewrittenURL = _getRewrittenURL(new URL(req.url, `${protocol}://${req.headers.host}/`));
 
     if (rewrittenURL) {
+        const rewrittenPath = rewrittenURL.pathname+rewrittenURL.search;
         access.info(`Rewrote URL ${req.url} to ${rewrittenPath}`);
         req.url = rewrittenPath;
     }

@@ -5,22 +5,25 @@
  * License: See enclosed file.
  */
 
+const mustache = require("mustache");
+
 exports.name = "redirect";
 exports.processRequest = async (req, res, dataSender, _errorSender, access) => {
-    if (!conf.server_redirect) return false;
+	const protocol = req.connection.encrypted ? "https" : "http",
+        {redirectedURL, code} = _getRedirectedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!redirectedURL) return false;
 
-    const urlIn = new URL(req.url, `http://${req.headers.host}/`);
-    let isRedirectServer = false, urlServer; try {urlServer = new URL(conf.server_redirect)} catch (err) {isRedirectServer = true};
-
-	const host = isRedirectServer ? conf.server_redirect : urlServer.host;
-	const protocol = !isRedirectServer ? (urlServer.protocol ? urlServer.protocol : (conf.ssl?"https:":"http:")) : 
-        (urlIn.protocol ? urlIn.protocol : (conf.ssl?"https:":"http:"));
-	if (!isRedirectServer && !conf.server_redirect.endsWith(urlServer.pathname)) urlServer.pathname = null;
-	const pathname = !isRedirectServer ? (urlServer.pathname || urlIn.pathname || "") : (urlIn.pathname || "");
-	const search = !isRedirectServer ? (urlServer.search || urlIn.search || "") : (urlIn.search || "");
-	const redirectURL = `${protocol}//${host}${pathname}${search}`;
-
-	access.info(`Redirecting, 302, ${req.url} to ${redirectURL}`);
+	access.info(`Redirecting, ${code}, ${req.url} to ${redirectedURL.href}`);
 	
-	dataSender(res, 302, {"Location": redirectURL}, null); return true;
+	dataSender(res, code, {"Location": redirectedURL.href}, null); return true;
+}
+
+function _getRedirectedURL(url) {
+    if (!conf.redirects) return null; // no redirects configured
+    for (const proxy of conf.redirects) {
+        const match = url.href.match(new RegExp(Object.keys(proxy)[0])); if (match) {
+            const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];
+            return {redirectedURL: new URL(mustache.render(proxy[Object.keys(proxy)[0]], data)), code: proxy[code]||302}
+        }
+    }
+    return null;    // nothing matched
 }
