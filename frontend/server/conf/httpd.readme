@@ -7,7 +7,8 @@
 														will replace server with that hostname, and rest of URL like path and
 														search will be reused and redirected.
 	"webroot": "./../", <-- The directory to serve from
-	"proxies": [{"/apps/app_name/proxiedapis/*":"localhost:9090"}], <-- HTTP proxies, if the proxied address is a full URL then protocol replacement is possible
+	"proxies": ["http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"], <-- HTTP proxies, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one ,
+	"rewriteurl": ["/test1/(.*)":"/apps/test1/{{{$1}}}"], <-- URL rewrite (just path), {{{1...n}}} mean the nth matching group, starting from index 1 for the first one 
 	"logdir": "./logs", <-- The logs directory
 	"libdir": "./lib", <-- The lib directory
 	"extdir": "./ext", <-- The extensions directory
