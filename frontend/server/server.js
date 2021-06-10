@@ -81,7 +81,7 @@ function _initExtensions() {
 
 async function _handleRequest(req, res) {
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError)) {
+	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, access, error)) {
 		access.info(`Request ${req.url} handled by extension ${extension.name}`);
 		return; // extension handled it
 	}
