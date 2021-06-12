@@ -17,10 +17,10 @@ function initSync() {
 	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
 	if (!CLUSTER_MEMORY.get(API_REG_DISTM_KEY)) CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
 
-	let decoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	let encoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	let headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	let securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	const decoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	const encoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	const headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	const securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
 
 	const apps = app.getApps();
 	for (const appObj of apps) {
@@ -114,19 +114,17 @@ function injectResponseHeaders(url, response, requestHeaders, responseHeaders, s
 
 function listAPIs() {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let list = Object.keys(apireg);
-	let retList = []; 
-	list.forEach( srv => {if (!srv.startsWith("/admin")) retList.push(srv);} );
+	const list = Object.keys(apireg), retList = []; 
+	for (const srv of list) if (!srv.startsWith("/admin")) retList.push(srv);
 	return retList;
 }
 
 const getExtension = name => require(`${CONSTANTS.LIBDIR}/apiregistry_extensions/${name.toLowerCase()}.js`);
 
 function _loadSortedConfOjbects(pathAndRoots) {
-	let sortedConfObjects = []; 
+	const sortedConfObjects = []; 
 	for (const {path, root} of pathAndRoots) {
 		const rawObject = require(path);
-
 		for (const key of Object.keys(rawObject)) sortedConfObjects.push(
 			{"module":`${root}/lib/apiregistry_extensions/${key.toLowerCase()}.js`, "priority":rawObject[key]} );
 	}
