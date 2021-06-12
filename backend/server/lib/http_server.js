@@ -7,7 +7,6 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const conf = require(`${CONSTANTS.HTTPDCONF}`);
-const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
 
