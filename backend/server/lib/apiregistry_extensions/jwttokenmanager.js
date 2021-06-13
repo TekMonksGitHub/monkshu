@@ -50,8 +50,12 @@ function checkToken(token, reason={}) {
 }
 
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
-    if (!apiregentry.query.addsToken || !response.result) return;   // nothing to do
+    if (!response?.result) return;   // nothing to do
+    else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject);
+}
 
+function injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
+    if (!apiregentry.query.addsToken) return;   // nothing to do
     const tokenCreds = apiregentry.query.addsToken;
     const tuples = tokenCreds.split(",");
     const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex")}; 
@@ -92,4 +96,4 @@ function _cleanTokens() {
     
 }
 
-module.exports = { checkSecurity, injectResponseHeaders, initSync, checkToken, addListener, removeListener };
+module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken, addListener, removeListener };

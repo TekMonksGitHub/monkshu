@@ -62,7 +62,7 @@ function initAndRunTransportLoop() {
 	server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
 	server.onReqEnd = async (url, headers, servObject) => {
 		const send500 = error => {
-			LOG.info(`Sending Internal Error for: ${url}, due to ${error}`);
+			LOG.info(`Sending Internal Error for: ${url}, due to ${error}${error.stack?"\n"+error.stack:""}`);
 			server.statusInternalError(servObject, error); server.end(servObject);
 		}
 		
