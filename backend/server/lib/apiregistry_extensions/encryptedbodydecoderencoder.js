@@ -10,8 +10,8 @@ const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
     if (!utils.parseBoolean(apiregentry.query.encrypted)) return data;  // not encrypted
 
-    return headers["content-type"].toLowerCase() == "application/json" ? 
-        crypt.decrypt(JSON.parse(data).data) : crypt.decrypt(data);
+    return crypt.decrypt(headers["content-type"].toLowerCase() == "application/json"?JSON.parse(data).data:data,
+        apiregentry.query.cryptkey);
 }
 
 function encodeResponse(apiregentry, _url, respObj, reqHeaders, _respHeaders, _servObject) {
@@ -21,7 +21,8 @@ function encodeResponse(apiregentry, _url, respObj, reqHeaders, _respHeaders, _s
     const sendJSONBack = acceptedEncodings != "application/json" && acceptedEncodings != "application/*" && 
         acceptedEncodings != "*/*" || apiregentry.query.notRESTAPI ? false : true;
 
-    return sendJSONBack ? JSON.stringify({data: crypt.encrypt(respObj)}) : crypt.encrypt(respObj);
+    return sendJSONBack ? JSON.stringify({data: crypt.encrypt(respObj, apiregentry.query.cryptkey)}) : crypt.encrypt(
+        respObj, apiregentry.query.cryptkey);
 }
 
 module.exports = {decodeIncomingData, encodeResponse}
