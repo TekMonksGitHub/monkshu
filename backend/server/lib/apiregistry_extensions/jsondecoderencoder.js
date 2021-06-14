@@ -12,7 +12,7 @@ function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
         apiregentry.query.notRESTAPI) return data;   // can't handle or query based
 
     try{return JSON.parse(data);} 
-    catch (err) {LOG.error(`JSON parsing error: ${err}, sending back unparsed data.`); return data;}
+    catch (err) {LOG.error(`JSON parsing error: ${err}.`); LOG.error(`Incoming JSON was: ${data}`); throw err;}
 }
 
 function encodeResponse(apiregentry, _url, respObj, reqHeaders, respHeaders, _servObject) {
