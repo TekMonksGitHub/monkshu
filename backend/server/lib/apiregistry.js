@@ -1,5 +1,5 @@
-/* 
- * (C) 2015, 2016, 2017, 2018, 2019, 2020. TekMonks. All rights reserved.
+/** 
+ * (C) 2015, 2016, 2017, 2018, 2019, 2020, 2021. TekMonks. All rights reserved.
  * License: MIT - see enclosed LICENSE file.
  * 
  * This is our main API Manager class.
@@ -119,6 +119,18 @@ function listAPIs() {
 	return retList;
 }
 
+function addAPI(path, apiregentry) {
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
+	apireg[path] = apiregentry;
+	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
+}
+
+function deleteAPI(path) {
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
+	if (apireg[path]) delete apireg[path];
+	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
+}
+
 const getExtension = name => require(`${CONSTANTS.LIBDIR}/apiregistry_extensions/${name.toLowerCase()}.js`);
 
 function _loadSortedConfOjbects(pathAndRoots) {
@@ -146,4 +158,4 @@ function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL
 	retURL.path = retURL.rawpathname+retURL.search; return retURL;
 }
 
-module.exports = {initSync, getAPI, listAPIs, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};
+module.exports = {initSync, getAPI, listAPIs, addAPI, deleteAPI, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};

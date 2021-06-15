@@ -6,7 +6,6 @@
  */
 
 const cryptmod = require("crypto");
-const utils = require(CONSTANTS.LIBDIR+"/utils.js");
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 
 const _jwttokenListeners = [];
@@ -28,21 +27,27 @@ function initSync() {
 }
 
 function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
-    if (!utils.parseBoolean(apiregentry.query.needsToken)) return true;	// no token needed
+    if ((!apiregentry.query.needsToken) || apiregentry.query.needsToken.toLowerCase() == "false") return true;	// no token needed
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(" "):[];
-    if (token_splits.length == 2) return checkToken(token_splits[1], reason); 
+    if (token_splits.length == 2) return checkToken(token_splits[1], reason, apiregentry.query.needsToken);
     else {reason.reason = "JWT Token Error, bad token"; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
-function checkToken(token, reason={}) {
+function checkToken(token, reason={}, accessNeeded) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     const lastAccess = activeTokens[token];
     if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
 
     const timeDiff = Date.now() - lastAccess;
-    if (timeDiff > conf.expiryTime) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} else {
+    if (timeDiff > conf.expiryTime) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
+
+    const claims = JSON.parse(Buffer.from(token.split(".")[0],"base64").toString("utf8")); // check that claims match the access needed, if specified
+    if (accessNeeded?.toLowerCase() != "true" && (!accessNeeded.split(",").includes(claims.sub))) {
+        reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
+        reason.code = 403; return false;
+    } else {    // success, update token last access time as well to prevent expiry
         activeTokens[token] = Date.now();   // update last access
         CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
         return true;
