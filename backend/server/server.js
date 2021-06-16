@@ -1,7 +1,7 @@
-/* 
+/** 
  * Main server bootstrap file for the API server.
  * 
- * (C) 2015, 2016, 2017, 2018, 2019, 2020 TekMonks. All rights reserved.
+ * (C) 2015, 2016, 2017, 2018, 2019, 2020, 2021 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
 
@@ -66,7 +66,7 @@ function initAndRunTransportLoop() {
 			server.statusInternalError(servObject, error); server.end(servObject);
 		}
 		
-		const {code, respObj} = await doService(url, servObject.env.data, headers, servObject);
+		const {code, respObj} = await doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
 			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
@@ -92,7 +92,7 @@ function initAndRunTransportLoop() {
 	}
 }
 
-async function doService(url, data, headers, servObject) {
+async function doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
 	
 	const api = APIREGISTRY.getAPI(url);
