@@ -5,11 +5,10 @@
  * Tokens are in JWT format.
  */
 
-const cryptmod = require("crypto");
-const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
-
 const _jwttokenListeners = [];
+const cryptmod = require("crypto");
 const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
+const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 
 let conf, alreadyInit = false;
 
