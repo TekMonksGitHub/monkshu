@@ -18,6 +18,7 @@ exports.LOGSCONF = rootdir+"/conf/log.json";
 exports.LOGMAIN = rootdir+"/logs/server.log.ndjson";
 exports.CRYPTCONF = rootdir+"/conf/crypt.json";
 exports.HTTPDCONF = rootdir + "/conf/httpd.json";
+exports.IPBLACKLIST = rootdir + "/conf/ipblacklist.json";
 exports.BLACKBOARDCONF = rootdir + "/conf/blackboard.json";
 exports.RELEASEFILE = rootdir+"/../../RELEASE";
 exports.MAX_LOG = 1024;

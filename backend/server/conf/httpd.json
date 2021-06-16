@@ -12,5 +12,6 @@
     "sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem",
 	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem",
     "host" : "::",
-    "port" : 9090
+    "port" : 9090,
+    "ipblacklistRefresh": 5000
 }

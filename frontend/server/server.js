@@ -41,6 +41,7 @@ function _initConfSync() {
 	conf.webroot = path.resolve(conf.webroot);	
 	conf.logdir = path.resolve(conf.logdir);	
 	conf.libdir = path.resolve(conf.libdir);
+	conf.confdir = path.resolve(conf.confdir);
 	conf.accesslog = path.resolve(conf.accesslog);
 	conf.errorlog = path.resolve(conf.errorlog);
 	const utils = require(conf.libdir+"/utils.js");

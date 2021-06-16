@@ -51,6 +51,12 @@ const getClientPort = req =>
         && req.headers['x-forwarded-port'].split(',').shift())
     || req.socket.remotePort;
 
+function getEmbeddedIPV4(address) { 
+    const pattern = /\:\:ffff\:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/;
+    const matches = address.match(pattern);
+    return matches && matches[1] ? matches[1] : null;
+}
+
 const union = function() {  // merges two arrays
     if (arguments.length == 0) return [];    // no union possible
     
@@ -59,5 +65,36 @@ const union = function() {  // merges two arrays
 
     return result;
 }
+
+function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018157
+{
+    let fullAddress = "", expandedAddress = "", validGroupCount = 8, validGroupSize = 4, ipv4 = "";
+    const extractIpv4 = /([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/, validateIpv4 = /((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})/;
+
+    // look for embedded ipv4
+    if (validateIpv4.test(address)) {
+        const groups = address.match(extractIpv4);
+        for(let i=1; i<groups.length; i++) ipv4 += ("00" + (parseInt(groups[i], 10).toString(16)) ).slice(-2) + ( i==2 ? ":" : "" );
+        address = address.replace(extractIpv4, ipv4);
+    }
+
+    if (address.indexOf("::") == -1) fullAddress = address; // All eight groups are present.
+    else {  // Consecutive groups of zeroes have been collapsed with "::".
+        const sides = address.split("::"); let groupsPresent = 0;
+        for (let i=0; i<sides.length; i++) groupsPresent += sides[i].split(":").length;
+        fullAddress += sides[0] + ":";
+        for (let i=0; i<validGroupCount-groupsPresent; i++) fullAddress += "0000:";
+        fullAddress += sides[1];
+    }
+    const groups = fullAddress.split(":");
+    for (let i=0; i<validGroupCount; i++) {
+        while(groups[i].length < validGroupSize) groups[i] = "0" + groups[i];
+        expandedAddress += (i!=validGroupCount-1) ? groups[i] + ":" : groups[i];
+    }
+    return expandedAddress;
+}
+
+const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
     
-module.exports = { copyFile, getDateTime, getClientIP, getClientPort, union };
+module.exports = { copyFile, getDateTime, getClientIP, getClientPort, getEmbeddedIPV4, union, setIntervalImmediately,
+    expandIPv6Address };
