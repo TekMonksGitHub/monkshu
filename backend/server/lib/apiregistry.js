@@ -114,9 +114,7 @@ function injectResponseHeaders(url, response, requestHeaders, responseHeaders, s
 
 function listAPIs() {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	const list = Object.keys(apireg), retList = []; 
-	for (const srv of list) if (!srv.startsWith("/admin")) retList.push(srv);
-	return retList;
+	return [...Object.keys(apireg)];	// clone for security
 }
 
 function addAPI(path, apiregentry) {

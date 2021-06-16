@@ -29,9 +29,8 @@ function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
     if ((!apiregentry.query.needsToken) || apiregentry.query.needsToken.toLowerCase() == "false") return true;	// no token needed
 
     const incomingToken = headers["authorization"];
-    const token_splits = incomingToken?incomingToken.split(" "):[];
-    if (token_splits.length >= 2 && token_splits[0].trim().toLowerCase() == "bearer") 
-        return checkToken(token_splits[token_splits.length-1], reason, apiregentry.query.needsToken);
+    const token_splits = incomingToken?incomingToken.split(/[ \t]+/):[];
+    if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return checkToken(token_splits[1], reason, apiregentry.query.needsToken);
     else {reason.reason = `JWT malformatted. Got token ${incomingToken}`; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
