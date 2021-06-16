@@ -117,16 +117,22 @@ function listAPIs() {
 	return [...Object.keys(apireg)];	// clone for security
 }
 
-function addAPI(path, apiregentry) {
+async function addAPI(path, apiregentry, app) {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	apireg[path] = apiregentry;
+	apireg[path] = app?`../apps/${app}/${apiregentry}`:apiregentry;
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
+	const regFile = app?`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
+	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
+	regFileObj[path] = apiregentry; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
 }
 
-function deleteAPI(path) {
+async function deleteAPI(path, app) {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
 	if (apireg[path]) delete apireg[path];
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
+	const regFile = app?`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
+	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
+	if (regFileObj[path]) delete regFileObj[path]; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
 }
 
 const getExtension = name => require(`${CONSTANTS.LIBDIR}/apiregistry_extensions/${name.toLowerCase()}.js`);
