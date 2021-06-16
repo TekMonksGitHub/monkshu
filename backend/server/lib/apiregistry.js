@@ -126,6 +126,8 @@ async function addAPI(path, apiregentry, app) {
 	regFileObj[path] = apiregentry; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
 }
 
+const editAPI = addAPI;
+
 async function deleteAPI(path, app) {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
 	if (apireg[path]) delete apireg[path];
@@ -162,4 +164,4 @@ function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL
 	retURL.path = retURL.rawpathname+retURL.search; return retURL;
 }
 
-module.exports = {initSync, getAPI, listAPIs, addAPI, deleteAPI, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};
+module.exports = {initSync, getAPI, listAPIs, addAPI, editAPI, deleteAPI, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};
