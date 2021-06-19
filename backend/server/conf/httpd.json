@@ -13,5 +13,6 @@
 	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem",
     "host" : "::",
     "port" : 9090,
-    "ipblacklistRefresh": 5000
+    "ipblacklistRefresh": 5000,
+    "ipwhitelistRefresh": 5000
 }

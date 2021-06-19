@@ -11,6 +11,8 @@ const lstatAsync = require("util").promisify(fs.lstat);
 const readdirAsync = require("util").promisify(fs.readdir);
 const copyFileAsync = require("util").promisify(fs.copyFile);
 
+let lastFileCheckTime = {};
+
 async function copyFileOrFolder(from, to) {
     if ((await lstatAsync(from)).isFile()) await copyFileAsync(from, to);
     else {
@@ -119,8 +121,33 @@ function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018
     return expandedAddress;
 }
 
+function analyzeIPAddr(ip) {
+    let ipv6 = true; let ipBack = ip;
+
+    if (ip.indexOf(":") != -1 && ip.indexOf(".") != -1 && (ip.indexOf("ffff") != 1)) {  // embedded IPv4
+        ipv6 = false;
+        ipBack = ip.substring(ip.lastIndexOf("ffff:")+5);
+    }
+
+    if (ip.indexOf(":") == -1 && ip.indexOf(".") != -1) ipv6 = false;   // regular IPv4
+
+    return {ip: ipBack, ipv6};  // rest are all regular IPv6
+}
+
+function watchFile(path, opIfModified, frequency) {
+    const toDoOnInterval = async _ => {
+        try { 
+            const stats = await fs.promises.stat(path); if (stats?.mtimeMs != lastFileCheckTime[path]) {
+                lastFileCheckTime[path] = stats.mtimeMs;
+                opIfModified(await fs.promises.readFile(path, "utf8")); 
+            } 
+        } catch (err) {}// file doesn't exist
+    }
+    setIntervalImmediately(toDoOnInterval, frequency);
+}
+
 const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
 
 module.exports = { parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive, 
     getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getEmbeddedIPV4, 
-    setIntervalImmediately, expandIPv6Address };
+    setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile };

@@ -4,6 +4,8 @@
 
 const fs = require("fs");
 
+let lastFileCheckTime = {};
+
 function copyFile(source, target, cb) {
     let cbCalled = false;
 
@@ -94,7 +96,19 @@ function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018
     return expandedAddress;
 }
 
+function watchFile(path, opIfModified, frequency) {
+    const toDoOnInterval = async _ => {
+        try { 
+            const stats = await fs.promises.stat(path); if (stats?.mtimeMs != lastFileCheckTime[path]) {
+                lastFileCheckTime[path] = stats.mtimeMs;
+                opIfModified(await fs.promises.readFile(path, "utf8")); 
+            } 
+        } catch (err) {}// file doesn't exist
+    }
+    setIntervalImmediately(toDoOnInterval, frequency);
+}
+
 const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
     
 module.exports = { copyFile, getDateTime, getClientIP, getClientPort, getEmbeddedIPV4, union, setIntervalImmediately,
-    expandIPv6Address };
+    expandIPv6Address, watchFile };

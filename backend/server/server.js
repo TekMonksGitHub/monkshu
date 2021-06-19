@@ -7,7 +7,7 @@
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
 
-exports.bootstrap = bootstrap;
+let _server;	// holds the transport 
 
 // support starting in stand-alone config
 if (require("cluster").isMaster == true) bootstrap();	
@@ -46,53 +46,53 @@ function bootstrap() {
 	require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();
 
 	/* Run the server */
-	initAndRunTransportLoop();
+	_initAndRunTransportLoop();
 }
 
-function initAndRunTransportLoop() {
+function _initAndRunTransportLoop() {
 	/* Init the transport */
-	let server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
-	server.initSync();
+	_server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
+	_server.initSync();
 	
 	/* Override the console now - to our log file*/
 	LOG.overrideConsole();
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
-	server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
-	server.onReqEnd = async (url, headers, servObject) => {
+	_server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
+	_server.onReqEnd = async (url, headers, servObject) => {
 		const send500 = error => {
 			LOG.info(`Sending Internal Error for: ${url}, due to ${error}${error.stack?"\n"+error.stack:""}`);
-			server.statusInternalError(servObject, error); server.end(servObject);
+			_server.statusInternalError(servObject, error); _server.end(servObject);
 		}
 		
-		const {code, respObj} = await doService(servObject.env.data, servObject, headers, url);
+		const {code, respObj} = await _doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
 			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
 
 			try {
-				server.statusOK(respHeaders, servObject);
-				await server.write(APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
-				server.end(servObject);
+				_server.statusOK(respHeaders, servObject);
+				await _server.write(APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
+				_server.end(servObject);
 			} catch (err) {send500(err)}
 		} else if (code == 404) {
 			LOG.info("Sending Not Found for: " + url);
-			server.statusNotFound(servObject);
-			server.end(servObject, respObj.error);
+			_server.statusNotFound(servObject);
+			_server.end(servObject, respObj.error);
 		} else if (code == 403 || code == 401) {
 			LOG.info("Sending Unauthorized for: " + url);
-			server.statusUnauthorized(servObject);
-			server.end(servObject, respObj.error);
+			_server.statusUnauthorized(servObject);
+			_server.end(servObject, respObj.error);
 		} else if (code == 429) {
 			LOG.info("Sending Throttled for: " + url);
-			server.statusThrottled(servObject);
-			server.end(servObject, respObj.error);
+			_server.statusThrottled(servObject);
+			_server.end(servObject, respObj.error);
 		} else if (code == 999) {/*special do nothing code*/} else send500(respObj.error);
 	}
 }
 
-async function doService(data, servObject, headers, url) {
+async function _doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
 	
 	const api = APIREGISTRY.getAPI(url);
@@ -118,3 +118,5 @@ async function doService(data, servObject, headers, url) {
 		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
+
+module.exports = {bootstrap, blacklistIP: _server.blacklistIP, whitelistIP: _server.whitelistIP};

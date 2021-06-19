@@ -10,15 +10,19 @@ const conf = require(`${CONSTANTS.HTTPDCONF}`);
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
-let ipblacklist = [], lastIPBlacklistCheckTime = -1;
+let ipblacklist = [], ipwhitelist = [];
 
 function initSync() {
 	/* create HTTP/S server */
 	let host = conf.host || "::"; 
-	utils.setIntervalImmediately(_reloadIPBlacklist, conf.ipblacklistRefresh||10000);	
+	utils.watchFile(CONSTANTS.IPBLACKLIST, data=>ipblacklist=JSON.parse(data), conf.ipblacklistRefresh||10000); 
+	utils.watchFile(CONSTANTS.IPWHITELIST, data=>ipwhitelist=JSON.parse(data), conf.ipwhitelistRefresh||10000); 
+
 	LOG.info(`Attaching socket listener on ${host}:${conf.port}`);
 	const listener = (req, res) => {
-		if (_isBlacklistedIP(req)) { LOG.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); // blacklisted, won't honor
+		if (ipwhitelist.length && !_isIPInList(req, ipwhitelist)) { LOG.error(`Blocking IP, not whitelisted ${utils.getClientIP(req)}`); // whitelist in operation, won't honor
+			res.socket.destroy(); res.end(); return; }	
+		if (!ipwhitelist.length && _isIPInList(req, ipblacklist)) { LOG.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); // blacklisted, won't honor
 			res.socket.destroy(); res.end(); return; }	
 
 		if (req.method.toLowerCase() == "options") {
@@ -89,18 +93,21 @@ function end(servObject) {
 	servObject.res.end();
 }
 
-async function _reloadIPBlacklist() {
-	const stats = await fs.promises.stat(CONSTANTS.IPBLACKLIST); if (stats.mtimeMs != lastIPBlacklistCheckTime) {
-		lastIPBlacklistCheckTime = stats.mtimeMs;
-		ipblacklist = JSON.parse(await fs.promises.readFile(CONSTANTS.IPBLACKLIST, "utf8"));
-	}
+const blacklistIP = async (ip, op) => addIPToIPList(CONSTANTS.IPBLACKLIST, ipblacklist, ip, op);
+const whitelistIP = async (ip, op) => addIPToIPList(CONSTANTS.IPWHITELIST, ipwhitelist, ip, op);
+
+async function addIPToIPList(file, listHolder, ip, op) {
+	const ipAnalysis = utils.analyzeIPAddr(ip); 
+	const realIP = ipAnalysis.ipv6?utils.expandIPv6Address(ipAnalysis.ip.toLowerCase()):ipAnalysis.ip;
+	if (op?.toLowerCase() != "remove") listHolder.push(realIP); else listHolder.splice(listHolder.indexOf(realIP),1);
+	await fs.promises.writeFile(file, JSON.stringify(listHolder, null, 4), "utf8");
 }
 
-function _isBlacklistedIP(req) {
+function _isIPInList(req, listHolder) {
 	let clientIP = utils.getClientIP(req);
 	if (req.socket.remoteFamily == "IPv6") clientIP = utils.getEmbeddedIPV4(clientIP)||utils.expandIPv6Address(clientIP);
 
-	return ipblacklist.includes(clientIP.toLowerCase());
+	return listHolder.includes(clientIP.toLowerCase());
 }
 
 function _shouldWeGZIP(servObject, dontGZIP) {
@@ -111,4 +118,4 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
 
-module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end}
+module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, statusInternalError, statusOK, write, end, blacklistIP, whitelistIP}
