@@ -83,9 +83,9 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
 }
 
 function _addHeaders(headers, body) {
-    if (body) headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded";
-    if (body) headers["Content-Length"] = Buffer.byteLength(body, "utf8");
-    headers["Accept"] = headers["Accept"] || "*/*";
+    if (body) headers["content-type"] = utils.getObjectKeyValueCaseInsensitive(headers, "content-type") || "application/x-www-form-urlencoded";
+    if (body) headers["content-length"] = Buffer.byteLength(body, "utf8");
+    headers["accept"] = utils.getObjectKeyValueCaseInsensitive(headers, "accept") || "*/*";
 }
 
 function _doCall(reqStr, options, secure, sslObj) {
@@ -94,7 +94,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         let resp, ignoreEvents = false, resPiped;
         if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
         const req = caller.request(options, res => {
-            const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "Content-Encoding") || "identity";
+            const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
             if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
 
             resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp,chunk]) : chunk });
