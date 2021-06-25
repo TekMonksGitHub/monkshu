@@ -1,19 +1,22 @@
-/* 
+/**
+ * Blackboard for frontend applications - for decoupled design.  
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed LICENSE file.
  */
 
-let topics = {};
+const topics = {};
 
-const registerListener = function(topic, listener) {
+function registerListener(topic, listener) {
+    topic = topic.toLowerCase();
     if (!topics[topic]) topics[topic] = []; 
     topics[topic].push(listener);
 }
 
-const broadCastMessage = function(topic, message) {
+function broadcastMessage(topic, message) {
+    topic = topic.toLowerCase();
     if (!topics[topic]) return; // no such topic exists / no one interested
 
-    topics[topic].forEach(listener => listener(message));
+    for (const listener of topics[topic]) listener(message);
 }
 
-export const blackboard = {registerListener, broadCastMessage};
+export const blackboard = {registerListener, broadcastMessage};

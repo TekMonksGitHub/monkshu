@@ -19,8 +19,8 @@ $$.ready = callback => {
 }
 
 $$.import = async (url, scope = window) => {
-    let result = await import(url);
-    Object.keys(result).forEach(key => scope[key] = result[key]);
+    const result = await import(url);
+    for (const key in result) scope[key] = result[key];
 }
 
 $$.__loadedJS = {};
@@ -89,6 +89,7 @@ $$.importPlugin = url => {
 }
 
 $$.boot = async appPath => {
-    let {bootstrap} = await import("/framework/js/bootstrap.mjs");
+    window.LOG = await import("/framework/js/log.mjs");
+    const {bootstrap} = await import("/framework/js/bootstrap.mjs");
     bootstrap(appPath);
 }
