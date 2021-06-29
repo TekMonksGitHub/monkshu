@@ -43,4 +43,6 @@ function escapeHTML(text) {
     return div.innerHTML;
 }
 
-export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML}
+const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
+
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath}
