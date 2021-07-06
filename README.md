@@ -1,5 +1,5 @@
-# monkshu
-The Monkshu Project
+# Monkshu - The Monkshu Project
+<p align="center"><img src="https://github.com/TekMonksGitHub/monkshu/blob/master/frontend/framework/img/logo_512.png?raw=true"></p>
 
 Monkshu - The HTML5/REST/JSON/Node.js/API Enterprise Application Server - JAMStack Compliant
 =============================================================================================
