@@ -29,12 +29,23 @@ and also allow full HTML5+CSS3 design capabilites instead of coming up with a mo
 * Full support for ECMA 6 standards
 * Full support for REST API based backend
 * Unified server - API runtime plus HTML5 Web Component frontend.
+  
+Everything in a single box
+==========================
+HTTP servers are built into Monkshu. No need to install any external HTTP servers or components. Allows for easier setup, and end to end control over the web applications. 
+
+Web Component Ready
+===================
+100% standards compliant support for Web Components. Doesn't introduce yet another custom, non-W3C compliant, web component framework. Monkshu's implementation of web components is fully standards compliant, supported by all modern web browsers, and doesn't require one to learn new technologies beyond standars HTML, CSS and Javascript. 
+
  
 Fully Secure Backend APIs and Frontend Web Apps
 ================================================
 JWT tokens and API keys are supported natively with a built in API Manager. Don't get hacked! API attacks now comprise 20% of all cyberattacks. Monkshu makes it easy to write 100% secure Web applications and APIs.
 
 Cookieless HTML5 sessions on Frontend, defeat all cross-site and cookie based attacks.
+
+Built in blacklist and whitelist support for the frontend and backend HTTP servers. 
 
 Build Internet Scale Applications
 ==================================
