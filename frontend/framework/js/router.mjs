@@ -59,7 +59,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 	} catch (err) {throw err}
 } 
 
-async function expandPageData(text, url, dataModels) {
+async function expandPageData(text, url=getCurrentURL(), dataModels) {
 	dataModels = await getPageData(url, dataModels);
 
 	Mustache.parse(text);
@@ -68,7 +68,7 @@ async function expandPageData(text, url, dataModels) {
 	return rendered;
 }
 
-async function getPageData(url, dataModels) {
+async function getPageData(url=getCurrentURL(), dataModels) {
 	const i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
 	dataModels = dataModels||{}; dataModels["i18n"] = i18nObj; 
 
