@@ -47,9 +47,9 @@ function getFunctionFromString(string) { // from https://stackoverflow.com/quest
  * @returns String href of the new URL
  */
 function replaceURLParamValue(url, name, value) {
-    url = new URL(url, window.location);
-    url.searchParams.set(name, value);
-    return url.href;
+    const tempURL = new URL(url, window.location);
+    tempURL.searchParams.set(name, value);
+    return tempURL.href;
 }
 
 /**
