@@ -8,7 +8,6 @@
  * (C) 2021 TekMonks. All rights reserved.
  * License: See enclosed file.
  */
-const cache = {};
 const fs = require("fs");
 const path = require("path");
 const fspromises = fs.promises;
@@ -17,10 +16,11 @@ const SIZE_KEY = "__org_monkshu_httpd_cache_size_key___";
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const IGNORE_AFTER_MAX_HITS = conf.diskCache.ignoreAfterMaxHits||10;   // don't keep trying to read disk for 404 files
 
-let uncacheableREs = [];
+const cache = {}, uncacheableREs = []; 
 
 exports.initSync = _ => {
-    if (conf.diskCache && conf.diskCache.refresh != 0) setInterval(_runCachingDeamon, conf.diskCache.refresh||1000, conf.webroot);
+    if (conf.diskCache && conf.diskCache.refresh != 0) setInterval(async _=>{ const all_files = []; 
+        await _runCachingDeamon(conf.webroot, all_files); _purgeDeletedFiles(all_files); }, conf.diskCache.refresh||1000);
     if (conf.diskCache.maxSizeInMB) conf.diskCache.maxSize = conf.diskCache.maxSizeInMB*1024*1024;
     if (conf.diskCache.dontCache) for (const re of conf.diskCache.dontCache) uncacheableREs.push(new RegExp(re));
     cache[SIZE_KEY] = 0;
@@ -50,17 +50,27 @@ exports.processRequest = async (req, res, dataSender) => {
     } else return false;    // cache miss or non-cacheable asset
 }
 
-async function _runCachingDeamon(pathIn) {
-    const statsIn = await fspromises.stat(pathIn); 
-    if (!statsIn.isDirectory()) _cacheThis(pathThis, statsIn, 0);
+async function _runCachingDeamon(pathIn, all_files) {
+    const _isCacheStale = (pathThis, stats) => {
+        const cacheEntry = cache[path.resolve(pathThis)];
+        return (cacheEntry && cacheEntry.mtimeMs == stats.mtimeMs && cacheEntry.sizeUncompressed == stats.size)?false:true;
+    }
+
+    const statsIn = await fspromises.stat(pathIn); all_files.push(path.resolve(pathIn));
+    if (!statsIn.isDirectory() && _isCacheStale(pathIn, statsIn)) await _cacheThis(pathIn, statsIn, 0);
     else for (const file of await fspromises.readdir(pathIn)) {
-        const pathThis = `${pathIn}/${file}`, stats = await fspromises.stat(pathThis), cacheEntry = cache[path.resolve(pathThis)];
-        if (cacheEntry && cacheEntry.mtimeMs == stats.mtimeMs && cacheEntry.sizeUncompressed == stats.size) continue;    // already cached and current
+        const pathThis = `${pathIn}/${file}`, stats = await fspromises.stat(pathThis);
+        all_files.push(path.resolve(pathThis)); if (!_isCacheStale(pathThis, stats)) continue;  // already cached and current
 
         if (conf.diskCache.maxSize && cache[SIZE_KEY] > conf.diskCache.maxSize) break;    // size exceeded
         
-        if (stats.isDirectory()) _runCachingDeamon(pathThis); else _cacheThis(pathThis, stats, 0);
+        if (stats.isDirectory()) await _runCachingDeamon(pathThis, all_files); else await _cacheThis(pathThis, stats, 0);
     }
+}
+
+function _purgeDeletedFiles(all_files) {
+    for (const entry in cache) if (!all_files.includes(entry) && entry != SIZE_KEY) { // file was deleted
+        cache[SIZE_KEY] -= cache[entry].data.length; delete cache[entry]; }
 }
 
 async function _cacheThis(pathThis, stats, hits) {
