@@ -43,6 +43,13 @@ function escapeHTML(text) {
     return div.innerHTML;
 }
 
+function downloadFile(contents, type, filename) {
+    const blob = new Blob([contents], {type}), link = document.createElement("a");
+    link.download = filename; link.href = window.URL.createObjectURL(blob);
+    link.click(); window.URL.revokeObjectURL(link.href); link.remove();
+}
+
 const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
 
-export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath}
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
+    downloadFile}
