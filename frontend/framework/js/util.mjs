@@ -92,5 +92,29 @@ function downloadFile(contents, type, filename) {
  */
 const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
 
+/**
+ * Uploads a single file.
+ * @param accept Optional: The MIME type to accept. Default is "*".
+ * @param type Optional: Can be "text" or "binary". Default is "text".
+ * @returns A promise which resolves to {name - filename, data - string or ArrayBuffer} or rejects with error
+ */
+function uploadAFile(accept="*/*", type="text") {
+    const uploadFiles = _ => new Promise(resolve => {
+        const uploader = document.createElement("input"); uploader.setAttribute("type","file"); 
+        uploader.style.display = "none"; uploader.setAttribute("accept", accept);
+        
+        document.body.appendChild(uploader); uploader.onchange = _ => {resolve(uploader.files); document.body.removeChild(uploader); }; 
+        uploader.click();
+    });
+
+    return new Promise(async (resolve, reject) => {
+        const file = (await uploadFiles())[0]; if (!file) {reject("User cancelled upload"); return;}
+        const reader = new FileReader();
+        reader.onload = event => resolve({name: file.name, data: event.target.result});
+        reader.onerror = event => reject(reader.error);
+        if (type.toLowerCase() == "text") reader.readAsText(file); else reader.readAsArrayBuffer(file);
+    });
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile}
+    downloadFile, uploadAFile}

@@ -81,7 +81,7 @@ async function _purgeDeletedFiles(webroot) {
 
     const all_files = []; await findAllFiles(webroot, all_files);
 
-    for (const entry in cache) if (!all_files.includes(entry) && entry != SIZE_KEY) { // file was deleted
+    for (const entry in cache) if (!all_files.includes(entry) && entry != SIZE_KEY && entry.data) { // file was deleted
         cache[SIZE_KEY] -= cache[entry].data.length; delete cache[entry]; }
 }
 
