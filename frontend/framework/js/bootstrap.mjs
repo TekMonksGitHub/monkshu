@@ -9,7 +9,7 @@ import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 export async function bootstrap(appPath) {
 	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS;
 	i18n.init(appPath);
-	window.monkshu_env = {components:{}, pageload_funcs:{}, pagedata_funcs:{}};
+	window.monkshu_env = {components:{}, pageload_funcs:{}, pagedata_funcs:{}, frameworklibs:{}};
 
 	let {application} = await import(`${appPath}/js/application.mjs`);											
 	if (application.init instanceof Function) await application.init();	// initialize the application

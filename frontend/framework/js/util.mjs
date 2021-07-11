@@ -109,12 +109,24 @@ function uploadAFile(accept="*/*", type="text") {
 
     return new Promise(async (resolve, reject) => {
         const file = (await uploadFiles())[0]; if (!file) {reject("User cancelled upload"); return;}
+        try {resolve(await getFileData(file));} catch (err) {reject(err);} 
+    });
+}
+
+/**
+ * Reads the given file and returns its data.
+ * @param file The File object
+ * @param type Optional: Can be "text" or "binary". Default is "text".
+ * @returns A promise which resolves to {name - filename, data - string or ArrayBuffer} or rejects with error
+ */
+function getFileData(file, type="text") {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = event => resolve({name: file.name, data: event.target.result});
-        reader.onerror = event => reject(reader.error);
+        reader.onerror = _event => reject(reader.error);
         if (type.toLowerCase() == "text") reader.readAsText(file); else reader.readAsArrayBuffer(file);
     });
 }
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile}
+    downloadFile, uploadAFile, getFileData}
