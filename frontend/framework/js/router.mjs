@@ -79,6 +79,7 @@ async function getPageData(url=getCurrentURL(), dataModels) {
 
 	dataModels["_org_monkshu_makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
+	dataModels["__window"] = _ => (key, render) => window[render(key)];
 
 	return dataModels;
 }
