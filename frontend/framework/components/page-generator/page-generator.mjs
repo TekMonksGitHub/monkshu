@@ -105,7 +105,7 @@ async function _generatePageHTML(schema, cssParsed, cssInternal, cssHref, layout
 		htmlElement.id = element.name || element.element; 
 		html += `<div class="item${i}${cssParsed.itemClasses?" "+cssParsed.itemClasses:''}${cssParsed.perItemClass?` ${cssParsed.perItemClass}-${htmlElement.id}`:''}"><${htmlElement.html || "div"}`; 
 		for (const attr of Object.keys(htmlElement)) {
-			if (attr == htmlElement.html  || attr == htmlElement.__org_monkshu_innerHTML) continue;	// our reserved attrs
+			if (attr == "html"  || attr == "__org_monkshu_innerHTML") continue;	// our reserved attrs
 			html += ` ${attr}="${await _evalAttrValue(htmlElement[attr])}"`; 
 		}
 		html += `>${htmlElement.__org_monkshu_innerHTML||''}</${htmlElement.html}></div>
