@@ -30,7 +30,7 @@ $$.require = async (url, targetDocument = document) => {
         const scriptNode = script.cloneNode(true);
         targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
     } else try {
-        const js = await (await fetch(url, {mode:"no-cors", cache: "default"})).text();
+        const js = await (await $$.__fetchThrowErrorOnNotOK(url)).text();
         const script = document.createElement("script");
         script.text = `${js}\n//# sourceURL=${url}`;
         $$.__loadedJS[url] = script.text; 
@@ -58,7 +58,7 @@ $$.requireJSON = async url => {
 
     if (Object.keys($$.__loadedJSON).includes(url)) return $$.__loadedJSON[url];   // already loaded
     else try {
-        const json = await (await fetch(url, {mode:"no-cors", cache: "default"})).json();
+        const json = await (await $$.__fetchThrowErrorOnNotOK(url)).json();
         $$.__loadedJSON[url]=json; return $$.__loadedJSON[url];
     } catch (err) {throw err};
 }
@@ -69,7 +69,7 @@ $$.requireText = async url => {
 
     if (Object.keys($$.__loadedText).includes(url)) return $$.__loadedText[url];   // already loaded
     else try {
-        const text = await (await fetch(url, {mode:"no-cors", cache: "default"})).text();
+        const text = await (await $$.__fetchThrowErrorOnNotOK(url)).text();
         $$.__loadedText[url]=text; return $$.__loadedText[url];
     } catch (err) {throw err};
 }
@@ -88,6 +88,12 @@ $$.importPlugin = url => {
             $$.__loadedPlugins.push(url); resolve();
         }).catch(err => reject(err));
     });
+}
+
+$$.__fetchThrowErrorOnNotOK = async url => {
+    const response = await fetch(url, {mode:"no-cors", cache: "default"});
+    if (!response.ok) throw new Error(`Issue in fetch, status returned is ${response.status}`);
+    else return response;
 }
 
 $$.boot = async appPath => {
