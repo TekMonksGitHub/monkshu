@@ -109,7 +109,7 @@ function uploadAFile(accept="*/*", type="text") {
 
     return new Promise(async (resolve, reject) => {
         const file = (await uploadFiles())[0]; if (!file) {reject("User cancelled upload"); return;}
-        try {resolve(await getFileData(file));} catch (err) {reject(err);} 
+        try {resolve(await getFileData(file, type));} catch (err) {reject(err);} 
     });
 }
 
