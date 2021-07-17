@@ -1,11 +1,11 @@
-/* 
+/** 
  * (C) 2018 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed LICENSE file.
  * 
  * Web component support. All Monkshu components must call the register function. 
  * Supports both true web component mode or simulated web components (not recommended).
  * 
- * Access to the element's javascript module is via monkshu_env.components[name]
+ * Access to the element's javascript module is via window.monkshu_env.components[name]
  * 
  * Dynamic data binding is then via monkshu_env.components[name].bindData(data, id).
  */
@@ -34,6 +34,7 @@ function register(name, htmlTemplate, module) {
     module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
     module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
 
+    module.getShadowRootByHost = host => module.getShadowRootByHostId(host.id);
     module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
     module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
 
