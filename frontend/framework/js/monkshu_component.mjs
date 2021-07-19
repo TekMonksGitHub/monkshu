@@ -126,6 +126,8 @@ function register(name, htmlTemplate, module) {
         }
 
         async connectedCallback() {
+            if (!this.isConnected) return;  // not in a DOM tree
+            
             if (this.id) {if (!module.elements) module.elements = {}; module.elements[this.id] = this;}
             else module.element = this;
 
