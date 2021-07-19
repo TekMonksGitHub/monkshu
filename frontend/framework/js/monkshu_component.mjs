@@ -63,6 +63,8 @@ function register(name, htmlTemplate, module) {
 
     module.getMemoryByContainedElement = element => module.getMemory(module.getHostElementID(element));
 
+    module.getMemoryByHost = hostElement => module.getMemory(hostElement.id);
+
     module.getAllElementInstances = _ => {
         const allInstances = []; 
         if (module.elements) for (const key in module.elements) allInstances.push(module.elements[key]); 
