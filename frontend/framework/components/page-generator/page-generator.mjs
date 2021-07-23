@@ -133,9 +133,8 @@ async function _evalAttrValue(str) {
 		if (!testForAttrFunctions.match) return val;	// nothing to expand
 		val = await _recursiveExpandFunctions(testForAttrFunctions.match);
 
-		if (testForAttrFunctions.cmd == "url") {
-			try {val = (await $$.requireText(val)).replace(/\r?\n|\r/g, "");} catch {}	// remove line feeds
-		} else if (testForAttrFunctions.cmd=="encodeURIComponent") val = encodeURIComponent(val);
+		if (testForAttrFunctions.cmd == "url") try {val = (await $$.requireText(val)).replace(/\r?\n|\r/g, "");} catch {}	// remove line feeds
+		else if (testForAttrFunctions.cmd=="encodeURIComponent") val = encodeURIComponent(val);
 		return val;
 	}
 	
