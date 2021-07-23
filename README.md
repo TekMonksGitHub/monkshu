@@ -36,7 +36,7 @@ HTTP servers are built into Monkshu. No need to install any external HTTP server
 
 Web Component Ready
 ===================
-100% standards compliant support for Web Components. Doesn't introduce yet another custom, non-W3C compliant, web component framework. Monkshu's implementation of web components is fully standards compliant, supported by all modern web browsers, and doesn't require one to learn new technologies beyond standars HTML, CSS and Javascript. 
+100% standards compliant support for Web Components. Doesn't introduce yet another custom, non-W3C compliant, web component framework. Monkshu's implementation of web components is fully standards compliant, supported by all modern web browsers, and doesn't require one to learn new technologies beyond standard HTML, CSS and Javascript. 
 
  
 Fully Secure Backend APIs and Frontend Web Apps
