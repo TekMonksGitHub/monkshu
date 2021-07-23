@@ -1,7 +1,7 @@
 {
 	"port": 8080,
 	"host": "::",
-	"extensions": ["ipblocker","diskcache"],
+	"extensions": [],
 	"webroot": "./../",
 	"logdir": "./logs",
 	"libdir": "./lib",
@@ -13,7 +13,7 @@
 	"ssl": false,
 	"enableGZIPEncoding": true,
 	"ipblacklistRefresh": 5000,
-	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2"},
+	"diskCache": {"refresh": 10000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2"},
 	"sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem",
 	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem",
 	"httpdHeaders": {

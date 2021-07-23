@@ -125,22 +125,21 @@ async function _evalAttrValue(str) {
 	let val = (window[str] || str).toString();	// Mustache expects strings only
 	val = await router.expandPageData(val, session.get($$.MONKSHU_CONSTANTS.PAGE_URL), {});
 
-	// try to load the URL if matches URL pattern
-	if (val.match(/url\((.+?)\)/)) {	
-		try {
-			const testURL = router.decodeURL(val.match(/url\((.+?)\)/)[1]); 
-			const content = (await $$.requireText(testURL)).replace(/\r?\n|\r/g, "");	// remove line feeds
-			val = val.replace(/url\((.+?)\)/, content);
-		} catch {}
-	}
+	const _xregexparrayToObject = array => {const retObj = {}; for (const object of array) retObj[object.name] = object.value; return retObj;}
 
-	// encodeURIComponent function
-	const test = XRegExp.matchRecursive(val, "\\(", "\\)", "g", {valueNames: ["cmd",null,"match",null]});
-	if (test.length > 1 && test[0].value=="encodeURIComponent") {
-		const match = test[1], encoded = encodeURIComponent(match.value);
-		val = val.substring(0, match.start-"encodeURIComponent(".length) + encoded + val.substring(match.end+1);
-	}
+	const _recursiveExpandFunctions = async val => {
+		const testForAttrFunctions = _xregexparrayToObject(XRegExp.matchRecursive(val, "\\(", "\\)", "g", 
+			{valueNames: ["cmd","left","match","right"]}));
+		if (!testForAttrFunctions.match) return val;	// nothing to expand
+		val = await _recursiveExpandFunctions(testForAttrFunctions.match);
 
+		if (testForAttrFunctions.cmd == "url") {
+			try {val = (await $$.requireText(val)).replace(/\r?\n|\r/g, "");} catch {}	// remove line feeds
+		} else if (testForAttrFunctions.cmd=="encodeURIComponent") val = encodeURIComponent(val);
+		return val;
+	}
+	
+	val = await _recursiveExpandFunctions(val);
 	return val;
 }
 
