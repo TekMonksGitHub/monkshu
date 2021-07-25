@@ -4,23 +4,25 @@
  * License: See enclosed LICENSE file.
  */
 import {router} from "/framework/js/router.mjs";
-import {session} from "/framework/js/session.mjs";
 import {monkshu_component} from "/framework/js/monkshu_component.mjs";
 $$.require("/framework/3p/xregexp-all.js");
 
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
-	element.componentHTML = await getHTML(new URL(pagePath, window.location.href), element.getAttribute("css")); 
+	element.componentHTML = await getHTML(new URL(pagePath, window.location.href), 
+		element.getAttribute("css"), JSON.parse(element.getAttribute("pageData")||"{}")); 
 }
 
 /**
  * Generates HTML for the give page
  * @param pageFileURLOrPageSchema Page URL as a URL object or page schema definition as a string
  * @param cssHref Optional: Any external CSS to include 
+ * @param data Optional: Mustache render data
  * @returns The generated HTML
  */
-async function getHTML(pageFileURLOrPageSchema, cssHref) {
-	const pageFile = (pageFileURLOrPageSchema instanceof URL) ? await $$.requireText(pageFileURLOrPageSchema) : pageFileURLOrPageSchema; 
+async function getHTML(pageFileURLOrPageSchema, cssHref, data) {
+	const pageFile = await router.expandPageData((pageFileURLOrPageSchema instanceof URL) ? 
+		await $$.requireText(pageFileURLOrPageSchema) : pageFileURLOrPageSchema, undefined, data);
 	const schemaArray = pageFile.match(/SCHEMA\s*\r?\n=+\r?\n(.+?)\r?\n=+[\r?\n]*/sm);
 	const schema = (schemaArray && schemaArray.length > 1) ? schemaArray[1] : "";
 
@@ -123,7 +125,6 @@ async function _generatePageHTML(schema, cssParsed, cssInternal, cssHref, layout
 
 async function _evalAttrValue(str) {
 	let val = (window[str] || str).toString();	// Mustache expects strings only
-	val = await router.expandPageData(val, session.get($$.MONKSHU_CONSTANTS.PAGE_URL), {});
 
 	const _xregexparrayToObject = array => {const retObj = {}; for (const object of array) retObj[object.name] = object.value; return retObj;}
 
