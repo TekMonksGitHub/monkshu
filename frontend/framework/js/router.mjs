@@ -70,7 +70,7 @@ async function expandPageData(text, url=getCurrentURL(), dataModels) {
 
 async function getPageData(url=getCurrentURL(), dataModels) {
 	const i18nObj = await i18n.getI18NObject(session.get($$.MONKSHU_CONSTANTS.LANG_ID));
-	dataModels = dataModels||{}; dataModels["i18n"] = i18nObj; 
+	dataModels = dataModels||{}; dataModels["i18n"] = dataModels["i18n"]?{...dataModels["i18n"],...i18nObj}:i18nObj; 
 
 	dataModels["lang"] = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
 	
