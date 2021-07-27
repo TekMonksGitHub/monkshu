@@ -122,7 +122,7 @@ function register(name, htmlTemplate, module) {
             }
 
             if (module.initialRender && initialRender) await module.initialRender(this);
-            if (module.elementRendered) await module.elementRendered(this);
+            if (module.elementRendered) await module.elementRendered(this, initialRender);
         }
 
         async connectedCallback() {
