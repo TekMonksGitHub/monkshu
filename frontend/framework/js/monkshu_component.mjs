@@ -80,6 +80,9 @@ function register(name, htmlTemplate, module) {
 
     module.getComponentPath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
 
+    module.getTemplateHTML = host => host._componentHTML;
+    module.setTemplateHTML = (host, html) => host._componentHTML = html;
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
@@ -96,11 +99,11 @@ function register(name, htmlTemplate, module) {
 
             // if it has template, or if the component already provided some HTML then honor it,
             // else make it an invisible component, as it has no HTML (case: pure JS components).
-            if (htmlTemplate) this.componentHTML = await router.loadHTML(htmlTemplate,
+            if (htmlTemplate) this._componentHTML = await router.loadHTML(htmlTemplate,
                 this.id?(module.datas?module.datas[this.id]||{}:{}):module.data||{}, false);
-            else if (!this.componentHTML) this.componentHTML = '<body style="margin: 0px; padding: 0px; height: 0px; display: none">';
+            else if (!this._componentHTML) this._componentHTML = '<body style="margin: 0px; padding: 0px; height: 0px; display: none">';
 
-            const templateRoot = new DOMParser().parseFromString(this.componentHTML, "text/html").documentElement;
+            const templateRoot = new DOMParser().parseFromString(this._componentHTML, "text/html").documentElement;
             
             if (module.trueWebComponentMode) {
                 if (initialRender) {
