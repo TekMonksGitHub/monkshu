@@ -9,8 +9,8 @@ $$.require("/framework/3p/xregexp-all.js");
 
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
-	element.componentHTML = await getHTML(new URL(pagePath, window.location.href), 
-		element.getAttribute("css"), JSON.parse(element.getAttribute("pageData")||"{}")); 
+	page_generator.setTemplateHTML(element, await getHTML(new URL(pagePath, window.location.href), 
+		element.getAttribute("css"), JSON.parse(element.getAttribute("pageData")||"{}"))); 
 }
 
 /**
