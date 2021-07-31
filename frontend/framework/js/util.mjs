@@ -129,4 +129,4 @@ function getFileData(file, type="text") {
 }
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData}
+    downloadFile, uploadAFile, getFileData, clone: o=>JSON.parse(JSON.stringify(o))}
