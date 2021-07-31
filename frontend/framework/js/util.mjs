@@ -128,5 +128,18 @@ function getFileData(file, type="text") {
     });
 }
 
+/**
+ * Deep clones an object, must be serializable or non-serializable properties must
+ * be listed to be skipped
+ * @param object The object to clone
+ * @param skipProperties Optional: Properties to skip while cloning
+ */
+function clone(object, skipProperties=[]) {
+    if (!skipProperties.length) return JSON.parse(JSON.stringify(object));
+
+    const clone = {}; for (const key in object) if (!skipProperties.includes(key)) clone[key] = JSON.parse(JSON.stringify(object[key]));
+    return clone;
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone: o=>JSON.parse(JSON.stringify(o))}
+    downloadFile, uploadAFile, getFileData, clone}
