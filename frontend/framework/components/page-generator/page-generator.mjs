@@ -124,7 +124,7 @@ async function _generatePageHTML(schema, cssParsed, cssInternal, cssHref, layout
 }
 
 async function _evalAttrValue(str) {
-	let val = (window[str] || str).toString();	// Mustache expects strings only
+	let val = ((window[str] && (!window[str] instanceof Object)) || str).toString();	// Mustache expects strings only
 
 	const _xregexparrayToObject = array => {const retObj = {}; for (const object of array) retObj[object.name] = object.value; return retObj;}
 
