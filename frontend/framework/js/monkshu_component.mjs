@@ -83,6 +83,15 @@ function register(name, htmlTemplate, module) {
     module.getTemplateHTML = host => host._componentHTML;
     module.setTemplateHTML = (host, html) => host._componentHTML = html;
 
+    module.setData = (hostID, data) => {
+        if (hostID) {
+            if (!module.datas) {module.datas = {}; module.datas[hostID] = data;} 
+            else module.datas[hostID] = data;
+        } else module.data = data;
+    }
+    module.setDataByHost = (host, data) => module.setData(host.id, data);
+    module.setDataByContainedElement = (element, data) => module.setData(module.getHostElementID(element), data);
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
@@ -96,6 +105,8 @@ function register(name, htmlTemplate, module) {
         async render(initialRender) {
             // check security policy
             if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
+
+            if (module.elementPrerender) await module.elementPrerender(this, initialRender);
 
             // if it has template, or if the component already provided some HTML then honor it,
             // else make it an invisible component, as it has no HTML (case: pure JS components).
