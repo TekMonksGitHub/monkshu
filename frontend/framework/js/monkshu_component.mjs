@@ -35,7 +35,7 @@ function register(name, htmlTemplate, module) {
     module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
 
     module.getShadowRootByHost = host => module.getShadowRootByHostId(host.id);
-    module.getShadowRootByHostId = id => id ? module.shadowRoots[id] : module.shadowRoot;
+    module.getShadowRootByHostId = id => id ? (module.shadowRoots ? module.shadowRoots[id] : null) : module.shadowRoot;
     module.getShadowRootByContainedElement = element => module.getShadowRootByHostId(module.getHostElementID(element));
 
     module.getMemory = id => {
