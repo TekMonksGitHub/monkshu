@@ -99,7 +99,7 @@ function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018
 function watchFile(path, opIfModified, frequency) {
     const toDoOnInterval = async _ => {
         try { 
-            const stats = await fs.promises.stat(path); if (stats?.mtimeMs != lastFileCheckTime[path]) {
+            const stats = await fs.promises.stat(path); if (stats.mtimeMs != lastFileCheckTime[path]) {
                 lastFileCheckTime[path] = stats.mtimeMs;
                 opIfModified(await fs.promises.readFile(path, "utf8")); 
             } 

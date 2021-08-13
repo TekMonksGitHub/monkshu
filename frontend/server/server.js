@@ -88,7 +88,7 @@ async function _handleRequest(req, res) {
 	}
 
 	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
-	let fileRequested = path.resolve(conf.webroot+"/"+pathname);
+	let fileRequested = path.resolve(conf.webroot+"/"+decodeURIComponent(pathname));
 
 	// don't allow reading outside webroot
 	if (!_isSubdirectory(fileRequested, conf.webroot))

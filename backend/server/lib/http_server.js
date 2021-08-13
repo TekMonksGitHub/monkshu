@@ -99,7 +99,7 @@ const whitelistIP = async (ip, op) => addIPToIPList(CONSTANTS.IPWHITELIST, ipwhi
 async function addIPToIPList(file, listHolder, ip, op) {
 	const ipAnalysis = utils.analyzeIPAddr(ip); 
 	const realIP = ipAnalysis.ipv6?utils.expandIPv6Address(ipAnalysis.ip.toLowerCase()):ipAnalysis.ip;
-	if (op?.toLowerCase() != "remove") listHolder.push(realIP); else listHolder.splice(listHolder.indexOf(realIP),1);
+	if (op.toLowerCase() != "remove") listHolder.push(realIP); else listHolder.splice(listHolder.indexOf(realIP),1);
 	await fs.promises.writeFile(file, JSON.stringify(listHolder, null, 4), "utf8");
 }
 

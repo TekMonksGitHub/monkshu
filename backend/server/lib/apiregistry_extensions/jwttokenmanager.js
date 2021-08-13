@@ -43,7 +43,7 @@ function checkToken(token, reason={}, accessNeeded) {
     if (timeDiff > conf.expiryTime) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
 
     const claims = JSON.parse(Buffer.from(token.split(".")[0],"base64").toString("utf8")); // check that claims match the access needed, if specified
-    if (accessNeeded?.toLowerCase() != "true" && (!accessNeeded.split(",").includes(claims.sub))) {
+    if (accessNeeded.toLowerCase() != "true" && (!accessNeeded.split(",").includes(claims.sub))) {
         reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
         reason.code = 403; return false;
     } else {    // success, update token last access time as well to prevent expiry
@@ -54,7 +54,7 @@ function checkToken(token, reason={}, accessNeeded) {
 }
 
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
-    if (!response?.result) return;   // nothing to do
+    if (!response.result) return;   // nothing to do
     else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject);
 }
 

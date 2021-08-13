@@ -137,7 +137,7 @@ function analyzeIPAddr(ip) {
 function watchFile(path, opIfModified, frequency) {
     const toDoOnInterval = async _ => {
         try { 
-            const stats = await fs.promises.stat(path); if (stats?.mtimeMs != lastFileCheckTime[path]) {
+                const stats = await fs.promises.stat(path); if (stats.mtimeMs != lastFileCheckTime[path]) {
                 lastFileCheckTime[path] = stats.mtimeMs;
                 opIfModified(await fs.promises.readFile(path, "utf8")); 
             } 
