@@ -9,16 +9,14 @@ let appPath;
 
 const init = appPathIn => appPath = appPathIn;
 
-async function get(key, language, refresh=false) {
+async function get(key, language=_getSessionLang(), refresh=false) {
 	try {
-		if (!language) language = _getSessionLang();
 		const i18nObject = await getI18NObject(language, refresh);
 		return i18nObject[key]
 	} catch (err) {throw err}
 }
 
-async function getI18NObject(language, refresh=false) {
-	if (!language) language = _getSessionLang();
+async function getI18NObject(language=_getSessionLang(), refresh=false) {
 	if (!i18nCached[language] || refresh) {
 		try {i18nCached[language] = await import(`${appPath}/i18n/i18n_${language}.mjs`);}
 		catch(err) {throw err}
