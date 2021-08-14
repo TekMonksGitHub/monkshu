@@ -5,7 +5,6 @@
  */
 import {router} from "/framework/js/router.mjs";
 import {monkshu_component} from "/framework/js/monkshu_component.mjs";
-$$.require("/framework/3p/xregexp-all.js");
 
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
@@ -124,6 +123,8 @@ async function _generatePageHTML(schema, cssParsed, cssInternal, cssHref, layout
 }
 
 async function _evalAttrValue(str) {
+	await $$.require("/framework/3p/xregexp-all.js");
+
 	let val = ((window[str] && (!window[str] instanceof Object)) || str).toString();	// Mustache expects strings only
 
 	const _xregexparrayToObject = array => {const retObj = {}; for (const object of array) retObj[object.name] = object.value; return retObj;}
