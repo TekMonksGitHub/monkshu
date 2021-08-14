@@ -9,14 +9,14 @@ let appPath;
 
 const init = appPathIn => appPath = appPathIn;
 
-async function get(key, language=_getSessionLang(), refresh=false) {
+async function get(key, language=getSessionLang(), refresh=false) {
 	try {
 		const i18nObject = await getI18NObject(language, refresh);
 		return i18nObject[key]
 	} catch (err) {throw err}
 }
 
-async function getI18NObject(language=_getSessionLang(), refresh=false) {
+async function getI18NObject(language=getSessionLang(), refresh=false) {
 	if (!i18nCached[language] || refresh) {
 		try {i18nCached[language] = await import(`${appPath}/i18n/i18n_${language}.mjs`);}
 		catch(err) {throw err}
@@ -27,6 +27,6 @@ async function getI18NObject(language=_getSessionLang(), refresh=false) {
 
 const setI18NObject = (language, i18n) => i18nCached[language] = {i18n:{...i18nCached[language].i18n, ...i18n}};
 
-const _getSessionLang = _ => session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en";
+const getSessionLang = _ => session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en";
 
-export const i18n = {init, get, getI18NObject, setI18NObject};
+export const i18n = {init, get, getI18NObject, setI18NObject, getSessionLang};
