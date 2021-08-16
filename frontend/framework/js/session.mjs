@@ -40,7 +40,7 @@ function _getProxy(object, key) {
         }
     }
 
-    return new Proxy(typeof object == "string" || typeof object == "number"?new NativeWrapper(object):object, handler);
+    return new Proxy(typeof object == "string" || typeof object == "number" || typeof object == "boolean" || typeof object == "bigint"?new NativeWrapper(object):object, handler);
 }
 
 export const session = {set, get, remove, destroy, contains, keys};
