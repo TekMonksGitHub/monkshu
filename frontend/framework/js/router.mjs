@@ -46,6 +46,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 		let [html, _] = await Promise.all([
 			fetch(url, {mode: "no-cors", cache: "default"}).then(response => response.text()), 
 			$$.require("/framework/3p/mustache.min.js")]);
+		window.monkshu_env["__org_monkshu_mustache"] = Mustache;
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
 		if (window.monkshu_env.pagedata_funcs[urlParsed.href]) for (const func of window.monkshu_env.pagedata_funcs[urlParsed.href]) await func(dataModels, url);
@@ -140,6 +141,8 @@ const getCurrentPageData = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_DATA);
 const setCurrentPageData = data => session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, data);
 
 const getLastSessionURL = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_URL);
+
+const getMustache = _ => window.monkshu_env["__org_monkshu_mustache"];
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
