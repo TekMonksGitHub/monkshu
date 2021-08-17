@@ -55,7 +55,7 @@ There is also a global event management system using a Publish/Subscribe global 
 
 NPMs needed
 ===========
-(1) Mustache if using custom authentication.  
+(1) Mustache.
 (2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms.
 
 Documentation
