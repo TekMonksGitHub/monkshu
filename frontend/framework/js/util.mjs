@@ -141,5 +141,7 @@ function clone(object, skipProperties=[]) {
     return clone;
 }
 
+const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone}
+    downloadFile, uploadAFile, getFileData, clone, resolveURL}
