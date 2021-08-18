@@ -12,7 +12,7 @@ let _current_role  = session.get("_com_monkshu_securityguard_current_role");
 function isAllowed(resource, role=_current_role) {
     if (_app_interceptor) return _app_interceptor.isAllowed(resource, role);
     else if (!role) return false;
-    else return _PERMISSIONS_MAP[role] ? _PERMISSIONS_MAP[role].includes(resource) : false;
+    else return _PERMISSIONS_MAP[role]?.includes(resource) ||  _PERMISSIONS_MAP[role] == "*";
 }
 
 function setAppInterceptor(interceptor) {
