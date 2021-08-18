@@ -19,6 +19,7 @@ async function loadPage(url, dataModels={}) {
 		window.history.pushState(null, null, new URL(window.location.href).pathname+HS+hash);
 		history[hash] = [url, dataModels];
 	} else {
+		window.history.pushState(null, null, url);
 		hash = url.substring(url.indexOf(HS)+HS.length);
 		url = new URL(atob(hash), window.location).href;
 		if (!history[hash]) history[hash] = [url,"en",{}];
@@ -148,4 +149,4 @@ function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.g
 
 export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, 
 	encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, getCurrentURL, getCurrentPageData, 
-	setCurrentPageData, doIndexNavigation, getLastSessionURL};
+	setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache};
