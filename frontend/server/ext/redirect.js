@@ -20,11 +20,11 @@ exports.processRequest = async (req, res, dataSender, _errorSender, access) => {
 
 function _getRedirectedURL(url) {
     if (!conf.redirects) return null; // no redirects configured
-    for (const proxy of conf.redirects) {
-        const match = url.href.match(new RegExp(Object.keys(proxy)[0])); if (match) {
+    for (const redirect of conf.redirects) {
+        const match = url.href.match(new RegExp(Object.keys(redirect)[0])); if (match) {
             const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];
-            return {redirectedURL: new URL(mustache.render(proxy[Object.keys(proxy)[0]], data)), code: proxy.code||302}
+            return {redirectedURL: new URL(mustache.render(redirect[Object.keys(redirect)[0]], data)), code: 302}
         }
     }
-    return null;    // nothing matched
+    return {redirectedURL: null, code: null};    // nothing matched
 }
