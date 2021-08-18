@@ -29,4 +29,6 @@ const setI18NObject = (language, i18n) => i18nCached[language] = {i18n:{...i18nC
 
 const getSessionLang = _ => session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en";
 
-export const i18n = {init, get, getI18NObject, setI18NObject, getSessionLang};
+const setSessionLang = lang => session.set($$.MONKSHU_CONSTANTS.LANG_ID, lang||"en");
+
+export const i18n = {init, get, getI18NObject, setI18NObject, getSessionLang, setSessionLang};
