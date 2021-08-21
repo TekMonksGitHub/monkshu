@@ -75,18 +75,12 @@ function _initExtensions() {
 	const extensions_dir = path.resolve(conf.extdir);
 	for (const extension of conf.extensions) {
 		console.log(`Loading extension ${extension}`);
-		const ext = require(`${extensions_dir}/${extension}.js`);  if (ext.initSync) ext.initSync();
+		const ext = require(`${extensions_dir}/${extension}.js`);  if (ext.initSync) ext.initSync(access, error);
 		extensions.push(ext);
 	}
 }
 
 async function _handleRequest(req, res) {
-	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, access, error)) {
-		access.info(`Request ${req.url} handled by extension ${extension.name}`);
-		return; // extension handled it
-	}
-
 	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
 	let fileRequested = path.resolve(conf.webroot+"/"+pathname);
 
@@ -97,6 +91,12 @@ async function _handleRequest(req, res) {
 	// don't allow reading the server tree, if requested
 	if (conf.restrictServerTree && _isSubdirectory(path.dirname(fileRequested), __dirname)) 
 		{_sendError(req, res, 404, "Path Not Found."); return;}
+		
+	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
+	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, access, error)) {
+		access.info(`Request ${req.url} handled by extension ${extension.name}`);
+		return; // extension handled it
+	}
 	
 	fs.access(fileRequested, fs.constants.R_OK, err => {
 		if (err) {_sendError(req, res, 404, "Path Not Found."); return;}
@@ -128,7 +128,7 @@ function _sendFile(fileRequested, req, res, stats) {
 			const rawStream = fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true});
 			const acceptEncodingHeader = req.headers["accept-encoding"] || "";
 
-			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && (!Array.isArray(mime) || Array.isArray(mime) && mime[1]) ) {
+			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && ((!Array.isArray(mime)) || Array.isArray(mime) && mime[1]) ) {
 				res.writeHead(200, _getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }, stats));
 				rawStream.pipe(zlib.createGzip()).pipe(res)
 				.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))

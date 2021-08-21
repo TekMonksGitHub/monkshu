@@ -17,15 +17,16 @@ const gzipAsync = require("util").promisify(require("zlib").gzip);
 const IGNORE_AFTER_MAX_HITS = conf.diskCache.ignoreAfterMaxHits||10;   // don't keep trying to read disk for 404 files
 
 const cache = {}, uncacheableREs = []; 
+let error, minifier; try {minifier = require (conf.diskCache.minifier||"terser")} catch (err) {};
 
 exports.name = "diskcache";
 
-exports.initSync = _ => {
+exports.initSync = (_accessLog, errorLog) => {
     if (conf.diskCache && conf.diskCache.refresh != 0) setInterval(_=>{
         _runCachingDeamon(conf.webroot); _purgeDeletedFiles(conf.webroot); }, conf.diskCache.refresh||1000);
     if (conf.diskCache.maxSizeInMB) conf.diskCache.maxSize = conf.diskCache.maxSizeInMB*1024*1024;
     if (conf.diskCache.dontCache) for (const re of conf.diskCache.dontCache) uncacheableREs.push(new RegExp(re));
-    cache[SIZE_KEY] = 0;
+    cache[SIZE_KEY] = 0; error = errorLog;
 }
 
 exports.processRequest = async (req, res, dataSender) => {
@@ -92,6 +93,9 @@ async function _cacheThis(pathThis, stats, hits) {
     if (!stats) stats = await fspromises.stat(pathThis); 
     const mime = conf.mimeTypes[path.extname(pathThis)]||"application/octet-stream";
     let data = await fspromises.readFile(pathThis); const sizeUncompressed = data.length;
+    if (conf.diskCache.autoUglifyJS && mime == "text/javascript" && minifier) {
+        try{data = (await minifier.minify(data.toString("utf8"), {compress: true, mangle: true})).code } catch (err) {error.error(`Path: ${pathThis}, auto uglify failed due to ${err}`)}; }
+    else if (conf.diskCache.autoUglifyJS && mime == "text/javascript" && !minifier) error.error(`Path: ${pathThis}, auto uglify selected, but terser is not installed.`);
     if (_canCompress(mime)) data = await gzipAsync(data);
 
     cache[path.resolve(pathThis)] = {
