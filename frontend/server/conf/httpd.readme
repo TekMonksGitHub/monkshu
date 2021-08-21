@@ -15,7 +15,7 @@
 	"ssl": false, <-- Set to true for HTTPS
 	"enableGZIPEncoding": true, <-- Everything will be gzip encoded if MIME supports it (see mime section),
 	"ipblacklistRefresh": 5000, <-- Refresh interval to re-read the IP blacklist, if ipblocker extension is enabled. Usually set to 5 or 10 seconds. Use conf/ipblacklist.json to add in blocked IPs. Note: add IPv6 in lowercase only.
-	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":10}, <-- Cache disk and refresh every second, don't cache PDFs, max 1 GB cache, maxSize can be maxSizeInMB or maxSize (bytes), if file not found after 10 hits, stop trying to cache. If not present disk cache will be disabled 
+	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":10, "autoUglifyJS": true, "minifier": "uglify-js"}, <-- Cache disk and refresh every second, don't cache PDFs, max 1 GB cache, maxSize can be maxSizeInMB or maxSize (bytes), if file not found after 10 hits, stop trying to cache. If not present disk cache will be disabled. Server will auto-uglify the JS files. Minifier can be uglify-js or terser.
 	"sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem", <-- Your domain's key file for SSL
 	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem", <-- Your domain's full chain file for SSL
 	"httpdHeaders": { <-- Hardcode these headers in every response
