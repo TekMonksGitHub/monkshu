@@ -17,7 +17,10 @@ const gzipAsync = require("util").promisify(require("zlib").gzip);
 const IGNORE_AFTER_MAX_HITS = conf.diskCache.ignoreAfterMaxHits||10;   // don't keep trying to read disk for 404 files
 
 const cache = {}, uncacheableREs = []; 
-let error, minifier; try {minifier = require (conf.diskCache.minifier||"terser")} catch (err) {};
+let error, minifier, htmlMinifier, cssMinifier; 
+try {minifier = require (conf.diskCache.minifier||"terser")} catch (err) {};
+try {htmlMinifier = require ("html-minifier")} catch (err) {};
+try {const CleanCSS = require ("clean-css"); cssMinifier = new CleanCSS();} catch (err) {};
 
 exports.name = "diskcache";
 
@@ -93,9 +96,22 @@ async function _cacheThis(pathThis, stats, hits) {
     if (!stats) stats = await fspromises.stat(pathThis); 
     const mime = conf.mimeTypes[path.extname(pathThis)]||"application/octet-stream";
     let data = await fspromises.readFile(pathThis); const sizeUncompressed = data.length;
+    
     if (conf.diskCache.autoUglifyJS && mime == "text/javascript" && minifier) {
         try{data = (await minifier.minify(data.toString("utf8"), {compress: true, mangle: true})).code } catch (err) {error.error(`Path: ${pathThis}, auto uglify failed due to ${err}`)}; }
     else if (conf.diskCache.autoUglifyJS && mime == "text/javascript" && !minifier) error.error(`Path: ${pathThis}, auto uglify selected, but terser is not installed.`);
+
+    if (conf.diskCache.autoMinifyHTML && mime == "text/html" && htmlMinifier) {
+        try{data = htmlMinifier.minify(data.toString("utf8"), {removeComments: true, collapseWhitespace: true, minifyCSS: true, minifyJS: true}) } catch (err) {error.error(`Path: ${pathThis}, auto HTML minify failed due to ${err}`)}; }
+    else if (conf.diskCache.autoMinifyHTML && mime == "text/html" && !htmlMinifier) error.error(`Path: ${pathThis}, auto minifyHTML selected, but html-minify is not installed.`);
+
+    if (conf.diskCache.autoMinifyCSS && mime == "text/css" && cssMinifier) {
+        try{
+            const cssResult = cssMinifier.minify(data.toString("utf8")); 
+            if (!cssResult.errors.length) data = cssResult.styles; else throw `Errors in CSS minification ${cssResult.errors}`
+        } catch (err) {error.error(`Path: ${pathThis}, auto CSS minify failed due to ${err}`)}; }
+    else if (conf.diskCache.autoMinifyCSS && mime == "text/css" && !cssMinifier) error.error(`Path: ${pathThis}, auto minifyCSS selected, but clean-css is not installed.`);
+
     if (_canCompress(mime)) data = await gzipAsync(data);
 
     cache[path.resolve(pathThis)] = {
