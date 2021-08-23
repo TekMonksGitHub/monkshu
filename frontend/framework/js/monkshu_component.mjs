@@ -24,8 +24,8 @@ function register(name, htmlTemplate, module) {
         if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
         else module.data = data; 
 
-        if (id && module.elements[id]) await module.elements[id].render(false);
-        else await module.element.render(false);
+        if (id && module.elements && module.elements[id]) await module.elements[id].render(false);
+        else if ((!id) && module.element) await module.element.render(false);
     }
 
     module.getData = id => id?module.datas?.[id]:module.data;
