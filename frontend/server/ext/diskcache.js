@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const fspromises = fs.promises;
 const crypto = require("crypto");
+const utils = require(conf.libdir+"/utils.js");
 const SIZE_KEY = "__org_monkshu_httpd_cache_size_key___";
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const IGNORE_AFTER_MAX_HITS = conf.diskCache.ignoreAfterMaxHits||10;   // don't keep trying to read disk for 404 files
@@ -25,7 +26,7 @@ try {const CleanCSS = require ("clean-css"); cssMinifier = new CleanCSS();} catc
 exports.name = "diskcache";
 
 exports.initSync = (_accessLog, errorLog) => {
-    if (conf.diskCache && conf.diskCache.refresh != 0) setInterval(_=>{
+    if (conf.diskCache && conf.diskCache.refresh != 0) utils.setIntervalImmediately(_=>{
         _runCachingDeamon(conf.webroot); _purgeDeletedFiles(conf.webroot); }, conf.diskCache.refresh||1000);
     if (conf.diskCache.maxSizeInMB) conf.diskCache.maxSize = conf.diskCache.maxSizeInMB*1024*1024;
     if (conf.diskCache.dontCache) for (const re of conf.diskCache.dontCache) uncacheableREs.push(new RegExp(re));
