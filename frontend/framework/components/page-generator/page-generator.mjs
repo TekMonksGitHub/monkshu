@@ -9,7 +9,7 @@ import {monkshu_component} from "/framework/js/monkshu_component.mjs";
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
 	page_generator.setTemplateHTML(element, await getHTML(new URL(pagePath, window.location.href), 
-		element.getAttribute("css"), JSON.parse(element.getAttribute("pageData")||"{}"))); 
+		element.getAttribute("css"), JSON.parse(decodeURIComponent(element.getAttribute("pageData")||"{}"))));
 }
 
 /**
