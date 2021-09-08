@@ -132,7 +132,8 @@ async function _evalAttrValue(str) {
 	const _recursiveExpandFunctions = async val => {
 		const testForAttrFunctions = _xregexparrayToObject(XRegExp.matchRecursive(val, "\\(", "\\)", "g", 
 			{valueNames: ["cmd","left","match","right"]}));
-		if (!testForAttrFunctions.match) return val;	// nothing to expand
+		if (!testForAttrFunctions.match || (testForAttrFunctions.cmd != "url" && 
+			testForAttrFunctions.cmd != "encodeURIComponent")) return val;	// nothing to expand
 		val = await _recursiveExpandFunctions(testForAttrFunctions.match);
 
 		if (testForAttrFunctions.cmd == "url") try {val = (await $$.requireText(val)).replace(/\r?\n|\r/g, "");} catch {}	// remove line feeds
