@@ -1,0 +1,34 @@
+{
+  "name": "monkshu",
+  "version": "2.96.0",
+  "description": "The Monkshu Project",
+  "main": "monkshu.sh",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TekMonks/monkshu.git"
+  },
+  "keywords": [
+    "JAMStack",
+    "Enterprise",
+    "Application",
+    "Server"
+  ],
+  "author": "TekMonks",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/TekMonks/monkshu/issues"
+  },
+  "homepage": "https://github.com/TekMonks/monkshu#readme",
+  "dependencies": {
+    "html-minifier": "^4.0.0",
+    "clean-css": "~5.1.5",
+    "mustache": ">4.2.0",
+    "xregexp": ">5.1.0",
+    "sqlite3": ">5.0.2",
+    "terser": ">5.8.0",
+    "uglify-js": ">3.14.2"
+  }
+}
