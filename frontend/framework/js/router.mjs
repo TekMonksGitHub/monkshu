@@ -5,7 +5,6 @@
 import {LOG} from "./log.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
 import {session} from "/framework/js/session.mjs";
-import {cacheworker} from "/framework/js/cacheworker.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
 const HS = "?.=";
@@ -159,8 +158,8 @@ function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.g
 
 function _addOfflineSupport(appName, listOfFilesToCache) {
 	if ("serviceWorker" in navigator) {
-		monkshu_env[cacheworker.CACHE_WORKER_APP_NAME] = appName;
-		monkshu_env[cacheworker.CACHE_WORKER_LIST_APP_FILES] = listOfFilesToCache;
+		monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_APP_NAME] = appName;
+		monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_LIST_APP_FILES] = listOfFilesToCache;
 		navigator.serviceWorker.register("/framework/js/cacheworker.mjs", {type: "module"});
 	} else LOG.error("Service workers not supported in the browser");
 }

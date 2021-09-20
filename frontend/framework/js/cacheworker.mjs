@@ -4,8 +4,6 @@
  * License: See enclosed LICENSE file.
  */
 
-const CACHE_WORKER_APP_NAME = "org_monkshu_router_appName", CACHE_WORKER_LIST_APP_FILES = "org_monkshu_router_listofappfiles";
-
 /**
  * Enables the cache worker
  * @param appName Name of the application 
@@ -33,10 +31,12 @@ async function registerHandleRequests() {
 }
 
 function _init(appName, listOfFilesToCache) {
-    enableCacheWorker(appName, listOfFilesToCache);
-    registerHandleRequests();
+    if (appName && listOfFilesToCache) {    // only enable if we have something to cache
+        enableCacheWorker(appName, listOfFilesToCache);
+        registerHandleRequests();
+    }
 }
 
-_init(monkshu_env[CACHE_WORKER_APP_NAME], monkshu_env[CACHE_WORKER_LIST_APP_FILES]);
+_init(monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_APP_NAME], monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_LIST_APP_FILES]);
 
 export const cacheworker = {CACHE_WORKER_APP_NAME, CACHE_WORKER_LIST_APP_FILES};
