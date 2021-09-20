@@ -3,11 +3,6 @@
  * License: MIT - see enclosed license.txt file.
  */
 
-@font-face {
-    font-family: corbert;
-    src: url(/framework/fonts/Corbert-Regular.otf);
-}
-
 #maincontent {
 	width: 992px;
 	top: 55px;
@@ -15,7 +10,8 @@
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    position: absolute;    
+    position: absolute;
+    font-family: sans-serif;
 }
 
 .error {

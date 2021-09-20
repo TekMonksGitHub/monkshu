@@ -1,6 +1,6 @@
 /* 
  * (C) 2018 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed LICENSE file.
  */
 
 import {session} from "/framework/js/session.mjs";

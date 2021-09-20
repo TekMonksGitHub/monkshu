@@ -1,6 +1,6 @@
 <!-- 
 (C) 2015 TekMonks. All rights reserved.
-License: MIT - see enclosed license.txt file.
+License: See enclosed LICENSE file.
 The Monkshu Framework
 -->
 <!doctype html>
@@ -12,9 +12,9 @@ The Monkshu Framework
 
 	<!-- Start the default app -->
 	<script type="module">
-		import {getDefaultRedirect} from "./framework/js/index.mjs";
+		import {getDefaultRedirect} from "/framework/js/index.mjs";
 		const redirect = async _ => {
-			let defaultApp = await getDefaultRedirect();
+			const defaultApp = await getDefaultRedirect();
 			if (defaultApp) window.location.href = defaultApp;
 		}
 		redirect();

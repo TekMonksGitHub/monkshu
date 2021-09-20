@@ -1,11 +1,13 @@
-/* 
+/** 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed LICENSE file.
  * 
- * DEPRECATED: Use apimanager.mjs instead
- * 
+ * @deprecated DEPRECATED: Use apimanager.mjs instead
  */
 
+/**
+ * @param url @deprecated DEPRECATED: Use apimanager.mjs instead
+ */
 async function rest(url, type, params) {
     if (!type || type.toUpperCase() == "GET") {
         params = Object.entries(params).map(e => {
@@ -22,19 +24,25 @@ async function rest(url, type, params) {
     }
 }
 
+/**
+ * @param url @deprecated DEPRECATED: Use apimanager.mjs instead
+ */
 function get(url) {
     return new Promise((resolve, reject) => 
-        callXHR("GET", url).then(response => resolve(response)).catch(err => reject(err)));
+        _callXHR("GET", url).then(response => resolve(response)).catch(err => reject(err)));
 }
 
+/**
+ * @param url @deprecated DEPRECATED: Use apimanager.mjs instead
+ */
 function post(url, params, contentType) {
     return new Promise((resolve, reject) => 
-        callXHR("POST", url, params, contentType).then(response => resolve(response)).catch(err => reject(err)));
+        _callXHR("POST", url, params, contentType).then(response => resolve(response)).catch(err => reject(err)));
 }
 
 export const xhr = {rest, get, post};
 
-function callXHR(method, url, params, contentType="application/x-www-form-urlencoded") {
+function _callXHR(method, url, params, contentType="application/x-www-form-urlencoded") {
     return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
