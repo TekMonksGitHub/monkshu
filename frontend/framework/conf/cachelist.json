@@ -1,7 +1,6 @@
 [
     "framework/3p/diffDOM.js",
     "framework/3p/mustache.min.js",
-    "framework/3p/readme.txt",
     "framework/3p/xregexp-all.js",
     "framework/components/page-generator/page-generator.mjs",
     "framework/conf/cachelist.json",
@@ -9,7 +8,6 @@
     "framework/conf/default_app.json.README",
     "framework/css/error.css",
     "framework/error.html",
-    "framework/fonts/Corbert-Regular.otf",
     "framework/img/logo_512.png",
     "framework/js/$$.js",
     "framework/js/apimanager.mjs",

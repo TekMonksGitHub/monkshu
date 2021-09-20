@@ -7,14 +7,15 @@ import {i18n} from "/framework/js/i18n.mjs";
 import {session} from "/framework/js/session.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
-const HS = "?.=";
+const HS = "?.=", FRAMEWORK_FILELIST = "/framework/conf/cachelist.json";
 
 function setAppAsPWA(appName, shortName, description, url, background_color, theme_color, icons, listOfFilesToCache) {
-	if (!listOfFilesToCache) {LOG.error("Can't set app as PWA without offline support and list of files"); return;}
+	if (!listOfFilesToCache) {LOG.error("Can't set app as PWA without offline support and list of files."); return;}
+	if (!appName) {LOG.error("Can't set app as PWA without app name."); return;}
 	const appManifest = JSON.stringify({name: appName, shortName, description, start_url: url, background_color, theme_color, icons});
 	const link = document.createElement("link"); link.rel = "manifest"; link.setAttribute("href", 
 		"data:application/json;charset=utf-8," + encodeURIComponent(appManifest)); document.head.appendChild(link);
-	_addOfflineSupport(appName, listOfFilesToCache);
+	if (!_addOfflineSupport(appName, listOfFilesToCache)) LOG.error("PWA setup failed in caching. Check logs.");
 }
 
 async function loadPage(url, dataModels={}) {
@@ -157,11 +158,14 @@ const getMustache = _ => window.monkshu_env["__org_monkshu_mustache"];
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
 function _addOfflineSupport(appName, listOfFilesToCache) {
-	if ("serviceWorker" in navigator) {
-		monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_APP_NAME] = appName;
-		monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_LIST_APP_FILES] = listOfFilesToCache;
-		navigator.serviceWorker.register("/framework/js/cacheworker.mjs", {type: "module"});
-	} else LOG.error("Service workers not supported in the browser");
+	if (!("serviceWorker" in navigator)) { LOG.error("Service workers not supported in the browser"); return false; }
+	if ((!appName) || (!listOfFilesToCache)) { LOG.error("Missing app name or list of files, refusing to cache"); return false; }
+	
+	const finalListOfFilesToCache = listOfFilesToCache.unshift($$.requireJSON(FRAMEWORK_FILELIST));
+	monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_APP_NAME] = appName;
+	monkshu_env[$$.MONKSHU_CONSTANTS.CACHE_WORKER_LIST_APP_FILES] = finalListOfFilesToCache;
+	navigator.serviceWorker.register("/framework/js/cacheworker.mjs", {type: "module"});
+	return true;
 }
 
 export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, 
