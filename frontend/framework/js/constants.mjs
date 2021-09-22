@@ -8,7 +8,6 @@ const LANG_ID = "com_monkshu_lang";
 const PAGE_URL = "__org_monkshu_router_url";
 const PAGE_DATA = "__org_monkshu_router_data";
 
-const CACHE_WORKER_APP_NAME = "org_monkshu_router_appName";
-const CACHE_WORKER_LIST_APP_FILES = "org_monkshu_router_listofappfiles";
+const CACHEWORKER_MSG = "org_monkshu_cacheworker_msg";
 
-export const MONKSHU_CONSTANTS = {ERROR_HTML, LANG_ID, PAGE_URL, PAGE_DATA, CACHE_WORKER_APP_NAME, CACHE_WORKER_LIST_APP_FILES};
+export const MONKSHU_CONSTANTS = {ERROR_HTML, LANG_ID, PAGE_URL, PAGE_DATA, CACHEWORKER_MSG};

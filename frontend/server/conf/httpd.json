@@ -23,8 +23,7 @@
 		"Server": "Monkshu HTTPD",
 		"X-XSS-Protection": 1,
 		"X-Frame-Options": "deny",
-		"X-Content-Type-Options": "nosniff",
-		"Cache-Control": "max-age=31536000, public"
+		"X-Content-Type-Options": "nosniff"
 	},
 	"mimeTypes" : {
 		".html":	"text/html",
