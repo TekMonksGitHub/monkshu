@@ -15,8 +15,15 @@ function enableCacheWorker() {
         const cache = await caches.open("__org_monkshu__app_cache"+appName);
         return cache.addAll(listOfFilesToCache);
     }
-    self.addEventListener("install", async e => e.waitUntil(self.skipWaiting()));   // take over immediately
-    self.addEventListener("activate", e => e.waitUntil(clients.claim()));   // we will handle everything
+
+    self.addEventListener("install", e => {
+        e.waitUntil(self.skipWaiting()); // take over immediately
+    });   
+    
+    self.addEventListener("activate", e => {
+        e.waitUntil(clients.claim())    // we will handle everything
+    });   
+
     self.addEventListener("message", e => {
         const message = e.data; if (message.id != MONKSHU_CONSTANTS.CACHEWORKER_MSG) return;    // not for us        
         if (message.op == "cache") e.waitUntil(cacheFunction(message.appName, message.listOfFilesToCache));

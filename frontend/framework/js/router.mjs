@@ -11,12 +11,11 @@ import {securityguard} from "/framework/js/securityguard.mjs";
 const HS = "?.=", FRAMEWORK_FILELIST = "/framework/conf/cachelist.json";
 
 function setAppAsPWA(listOfFilesToCache, manifest) {
-	if (!listOfFilesToCache) {LOG.error("Can't set app as PWA without offline support and list of files."); return;}
-	if (!manifest?.name) {LOG.error("Can't set app as PWA without an application name."); return;}
-	const appManifest = JSON.stringify(manifest);
-	const link = document.createElement("link"); link.rel = "manifest"; link.setAttribute("href", 
-		"data:application/json;charset=utf-8," + encodeURIComponent(appManifest)); document.head.appendChild(link);
+	if (!listOfFilesToCache) {LOG.error("Can't set app as a PWA without offline support and list of files."); return;}
+	if (!manifest?.name) {LOG.error("Can't set app as a PWA without a manifest or application name."); return;}
+	_addWebManifest(getCurrentAppName(), manifest);
 	if (!_addOfflineSupport(manifest.name, listOfFilesToCache)) LOG.error("PWA setup failed in caching. Check logs.");
+	monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`] = {isPWA: true};
 }
 
 async function loadPage(url, dataModels={}) {
@@ -48,6 +47,10 @@ async function loadPage(url, dataModels={}) {
 	if (window.monkshu_env.pageload_funcs[url]) for (const func of window.monkshu_env.pageload_funcs[url]) await func(dataModels, url);
 	if (window.monkshu_env.pageload_funcs[baseURL]) for (const func of window.monkshu_env.pageload_funcs[baseURL]) await func(dataModels, url);
 	if (window.monkshu_env.pageload_funcs["*"]) for (const func of window.monkshu_env.pageload_funcs["*"]) await func(dataModels, url);
+
+	// inject PWA manifests if setup for this app
+	if (monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`] && 
+		monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`].isPWA) _addWebManifest(getCurrentAppName(url));
 }
 
 async function loadHTML(url, dataModels, checkSecurity = true) {
@@ -158,13 +161,22 @@ const getMustache = _ => window.monkshu_env["__org_monkshu_mustache"];
 
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 
+function getCurrentAppName(url) {	// relies on URL being in Monkshu standard format, i.e. <hostname>/apps/<appname>/...
+	const path = new URL(url||window.location.href).pathname;
+	const appName = path.split("/")[2];
+	return appName;
+}
+
 async function _addOfflineSupport(appName, listOfFilesToCache) {
 	if (!("serviceWorker" in navigator)) { LOG.error("Service workers not supported in the browser"); return false; }
 	if ((!appName) || (!listOfFilesToCache)) { LOG.error("Missing app name or list of files, refusing to cache"); return false; }
 	
 	let finalListOfFilesToCache = util.clone(listOfFilesToCache); 
+	if (monkshu_env.__org_monkshu_pwa_filelist) finalListOfFilesToCache.unshift(...monkshu_env.__org_monkshu_pwa_filelist);
+	monkshu_env.__org_monkshu_pwa_filelist = util.clone(finalListOfFilesToCache);
 	finalListOfFilesToCache.unshift(...await $$.requireJSON(FRAMEWORK_FILELIST));
 	finalListOfFilesToCache = finalListOfFilesToCache.map(file => util.resolveURL(file));	// make all URLs proper
+	finalListOfFilesToCache = [...new Set(finalListOfFilesToCache)];	// remove duplicates
 
 	navigator.serviceWorker.register("/framework/js/cacheworker.mjs", {type: "module", scope: "/"});
 	const registration = await navigator.serviceWorker.ready; 
@@ -173,6 +185,18 @@ async function _addOfflineSupport(appName, listOfFilesToCache) {
 	return true;
 }
 
+function _addWebManifest(app, manifest) {
+	if (!monkshu_env.__org_monkshu_router_appmanifests) monkshu_env.__org_monkshu_router_appmanifests = {};
+	if (!monkshu_env.__org_monkshu_router_appmanifests[app]) monkshu_env.__org_monkshu_router_appmanifests[app] = manifest;
+	
+	const manifestObj = monkshu_env.__org_monkshu_router_appmanifests[app];
+	if (!manifestObj) {LOG.warn(`Missing web manifest for ${app}.`); return;}
+
+	const appManifest = JSON.stringify(manifestObj);
+	const link = document.createElement("link"); link.rel = "manifest"; link.setAttribute("href", 
+		"data:application/manifest+json;charset=utf-8," + appManifest); document.head.appendChild(link);
+}
+
 export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, 
 	encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, getCurrentURL, getCurrentPageData, 
-	setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, setAppAsPWA};
+	setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, setAppAsPWA, getCurrentAppName};

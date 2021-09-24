@@ -6,5 +6,6 @@
 const debug = s => console.debug(`[DEBUG] ${s}`);
 const info = s => console.log(`[INFO] ${s}`);
 const error = s => console.error(`[ERROR] ${s}`);
+const warn = s => console.warn(`[WARNING] ${s}`);
 
-export const LOG = {debug, info, error};
+export const LOG = {debug, info, error, warn};
