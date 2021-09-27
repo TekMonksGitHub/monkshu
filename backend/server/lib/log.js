@@ -13,7 +13,7 @@ const logQueue = []; let pendingWrites = false;	// queueing mechanism for synchr
 function initGlobalLoggerSync(logName) {
 	/* create the logger */
 	if (!fs.existsSync(CONSTANTS.LOGDIR)) {fs.mkdirSync(CONSTANTS.LOGDIR);}
-	let filewriter = ffs.createFileWriter(logName,log_conf.closeTimeOut,"utf8");
+	const filewriter = ffs.createFileWriter(logName,log_conf.closeTimeOut,"utf8");
 	
 	global.LOG = new Logger(logName, log_conf.max_log_mb*1024*1024, filewriter);	// 100 MB log max
 	
@@ -80,7 +80,7 @@ Logger.prototype.writeFile = function(level, s, sync) {
 	const msg = JSON.stringify({ts: utils.getDateTime(), level, message: s})+"\n";
 	
 	if (sync === undefined) {
-		const writeFile = msg => {
+		const queuedWrite = msg => {
 			pendingWrites = true;
 			this.filewriter.writeFile(msg, err => {
 				pendingWrites = false;
@@ -89,13 +89,13 @@ Logger.prototype.writeFile = function(level, s, sync) {
 					this._origLog(msg);
 					this._oldStderrWrite.call(process.stderr, "Logger error!\n");
 					this._oldStderrWrite.call(process.stderr, msg);
-				} else if (logQueue.length) writeFile(logQueue.shift());
+				} else if (logQueue.length) queuedWrite(logQueue.shift());
 			});
 		}
 
 		if (log_conf.sync_log) {
-			logQueue.push(msg); if (logQueue.length == 1 && !pendingWrites) writeFile(logQueue.shift());
-		} else writeFile(msg);
+			logQueue.push(msg); if (logQueue.length == 1 && !pendingWrites) queuedWrite(logQueue.shift());
+		} else queuedWrite(msg);
 	} else {
 		try {fs.appendFileSync(this.path, msg);}
 		catch (err){
