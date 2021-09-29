@@ -10,6 +10,7 @@ if not defined APP_NAME GOTO USAGE
 
 mklink /d "%CURPATH%\backend\apps" "%APP_DIR%\%APP_NAME%\backend\apps"
 mklink /d "%CURPATH%\frontend\apps" "%APP_DIR%\%APP_NAME%\frontend\apps"
+mklink /d "%CURPATH%\electron\app" "%APP_DIR%\%APP_NAME%\electron\app"
 
 echo Done.
 goto END

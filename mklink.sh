@@ -13,5 +13,6 @@ APP_NAME=$1
 
 ln -s "$APP_DIR/$APP_NAME/backend/apps" "$CURPATH/backend/apps" 
 ln -s "$APP_DIR/$APP_NAME/frontend/apps" "$CURPATH/frontend/apps"
+ln -s "$APP_DIR/$APP_NAME/electron/app" "$CURPATH/electron/app"
 
 echo Done.

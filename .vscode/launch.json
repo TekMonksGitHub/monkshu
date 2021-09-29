@@ -32,6 +32,18 @@
             "program": "${workspaceFolder}/backend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks"],
             "outFiles": ["${workspaceFolder}/backend/**/*.js"]
-        }
+        },
+        {
+            "name": "Launch Electron",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            },
+            "args" : ["${workspaceFolder}/electron/framework/main.js"],
+            "outputCapture": "std"
+          }
     ]
 }
