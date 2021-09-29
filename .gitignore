@@ -2,6 +2,7 @@ backend/server/logs/*
 frontend/server/logs/*
 backend/apps
 frontend/apps
+electron/app
 .chrome
 .DS_Store
 debug.log
