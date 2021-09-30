@@ -44,6 +44,15 @@
             },
             "args" : ["${workspaceFolder}/electron/framework/main.js"],
             "outputCapture": "std"
-          }
+          },
+          {
+              "name": "Build Electron Native App",
+              "type": "node",
+              "request": "launch",
+              "cwd": "${workspaceFolder}",
+              "program": "${workspaceFolder}/../xforge/xforge",
+              "args" : ["-c", "-f", "${workspaceFolder}/electron/buildApp.xf.js", "-o", "rsjspeedxejs", "-o", "${workspaceFolder}"],
+              "outputCapture": "std"
+            }
     ]
 }

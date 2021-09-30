@@ -17,7 +17,7 @@ const menuTemplate = [
 		{ type: "separator" }, { role: "hide" }, { role: "hideOthers" }, { role: "unhide" }, 
 		{ type: "separator" }, { role: "quit" }]}] : []),
 	{label: "File", submenu: [{ role: "quit" }]},
-	{role: "help", submenu: [{label: "Learn More", click: async () => {shell.openExternal(appconf.help)}}]}
+	{role: "help", submenu: [{label: "Learn More", click: async () => {shell.openExternal(appconf.homepage)}}]}
 ];
 
 function _getMainAppPath() {

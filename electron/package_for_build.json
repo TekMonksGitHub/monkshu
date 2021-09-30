@@ -1,0 +1,30 @@
+{
+  "name": "monkshunative",
+  "version": "{{version}}",
+  "description": "{{apptooltip}}",
+  "main": "framework/main.js",
+  "scripts": {
+    "start": "electron.sh.bat framework/main.js"
+  },
+  "author": "{{company}}",
+  "license": "{{license}}",
+  "homepage": "{{homepage}}",
+  "dependencies": {
+    "mustache": "latest"
+  },
+  "devDependencies": {
+    "electron-prebuilt-compile": "latest"
+  },
+  "build": {
+    "appId": "{{appid}}",
+    "productName": "{{productname}}",
+    "mac": {
+      "target": "dmg",
+      "icon": "app/{{monkshuappname}}/{{logo}}"
+    },
+    "win": {
+      "target": "default",
+      "icon": "app/{{monkshuappname}}/{{logo}}"
+    }
+  }
+}
