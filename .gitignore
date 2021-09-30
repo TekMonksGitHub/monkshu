@@ -9,3 +9,4 @@ debug.log
 frontend/framework/conf/default_app.json
 !frontend/framework/conf/default_app.json.README
 node_modules
+**/package-lock.json
