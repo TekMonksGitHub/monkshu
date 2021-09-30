@@ -25,10 +25,14 @@ exports.make = async function(monkshuAppName, output_dir) {
         await os_cmd(buildCmd, true);
 
         // move to the output directory, if given
+        if (await CONSTANTS.SHELL.test("-e", `${output_dir}/dist`)) await CONSTANTS.SHELL.rm("-rf", `${output_dir}/dist`);
         if (output_dir && (await CONSTANTS.SHELL.mv(`${MONKSHU_ELECTRON_PATH}/dist`, output_dir)).code != 0)
             CONSTANTS.HANDLE_BUILD_ERROR("Unable to move the generated binaries.")
 
-        await CONSTANTS.SHELL.rm(`${MONKSHU_ELECTRON_PATH}/package.json`); await CONSTANTS.SHELL.rm(`${MONKSHU_ELECTRON_PATH}/package-lock.json`); 
+        // cleanup
+        if (await CONSTANTS.SHELL.test("-e", `${MONKSHU_ELECTRON_PATH}/package.json`)) await CONSTANTS.SHELL.rm(`${MONKSHU_ELECTRON_PATH}/package.json`); 
+        if (await CONSTANTS.SHELL.test("-e", `${MONKSHU_ELECTRON_PATH}/package-lock.json`)) await CONSTANTS.SHELL.rm(`${MONKSHU_ELECTRON_PATH}/package-lock.json`); 
+        if (await CONSTANTS.SHELL.test("-e", `${MONKSHU_ELECTRON_PATH}/node_modules`)) await CONSTANTS.SHELL.rm("-rf", `${MONKSHU_ELECTRON_PATH}/node_modules`); 
 
         CONSTANTS.LOGSUCCESS();
     } catch (err) {
