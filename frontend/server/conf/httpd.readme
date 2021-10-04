@@ -47,3 +47,10 @@
 	"restrictServerTree": true, <-- Don't serve anything outside webroot
 	"timeout": 120000 <-- Server timeout waiting for response
 }
+
+App Specific Redirects
+=======================
+"extensions": ["redirect"],
+"redirects": [{"^http://localhost:8080/index.html$":"http://localhost:8080/apps/[your app]/index.html"},
+	{"^http://localhost:8080/$":"http://localhost:8080/apps/[your app]/index.html"},
+	{"^http://localhost:8080$":"http://localhost:8080/apps/[your app]/index.html"}]

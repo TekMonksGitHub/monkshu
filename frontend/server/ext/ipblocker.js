@@ -10,7 +10,7 @@ let ipblacklist = [];
 
 exports.name = "ipblocker";
 exports.initSync = _ => utils.watchFile(`${conf.confdir}/ipblacklist.json`, data=>ipblacklist=JSON.parse(data), conf.ipblacklistRefresh||10000);	
-exports.processRequest = async (req, res, _dataSender, _errorSender, _access, error) => {
+exports.processRequest = async (req, res, _dataSender, _errorSender, _codeSender, _access, error) => {
     if (_isBlacklistedIP(req)) { error.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); // blacklisted, won't honor
         res.socket.destroy(); res.end(); return true; } 
     else return false;

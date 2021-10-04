@@ -8,7 +8,7 @@
 const mustache = require("mustache");
 
 exports.name = "rewriteurl";
-exports.processRequest = async (req, _res, _dataSender, _errorSender, access) => {
+exports.processRequest = async (req, _res, _dataSender, _errorSender, _codeSender, access, _error) => {
     const protocol = req.connection.encrypted ? "https" : "http",
         rewrittenURL = _getRewrittenURL(new URL(req.url, `${protocol}://${req.headers.host}/`));
 

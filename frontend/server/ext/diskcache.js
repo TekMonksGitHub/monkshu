@@ -33,7 +33,7 @@ exports.initSync = (_accessLog, errorLog) => {
     cache[SIZE_KEY] = 0; error = errorLog;
 }
 
-exports.processRequest = async (req, res, dataSender) => {
+exports.processRequest = async (req, res, dataSender, _errorSender, codeSender, _access, _error) => {
     if (!conf.diskCache || conf.diskCache.refresh == 0) return false;   // disk caching is disabled
 
     const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
@@ -46,7 +46,8 @@ exports.processRequest = async (req, res, dataSender) => {
     if (!cache[fileRequested].data && conf.diskCache.maxSize) _tryToCache(fileRequested, cache[fileRequested].hits);    // run LRU if there are size limits
 
     if (cache[fileRequested] && cache[fileRequested].data && fileRequested != SIZE_KEY) {
-        dataSender(res, 200, {
+        const eTagMatches = utils.etagsMatch(req.headers["if-none-match"], cache[fileRequested].etag);
+        if (eTagMatches) codeSender(req, res, 304, "No change."); else dataSender(res, 200, {
             "Content-Type": cache[fileRequested].mime, 
             "Content-Length": cache[fileRequested].size,
             "Last-Modified": cache[fileRequested].modified,

@@ -8,7 +8,7 @@
 const mustache = require("mustache");
 
 exports.name = "redirect";
-exports.processRequest = async (req, res, dataSender, _errorSender, access) => {
+exports.processRequest = async (req, res, dataSender, _errorSender, _codeSender, access, _error) => {
 	const protocol = req.connection.encrypted ? "https" : "http",
         {redirectedURL, code} = _getRedirectedURL(new URL(req.url, `${protocol}://${req.headers.host}/`))||{redirectedURL:null, code:null}; 
 	if (!redirectedURL) return false;

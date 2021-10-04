@@ -10,7 +10,7 @@ const utils = require(`${conf.libdir}/utils.js`);
 const httpClient = require(`${conf.libdir}/httpClient.js`);
 
 exports.name = "proxy";
-exports.processRequest = async (req, res, dataSender, errorSender, access) => {
+exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, access, _error) => {
     const protocol = req.connection.encrypted ? "https" : "http",
         proxiedURL = _getProxiedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false;
 

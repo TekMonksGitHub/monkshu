@@ -109,6 +109,12 @@ function watchFile(path, opIfModified, frequency) {
 }
 
 const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
-    
+
+function etagsMatch(etagHeader, etag) {
+    if (!etagHeader) return false;
+    const etagsAllowed = etagHeader.split(",").map(value => value.trim());
+    return (etagsAllowed.includes(etag) || etagsAllowed.includes(`W/${etag}`));
+}
+
 module.exports = { copyFile, getDateTime, getClientIP, getClientPort, getEmbeddedIPV4, union, setIntervalImmediately,
-    expandIPv6Address, watchFile };
+    expandIPv6Address, watchFile, etagsMatch };

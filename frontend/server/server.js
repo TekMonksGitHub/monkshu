@@ -2,7 +2,7 @@
  * A simple, static http GET server. 
  * 
  * (C) 2015 TekMonks. All rights reserved.
- * License: See enclosed file.
+ * License: See enclosed LICENSE file.
  */
 
 const extensions = [];
@@ -11,7 +11,9 @@ const zlib = require("zlib");
 const path = require("path");
 const http = require("http");
 const https = require("https");
-let access; let error;
+const fspromises = fs.promises;
+
+let access, error, utils;
 
 exports.bootstrap = bootstrap;
 
@@ -44,7 +46,7 @@ function _initConfSync() {
 	conf.confdir = path.resolve(conf.confdir);
 	conf.accesslog = path.resolve(conf.accesslog);
 	conf.errorlog = path.resolve(conf.errorlog);
-	const utils = require(conf.libdir+"/utils.js");
+	utils = require(conf.libdir+"/utils.js");
 
 	// merge web app conf files into main http server, for app specific configuration directives
 	if (fs.existsSync(`${__dirname}/../apps/`)) for (const app of fs.readdirSync(`${__dirname}/../apps/`)) if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
@@ -93,58 +95,70 @@ async function _handleRequest(req, res) {
 		{_sendError(req, res, 404, "Path Not Found."); return;}
 		
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, access, error)) {
+	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, _sendCode, access, error)) {
 		access.info(`Request ${req.url} handled by extension ${extension.name}`);
 		return; // extension handled it
 	}
 	
-	fs.access(fileRequested, fs.constants.R_OK, err => {
-		if (err) {_sendError(req, res, 404, "Path Not Found."); return;}
+	try {
+		fspromises.access(fileRequested, fs.constants.R_OK);	// test file can be read
+		const stats = await fspromises.stat(fileRequested);
+		if (stats.isDirectory()) { 
+			fileRequested += "/" + conf.indexfile;
+			stats = await fspromises.stat(fileRequested);
+		}
 
-		fs.stat(fileRequested, (err, stats) => {
-			if (err) {_sendError(req, res, 404, "Path Not Found."); return;}
-			
-			if (stats.isDirectory()) fileRequested += "/" + conf.indexfile;
-			_sendFile(fileRequested, req, res, stats);
-		});
-	});
+		if (utils.etagsMatch(req.headers["if-none-match"], _genEtag(stats))) {
+			_sendCode(req, res, 304, "Not changed."); return; }
+		
+		_sendFile(fileRequested, req, res, stats);	// nothing matched, send the file
+	} catch (err) {_sendError(req, res, 404, "Path Not Found."); return;}
 }
 
 function _getServerHeaders(headers, stats) {
 	if (conf.httpdHeaders) headers = { ...headers, ...conf.httpdHeaders };
 	if (stats) {
 		headers["Last-Modified"] = stats.mtime.toGMTString();
-		headers["ETag"] = `${stats.ino}-${stats.mtimeMs}-${stats.size}`;
+		headers["ETag"] = _genEtag(stats);
 	}
 	return headers;
 }
 
-function _sendFile(fileRequested, req, res, stats) {
-	fs.open(fileRequested, "r", (err, fd) => {	
-		if (err) (err.code === "ENOENT") ? _sendError(req, res, 404, "Path Not Found.") : _sendError(req, res, 500, err);
-		else {
-			access.info(`Sending: ${fileRequested}`);
-			const mime = conf.mimeTypes[path.extname(fileRequested)];
-			const rawStream = fs.createReadStream(null, {"flags":"r","fd":fd,"autoClose":true});
-			const acceptEncodingHeader = req.headers["accept-encoding"] || "";
+const _genEtag = stats => `${stats.ino}-${stats.mtimeMs}-${stats.size}`;
 
-			if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && ((!Array.isArray(mime)) || Array.isArray(mime) && mime[1]) ) {
-				res.writeHead(200, _getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }, stats));
-				rawStream.pipe(zlib.createGzip()).pipe(res)
+async function _sendFile(fileRequested, req, res, stats) {
+	try {		
+		access.info(`Sending: ${fileRequested}`);
+		const mime = conf.mimeTypes[path.extname(fileRequested)];
+		const rawStream = fs.createReadStream(fileRequested, {"flags":"r","autoClose":true});
+		const acceptEncodingHeader = req.headers["accept-encoding"] || "";
+
+		if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && ((!Array.isArray(mime)) || Array.isArray(mime) && mime[1]) ) {
+			res.writeHead(200, _getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }, stats));
+			rawStream.pipe(zlib.createGzip()).pipe(res)
+			.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
+			.on("end", _ => res.end());
+		} else {
+			res.writeHead(200, mime ? _getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}, stats) : _getServerHeaders({}, stats));
+			rawStream.on("data", chunk => res.write(chunk, "binary"))
 				.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
 				.on("end", _ => res.end());
-			} else {
-				res.writeHead(200, mime ? _getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}, stats) : _getServerHeaders({}, stats));
-				rawStream.on("data", chunk => res.write(chunk, "binary"))
-					.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
-					.on("end", _ => res.end());
-			}
 		}
-	});
+	} catch (err) {
+		if (err && err.code === "ENOENT") _sendError(req, res, 404, "Path Not Found.");
+		else _sendError(req, res, 500, err);
+	}
 }
 
 function _sendError(req, res, code, message) {
-	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}`);
+	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}${message.stack?", Stack: "+message.stack:""}`);
+	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
+	res.write(`${code} ${message}\n`);
+	res.end();
+}
+
+function _sendCode(req, res, code, message) {
+	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}`);
 	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();

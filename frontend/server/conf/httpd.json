@@ -1,10 +1,9 @@
 {
+	"COMMENT": "Please see httpd.readme for a full list of options",
+	
 	"port": 8080,
 	"host": "::",
-	"extensions": ["redirect"],
-	"redirects": [{"^http://localhost:8080/index.html$":"http://localhost:8080/apps/[your app]/index.html"},
-		{"^http://localhost:8080/$":"http://localhost:8080/apps/[your app]/index.html"},
-		{"^http://localhost:8080$":"http://localhost:8080/apps/[your app]/index.html"}],
+	"extensions": [],
 	"webroot": "./../",
 	"logdir": "./logs",
 	"libdir": "./lib",
@@ -15,15 +14,12 @@
 	"indexfile": "index.html",
 	"ssl": false,
 	"enableGZIPEncoding": true,
-	"ipblacklistRefresh": 5000,
-	"diskCache": {"refresh": 10000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":"2", "autoUglifyJS": true, "minifier": "uglify-js", "autoMinifyHTML": true, "autoMinifyCSS": true},
-	"sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem",
-	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem",
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
 		"X-XSS-Protection": 1,
 		"X-Frame-Options": "deny",
-		"X-Content-Type-Options": "nosniff"
+		"X-Content-Type-Options": "nosniff",
+		"Service-Worker-Allowed": "/"
 	},
 	"mimeTypes" : {
 		".html":	"text/html",
