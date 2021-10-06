@@ -45,15 +45,24 @@
             },
             "args" : ["${workspaceFolder}/desktop/framework/main.js"],
             "outputCapture": "std"
-          },
-          {
-              "name": "Build Desktop Native App",
-              "type": "node",
-              "request": "launch",
-              "cwd": "${workspaceFolder}",
-              "program": "${workspaceFolder}/../xforge/xforge",
-              "args" : ["-c", "-f", "${workspaceFolder}/desktop/buildApp.xf.js", "-o", "rsjspeedxejs", "-o", "${workspaceFolder}"],
-              "outputCapture": "std"
-            }
+        },
+        {
+            "name": "Build Desktop Native App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/../xforge/xforge",
+            "args" : ["-c", "-f", "${workspaceFolder}/build/buildApp.xf.js"],
+            "outputCapture": "std"
+        },
+        {
+            "name": "Build Cachelists",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/../xforge/xforge",
+            "args" : ["-c", "-f", "${workspaceFolder}/build/genCacheableFilesList.xf.js"],
+            "outputCapture": "std"
+        }
     ]
 }

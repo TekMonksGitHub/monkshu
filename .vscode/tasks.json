@@ -4,18 +4,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Delete Chrome Profile",
+            "label": "Real Delete Chrome Profile",
             "type": "shell",
             "linux": {"command": "rm -rf '${workspaceFolder}/.chrome'"},
             "osx": {"command": "rm -rf '${workspaceFolder}/.chrome'"},
             "windows": {"command": "cmd.exe /c \"rmdir /s /q \"\"${workspaceFolder}\\.chrome\"\"\""}
         },
         {
-            "label": "Delete Electron Cache",
+            "label": "Real Delete Electron Cache",
             "type": "shell",
             "linux": {"command": "rm -rf '${env:HOME}/.config/Electron'"},
             "osx": {"command": "rm -rf '${env:HOME}/Library/Application Support/Electron'"},
             "windows": {"command": "cmd.exe /c \"rmdir /s /q \"\"${env:APPDATA}\\Electron\"\"\""}
-        }
+        },
+        {
+            "label": "Build Cachelists",
+            "type": "shell",
+            "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genCacheableFilesList.xf.js'"},
+            "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genCacheableFilesList.xf.js'"},
+            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genCacheableFilesList.xf.js\""}
+        },
+        {
+            "label": "Delete Electron Cache",
+            "dependsOn": ["Real Delete Electron Cache", "Build Cachelists"]
+        },
+        {
+            "label": "Delete Chrome Profile",
+            "dependsOn": ["Real Delete Chrome Profile", "Build Cachelists"]
+        },
     ]
 }
