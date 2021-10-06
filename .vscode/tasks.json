@@ -6,9 +6,16 @@
         {
             "label": "Delete Chrome Profile",
             "type": "shell",
-            "linux": {"command": "rm -rf ${workspaceFolder}/.chrome"},
-            "osx": {"command": "rm -rf ${workspaceFolder}/.chrome"},
+            "linux": {"command": "rm -rf '${workspaceFolder}/.chrome'"},
+            "osx": {"command": "rm -rf '${workspaceFolder}/.chrome'"},
             "windows": {"command": "cmd.exe /c \"rmdir /s /q \"\"${workspaceFolder}\\.chrome\"\"\""}
+        },
+        {
+            "label": "Delete Electron Cache",
+            "type": "shell",
+            "linux": {"command": "rm -rf '${env:HOME}/.config/Electron'"},
+            "osx": {"command": "rm -rf '${env:HOME}/Library/Application Support/Electron'"},
+            "windows": {"command": "cmd.exe /c \"rmdir /s /q \"\"${env:APPDATA}\\Electron\"\"\""}
         }
     ]
 }
