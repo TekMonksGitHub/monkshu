@@ -35,7 +35,7 @@ function broadcastMessage(topic, message) {
 /**
  * Returns the array of discoverable listenrs for the given topic
  * @param topic The topic for which discoverable listeners are required
- * @returns The array of discoverable listenrs for the given topic
+ * @returns The array of discoverable listeners for the given topic
  */
 function getListeners(topic) {
     topic = topic.toLowerCase();
