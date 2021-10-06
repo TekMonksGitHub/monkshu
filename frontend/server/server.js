@@ -102,7 +102,7 @@ async function _handleRequest(req, res) {
 	
 	try {
 		fspromises.access(fileRequested, fs.constants.R_OK);	// test file can be read
-		const stats = await fspromises.stat(fileRequested);
+		let stats = await fspromises.stat(fileRequested);
 		if (stats.isDirectory()) { 
 			fileRequested += "/" + conf.indexfile;
 			stats = await fspromises.stat(fileRequested);

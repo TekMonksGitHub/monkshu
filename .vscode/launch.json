@@ -34,7 +34,7 @@
             "outFiles": ["${workspaceFolder}/backend/**/*.js"]
         },
         {
-            "name": "Launch Electron",
+            "name": "Launch Desktop App",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -42,16 +42,16 @@
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             },
-            "args" : ["${workspaceFolder}/electron/framework/main.js"],
+            "args" : ["${workspaceFolder}/desktop/framework/main.js"],
             "outputCapture": "std"
           },
           {
-              "name": "Build Electron Native App",
+              "name": "Build Desktop Native App",
               "type": "node",
               "request": "launch",
               "cwd": "${workspaceFolder}",
               "program": "${workspaceFolder}/../xforge/xforge",
-              "args" : ["-c", "-f", "${workspaceFolder}/electron/buildApp.xf.js", "-o", "rsjspeedxejs", "-o", "${workspaceFolder}"],
+              "args" : ["-c", "-f", "${workspaceFolder}/desktop/buildApp.xf.js", "-o", "rsjspeedxejs", "-o", "${workspaceFolder}"],
               "outputCapture": "std"
             }
     ]
