@@ -102,8 +102,8 @@ async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToC
                     else if (pwaUpdateResult.action) postSwitchActions.push(pwaUpdateResult.action);
                 }
             
-                serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", appName, 
-                    except_version: manifestNew.version});
+                serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", 
+                    appName, except_version: manifestNew.version});
 
                 if (postSwitchActions.length) for (const action of postSwitchActions) action();
                 else setTimeout(router.hardreload, 500);    // else hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
