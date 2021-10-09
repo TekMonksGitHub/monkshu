@@ -3,25 +3,26 @@
  * (C) 2018 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
-import {LOG} from "./log.mjs";
-import {util} from "./util.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
 import {session} from "/framework/js/session.mjs";
+import {pwasupport} from "/framework/js/pwasupport.mjs"
 import {securityguard} from "/framework/js/securityguard.mjs";
 
-const HS = "?.=", FRAMEWORK_FILELIST = "/framework/conf/cachelist.json";
+const HS = "?.=", PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_data";
 
 /**
- * Sets the given app as PWA
- * @param listOfFilesToCache List of files to cache
- * @param manifest The webmanifest of the app
+ * Sets the current app as PWA
+ * @param appName 		Optional: The application name (monkshu app name), if not provided will be
+ * 				  		auto-detected from the current URL.
+ * @param manifestdata  Optional: Manifest data 
  */
-function setAppAsPWA(listOfFilesToCache, manifest) {
-	if (!listOfFilesToCache) {LOG.error("Can't set app as a PWA without offline support and list of files."); return;}
-	if (!manifest?.name) {LOG.error("Can't set app as a PWA without a manifest or application name."); return;}
-	_addWebManifest(getCurrentAppName(), manifest);
-	if (!_addOfflineSupport(manifest.name, listOfFilesToCache, manifest.version)) LOG.error("PWA setup failed in caching. Check logs.");
-	monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`] = {isPWA: true};
+async function setAppAsPWA(appName=getCurrentAppName(), manifestdata={}) {
+	const manifest = await pwasupport.addWebManifest(appName, null, manifestdata); if (!manifest) {
+		$$.LOG.error("Can't set app as a PWA without a proper webmanifest."); return; }
+	const serviceWorker = await pwasupport.addOfflineSupport(appName, manifest); 
+	if (!serviceWorker) $$.LOG.error("PWA setup failed in caching. Check logs.");
+	monkshu_env.frameworklibs[`org_monkshu_router_apps_env_${appName}`] = {isPWA: true};
+	await pwasupport.setupPWAVersionChecks(appName, manifest);
 }
 
 /**
@@ -31,6 +32,10 @@ function setAppAsPWA(listOfFilesToCache, manifest) {
  */
 async function loadPage(url, dataModels={}) {
 	const urlParsed = new URL(url, window.location.href), baseURL = urlParsed.origin + urlParsed.pathname; url = urlParsed.href;	// normalize
+
+	// in case of hard reloads etc we may have saved transient data
+	if (session.get(PAGE_TRANSIENT_DATA) && !Object.keys(dataModels).length) dataModels = session.get(PAGE_TRANSIENT_DATA);
+	if (session.get(PAGE_TRANSIENT_DATA)) session.remove(PAGE_TRANSIENT_DATA);
 
 	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
 	const history = session.get("__org_monkshu_router_history"); let hash;
@@ -60,8 +65,8 @@ async function loadPage(url, dataModels={}) {
 	if (window.monkshu_env.pageload_funcs["*"]) for (const func of window.monkshu_env.pageload_funcs["*"]) await func(dataModels, url);
 
 	// inject PWA manifests if setup for this app
-	if (monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`] && 
-		monkshu_env[`org_monkshu_router_apps${getCurrentAppName()}`].isPWA) _addWebManifest(getCurrentAppName(url));
+	const appName = getCurrentAppName(url); 
+	if (monkshu_env.frameworklibs[`org_monkshu_router_apps_env_${appName}`]?.isPWA) pwasupport.addWebManifest(appName);
 }
 
 /**
@@ -79,7 +84,7 @@ async function loadHTML(url, dataModels, checkSecurity = true) {
 		let [html, _] = await Promise.all([
 			fetch(url, {mode: "no-cors", cache: "default"}).then(response => response.text()), 
 			$$.require("/framework/3p/mustache.min.js")]);
-		window.monkshu_env["__org_monkshu_mustache"] = Mustache;
+		window.monkshu_env.frameworklibs["__org_monkshu_mustache"] = Mustache;
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
 		if (window.monkshu_env.pagedata_funcs[urlParsed.href]) for (const func of window.monkshu_env.pagedata_funcs[urlParsed.href]) await func(dataModels, url);
@@ -234,10 +239,16 @@ const setCurrentPageData = data => session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, d
 const getLastSessionURL = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_URL);
 
 /** Returns the Mustache instance being used by the framework */
-const getMustache = _ => window.monkshu_env["__org_monkshu_mustache"];
+const getMustache = _ => window.monkshu_env.frameworklibs["__org_monkshu_mustache"];
 
 /** Reloads the page */
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
+
+/** Hard reloads the page */
+function hardreload() {
+	session.set(PAGE_TRANSIENT_DATA, session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));
+	location.reload();
+}
 
 /** Returns the current app's name */
 function getCurrentAppName(url) {	// relies on URL being in Monkshu standard format, i.e. <hostname>/apps/<appname>/...
@@ -246,37 +257,7 @@ function getCurrentAppName(url) {	// relies on URL being in Monkshu standard for
 	return appName;
 }
 
-async function _addOfflineSupport(appName, listOfFilesToCache, version) {
-	if (!("serviceWorker" in navigator)) { LOG.error("Service workers not supported in the browser"); return false; }
-	if ((!appName) || (!listOfFilesToCache)) { LOG.error("Missing app name or list of files, refusing to cache"); return false; }
-	
-	let finalListOfFilesToCache = util.clone(listOfFilesToCache); 
-	if (monkshu_env.__org_monkshu_pwa_filelist) finalListOfFilesToCache.unshift(...monkshu_env.__org_monkshu_pwa_filelist);
-	monkshu_env.__org_monkshu_pwa_filelist = util.clone(finalListOfFilesToCache);
-	finalListOfFilesToCache.unshift(...await $$.requireJSON(FRAMEWORK_FILELIST));
-	finalListOfFilesToCache = finalListOfFilesToCache.map(file => util.resolveURL(file));	// make all URLs proper
-	finalListOfFilesToCache = [...new Set(finalListOfFilesToCache)];	// remove duplicates
-
-	navigator.serviceWorker.register("/framework/js/cacheworker.mjs", {type: "module", scope: "/"});
-	const registration = await navigator.serviceWorker.ready; 
-	registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", 
-		appName, listOfFilesToCache: finalListOfFilesToCache, version});	// start caching
-	registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "serve", appName, version});	// start serving
-	return true;
-}
-
-function _addWebManifest(app, manifest) {
-	if (!monkshu_env.__org_monkshu_router_appmanifests) monkshu_env.__org_monkshu_router_appmanifests = {};
-	if (!monkshu_env.__org_monkshu_router_appmanifests[app]) monkshu_env.__org_monkshu_router_appmanifests[app] = manifest;
-	
-	const manifestObj = monkshu_env.__org_monkshu_router_appmanifests[app];
-	if (!manifestObj) {LOG.warn(`Missing web manifest for ${app}.`); return;}
-
-	const appManifest = JSON.stringify(manifestObj);
-	const link = document.createElement("link"); link.rel = "manifest"; link.setAttribute("href", 
-		"data:application/manifest+json;charset=utf-8," + appManifest); document.head.appendChild(link);
-}
-
-export const router = {reload, loadPage, loadHTML, isInHistory, runShadowJSScripts, getPageData, expandPageData, decodeURL, 
-	encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, getCurrentURL, getCurrentPageData, 
-	setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, setAppAsPWA, getCurrentAppName};
+export const router = {loadPage, loadHTML, reload, hardreload, isInHistory, runShadowJSScripts, getPageData, 
+	expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, 
+	getCurrentURL, getCurrentPageData, setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, 
+	setAppAsPWA, getCurrentAppName};

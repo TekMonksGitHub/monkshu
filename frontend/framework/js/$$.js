@@ -97,7 +97,7 @@ $$.__fetchThrowErrorOnNotOK = async url => {
 }
 
 $$.boot = async appPath => {
-    window.LOG = await import("/framework/js/log.mjs");
+    $$.LOG = (await import("/framework/js/log.mjs")).LOG;
     const {bootstrap} = await import("/framework/js/bootstrap.mjs");
     bootstrap(appPath);
 }

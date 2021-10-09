@@ -18,6 +18,7 @@
     "framework/js/index.mjs",
     "framework/js/log.mjs",
     "framework/js/monkshu_component.mjs",
+    "framework/js/pwasupport.mjs",
     "framework/js/router.mjs",
     "framework/js/securityguard.mjs",
     "framework/js/session.mjs",
