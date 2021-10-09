@@ -9,7 +9,7 @@ import {blackboard} from "/framework/js/blackboard.mjs";
 
 const FRAMEWORK_FILELIST = `/framework/${$$.MONKSHU_CONSTANTS.CACHELIST_SUFFIX}`, 
     DEFAULT_VERSION_CHECK_FREQUENCY = 300000, CACHE_WORKER_URL = "/framework/js/cacheworker.mjs",
-    VERSION_SWITCH_EVENT_LISTENERS = {};
+    VERSION_SWITCH_IN_PROGRESS = {};
     
 /**
  * Adds web manifest to the current document
@@ -83,25 +83,30 @@ function setupPWAVersionChecks(appName, manifest) {
 async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToCache) {
     if (manifestOld.version >= manifestNew.version) return;   // no new version detected
 
-    serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", appName, listOfFilesToCache, 
-        version: manifestNew.version});
+    if (!VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]) {
+        VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version] = true;
 
-    if (!VERSION_SWITCH_EVENT_LISTENERS[appName+manifestNew.version]) {
-        VERSION_SWITCH_EVENT_LISTENERS[appName+manifestNew.version] = true;
+        serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", appName, listOfFilesToCache, 
+            version: manifestNew.version}); // cache new version
         window.addEventListener("message", async event => {
             const message = event.data; if ((message?.id != $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG)) return;
 
             // app caching completed, try to switch to the new version
             if (message.op == "cacheComplete" && message.app == appName && message.version == manifestNew.version) {
-                delete VERSION_SWITCH_EVENT_LISTENERS[appName+manifestNew.version]; // got the complete event
+                delete VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]; // got the cache complete event
 
-                for (const listener of blackboard.getListeners($$.MONKSHU_CONSTANTS.PWA_UPDATE_MESSAGE)) 
-                    if (!await listener({app: appName, manifestOld, manifestNew})) return;    // veto to prevent version upgrade
+                const postSwitchActions = [];
+                for (const listener of blackboard.getListeners($$.MONKSHU_CONSTANTS.PWA_UPDATE_MESSAGE)) {
+                    const pwaUpdateResult = await listener({app: appName, manifestOld, manifestNew});
+                    if (!pwaUpdateResult) return;   // got veto to prevent version upgrade
+                    else if (pwaUpdateResult.action) postSwitchActions.push(pwaUpdateResult.action);
+                }
             
                 serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", appName, 
                     except_version: manifestNew.version});
 
-                setTimeout(router.hardreload, 500);    // hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
+                if (postSwitchActions.length) for (const action of postSwitchActions) action();
+                else setTimeout(router.hardreload, 500);    // else hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
             }
         });
     }
