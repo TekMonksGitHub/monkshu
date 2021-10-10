@@ -57,21 +57,13 @@ function _enableCacheWorker() {
  */
  function _registerRequestHandler() {
     self.addEventListener("fetch", e => e.respondWith(new Promise(async resolve => {
-        if (_justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) {    // forced network fetch handler
-            const urlToFetch = e.request.url.replace(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH, "");
-            const newRequest = new Request(urlToFetch, e.request);
-            LOG.debug(`Forced network read for ${urlToFetch}.`);
-            resolve(await fetch(newRequest));    // no request handler responded that they can handle this, go to the network
-            return;
-        }
-
         if (requestHandlers.length) for (const requestHandler of requestHandlers) if (await requestHandler.canHandle(e)) {
             resolve(await requestHandler.handle(e)); 
             return; 
         }
 
         LOG.debug(`Cache miss for request ${e.request.url}.`);
-        resolve(await fetch(e.request));    // no request handler responded that they can handle this, go to the network
+        resolve(await _errorHandeledFetch(e.request));    // no request handler responded that they can handle this, go to the network
     })));
 }
 
@@ -88,12 +80,14 @@ async function _cache(appName, version, listOfFilesToCache, client) {
 
     const fetchRequests = {};
     for (const file of listOfFilesToCache) {
-        const response = await fetch(file); fetchRequests[file] = response;
+        const response = await _errorHandeledFetch(file); 
         if (!response.ok) LOG.error(`Can't cache ${file}, for app ${appName} response not ok, response status is ${response.status}, ${response.statusText}.`);
+        else fetchRequests[file] = response;
     }
     
     for (const key in fetchRequests) if (key != END_OF_CACHE_MARKER) await cache.put(key, fetchRequests[key]); 
-    await cache.put(END_OF_CACHE_MARKER, fetchRequests[END_OF_CACHE_MARKER]||fetch(END_OF_CACHE_MARKER)); _cacheReady[cacheSig] = true;
+    await cache.put(END_OF_CACHE_MARKER, fetchRequests[END_OF_CACHE_MARKER] || await _errorHandeledFetch(END_OF_CACHE_MARKER)); 
+    _cacheReady[cacheSig] = true;
 
     LOG.debug(`Service worker caching completed for ${appName}, version ${version}`); 
     client.postMessage({id: MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cacheComplete", app: appName, version});
@@ -148,11 +142,15 @@ const _getCacheKeyAppName = cacheKey => cacheKey.startsWith("__org_monkshu__app_
 const _getCacheKeyAppVersion = cacheKey => cacheKey.startsWith("__org_monkshu__app_cache_#$.")? cacheKey.substring("__org_monkshu__app_cache_#$.".length).split("#$.")[1] : null;
 
 /**
- * Standardizes URLs to cache keys, strips query params and #s.
- * @param url The URL to standardize
- * @returns The URL after standardization
+ * Fetch and return offline errors as empty response with 500, offline error.
+ * @param request The request to fetch
+ * @returns The response (promise) or a Response object with 500, offline error.
  */
-const _justURL = url => url.replace(/([^:]\/)\/+/g, "$1").split("?")[0].split("#")[0];
+async function _errorHandeledFetch(request){
+    try { return await fetch(request); } catch (err) {
+        return new Response("", { "status" : 500 , "statusText" : "offline" });
+    }
+}
 
 /** Private Classes */
 class RequestHandler {
@@ -172,14 +170,16 @@ class RequestHandler {
      * @param e The incoming request event
      * @returns true if this handler can handle this request, else false
      */
-    async canHandle(e) {
+    async canHandle(e) {        
         if (!_cacheReady[_getCacheKey(this.appName, this.version)]) {
             LOG.debug(`Cache not ready for app ${this.appName}, version ${this.version}, refusing to handle request ${e.request.url}.`)
             return false;
         }
 
+        if (this.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) return true;   // can always network fetch
+
         const cache = await caches.open(_getCacheKey(this.appName, this.version));
-        if (await cache.match(_justURL(e.request.url))) return true;
+        if (await cache.match(this.#justURL(e.request.url))) return true;
         else return false;
     }
 
@@ -188,10 +188,31 @@ class RequestHandler {
      * @param e The incoming request event.
      */
     async handle(e) {
+        if (this.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) return this.#networkFetch(e);
+
         const cache = await caches.open(_getCacheKey(this.appName, this.version));
-        const cacheKey = _justURL(e.request.url); // monkshu assets don't change based on query params
-        const response = await cache.match(_justURL(cacheKey));
+        const cacheKey = this.#justURL(e.request.url); // monkshu assets don't change based on query params
+        const response = await cache.match(this.#justURL(cacheKey));
         if (!response) LOG.debug(`Cache miss for app ${this.appName}, version ${this.version} and request ${e.request.url}.`);
-        return response || await fetch(e.request);    // we won't add to cache, APIs are dynamic for example
+        return response || _errorHandeledFetch(e.request);    // we won't add to cache, APIs are dynamic for example
     }
+
+    /**
+     * Network fetches the given forced network URL
+     * @param e The incoming event 
+     * @returns The fetch response object via network
+     */
+    async #networkFetch(e) {
+        const urlToFetch = e.request.url.replace(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH, "");
+        const newRequest = new Request(urlToFetch, e.request);
+        LOG.debug(`Forced network read for ${urlToFetch}.`);
+        return _errorHandeledFetch(newRequest);    // return from the network
+    }
+
+    /**
+     * Standardizes URLs to cache keys, strips query params and #s.
+     * @param url The URL to standardize
+     * @returns The URL after standardization
+     */
+    #justURL = url => url.replace(/([^:]\/)\/+/g, "$1").split("?")[0].split("#")[0];
 }

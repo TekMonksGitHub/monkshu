@@ -22,7 +22,7 @@ async function setAppAsPWA(appName=getCurrentAppName(), manifestdata={}) {
 	const serviceWorker = await pwasupport.addOfflineSupport(appName, manifest); 
 	if (!serviceWorker) $$.LOG.error("PWA setup failed in caching. Check logs.");
 	monkshu_env.frameworklibs[`org_monkshu_router_apps_env_${appName}`] = {isPWA: true};
-	await pwasupport.setupPWAVersionChecks(appName, manifest);
+	await pwasupport.setupPWAVersionChecks(appName, manifest, serviceWorker);
 }
 
 /**

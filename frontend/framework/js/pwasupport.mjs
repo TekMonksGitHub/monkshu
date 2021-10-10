@@ -9,7 +9,7 @@ import {blackboard} from "/framework/js/blackboard.mjs";
 
 const FRAMEWORK_FILELIST = `/framework/${$$.MONKSHU_CONSTANTS.CACHELIST_SUFFIX}`, 
     DEFAULT_VERSION_CHECK_FREQUENCY = 300000, CACHE_WORKER_URL = "/framework/js/cacheworker.mjs",
-    VERSION_SWITCH_IN_PROGRESS = {};
+    VERSION_SWITCH_IN_PROGRESS = {}, PAGE_RELOAD_ON_UPGRADE_INTERVAL = 500;
     
 /**
  * Adds web manifest to the current document
@@ -65,51 +65,61 @@ async function addOfflineSupport(appName, manifest) {
  * Sets up PWA version checks and upgrades the app if newer version is found.
  * @param appName The application name (monkshu app name)
  * @param manifest The application webmanifest
+ * @param serviceWorker The active service worker
  */
-function setupPWAVersionChecks(appName, manifest) {
+function setupPWAVersionChecks(appName, manifest, serviceWorker) {
 	setInterval(async _ => {
         try {
             const forceNW = $$.MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH;
-            const manifestNew = await $$.requireJSON(_getAppWebManifestURL(appName)+forceNW);
-            const appList = await $$.requireJSON(_getAppCachelistURL(appName)+forceNW);
-            const appListFramework = await $$.requireJSON(FRAMEWORK_FILELIST+forceNW);
+            const manifestNew = await $$.requireJSON(_getAppWebManifestURL(appName)+forceNW, true);
+            const appList = await $$.requireJSON(_getAppCachelistURL(appName)+forceNW, true);
+            const appListFramework = await $$.requireJSON(FRAMEWORK_FILELIST+forceNW, true);
 
             const listOfFilesToCache = _combineFileLists(appList, appListFramework);
-            _versionChecker(appName, manifest, manifestNew, listOfFilesToCache);
+            _versionChecker(appName, manifest, manifestNew, listOfFilesToCache, serviceWorker);
         } catch (err) { LOG.debug(`Version check being skipped due to error, ${err}.`); }
 	}, manifest.versionCheckFrequency || DEFAULT_VERSION_CHECK_FREQUENCY);
 }
 
-async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToCache) {
+/**
+ * Will check versions, cache new version if available, and then switch and clean
+ * old caches if the user decides to upgrade. Will issue event with Monkshu Blackboard
+ * with ID $$.MONKSHU_CONSTANTS.PWA_UPDATE_MESSAGE, the listeners can show a message to the
+ * user and return true, false (skip upgrade) or function which should be executed once
+ * the upgrade is completely (typically logout and reaload the app). If true is returned
+ * then the page will be auto hard-reloaded once the version upgrade is complete.
+ * @param appName The app name (monkshu app name)
+ * @param manifestOld The old manifest (from cache)
+ * @param manifestNew The new manifest (from network)
+ * @param listOfFilesToCache List of files to cache (from network)
+ * @param serviceWorker The active service worker
+ */
+async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToCache, serviceWorker) {
     if (manifestOld.version >= manifestNew.version) return;   // no new version detected
+    if (VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]) return;    // version switch already underway
+    else VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version] = true;   
 
-    if (!VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]) {
-        VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version] = true;
+    serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", appName, listOfFilesToCache, 
+        version: manifestNew.version}); // cache new version
+    window.addEventListener("message", async event => { // switch when caching is complete
+        const message = event.data; if ((message?.id != $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG)) return;
+        if (message.op != "cacheComplete" || message.app != appName || message.version != manifestNew.version) return;
+        
+        delete VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]; // got the cache complete event
 
-        serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", appName, listOfFilesToCache, 
-            version: manifestNew.version}); // cache new version
-        window.addEventListener("message", async event => {
-            const message = event.data; if ((message?.id != $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG)) return;
+        const postSwitchActions = [];
+        for (const listener of blackboard.getListeners($$.MONKSHU_CONSTANTS.PWA_UPDATE_MESSAGE)) {
+            const pwaUpdateResult = await listener({app: appName, manifestOld, manifestNew});
+            if (!pwaUpdateResult) return;   // got veto to prevent version upgrade
+            else if (pwaUpdateResult !== true) postSwitchActions.push(pwaUpdateResult); // function returned
+        }
+    
+        serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", 
+            appName, except_version: manifestNew.version});
 
-            // app caching completed, try to switch to the new version
-            if (message.op == "cacheComplete" && message.app == appName && message.version == manifestNew.version) {
-                delete VERSION_SWITCH_IN_PROGRESS[appName+manifestNew.version]; // got the cache complete event
-
-                const postSwitchActions = [];
-                for (const listener of blackboard.getListeners($$.MONKSHU_CONSTANTS.PWA_UPDATE_MESSAGE)) {
-                    const pwaUpdateResult = await listener({app: appName, manifestOld, manifestNew});
-                    if (!pwaUpdateResult) return;   // got veto to prevent version upgrade
-                    else if (pwaUpdateResult.action) postSwitchActions.push(pwaUpdateResult.action);
-                }
-            
-                serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", 
-                    appName, except_version: manifestNew.version});
-
-                if (postSwitchActions.length) for (const action of postSwitchActions) action();
-                else setTimeout(router.hardreload, 500);    // else hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
-            }
-        });
-    }
+        if (postSwitchActions.length) for (const action of postSwitchActions) action();
+        else setTimeout(router.hardreload, PAGE_RELOAD_ON_UPGRADE_INTERVAL);    // else hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
+    });
 }
 
 const _getAppRootURL = appName => `/apps/${appName}`;

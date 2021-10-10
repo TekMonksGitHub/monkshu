@@ -21,10 +21,10 @@ $$.import = async (url, scope = window) => {
 }
 
 $$.__loadedJS = {};
-$$.require = async (url, targetDocument = document) => {
+$$.require = async (url, targetDocument = document, nocache) => {
     url = new URL(url, window.location).href;        // Normalize
 
-    if (Object.keys($$.__loadedJS).includes(url)) { // already loaded
+    if (Object.keys($$.__loadedJS).includes(url) && !nocache) { // already loaded
         const script = document.createElement("script");
         script.text = $$.__loadedJS[url];
         const scriptNode = script.cloneNode(true);
@@ -40,9 +40,9 @@ $$.require = async (url, targetDocument = document) => {
 }
 
 $$.__loadedCSS = [];
-$$.requireCSS = url => {
+$$.requireCSS = (url, nocache) => {
     url = new URL(url, window.location).href;        // Normalize
-    if ($$.__loadedCSS.includes(url)) return Promise.resolve();    // already loaded
+    if ($$.__loadedCSS.includes(url) && !nocache) return Promise.resolve();    // already loaded
 
     return new Promise((resolve, reject) => {
         const link = document.createElement("link");
@@ -53,10 +53,10 @@ $$.requireCSS = url => {
 }
 
 $$.__loadedJSON = {};
-$$.requireJSON = async url => {
+$$.requireJSON = async (url, nocache) => {
     url = new URL(url, window.location).href;        // Normalize
 
-    if (Object.keys($$.__loadedJSON).includes(url)) return $$.__loadedJSON[url];   // already loaded
+    if (Object.keys($$.__loadedJSON).includes(url) && !nocache) return $$.__loadedJSON[url];   // already loaded
     else try {
         const json = await (await $$.__fetchThrowErrorOnNotOK(url)).json();
         $$.__loadedJSON[url]=json; return $$.__loadedJSON[url];
@@ -64,10 +64,10 @@ $$.requireJSON = async url => {
 }
 
 $$.__loadedText = {};
-$$.requireText = async url => {
+$$.requireText = async (url, nocache) => {
     url = new URL(url, window.location).href;        // Normalize
 
-    if (Object.keys($$.__loadedText).includes(url)) return $$.__loadedText[url];   // already loaded
+    if (Object.keys($$.__loadedText).includes(url) && !nocache) return $$.__loadedText[url];   // already loaded
     else try {
         const text = await (await $$.__fetchThrowErrorOnNotOK(url)).text();
         $$.__loadedText[url]=text; return $$.__loadedText[url];
@@ -76,9 +76,9 @@ $$.requireText = async url => {
 
 $$.__loadedPlugins = [];
 $$.getLoadedPlugins = _ => $$.__loadedPlugins;
-$$.importPlugin = url => {
+$$.importPlugin = (url, nocache) => {
     url = new URL(url, window.location).href;        // Normalize
-    if ($$.__loadedPlugins.includes(url)) return Promise.resolve();   // already loaded
+    if ($$.__loadedPlugins.includes(url) && !nocache) return Promise.resolve();   // already loaded
 
     return new Promise( (resolve, reject) => {
         import (url).then(exported => {
@@ -92,7 +92,7 @@ $$.importPlugin = url => {
 
 $$.__fetchThrowErrorOnNotOK = async url => {
     const response = await fetch(url, {mode:"no-cors", cache: "default"});
-    if (!response.ok) throw new Error(`Issue in fetch, status returned is ${response.status}`);
+    if (!response.ok) throw new Error(`Issue in fetch, status returned is ${response.status} ${response.statusText}`);
     else return response;
 }
 
