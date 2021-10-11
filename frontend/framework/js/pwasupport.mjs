@@ -27,6 +27,7 @@ async function addWebManifest(appName, manifest, manifestData={}) {
 	
 	const manifestObj = monkshu_env.frameworklibs.__org_monkshu_router_appmanifests[appName];
 	if (!manifestObj) {$$.LOG.warn(`Missing web manifest for ${appName}.`); return;}
+    if (parseFloat(manifestObj.version) == NaN) {$$.LOG.warn(`Bad version ${manifestObj.version} in web manifest for ${appName}.`); return;}
 
 	const appManifest = JSON.stringify(manifestObj);
 	const link = document.createElement("link"); link.rel = "manifest"; link.setAttribute("href", 
@@ -101,7 +102,7 @@ async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToC
 
     serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", appName, listOfFilesToCache, 
         version: manifestNew.version}); // cache new version
-    window.addEventListener("message", async event => { // switch when caching is complete
+    navigator.serviceWorker.addEventListener("message", async event => { // switch when caching is complete
         const message = event.data; if ((message?.id != $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG)) return;
         if (message.op != "cacheComplete" || message.app != appName || message.version != manifestNew.version) return;
         

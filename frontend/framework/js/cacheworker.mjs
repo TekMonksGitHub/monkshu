@@ -21,7 +21,7 @@
 import {LOG} from "/framework/js/log.mjs";
 import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 
-const END_OF_CACHE_MARKER = import.meta.url;
+const END_OF_CACHE_MARKER = import.meta.url, CACHESIG_PRE = "__org_monkshu__app_cache", CACHESIG_SPLITTER = "#$.";
 
 let _cacheReady = {}, requestHandlers = [];
 
@@ -112,13 +112,16 @@ function _serve(appName, version) {
  * @param versionToSave The version to save, delete all else
  */
 async function _unserveAllVersionsExcept(appName, versionToSave) {
-    _serve(appName, versionToSave);
+    _serve(appName, versionToSave); // start serving the new version
 
     requestHandlers = requestHandlers.filter(handler => handler.getAppName() != appName || (
-        handler.getAppName() == appName && handler.getVersion() == versionToSave));
+        handler.getAppName() == appName && handler.getVersion() == versionToSave)); // clean request handlers
     
-    for (const key of await caches.keys()) if (_getCacheKeyAppName(key) == appName && 
-        _getCacheKeyAppVersion(key) != versionToSave) await caches.delete(key);
+    for (const key of await caches.keys()) if (_getCacheKeyAppName(key) == appName && // clean cache
+        parseFloat(_getCacheKeyAppVersion(key)) != parseFloat(versionToSave)) await caches.delete(key); 
+
+    for (const cacheSig in _cacheReady) if (_getCacheKeyAppName(cacheSig) == appName && // clean cache ready flags
+        parseFloat(_getCacheKeyAppVersion(cacheSig)) != parseFloat(versionToSave)) delete _cacheReady[cacheSig];    
 }
 
 /**
@@ -127,19 +130,19 @@ async function _unserveAllVersionsExcept(appName, versionToSave) {
  * @param version The app version
  * @return The cache key for this app
  */
-const _getCacheKey = (appName, version) => `__org_monkshu__app_cache#$.${appName}#$.${version}`;
+const _getCacheKey = (appName, version) => CACHESIG_PRE+CACHESIG_SPLITTER+appName+CACHESIG_SPLITTER+version;
 /**
  * Returns app name from a given cache key
  * @param cacheKey The cache key
  * @returns The app name, if it is for a monkshu app, else null
  */
-const _getCacheKeyAppName = cacheKey => cacheKey.startsWith("__org_monkshu__app_cache_#$.")? cacheKey.substring("__org_monkshu__app_cache_#$.".length).split("#$.")[0] : null;
+const _getCacheKeyAppName = cacheKey => cacheKey.startsWith(CACHESIG_PRE)? cacheKey.substring(CACHESIG_PRE.length).split(CACHESIG_SPLITTER)[1] : null;
 /**
  * Returns app version from a given cache key
  * @param cacheKey The cache key
  * @returns The app verion, if it is for a monkshu app, else null
  */
-const _getCacheKeyAppVersion = cacheKey => cacheKey.startsWith("__org_monkshu__app_cache_#$.")? cacheKey.substring("__org_monkshu__app_cache_#$.".length).split("#$.")[1] : null;
+const _getCacheKeyAppVersion = cacheKey => cacheKey.startsWith(CACHESIG_PRE)? parseFloat(cacheKey.substring(CACHESIG_PRE.length).split(CACHESIG_SPLITTER)[2]) : null;
 
 /**
  * Fetch and return offline errors as empty response with 500, offline error.
