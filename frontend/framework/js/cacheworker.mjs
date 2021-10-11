@@ -63,7 +63,7 @@ function _enableCacheWorker() {
         }
 
         LOG.debug(`Cache miss for request ${e.request.url}.`);
-        resolve(await _errorHandeledFetch(e.request));    // no request handler responded that they can handle this, go to the network
+        resolve(await RequestHandler.networkFetch(e));    // no request handler responded that they can handle this, go to the network
     })));
 }
 
@@ -179,10 +179,10 @@ class RequestHandler {
             return false;
         }
 
-        if (this.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) return true;   // can always network fetch
+        if (RequestHandler.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) return true;   // can always network fetch
 
         const cache = await caches.open(_getCacheKey(this.appName, this.version));
-        if (await cache.match(this.#justURL(e.request.url))) return true;
+        if (await cache.match(RequestHandler.#justURL(e.request.url))) return true;
         else return false;
     }
 
@@ -191,11 +191,14 @@ class RequestHandler {
      * @param e The incoming request event.
      */
     async handle(e) {
-        if (this.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) return this.#networkFetch(e);
+        if (RequestHandler.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH)) {
+            LOG.debug(`Forced network read for ${e.request.url}.`);
+            return RequestHandler.networkFetch(e);
+        }
 
         const cache = await caches.open(_getCacheKey(this.appName, this.version));
-        const cacheKey = this.#justURL(e.request.url); // monkshu assets don't change based on query params
-        const response = await cache.match(this.#justURL(cacheKey));
+        const cacheKey = RequestHandler.#justURL(e.request.url); // monkshu assets don't change based on query params
+        const response = await cache.match(RequestHandler.#justURL(cacheKey));
         if (!response) LOG.debug(`Cache miss for app ${this.appName}, version ${this.version} and request ${e.request.url}.`);
         return response || _errorHandeledFetch(e.request);    // we won't add to cache, APIs are dynamic for example
     }
@@ -205,10 +208,11 @@ class RequestHandler {
      * @param e The incoming event 
      * @returns The fetch response object via network
      */
-    async #networkFetch(e) {
-        const urlToFetch = e.request.url.replace(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH, "");
+    static async networkFetch(e) {
+        const urlToFetch = RequestHandler.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH) ?
+            e.request.url.replace(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH, "") : e.request.url;
+        LOG.debug(`Performing network fetch for URL ${urlToFetch}`);
         const newRequest = new Request(urlToFetch, e.request);
-        LOG.debug(`Forced network read for ${urlToFetch}.`);
         return _errorHandeledFetch(newRequest);    // return from the network
     }
 
@@ -217,5 +221,5 @@ class RequestHandler {
      * @param url The URL to standardize
      * @returns The URL after standardization
      */
-    #justURL = url => url.replace(/([^:]\/)\/+/g, "$1").split("?")[0].split("#")[0];
+    static #justURL = url => url.replace(/([^:]\/)\/+/g, "$1").split("?")[0].split("#")[0];
 }
