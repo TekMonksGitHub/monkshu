@@ -4,13 +4,13 @@ CURPATH="$( cd "$( dirname "$0" )" && pwd )"
 pushd .
 cd "$CURPATH"
 mkdir node_modules
-call npm install mustache
+npm install mustache
 
-call npm install sqlite3
-call npm install terser
-call npm install uglify-js
-call npm install html-minifier
-call npm install clean-css
+npm install sqlite3
+npm install terser
+npm install uglify-js
+npm install html-minifier
+npm install clean-css
 
 npm install --save-dev electron
 popd
