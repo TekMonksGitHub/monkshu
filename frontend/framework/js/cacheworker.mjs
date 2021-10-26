@@ -212,8 +212,35 @@ class RequestHandler {
         const urlToFetch = RequestHandler.#justURL(e.request.url).endsWith(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH) ?
             e.request.url.replace(MONKSHU_CONSTANTS.FORCE_NETWORK_FETCH, "") : e.request.url;
         LOG.debug(`Performing network fetch for URL ${urlToFetch}`);
-        const newRequest = new Request(urlToFetch, e.request);
+        const newRequest = e.request.url == urlToFetch ? e.request : await RequestHandler.#duplicateRequestWithNewURL(urlToFetch, e.request);
         return _errorHandeledFetch(newRequest);    // return from the network
+    }
+
+    static async #duplicateRequestWithNewURL(url, request) {
+        const duplicatedRequest = new Request(url, (request.method.toLowerCase() != "get") && (request.method.toLowerCase() != "head") ?
+            {
+                method: request.method,
+                headers: [...request.headers],
+                body: await request.blob(),
+                mode: request.mode,
+                credentials: request.credentials,
+                cache: request.cache,
+                redirect: request.redirect,
+                referrer: request.referrer,
+                integrity: request.integrity
+            } : 
+            {
+            method: request.method,
+            headers: [...request.headers],
+            mode: request.mode,
+            credentials: request.credentials,
+            cache: request.cache,
+            redirect: request.redirect,
+            referrer: request.referrer,
+            integrity: request.integrity
+            }
+        );
+        return duplicatedRequest;
     }
 
     /**
