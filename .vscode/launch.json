@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
             "name": "Launch Frontend",
             "request": "launch",
@@ -63,6 +64,12 @@
             "program": "${workspaceFolder}/../xforge/xforge",
             "args" : ["-c", "-f", "${workspaceFolder}/build/genCacheableFilesList.xf.js"],
             "outputCapture": "std"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch All - Backend, HTTPD and Frontend",
+            "configurations": ["Launch Backend", "Launch HTTPD", "Launch Frontend"]
         }
     ]
 }
