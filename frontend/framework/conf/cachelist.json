@@ -5,6 +5,7 @@
     "framework/components/page-generator/page-generator.mjs",
     "framework/conf/cachelist.json",
     "framework/conf/default_app.json.README",
+    "framework/conf/frameworklibs.json",
     "framework/css/error.css",
     "framework/error.html",
     "framework/img/logo_512.png",
