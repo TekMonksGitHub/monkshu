@@ -26,6 +26,17 @@ async function setAppAsPWA(appName=getCurrentAppName(), manifestdata={}) {
 }
 
 /**
+ * Navigates to the given URL, this is different than loadPage which will
+ * load it without changing Window location.
+ * @param url The URL to navigate to
+ */
+ function navigate(url) {
+	let normalizedUrl = new URL(url, window.location.href).href;	// normalize
+	if (normalizedUrl.indexOf(HS) == -1) normalizedUrl = encodeURL(url);
+	window.location = normalizedUrl;
+}
+
+/**
  * Loads the given page into the browser tab.
  * @param url The URL to load - can be either in hashed form, or the actual page URL
  * @param dataModels Data models object
@@ -257,7 +268,7 @@ function getCurrentAppName(url) {	// relies on URL being in Monkshu standard for
 	return appName;
 }
 
-export const router = {loadPage, loadHTML, reload, hardreload, isInHistory, runShadowJSScripts, getPageData, 
+export const router = {navigate, loadPage, loadHTML, reload, hardreload, isInHistory, runShadowJSScripts, getPageData, 
 	expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, 
 	getCurrentURL, getCurrentPageData, setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, 
 	setAppAsPWA, getCurrentAppName};

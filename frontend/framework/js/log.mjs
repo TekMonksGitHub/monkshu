@@ -12,4 +12,5 @@ const error = s => console.error(`[ERROR] ${s}`);
 const warn = s => console.warn(`[WARNING] ${s}`);
 const setDebug = flag => debugFlag = flag;
 
-export const LOG = {debug, info, error, warn, setDebug};
+export const log = {debug, info, error, warn, setDebug};
+export const LOG = log; // for backwards compatibility
