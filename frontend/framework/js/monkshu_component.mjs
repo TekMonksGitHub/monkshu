@@ -30,7 +30,7 @@ function register(name, htmlTemplate, module) {
 
     module.getData = id => id?module.datas?.[id]:module.data;
 
-    module.getHostElementByID = id => module.elements[id];
+    module.getHostElementByID = id => id && module.elements && module.elements[id] ? module.elements[id] :  module.element;
     module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
     module.getHostElementID = element => module.trueWebComponentMode ? element.getRootNode().host.id : element.closest(name).id;
 
@@ -73,9 +73,9 @@ function register(name, htmlTemplate, module) {
     }
 
     module.reload = async id => {
-        module.clearMemory(id); 
-        if (module.elementConnected) await module.elementConnected(module.elements[id]); 
-        await module.elements[id].render(false);
+        module.clearMemory(id);  const host = module.getHostElementByID(id);
+        if (module.elementConnected) await module.elementConnected(host); 
+        await host.render(false);
     }
 
     module.getComponentPath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
