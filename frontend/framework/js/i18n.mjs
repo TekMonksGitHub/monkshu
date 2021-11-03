@@ -27,7 +27,7 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 
 const setI18NObject = (language, i18n) => i18nCached[language] = {i18n:{...i18nCached[language].i18n, ...i18n}};
 
-const getSessionLang = _ => session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en";
+const getSessionLang = _ => (session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en").toString();
 
 const setSessionLang = lang => session.set($$.MONKSHU_CONSTANTS.LANG_ID, lang||"en");
 
