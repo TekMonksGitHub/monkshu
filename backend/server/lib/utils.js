@@ -29,15 +29,29 @@ function parseBoolean(value) {
 function queryToObject(query) {
     let jsObj = {};
     const pairs = query.split("&");
-    pairs.forEach((pair) => {
+    for (const pair of pairs) {
         let keyVal = pair.split("=");
         if (jsObj[keyVal[0]]) {
             if (jsObj[keyVal[0]].constructor == Array) jsObj[keyVal[0]].push(decodeURIComponent(keyVal[1]));
             else jsObj[keyVal[0]] = [jsObj[keyVal[0]], decodeURIComponent(keyVal[1])];
         } else jsObj[keyVal[0]] = decodeURIComponent(keyVal[1]);
-    });
+    }
 
     return jsObj;
+}
+
+function escapedSplit(string, character) {
+    const tempSplits = string.split(character), splits = []; 
+    for (let i = 0; i < tempSplits.length; i++) {
+        if (tempSplits[i] != "") splits.push(tempSplits[i]);
+        else if (i==0 && tempSplits[i]=="" && tempSplits[i+1]=="") continue;
+        else {
+            const prev = splits.pop(); 
+            splits.push((prev||"")+character+(tempSplits[i+1]?tempSplits[i+1]:"")); 
+            i++;
+        }
+    }
+    return splits;
 }
 
 function getDateTime() {
@@ -148,6 +162,6 @@ function watchFile(path, opIfModified, frequency) {
 
 const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
 
-module.exports = { parseBoolean, getDateTime, queryToObject, getTimeStamp, getObjectKeyValueCaseInsensitive, 
+module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getObjectKeyValueCaseInsensitive, 
     getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getEmbeddedIPV4, 
     setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile };

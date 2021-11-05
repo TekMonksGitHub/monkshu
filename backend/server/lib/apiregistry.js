@@ -7,7 +7,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const mustache = require("mustache");
 const querystring = require("querystring");
 const app = require(`${CONSTANTS.LIBDIR}/app.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
@@ -27,7 +26,7 @@ function initSync() {
 	for (const appObj of apps) {
 		const app = Object.keys(appObj)[0];
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
-			let regThisRaw = mustache.render(fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8"), {app});
+			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8").replace(/{{app}}/g, app);
 			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
 			Object.keys(regThis).forEach(key => regThis[key] = (`../apps/${app}/${regThis[key]}`));

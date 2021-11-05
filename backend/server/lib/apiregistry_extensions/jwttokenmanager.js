@@ -2,11 +2,15 @@
  * (C) 2020 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  * 
- * Tokens are in JWT format.
+ * Tokens are in JWT & JWS format - RFCs 7515 & 7519. 
+ * https://datatracker.ietf.org/doc/html/rfc7515
+ * https://datatracker.ietf.org/doc/html/rfc7519
  */
 
 const _jwttokenListeners = [];
 const cryptmod = require("crypto");
+const mustache = require("mustache");
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
 
@@ -25,49 +29,51 @@ function initSync() {
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
 
-function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
+function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
     if ((!apiregentry.query.needsToken) || apiregentry.query.needsToken.toLowerCase() == "false") return true;	// no token needed
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(/[ \t]+/):[];
-    if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return checkToken(token_splits[1], reason, apiregentry.query.needsToken);
+    if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return checkToken(token_splits[1], reason, apiregentry.query.needsToken, apiregentry.query.checkClaims, req);
     else {reason.reason = `JWT malformatted. Got token ${incomingToken}`; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
-function checkToken(token, reason={}, accessNeeded) {
+function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
-    const lastAccess = activeTokens[token];
+    const lastAccess = activeTokens[token]; // this automatically verifies token integrity too, and is a stronger check than rehashing and checking the hash signature
     if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
 
     const timeDiff = Date.now() - lastAccess;
     if (timeDiff > conf.expiryTime) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
 
-    const claims = JSON.parse(Buffer.from(token.split(".")[0],"base64").toString("utf8")); // check that claims match the access needed, if specified
+    let claims; try{ claims = JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8")); } catch (err) {LOG.error(`Error parsing claims ${err}`); return false;} 
+
     if (accessNeeded?.toLowerCase() != "true" && (!accessNeeded.split(",").includes(claims.sub))) {
         reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
         reason.code = 403; return false;
-    } else {    // success, update token last access time as well to prevent expiry
-        activeTokens[token] = Date.now();   // update last access
-        CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
-        return true;
+    } 
+
+    if (checkClaims) for (const key of checkClaims.split(",")) if (claims[key] != req[key]) {
+        reason.reason = `JWT Token Error, claims check failed. Claims keys is ${key}, found JWT claim ${claims[key]}, request claims ${req[key]}.`; 
+        reason.code = 403; return false;
     }
+
+    activeTokens[token] = Date.now();   // update last access
+    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    return true;
 }
 
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
-    if (!response?.result) return;   // nothing to do
+    if (!apiregentry.query.addsToken) return;   // nothing to do
     else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject);
 }
 
 function injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
-    if (!apiregentry.query.addsToken) return;   // nothing to do
-    const tokenCreds = apiregentry.query.addsToken;
-    const tuples = tokenCreds.split(",");
-    const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex")}; 
-    for (const tuple of tuples) {
-        const keyVal = tuple.split(":"); 
-        if (keyVal.length != 2) {LOG.error(`Bad token credential: ${tuple}, skipping.`); continue;}
-        claims[keyVal[0]] = keyVal[1];
-    }
+    const addsTokenParsed = _parseAddstokenString(apiregentry.query.addsToken, response);
+    if (addsTokenParsed.flag && !(utils.parseBoolean(addsTokenParsed.flag))) return; // failed to pass the API success test 
+    if ((!addsTokenParsed.flag) && (!response.result)) return; // failed to pass the API success test 
+    
+    const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), ...addsTokenParsed}; 
 
     const claimB64 = Buffer.from(JSON.stringify(claims)).toString("base64"); 
     const headerB64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
@@ -75,7 +81,7 @@ function injectResponseHeadersInternal(apiregentry, url, response, requestHeader
 
     const sig64 = cryptmod.createHmac("sha256", cryptmod.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
-    const token = `${claimB64}.${headerB64}.${sig64}`;
+    const token = `${headerB64}.${claimB64}.${sig64}`;
 
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();
@@ -100,4 +106,15 @@ function _cleanTokens() {
     
 }
 
-module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken, addListener, removeListener };
+function _parseAddstokenString(addsTokenString, response) {
+    const parsed = mustache.render(addsTokenString, response), retObj = {};
+    const splits = utils.escapedSplit(parsed, ","); for (const split of splits) {
+        const tuple = split.split(":");
+        retObj[tuple[0]] = tuple[1];
+    }
+
+    return retObj;
+}
+
+module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
+    addListener, removeListener };
