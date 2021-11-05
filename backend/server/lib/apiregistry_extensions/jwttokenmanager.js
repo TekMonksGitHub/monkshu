@@ -110,7 +110,7 @@ function _parseAddstokenString(addsTokenString, response) {
     const parsed = mustache.render(addsTokenString, response), retObj = {};
     const splits = utils.escapedSplit(parsed, ","); for (const split of splits) {
         const tuple = split.split(":");
-        retObj[tuple[0]] = tuple[1];
+        retObj[tuple[0]] = tuple.slice(1).join(":");
     }
 
     return retObj;

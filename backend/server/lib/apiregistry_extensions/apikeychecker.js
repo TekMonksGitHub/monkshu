@@ -4,10 +4,13 @@
  * 
  * Checks API keys.
  */
+
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
+
 const APIKEYS = ["x-api-key", "org_monkshu_apikey"];
 
 function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
-    const keysExpected = apiregentry.query.keys ? (Array.isArray(apiregentry.query.keys) ? apiregentry.query.keys : [apiregentry.query.keys]) : [];
+    const keysExpected = apiregentry.query.keys?utils.escapedSplit(apiregentry.query.keys, ","):[];
     if (!keysExpected.length) return true; 
     else for (const apiKeyHeaderName of APIKEYS) if (keysExpected.includes(headers[apiKeyHeaderName])) return true;
     
