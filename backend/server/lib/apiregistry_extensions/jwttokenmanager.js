@@ -48,7 +48,7 @@ function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
 
     let claims; try{ claims = JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8")); } catch (err) {LOG.error(`Error parsing claims ${err}`); return false;} 
 
-    if (accessNeeded?.toLowerCase() != "true" && (!accessNeeded.split(",").includes(claims.sub))) {
+    if (accessNeeded?.toLowerCase() != "true" && (!utils.escapedSplit(accessNeeded, ",").includes(claims.sub))) {
         reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
         reason.code = 403; return false;
     } 
