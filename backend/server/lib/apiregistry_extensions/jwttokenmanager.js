@@ -63,13 +63,13 @@ function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
     return true;
 }
 
-function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
+function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
     if (!apiregentry.query.addsToken) return;   // nothing to do
-    else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject);
+    else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request);
 }
 
-function injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject) {
-    const addsTokenParsed = _parseAddstokenString(apiregentry.query.addsToken, response);
+function injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
+    const addsTokenParsed = _parseAddstokenString(apiregentry.query.addsToken, request, response);
     if (addsTokenParsed.flag && !(utils.parseBoolean(addsTokenParsed.flag))) return; // failed to pass the API success test 
     if ((!addsTokenParsed.flag) && (!response.result)) return; // failed to pass the API success test 
     
@@ -106,11 +106,13 @@ function _cleanTokens() {
     
 }
 
-function _parseAddstokenString(addsTokenString, response) {
-    const parsed = mustache.render(addsTokenString, response), retObj = {};
-    const splits = utils.escapedSplit(parsed, ","); for (const split of splits) {
-        const tuple = split.split(":");
-        retObj[tuple[0]] = tuple.slice(1).join(":");
+function _parseAddstokenString(addsTokenString, request, response) {
+    const retObj = {}, splits = utils.escapedSplit(addsTokenString, ","); 
+    for (const split of splits) {
+        const tuple = split.split(":"), key = tuple[0], value = tuple.slice(1).join(":"), 
+            renderedFromResponse = mustache.render(value, response), renderedFromRequest = mustache.render(value, request);
+        retObj[key] =  renderedFromResponse != "" ? renderedFromResponse : (renderedFromRequest != "" && key != "flag" ? 
+            renderedFromRequest : value);
     }
 
     return retObj;

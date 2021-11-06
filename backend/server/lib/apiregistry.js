@@ -103,13 +103,13 @@ function checkSecurity(url, req, headers, servObject, reason) {
 	return true;
 }
 
-function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject) {
+function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject, reqObj) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	for (const headermanagerThis of headermanagers) 
-		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders, servObject);
+		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders, servObject, reqObj);
 }
 
 function listAPIs() {

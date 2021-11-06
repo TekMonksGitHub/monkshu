@@ -66,10 +66,10 @@ function _initAndRunTransportLoop() {
 			_server.statusInternalError(servObject, error); _server.end(servObject);
 		}
 		
-		const {code, respObj} = await _doService(servObject.env.data, servObject, headers, url);
+		const {code, respObj, reqObj} = await _doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
-			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject);
+			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject, reqObj);
 
 			try {
 				_server.statusOK(respHeaders, servObject);
@@ -106,17 +106,17 @@ async function _doService(data, servObject, headers, url) {
 
 		let reason = {};
 		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason)) {
-			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}}); }
+			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}, reqObj: jsonObj}); }
 
 		try { 
 			const apiModule = require(api);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url); return ({code: 999});}
-			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url)}); 
+			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url), reqObj: jsonObj}); 
 		} catch (error) {
 			LOG.debug(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
-			return ({code: error.status||500, respObj: {result: false, error: error.message||error}}); 
+			return ({code: error.status||500, respObj: {result: false, error: error.message||error}, reqObj: jsonObj}); 
 		}
-	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
+	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}, reqObj: jsonObj});
 }
 
 module.exports = {bootstrap, blacklistIP: _server.blacklistIP, whitelistIP: _server.whitelistIP};
