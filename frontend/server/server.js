@@ -101,7 +101,7 @@ async function _handleRequest(req, res) {
 	}
 	
 	try {
-		fspromises.access(fileRequested, fs.constants.R_OK);	// test file can be read
+		await fspromises.access(fileRequested, fs.constants.R_OK);	// test file can be read
 		let stats = await fspromises.stat(fileRequested);
 		if (stats.isDirectory()) { 
 			fileRequested += "/" + conf.indexfile;
