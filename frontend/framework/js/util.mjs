@@ -141,7 +141,19 @@ function clone(object, skipProperties=[]) {
     return clone;
 }
 
+/**
+ * Tries to detect if the given string is URI encoded, and decodes it
+ * and returns the decoded string, or the string itself, if it is not
+ * URI encoded.
+ * @param s A possibly URI encoded string
+ * @returns The decoded string, or the string itself, if it is not URI encoded.
+ */
+function safeURIDecode(s) {
+    if (decodeURIComponent(s).length < s.length) return decodeURIComponent(s);
+    else return s;
+}
+
 const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL}
+    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode}

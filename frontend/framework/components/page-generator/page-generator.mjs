@@ -3,13 +3,14 @@
  * (C) 2019 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
+import {util} from "/framework/js/util.mjs";
 import {router} from "/framework/js/router.mjs";
 import {monkshu_component} from "/framework/js/monkshu_component.mjs";
 
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
 	page_generator.setTemplateHTML(element, await getHTML(new URL(pagePath, window.location.href), 
-		element.getAttribute("css"), JSON.parse(decodeURIComponent(element.getAttribute("pageData")||"{}"))));
+		element.getAttribute("css"), JSON.parse(util.safeURIDecode(element.getAttribute("pageData")||"{}"))));
 }
 
 /**
