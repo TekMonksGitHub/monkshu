@@ -13,6 +13,11 @@ const copyFileAsync = require("util").promisify(fs.copyFile);
 
 let lastFileCheckTime = {};
 
+/**
+ * Copies file or folder recursively.
+ * @param {string} from The path to copy from
+ * @param {string} to The path to copy to (will create directories if needed)
+ */
 async function copyFileOrFolder(from, to) {
     if ((await lstatAsync(from)).isFile()) await copyFileAsync(from, to);
     else {
@@ -21,11 +26,21 @@ async function copyFileOrFolder(from, to) {
     }
 }
 
+/**
+ * Parses given value to a boolean
+ * @param {string|object} value The value to convert
+ * @returns The resulting boolean (true or false)
+ */
 function parseBoolean(value) {
     if (!value) return false;
     return String(value).toLowerCase() == "true";
 }
 
+/**
+ * Converts the given URL query string to an object.
+ * @param {string} query URL query string 
+ * @returns Object result of conversion
+ */
 function queryToObject(query) {
     let jsObj = {};
     const pairs = query.split("&");
@@ -40,6 +55,13 @@ function queryToObject(query) {
     return jsObj;
 }
 
+/**
+ * Splits a given string escaping the split character if it is repeated twice. 
+ * E.g. splits this string -> a,,b,c as ["a,b","c"]
+ * @param {string} string The string to split
+ * @param {string} character The split character
+ * @returns An array as a result of the split.
+ */
 function escapedSplit(string, character) {
     const tempSplits = string.split(character), splits = []; 
     for (let i = 0; i < tempSplits.length; i++) {
@@ -54,6 +76,10 @@ function escapedSplit(string, character) {
     return splits;
 }
 
+/**
+ * Returns a human readable timestamp in year:month:day:hour:min:sec format.
+ * @returns A human readable timestamp in year:month:day:hour:min:sec format.
+ */
 function getDateTime() {
 
     const date = new Date();
@@ -78,35 +104,71 @@ function getDateTime() {
     return `${year}:${month}:${day}:${hour}:${min}:${sec}`;
 }
 
+/**
+ * Returns current timestamp accurate to nano seconds, if available.
+ * @returns Current timestamp accurate to nano seconds, if available.
+ */
 function getTimeStamp() {
     const hrTime = process.hrtime();
     return hrTime[0] * 1000000000 + hrTime[1];
 }
 
+/**
+ * Returns the  object key value, if present, using name insensitive matching. 
+ * @param {object} obj The object
+ * @param {string} key The key
+ * @returns Key value using name insensitive lookup.
+ */
 function getObjectKeyValueCaseInsensitive(obj, key) {
     for (const keyThis of Object.keys(obj)) if (keyThis.toUpperCase() == key.toUpperCase()) return obj[keyThis];
     return null;
 }
 
+/**
+ * Returns the  object key, if present, using name insensitive matching. 
+ * @param {object} obj The object
+ * @param {string} key The key
+ * @returns Key name using name insensitive lookup.
+ */
 function getObjectKeyNameCaseInsensitive(obj, key) {
     for (const keyThis of Object.keys(obj)) if (keyThis.toUpperCase() == key.toUpperCase()) return keyThis;
     return null;
 }
 
+/**
+ * Returns path to a temp file we can use.
+ * @param {string} ext The extension of the file.
+ * @returns The path to a temp file we can use.
+ */
 const getTempFile = ext =>
     `${os.tmpdir()+"/"+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`;
 
+/**
+ * Returns client IP, parsing out proxy headers, from an incoming HTTP req object.
+ * @param {object} req Incoming HTTP request object.
+ * @returns The client IP
+ */
 const getClientIP = req =>
     (typeof req.headers['x-forwarded-for'] === 'string'
         && req.headers['x-forwarded-for'].split(',').shift())
     || req.socket.remoteAddress;
 
+/**
+ * Returns embedded IPv4 inside an IPv6.
+ * @param {string} address The IPv6 in short hand notation.
+ * @returns The embedded IPv4 inside an IPv6 or null if none found.
+ */
 function getEmbeddedIPV4(address) { 
     const pattern = /\:\:ffff\:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/;
     const matches = address.match(pattern);
     return matches && matches[1] ? matches[1] : null;
 }
 
+/**
+ * Expands a shorthand IPv6 with full expanded form IPv6.
+ * @param {string} address The IPv6 in short hand notation.
+ * @returns The expanded IPv6.
+ */
 function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018157
 {
     let fullAddress = "", expandedAddress = "", validGroupCount = 8, validGroupSize = 4, ipv4 = "";
@@ -135,6 +197,12 @@ function expandIPv6Address(address) // from: https://gist.github.com/Mottie/7018
     return expandedAddress;
 }
 
+/**
+ * Analyzes the given IP and returns back normalized IP and a flag indicating
+ * if it is IPv6 or not.
+ * @param {string} ip The IP in IPV4 or IPv6 format.
+ * @returns The normalized IP and a flag indicating if it is IPv6 or not.
+ */
 function analyzeIPAddr(ip) {
     let ipv6 = true; let ipBack = ip;
 
@@ -148,6 +216,12 @@ function analyzeIPAddr(ip) {
     return {ip: ipBack, ipv6};  // rest are all regular IPv6
 }
 
+/**
+ * Watches the given file. 
+ * @param {string} path The file path
+ * @param {function} opIfModified Function which is passed the file contents if it is modified
+ * @param {number} frequency The frequency to check at
+ */
 function watchFile(path, opIfModified, frequency) {
     const toDoOnInterval = async _ => {
         try { 
@@ -160,8 +234,26 @@ function watchFile(path, opIfModified, frequency) {
     setIntervalImmediately(toDoOnInterval, frequency);
 }
 
+/**
+ * Deep clones an object, must be serializable or non-serializable properties must
+ * be listed to be skipped
+ * @param object The object to clone
+ * @param skipProperties Optional: Properties to skip while cloning
+ */
+ function clone(object, skipProperties=[]) {
+    if (!skipProperties.length) return JSON.parse(JSON.stringify(object));
+
+    const clone = {}; for (const key in object) if (!skipProperties.includes(key)) clone[key] = JSON.parse(JSON.stringify(object[key]));
+    return clone;
+}
+
+/**
+ * Calls the given function at the given intervals with the first call starting immediately.
+ * @param {function} functionToCall The function to call
+ * @param {number} interval The interval in milliseconds
+ */
 const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getObjectKeyValueCaseInsensitive, 
     getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getEmbeddedIPV4, 
-    setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile };
+    setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone };
