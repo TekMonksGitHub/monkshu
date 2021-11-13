@@ -21,7 +21,7 @@ $$.import = async (url, scope = window) => {
 }
 
 $$.__loadedJS = {};
-$$.require = async (url, targetDocument = document, nocache) => {
+$$.require = async (url, targetDocument = document, nocache, corsMode) => {
     url = new URL(url, window.location).href;        // Normalize
 
     if (Object.keys($$.__loadedJS).includes(url) && !nocache) { // already loaded
@@ -30,7 +30,7 @@ $$.require = async (url, targetDocument = document, nocache) => {
         const scriptNode = script.cloneNode(true);
         targetDocument.head.appendChild(scriptNode).parentNode.removeChild(scriptNode);
     } else try {
-        const js = await (await $$.__fetchThrowErrorOnNotOK(url)).text();
+        const js = await (await $$.__fetchGETThrowErrorOnNotOK(url, "application/javascript", corsMode)).text();
         const script = document.createElement("script");
         script.text = `${js}\n//# sourceURL=${url}`;
         $$.__loadedJS[url] = script.text; 
@@ -53,23 +53,23 @@ $$.requireCSS = (url, nocache) => {
 }
 
 $$.__loadedJSON = {};
-$$.requireJSON = async (url, nocache) => {
+$$.requireJSON = async (url, nocache, corsMode) => {
     url = new URL(url, window.location).href;        // Normalize
 
     if (Object.keys($$.__loadedJSON).includes(url) && !nocache) return $$.__loadedJSON[url];   // already loaded
     else try {
-        const json = await (await $$.__fetchThrowErrorOnNotOK(url)).json();
+        const json = await (await $$.__fetchGETThrowErrorOnNotOK(url, "application/json", corsMode)).json();
         $$.__loadedJSON[url]=json; return $$.__loadedJSON[url];
     } catch (err) {throw err};
 }
 
 $$.__loadedText = {};
-$$.requireText = async (url, nocache) => {
+$$.requireText = async (url, nocache, corsMode) => {
     url = new URL(url, window.location).href;        // Normalize
 
     if (Object.keys($$.__loadedText).includes(url) && !nocache) return $$.__loadedText[url];   // already loaded
     else try {
-        const text = await (await $$.__fetchThrowErrorOnNotOK(url)).text();
+        const text = await (await $$.__fetchGETThrowErrorOnNotOK(url, "text/plain", corsMode)).text();
         $$.__loadedText[url]=text; return $$.__loadedText[url];
     } catch (err) {throw err};
 }
@@ -90,8 +90,9 @@ $$.importPlugin = (url, nocache) => {
     });
 }
 
-$$.__fetchThrowErrorOnNotOK = async url => {
-    const response = await fetch(url, {mode:"no-cors", cache: "default"});
+$$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
+    const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
+        headers: {'Content-Type': contentType||'text/plain'}});
     if (!response.ok) throw new Error(`Issue in fetch, status returned is ${response.status} ${response.statusText}`);
     else return response;
 }

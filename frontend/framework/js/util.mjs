@@ -153,7 +153,18 @@ function safeURIDecode(s) {
     else return s;
 }
 
+/**
+ * Returns child element by ID of the given parent element.
+ * @param element The parent element.
+ * @param id ID of the child wanted.
+ * @returns Child element by ID of the given parent element or null if not found.
+ */
+function getChildByID(element, id) {
+    for (const child of element.childNodes) if (child.id == id) return child;
+    return null;
+}
+
 const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode}
+    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID}
