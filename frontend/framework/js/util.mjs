@@ -164,7 +164,19 @@ function getChildByID(element, id) {
     return null;
 }
 
+/**
+ * Returns child elements of the given tagname.
+ * @param element The parent element.
+ * @param tagName Tagname of the children wanted.
+ * @returns Returns child elements of the given tanameg.
+ */
+ function getChildrenByTagName(element, tagName) {
+    const retNodes = [];
+    for (const child of element.childNodes) if (child.tagName?.toLowerCase() == tagName.toLowerCase()) retNodes.push(child);
+    return retNodes;
+}
+
 const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID}
+    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName}
