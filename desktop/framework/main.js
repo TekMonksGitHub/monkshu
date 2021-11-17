@@ -14,7 +14,8 @@ const { app, BrowserWindow, Menu, shell, Tray, ipcMain, nativeImage } = require(
 const isMac = process.platform === "darwin";
 const menuTemplate = [
 	...(isMac ? [{label: app.name, submenu: [{ role: "about" }, { type: "separator" }, { role: "services" }, 
-		{ type: "separator" }, { role: "hide" }, { role: "hideOthers" }, { role: "unhide" }, 
+		{ type: "separator" }, { role: "hide" }, { role: "hideOthers" }, { role: "unhide" },
+		{ type: 'separator' }, { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'delete' }, { role: 'selectall' },
 		{ type: "separator" }, { role: "quit" }]}] : []),
 	{label: "File", submenu: [{ role: "quit" }]},
 	{role: "help", submenu: [{label: "Learn More", click: async () => {shell.openExternal(appconf.homepage)}}]}
