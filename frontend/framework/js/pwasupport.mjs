@@ -8,7 +8,7 @@ import {router} from "./router.mjs";
 import {blackboard} from "/framework/js/blackboard.mjs";
 
 const FRAMEWORK_FILELIST = `/framework/${$$.MONKSHU_CONSTANTS.CACHELIST_SUFFIX}`, 
-    DEFAULT_VERSION_CHECK_FREQUENCY = 300000, CACHE_WORKER_URL = "/framework/js/cacheworker.mjs",
+    DEFAULT_VERSION_CHECK_FREQUENCY = 300000, CACHE_WORKER_URL = util.resolveURL("/framework/js/cacheworker.mjs"),
     VERSION_SWITCH_IN_PROGRESS = {}, PAGE_RELOAD_ON_UPGRADE_INTERVAL = 500;
     
 /**
@@ -40,9 +40,10 @@ async function addWebManifest(appName, manifest, manifestData={}) {
  * Adds offline support by registering service worker and caching files.
  * @param appName The application name (monkshu app name)
  * @param manifest The application webmanifest
+ * @param timeout The time to wait for the worker to install and become active, else assume failure
  * @returns The registered service worker on success, and false on failure
  */
-async function addOfflineSupport(appName, manifest) {
+async function addOfflineSupport(appName, manifest, timeout) {
     if (!("serviceWorker" in navigator)) { $$.LOG.error("Service workers not supported in the browser"); return false; }
 
     const listOfFilesToCache = await $$.requireJSON(_getAppCachelistURL(appName));
@@ -51,15 +52,21 @@ async function addOfflineSupport(appName, manifest) {
 	
 	const finalListOfFilesToCache = _combineFileLists(listOfFilesToCache, await $$.requireJSON(FRAMEWORK_FILELIST));
 
-	navigator.serviceWorker.register(CACHE_WORKER_URL, {type: "module", scope: "/"});
-	const registration = await navigator.serviceWorker.ready; 
+    return new Promise(async resolve => {
+        let alreadySentFalse = false; 
+        const timedOutInstall = timeout?setTimeout(_=>{alreadySentFalse = true; resolve(false); LOG.error("PWA registration timedout.");}, timeout):undefined;
+        await navigator.serviceWorker.register(CACHE_WORKER_URL, {type: "module", scope: "/"});
+        const registration = await navigator.serviceWorker.ready; 
 
-	registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", 
-		appName, version: manifest.version, listOfFilesToCache: finalListOfFilesToCache});	
-    registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "serve", appName, 
-        version: manifest.version});	
-
-	return registration.active;
+        if (!alreadySentFalse) {
+            if (timedOutInstall) clearTimeout(timedOutInstall);
+            registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "cache", 
+                appName, version: manifest.version, listOfFilesToCache: finalListOfFilesToCache});	
+            registration.active.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "serve", appName, 
+                version: manifest.version});	
+            resolve(registration.active);
+        }
+    });
 }
 
 /**

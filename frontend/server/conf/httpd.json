@@ -17,8 +17,7 @@
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",
 		"X-Frame-Options": "deny",
-		"X-Content-Type-Options": "nosniff",
-		"Service-Worker-Allowed": "/"
+		"X-Content-Type-Options": "nosniff"
 	},
 	"mimeTypes" : {
 		".html":	"text/html",

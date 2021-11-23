@@ -12,15 +12,16 @@ const HS = "?.=", PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_dat
 
 /**
  * Sets the current app as PWA
+ * @param timeout		The timeout period to wait for service workers to become active, default is 10 seconds
  * @param appName 		Optional: The application name (monkshu app name), if not provided will be
  * 				  		auto-detected from the current URL.
  * @param manifestdata  Optional: Manifest data 
  */
-async function setAppAsPWA(appName=getCurrentAppName(), manifestdata={}) {
+async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestdata={}) {
 	const manifest = await pwasupport.addWebManifest(appName, null, manifestdata); if (!manifest) {
 		$$.LOG.error("Can't set app as a PWA without a proper webmanifest."); return; }
-	const serviceWorker = await pwasupport.addOfflineSupport(appName, manifest); 
-	if (!serviceWorker) $$.LOG.error("PWA setup failed in caching. Check logs.");
+	const serviceWorker = await pwasupport.addOfflineSupport(appName, manifest, timeout); 
+	if (!serviceWorker) {$$.LOG.error("PWA setup failed in caching. Check logs."); return;}	// PWA unavailable
 	monkshu_env.frameworklibs[`org_monkshu_router_apps_env_${appName}`] = {isPWA: true};
 	await pwasupport.setupPWAVersionChecks(appName, manifest, serviceWorker);
 }
