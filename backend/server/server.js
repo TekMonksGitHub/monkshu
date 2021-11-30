@@ -116,7 +116,7 @@ async function _doService(data, servObject, headers, url) {
 			LOG.debug(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}, reqObj: jsonObj}); 
 		}
-	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}, reqObj: jsonObj});
+	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}, reqObj: {}});
 }
 
 module.exports = {bootstrap, blacklistIP: _server.blacklistIP, whitelistIP: _server.whitelistIP};
