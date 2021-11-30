@@ -92,6 +92,30 @@ function register(name, htmlTemplate, module) {
     module.setDataByHost = (host, data) => module.setData(host.id, data);
     module.setDataByContainedElement = (element, data) => module.setData(module.getHostElementID(element), data);
 
+    module.getAttrValue = async (host, attr) => {
+        const str = host.getAttribute(attr); if (!str) return null;
+        await $$.require("/framework/3p/xregexp-all.js");
+
+        let val = ((window[str] && (!window[str] instanceof Object)) || str).toString();	// Mustache expects strings only
+
+        const _xregexparrayToObject = array => {const retObj = {}; for (const object of array) retObj[object.name] = object.value; return retObj;}
+
+        const _recursiveExpandFunctions = async val => {
+            const testForAttrFunctions = _xregexparrayToObject(XRegExp.matchRecursive(val, "\\(", "\\)", "g", 
+                {valueNames: ["cmd","left","match","right"]}));
+            if (!testForAttrFunctions.match || (testForAttrFunctions.cmd != "url" && 
+                testForAttrFunctions.cmd != "decodeURIComponent")) return val;	// nothing to expand
+            val = await _recursiveExpandFunctions(testForAttrFunctions.match);
+
+            if (testForAttrFunctions.cmd == "url") try {val = (await $$.requireText(val)).replace(/\r?\n|\r/g, "");} catch {}	// remove line feeds
+            else if (testForAttrFunctions.cmd=="decodeURIComponent") val = decodeURIComponent(val);
+            return val;
+        }
+        
+        val = await _recursiveExpandFunctions(val);
+        return val;
+    }
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
