@@ -2,6 +2,7 @@
     "framework/3p/diffDOM.js",
     "framework/3p/mustache.min.js",
     "framework/3p/xregexp-all.js",
+    "framework/components/html-fragment/html-fragment.mjs",
     "framework/components/page-generator/page-generator.mjs",
     "framework/conf/cachelist.json",
     "framework/conf/default_app.json.README",

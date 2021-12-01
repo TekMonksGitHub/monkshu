@@ -65,6 +65,10 @@ function register(name, htmlTemplate, module) {
 
     module.getMemoryByHost = hostElement => module.getMemory(hostElement.id);
 
+    module.getSessionMemoryByContainedElement = element => module.getSessionMemory(module.getHostElementID(element));
+
+    module.getSessionMemoryByHost = hostElement => module.getSessionMemory(hostElement.id);
+
     module.getAllElementInstances = _ => {
         const allInstances = []; 
         if (module.elements) for (const key in module.elements) allInstances.push(module.elements[key]); 
