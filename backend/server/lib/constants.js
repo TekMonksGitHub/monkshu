@@ -24,7 +24,7 @@ exports.HTTPDCONF = confdir + "/httpd.json";
 exports.IPBLACKLIST = confdir + "/ipblacklist.json";
 exports.IPWHITELIST = confdir + "/ipwhitelist.json";
 exports.BLACKBOARDCONF = confdir + "/blackboard.json";
-exports.GLOBALMEMCONF = confdir + "/blackboard.json";
+exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
 exports.RELEASEFILE = rootdir + "/../../RELEASE";
 exports.MAX_LOG = 1024;
 

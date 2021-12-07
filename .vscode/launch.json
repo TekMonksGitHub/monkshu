@@ -23,7 +23,7 @@
             "name": "Launch HTTPD",
             "cwd": "${workspaceFolder}/frontend/server",
             "program": "${workspaceFolder}/frontend/server/server.js",
-            "runtimeArgs": ["--preserve-symlinks"],
+            "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"]
         },
         {
@@ -31,7 +31,7 @@
             "request": "launch",
             "name": "Launch Backend",
             "program": "${workspaceFolder}/backend/server/server.js",
-            "runtimeArgs": ["--preserve-symlinks"],
+            "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/backend/**/*.js"]
         },
         {
@@ -39,7 +39,7 @@
             "request": "launch",
             "name": "Launch Backend - Second Server",
             "program": "${workspaceFolder}/backend/server/server.js",
-            "runtimeArgs": ["--preserve-symlinks"],
+            "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/backend/**/*.js"],
             "args": ["-c", "${workspaceFolder}/tests/backend/secondserver/conf"]
         },

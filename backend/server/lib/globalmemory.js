@@ -22,7 +22,14 @@ function init() {
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_set", _set);
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_setmemory"+server_id, _setMemory);
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_offer", _receivedMemoryOffer);
-    BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_offer", {id: server_id}); // get current memory on start
+
+    const sendMemSyncRequest = counter => {
+        if (!acceptedMemoryOffer && counter < conf.syncRetries) {
+            BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_offer", {id: server_id}); 
+            setTimeout(_=>{if (!acceptedMemoryOffer) sendMemSyncRequest(counter+1);}, conf.syncTimeout);
+        } else if (counter == conf.syncRetries) memoryInSync = true; // no one replied to us, assume memory is current as is
+    }; sendMemSyncRequest(0);   // start trying to sync the memory
+    
     if (conf.replication_node) { // replicate memory if configured
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_offer", _getMemoryOffer);  
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_accept", _acceptMemoryOffer);  
@@ -65,14 +72,17 @@ const _set = message =>  {
 }
 
 function _setMemory(message) {
-    for (const key in message) _globalmemory[key] = message[key];
-    if (message.__org_monkshu_distribued_memory_transfercomplete) {
+    if (memoryInSync) {LOG.error(`Global memory coherence issue, got reply to sync after timeout. Global memory is now fragmented! Fragmented nodes are, this node -> ${server_id} and remote node -> ${message.__org_monkshu_distribued_memory_internals.server_id}.`); return; }  // we must have timedout before this server responded, ignore
+    else LOG.info(`Syncing memory from ${message.__org_monkshu_distribued_memory_internals.server_id} -> to ${server_id}`);
+    
+    for (const key in message) if (key != "__org_monkshu_distribued_memory_internals") _globalmemory[key] = message[key];
+    if (message.__org_monkshu_distribued_memory_internals.transfercomplete) {
         memoryInSync = true; for (const listener of _memInSyncListeners) listener(); }
 }
 
 function _receivedMemoryOffer(message) {
     if (!acceptedMemoryOffer) acceptedMemoryOffer = true; else return;   // first one wins
-    BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_accept", {id: message.server_id, receiver: server_id});
+    BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_accept", {id: message.id, receiver: server_id});
 }
 
 const _getMemoryOffer = message => {
@@ -81,7 +91,7 @@ const _getMemoryOffer = message => {
 
 const _acceptMemoryOffer = message => {
     if (message.id == server_id)  BLACKBOARD.publish("__org_monkshu_distribued_memory_setmemory"+message.receiver,
-        {..._globalmemory, __org_monkshu_distribued_memory_transfercomplete: true});    // TODO: chunk this
+        {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id}});    // TODO: chunk this
 }
 
 module.exports = {init, set, get, listen, listenMemInSync, isMemoryInSync};

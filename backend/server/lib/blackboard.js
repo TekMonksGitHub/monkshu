@@ -41,9 +41,11 @@ async function publish(topic, payload) {
 
     for (const replica of conf.replicas) {
         const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
-        await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:{topic, payload}}, (err,result) => {
-            if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
-        });
+        try {
+            await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:{topic, payload}}, (err,result) => {
+                if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
+            });
+        } catch (err) {LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}`);}
     }
 }
 

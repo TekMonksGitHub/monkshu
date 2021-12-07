@@ -1,3 +1,5 @@
 {
-    "replication_node": true
+    "replication_node": true,
+    "syncRetries": 3,
+    "syncTimeout": 1000
 }
