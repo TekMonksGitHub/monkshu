@@ -12,6 +12,7 @@ const path = require("path");
 const http = require("http");
 const https = require("https");
 const fspromises = fs.promises;
+const args = require(`${__dirname}/lib/processargs.js`);
 
 let access, error, utils;
 
@@ -37,15 +38,15 @@ function bootstrap() {
 }
 
 function _initConfSync() {
-	global.conf = require(`${__dirname}/conf/httpd.json`);
+	global.conf = require(`${args.getArgs().c||args.getArgs().conf||`${__dirname}/conf`}/httpd.json`);
 
 	// normalize paths
-	conf.webroot = path.resolve(conf.webroot);	
-	conf.logdir = path.resolve(conf.logdir);	
-	conf.libdir = path.resolve(conf.libdir);
-	conf.confdir = path.resolve(conf.confdir);
-	conf.accesslog = path.resolve(conf.accesslog);
-	conf.errorlog = path.resolve(conf.errorlog);
+	conf.webroot = path.resolve(`${__dirname}/${conf.webroot}`);	
+	conf.logdir = path.resolve(`${__dirname}/${conf.logdir}`);	
+	conf.libdir = path.resolve(`${__dirname}/${conf.libdir}`);
+	conf.confdir = path.resolve(`${__dirname}/${conf.confdir}`);
+	conf.accesslog = path.resolve(`${__dirname}/${conf.accesslog}`);
+	conf.errorlog = path.resolve(`${__dirname}/${conf.errorlog}`);
 	utils = require(conf.libdir+"/utils.js");
 
 	// merge web app conf files into main http server, for app specific configuration directives

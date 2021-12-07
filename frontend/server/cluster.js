@@ -2,13 +2,14 @@
  * Cluster.js, Cluster manager
  * 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  */
 
 const cluster = require("cluster");
+const args = require(`${__dirname}/lib/processargs.js`);
 
 if (cluster.isMaster) {
-	let conf = require(`${__dirname}/conf/cluster.json`);
+	let conf = require(`${args.getArgs().c||args.getArgs().conf||`${__dirname}/conf`}/cluster.json`);
 
 	// Figure out number of workers.
 	let numWorkers = conf.workers;

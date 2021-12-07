@@ -1,0 +1,56 @@
+{
+	"port": 8080, <-- The port to listen to
+	"host": "::", <-- The host name or IP to listen to, 0.0.0.0 means all IPv4 and :: means all IPv4 and IPv6
+	"extensions": ["redirect", "proxy", "diskcache"], <-- Server extensions, order matters as server evaluates them in this order
+	"webroot": "./../", <-- The directory to serve from
+	"proxies": [{"http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"}], <-- HTTP proxies, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one ,
+	"redirects": [{"http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"}], <-- Redirects, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one ,
+	"rewriteurl": [{"/test1/(.*)":"/apps/test1/{{{$1}}}"}], <-- URL rewrite (just path), {{{1...n}}} mean the nth matching group, starting from index 1 for the first one 
+	"logdir": "./logs", <-- The logs directory
+	"libdir": "./lib", <-- The lib directory
+	"extdir": "./ext", <-- The extensions directory
+	"accesslog": "./logs/access.log.json", <-- The access log file name
+	"errorlog": "./logs/error.log.json", <-- The error log file name
+	"indexfile": "index.html", <-- The index file name
+	"ssl": false, <-- Set to true for HTTPS
+	"enableGZIPEncoding": true, <-- Everything will be gzip encoded if MIME supports it (see mime section),
+	"ipblacklistRefresh": 5000, <-- Refresh interval to re-read the IP blacklist, if ipblocker extension is enabled. Usually set to 5 or 10 seconds. Use conf/ipblacklist.json to add in blocked IPs. Note: add IPv6 in lowercase only.
+	"diskCache": {"refresh": 1000, "dontCache": [".*\\.pdf"], "maxSizeInMB": "1024", "ignoreAfterMaxHits":10, "autoUglifyJS": true, "minifier": "uglify-js", "autoMinifyHTML": true, "autoMinifyCSS": true}, <-- Cache disk and refresh every second, don't cache PDFs, max 1 GB cache, maxSize can be maxSizeInMB or maxSize (bytes), if file not found after 10 hits, stop trying to cache. If not present disk cache will be disabled. Server will auto-uglify the JS files. Minifier can be uglify-js or terser. Auto minify HTML (needs ufligy-js and clean-css). Auto minify CSS (needs clean-css).
+	"sslKeyFile":"/etc/letsencrypt/live/[your domain]/privkey.pem", <-- Your domain's key file for SSL
+	"sslCertFile":"/etc/letsencrypt/live/[your domain]/fullchain.pem", <-- Your domain's full chain file for SSL
+	"httpdHeaders": { <-- Hardcode these headers in every response
+		"Server": "Monkshu HTTPD",
+		"X-XSS-Protection": 1,
+		"X-Frame-Options": "deny",
+		"X-Content-Type-Options": "nosniff",
+		"Cache-Control": "max-age=31536000, public"
+	},
+	"mimeTypes" : { <-- Mime types, extensions and their types, add true if they can be compressed
+		".html":	"text/html",
+		".htm":		"text/html",
+		".thtml":	"text/html",
+		".css":		"text/css",
+		".js":		"text/javascript",
+		".mjs":		"text/javascript",
+		".page":	"text/plain",
+		".otf":		"application/x-font-opentype",
+		".ttf":		"application/x-font-truetype",
+		".pdf":		"application/pdf",
+		".png":		["image/png", false],
+		".jpg":		["image/jpeg", false],
+		".jpeg":	["image/jpeg", false],
+		".gif":		["image/gif", false],
+		".md":		["text/markdown", true],
+		".svg":		"image/svg+xml",
+		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
+	},
+	"restrictServerTree": true, <-- Don't serve anything outside webroot
+	"timeout": 120000 <-- Server timeout waiting for response
+}
+
+App Specific Redirects
+=======================
+"extensions": ["redirect"],
+"redirects": [{"^http://localhost:8080/index.html$":"http://localhost:8080/apps/[your app]/index.html"},
+	{"^http://localhost:8080/$":"http://localhost:8080/apps/[your app]/index.html"},
+	{"^http://localhost:8080$":"http://localhost:8080/apps/[your app]/index.html"}]

@@ -16,7 +16,7 @@ let args;
  * @returns The process args as a key-value pair object. All values are arrays.
  */
 function getArgs() {
-    if (args) return argv; else args = {};
+    if (args) return args; else args = {};
 
     const argv = process.argv.slice(2);
     let currKey; for (const arg of argv) {

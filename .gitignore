@@ -1,5 +1,6 @@
 backend/server/logs/*
 frontend/server/logs/*
+tests/*/*/logs/*
 backend/apps
 frontend/apps
 desktop/app
