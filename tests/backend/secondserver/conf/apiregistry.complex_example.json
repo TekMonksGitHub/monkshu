@@ -1,0 +1,6 @@
+{
+"/getTrades" : "/services/get_trades.js?encrypted=true&get=false&keys=fjkw79842ufn4289udej2348&needsToken=false&addsToken=sub:{{{role}}},id:{{{id}}},flag:{{{result}}}",
+"/addUser" : "/services/addUser.js?encrypted=true&keys=89jfkl09urjq9udj39f8ndeku397rdj&needsToken=true",
+"/updateUser" : "/services/updateUser.js?encrypted=false&keys=nmdjfheu9if3uiq98948ruejd1u232d10irfc&needsToken=admin&checkClaims=id",
+"/deleteUser" : "/services/deleteUser.js?encrypted=true&keys=4dnei9eiorjeo13e3ojr98greji3u&notRESTAPI=false"
+}

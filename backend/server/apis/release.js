@@ -1,6 +1,7 @@
-/* 
+/**
+ * Simply returns the current release of the server. 
  * (C) 2018 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See the enclosed LICENSE file.
  */
 
 const release = require("fs").readFileSync(CONSTANTS.RELEASEFILE, "utf8");

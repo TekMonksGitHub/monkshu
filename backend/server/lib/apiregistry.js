@@ -17,10 +17,10 @@ function initSync() {
 	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
 	if (!CLUSTER_MEMORY.get(API_REG_DISTM_KEY)) CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
 
-	const decoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	const encoderPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	const headermanagersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: CONSTANTS.ROOTDIR}];
-	const securitycheckersPathAndRoots = [{path: `${CONSTANTS.ROOTDIR}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: CONSTANTS.ROOTDIR}];
+	const decoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_DECODERS_CONF, root: CONSTANTS.ROOTDIR}];
+	const encoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_ENCODERS_CONF, root: CONSTANTS.ROOTDIR}];
+	const headermanagersPathAndRoots = [{path: CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF, root: CONSTANTS.ROOTDIR}];
+	const securitycheckersPathAndRoots = [{path: CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF, root: CONSTANTS.ROOTDIR}];
 
 	const apps = app.getApps();
 	for (const appObj of apps) {

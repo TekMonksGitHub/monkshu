@@ -1,0 +1,5 @@
+{
+    "/__org_monkshu__release" : "/apis/release.js",
+    "/__org_monkshu__blackboard" : "/lib/blackboard.js",
+    "/__org_monkshu__globalmem" : "/apis/globalmem.js"
+}

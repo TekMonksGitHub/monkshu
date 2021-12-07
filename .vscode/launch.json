@@ -35,6 +35,15 @@
             "outFiles": ["${workspaceFolder}/backend/**/*.js"]
         },
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Backend - Second Server",
+            "program": "${workspaceFolder}/backend/server/server.js",
+            "runtimeArgs": ["--preserve-symlinks"],
+            "outFiles": ["${workspaceFolder}/backend/**/*.js"],
+            "args": ["-c", "${workspaceFolder}/tests/backend/secondserver/conf"]
+        },
+        {
             "name": "Launch Desktop App",
             "type": "node",
             "request": "launch",

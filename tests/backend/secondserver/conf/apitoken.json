@@ -1,0 +1,4 @@
+{
+    "expiryTime": 3600000,
+    "tokenGCInterval": 1800000
+}
