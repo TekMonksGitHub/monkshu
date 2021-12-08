@@ -53,7 +53,7 @@ Built in blacklist and whitelist support for the frontend and backend HTTP serve
 
 Build Internet Scale Applications
 ==================================
-Monkshu includes a global distributed memory framework, which allows building SAS applications that scale as wide as the Internet, with a distributed memory that spans clusters, countries, multiple clould providers and data centers. You can now easily buid applications at the same global scale as Facebook or Google. 
+Monkshu includes a global distributed memory framework, which allows building SAAS applications that scale as wide as the Internet, with a distributed memory that spans clusters, countries, multiple clould providers and data centers. You can now easily buid applications at the same global scale as Facebook or Google. 
 
 There is also a global event management system using a Publish/Subscribe global dashboard, running on top the global distribued memory.
 
