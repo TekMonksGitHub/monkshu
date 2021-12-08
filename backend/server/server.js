@@ -7,6 +7,7 @@
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
 
+const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
 let _server;	// holds the transport 
 
 // support starting in stand-alone config
@@ -18,7 +19,7 @@ async function bootstrap() {
 
 	/* Init the logs */
 	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(CONSTANTS.LOGMAIN);
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
 
 	/* Init the cluster memory */
 	LOG.info("Initializing the cluster memory.");

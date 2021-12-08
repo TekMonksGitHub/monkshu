@@ -10,16 +10,15 @@ const confdir = path.resolve(args["c"] || args["conf"] ? (args["c"] || args["con
 
 exports.ARGS = args;
 exports.ROOTDIR = rootdir;
+exports.CONFDIR = confdir;
 exports.APPROOTDIR = rootdir + "/../apps";
 exports.LIBDIR = rootdir + "/lib";
 exports.LOGDIR = rootdir + "/logs";
-exports.ACCESSLOG = rootdir+"/logs/server.log.ndjson";
 exports.GLOBALMEMLOGDIR = rootdir+"/logs";
 exports.API_REGISTRY = confdir + "/apiregistry.json";
 exports.TRANSPORT = confdir + "/transport.json";
 exports.CLUSTERCONF = confdir + "/cluster.json";
 exports.LOGSCONF = confdir + "/log.json";
-exports.LOGMAIN = rootdir + "/logs/server.log.ndjson";
 exports.CRYPTCONF = confdir + "/crypt.json";
 exports.HTTPDCONF = confdir + "/httpd.json";
 exports.IPBLACKLIST = confdir + "/ipblacklist.json";

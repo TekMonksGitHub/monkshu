@@ -1,0 +1,4 @@
+{
+    "logfile": "server.log.ndjson",
+    "accesslog": "server.log.ndjson"
+}
