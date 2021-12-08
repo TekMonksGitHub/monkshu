@@ -1,5 +1,6 @@
 {
     "replication_node": true,
     "syncRetries": 3,
-    "syncTimeout": 1000
+    "syncTimeout": 1000,
+    "logfile": "globalmemory2.log.ndjson"
 }

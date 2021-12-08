@@ -8,12 +8,10 @@ const log_conf = require(CONSTANTS.LOGSCONF);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
 
-const logQueue = []; let pendingWrites = false;	// queueing mechanism for synchronous logging, eats memory potentially
-
 function initGlobalLoggerSync(logName) {
 	/* create the logger */
 	if (!fs.existsSync(CONSTANTS.LOGDIR)) {fs.mkdirSync(CONSTANTS.LOGDIR);}
-	const filewriter = ffs.createFileWriter(logName,log_conf.closeTimeOut,"utf8");
+	const filewriter = ffs.createFileWriter(logName,log_conf.fileCloseTimeOut,"utf8");
 	
 	global.LOG = new Logger(logName, log_conf.max_log_mb*1024*1024, filewriter);	// 100 MB log max
 	
@@ -78,35 +76,22 @@ Logger.prototype.getLogContents = function(callback) {
 
 Logger.prototype.writeFile = function(level, s, sync) {
 	const msg = JSON.stringify({ts: utils.getDateTime(), level, message: s})+"\n";
+	const _errorHandler = err => {
+		this._origLog("Logger error!\n"+err);
+		this._origLog(msg);
+		this._oldStderrWrite.call(process.stderr, "Logger error!\n"+err+"\n");
+		this._oldStderrWrite.call(process.stderr, msg);
+	}
 	
 	if (sync === undefined) {
-		const queuedWrite = msg => {
-			pendingWrites = true;
-			this.filewriter.writeFile(msg, err => {
-				pendingWrites = false;
-				if (err) { 
-					this._origLog("Logger error!");
-					this._origLog(msg);
-					this._oldStderrWrite.call(process.stderr, "Logger error!\n");
-					this._oldStderrWrite.call(process.stderr, msg);
-				} else if (logQueue.length) queuedWrite(logQueue.shift());
-			});
-		}
-
-		if (log_conf.sync_log) {
-			logQueue.push(msg); if (logQueue.length == 1 && !pendingWrites) queuedWrite(logQueue.shift());
-		} else queuedWrite(msg);
+		if (log_conf.sync_log) this.filewriter.queuedWrite(msg, err => {if (err) _errorHandler(err)});
+		else this.filewriter.writeFile(msg, err => {if (err) _errorHandler(err)});
 	} else {
 		try {fs.appendFileSync(this.path, msg);}
-		catch (err){
-			this._origLog("Logger error!");
-			this._origLog(msg);
-			this._oldStderrWrite.call(process.stderr, "Logger error!\n");
-			this._oldStderrWrite.call(process.stderr, msg);
-		};
+		catch (err) {_errorHandler(err)};
 	}
 }
 
 Logger.prototype.flush = function(callback) {
-	const timer = setInterval(_=>{if (!logQueue.length) {clearInterval(timer); callback();}}, 100);
+	const timer = setInterval(_=>{if (!this.filewriter.areTherePendingWrites()) {clearInterval(timer); callback();}}, 100);
 }

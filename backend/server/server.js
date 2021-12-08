@@ -12,7 +12,7 @@ let _server;	// holds the transport
 // support starting in stand-alone config
 if (require("cluster").isMaster == true) bootstrap();	
 
-function bootstrap() {
+async function bootstrap() {
 	/* Init - Server bootup */
 	console.log("Starting...");
 
@@ -39,7 +39,7 @@ function bootstrap() {
 
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
-	require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
+	await require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
 	
 	/* Init the apps themselves */
 	LOG.info("Initializing the apps.");
@@ -52,7 +52,7 @@ function bootstrap() {
 function _initAndRunTransportLoop() {
 	/* Init the transport */
 	_server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
-	_server.initSync();
+	_server.initSync(); module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
 	
 	/* Override the console now - to our log file*/
 	LOG.overrideConsole();
@@ -119,4 +119,4 @@ async function _doService(data, servObject, headers, url) {
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 
-module.exports = {bootstrap, blacklistIP: _server.blacklistIP, whitelistIP: _server.whitelistIP};
+module.exports = {bootstrap};

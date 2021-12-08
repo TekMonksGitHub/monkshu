@@ -1,7 +1,8 @@
-/* 
- * filewriter.js - Write the message to a file. Can append or overwrite. 
- *                 Needed because node.js will open multiple file handles to 
- *                 handle aysnc writes to the same file. This is not necessary.
+/** 
+ * Write the message to a file. Can append or overwrite. 
+ * Needed because node.js will open multiple file handles to 
+ * handle aysnc writes to the same file. This is not necessary.
+ * Can also handle queued writes for in sync writing to the file.
  * 
  * (C) 2018 TekMonks. All rights reserved.
  */
@@ -16,6 +17,8 @@ class FastFileWriter {
         this.encoding = encoding;
         this.overwrite = overwrite;
         this._resetInternalEnv();
+        this.writeQueue = [];
+        this.pendingWrites = false;
     }
 
     _writeToFile(data, callback) {
@@ -31,6 +34,20 @@ class FastFileWriter {
         if (this._env) delete this._env;
         this._env = {"bufferedWrites":[], "writesPending": 0, "fd":null, "isFileToBeOpened": true};
     }
+
+    queuedWrite(data, callback) {
+        const queuedWriteInternal = writeObject => {
+            this.pendingWrites = true;
+            this.writeFile(writeObject.data, err => {
+                this.pendingWrites = false; writeObject.callback(err);
+                if (this.writeQueue.length) queuedWriteInternal(this.writeQueue.shift());
+            });
+        }
+    
+        this.writeQueue.push({data, callback}); if (this.writeQueue.length == 1 && (!this.pendingWrites)) queuedWriteInternal(this.writeQueue.shift());
+    }
+
+    areTherePendingWrites() {return this.pendingWrites||this.writeQueue.length;}
     
     // callback(err)
     writeFile(data, callback) {

@@ -14,6 +14,7 @@ exports.APPROOTDIR = rootdir + "/../apps";
 exports.LIBDIR = rootdir + "/lib";
 exports.LOGDIR = rootdir + "/logs";
 exports.ACCESSLOG = rootdir+"/logs/server.log.ndjson";
+exports.GLOBALMEMLOGDIR = rootdir+"/logs";
 exports.API_REGISTRY = confdir + "/apiregistry.json";
 exports.TRANSPORT = confdir + "/transport.json";
 exports.CLUSTERCONF = confdir + "/cluster.json";
@@ -25,6 +26,7 @@ exports.IPBLACKLIST = confdir + "/ipblacklist.json";
 exports.IPWHITELIST = confdir + "/ipwhitelist.json";
 exports.BLACKBOARDCONF = confdir + "/blackboard.json";
 exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
+exports.OBJOBSERVERCONF = confdir + "/objectobserver.json";
 exports.RELEASEFILE = rootdir + "/../../RELEASE";
 exports.MAX_LOG = 1024;
 

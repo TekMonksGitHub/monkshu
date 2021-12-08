@@ -12,12 +12,15 @@
  * A caching daemon, or eviction engine can easily be 
  * built on top of this though.
  */
+const fs = require("fs");
+const fspromises = require("fs").promises;
 const conf = require(CONSTANTS.GLOBALMEMCONF);
+const objectwatcher = require(`${CONSTANTS.LIBDIR}/objectwatcher.js`);
 
-const _globalmemory = {}, _listeners = {}, _memInSyncListeners = [], server_id = require("crypto").randomUUID();
-let memoryInSync = false, acceptedMemoryOffer = false;
+const _listeners = {}, _memInSyncListeners = [], server_id = require("crypto").randomUUID(), globalmemlog = `${CONSTANTS.GLOBALMEMLOGDIR}/${conf.logfile}`;
+let _globalmemory = {}, memoryInSync = false, acceptedMemoryOffer = false, _tempRestoreGlobalMemoryObject = {};
 
-function init() {
+async function init() {
     global.DISTRIBUTED_MEMORY = this;
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_set", _set);
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_setmemory"+server_id, _setMemory);
@@ -33,6 +36,7 @@ function init() {
     if (conf.replication_node) { // replicate memory if configured
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_offer", _getMemoryOffer);  
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_accept", _acceptMemoryOffer);  
+        await _restoreGlobalMemoryFromFile();
     }
 }
 
@@ -74,8 +78,14 @@ const _set = message =>  {
 function _setMemory(message) {
     if (memoryInSync) {LOG.error(`Global memory coherence issue, got reply to sync after timeout. Global memory is now fragmented! Fragmented nodes are, this node -> ${server_id} and remote node -> ${message.__org_monkshu_distribued_memory_internals.server_id}.`); return; }  // we must have timedout before this server responded, ignore
     else LOG.info(`Syncing memory from ${message.__org_monkshu_distribued_memory_internals.server_id} -> to ${server_id}`);
+
+    if (conf.replication_node) {    // we will restore from the offer not the file now
+        _stopRestoringGlobalMemory(); LOG.info("Global memory restore is from memory to memory replication, not replay log."); 
+        _globalmemory = objectwatcher.observe({}, globalmemlog);
+    }
     
-    for (const key in message) if (key != "__org_monkshu_distribued_memory_internals") _globalmemory[key] = message[key];
+    for (const key in message) if (key != "__org_monkshu_distribued_memory_internals" && 
+        key != objectwatcher.getWatchedKeyName()) _globalmemory[key] = message[key];
     if (message.__org_monkshu_distribued_memory_internals.transfercomplete) {
         memoryInSync = true; for (const listener of _memInSyncListeners) listener(); }
 }
@@ -92,6 +102,22 @@ const _getMemoryOffer = message => {
 const _acceptMemoryOffer = message => {
     if (message.id == server_id)  BLACKBOARD.publish("__org_monkshu_distribued_memory_setmemory"+message.receiver,
         {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id}});    // TODO: chunk this
+}
+
+async function _restoreGlobalMemoryFromFile() {
+    LOG.info("Restoring global memory from replay log.");
+    try {await fspromises.access(globalmemlog, fs.constants.R_OK)} catch (err) {
+        LOG.info("No global memory replay log found. Assuming nothing needs to be restored.");
+        return;
+    }
+    await objectwatcher.restoreObject(_tempRestoreGlobalMemoryObject, globalmemlog);
+    if (!_tempRestoreGlobalMemoryObject.__global_memory_restore_stoppped) _globalmemory = objectwatcher.observe(
+        _tempRestoreGlobalMemoryObject, globalmemlog);
+}
+
+async function _stopRestoringGlobalMemory() {
+    _tempRestoreGlobalMemoryObject.__global_memory_restore_stoppped = true;
+    objectwatcher.stopRestoringObject(_tempRestoreGlobalMemoryObject);
 }
 
 module.exports = {init, set, get, listen, listenMemInSync, isMemoryInSync};
