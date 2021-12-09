@@ -33,8 +33,10 @@ function bootstrap() {
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
-	access.info(`Server started on ${conf.host||"::"}:${conf.port}`);
-	console.log(`Server started on ${conf.host||"::"}:${conf.port}`);
+	access.info(`HTTP transport started on ${conf.host||"::"}:${conf.port}`);
+	console.log(`HTTP transport started on ${conf.host||"::"}:${conf.port}`);
+	access.info("Server started.");
+	console.log("Server started.");
 }
 
 function _initConfSync() {

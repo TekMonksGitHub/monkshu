@@ -20,6 +20,7 @@ async function bootstrap() {
 	/* Init the logs */
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
+	LOG.overrideConsole();
 
 	/* Init the cluster memory */
 	LOG.info("Initializing the cluster memory.");
@@ -38,6 +39,9 @@ async function bootstrap() {
 	LOG.info("Initializing the distributed blackboard.");
 	require(CONSTANTS.LIBDIR+"/blackboard.js").init();
 
+	/* Run the transport */
+	_initAndRunTransportLoop();
+
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
 	await require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
@@ -46,17 +50,15 @@ async function bootstrap() {
 	LOG.info("Initializing the apps.");
 	require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();
 
-	/* Run the server */
-	_initAndRunTransportLoop();
+	/* Log the start */
+	LOG.info("Server started.");
+	LOG.console("Server started.");
 }
 
 function _initAndRunTransportLoop() {
 	/* Init the transport */
 	_server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
 	_server.initSync(); module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
-	
-	/* Override the console now - to our log file*/
-	LOG.overrideConsole();
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/

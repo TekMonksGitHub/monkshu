@@ -33,25 +33,37 @@ function observe(object, file) {
     });
 }
 
+/**
+ * Restores the given object from the given file.
+ * @param {object} object The object to restore into
+ * @param {string} file The file to restore from
+ * @return The timestamp of the time till which the object was restored
+ */
 async function restoreObject(object, file) {
     const readstream = fs.createReadStream(file), rl = readline.createInterface({input: readstream});
-    for await (const line of rl) {
+    let timeTill = 0; for await (const line of rl) {
         if (object._org_monkshu_watched?.stopRestore) {delete object._org_monkshu_watched.stopRestore; break;}
         if (line.trim() == "") continue;    // skip empty lines
 
-        const change = JSON.parse(line);
+        const change = JSON.parse(line); timeTill = change.time;
         if (change.op == "update") object[change.property] = change.value;
         if (change.op == "delete") delete object[change.property];
     }
-    rl.close(); readstream.close();
+    rl.close(); readstream.close(); return timeTill;
 }
 
+/** 
+ * Stops restoring the given object 
+ * @param object    The object to stop restoring. Must be the same object that restoreObject
+ *                  was called on before.
+ */
 const stopRestoringObject = object => object._org_monkshu_watched.stopRestore = true;
 
+/** @return The keyname for special key added to observed objects */
 const getWatchedKeyName = _ => "_org_monkshu_watched";
 
 function _objectChanged(target, property, value) {
-    const change = {op:"update", property, value}
+    const change = {op:"update", property, value, time: Date.now()}
     if (!value) {change.op = "delete"; delete change.value;}
     target._org_monkshu_watched.filewriter.queuedWrite(JSON.stringify(change)+"\n", err => {
         if (err) LOG.error("Object change serialization error "+err)});

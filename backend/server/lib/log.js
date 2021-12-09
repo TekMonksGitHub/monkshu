@@ -35,6 +35,8 @@ Logger.prototype.info = function(s, sync) {this.writeFile("info", s, sync);}
 
 Logger.prototype.debug = function(s, sync) {if (log_conf.debug) this.writeFile("debug", s, sync);}
 
+Logger.prototype.warn = function(s, sync) {this.writeFile("warning", s && s.stack ? s.stack:s, sync);}
+
 Logger.prototype.error = function(s, sync) {this.writeFile("error", s && s.stack ? s.stack:s, sync);}
 
 Logger.prototype.truncate = function(s) {return s && s.length > CONSTANTS.MAX_LOG ? s.substring(0, CONSTANTS.MAX_LOG) : s}
