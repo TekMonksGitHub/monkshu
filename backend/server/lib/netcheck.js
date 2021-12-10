@@ -9,12 +9,20 @@ const conf = require(CONSTANTS.NETCHECKCONF);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 let online = undefined, netEventListeners = [];
 
+/** Init the module */
 const init = _ => utils.setIntervalImmediately(_checkNet, conf.netcheck_frequency);
 
+/** @return true if net is online, else false */
 const isNetOnline = _ => online;
 
+/** 
+ * Adds a network state listener, if network state changes, 
+ * the listener is called with old and new states
+ * @param listener The listener callback 
+ */
 const addNetEventListener = listener => netEventListeners.push(listener);
 
+/**@param listener The listener to remove from network event broadcasts */
 const removeNetEventListener = listener => {if (netEventListeners.indexOf(listener) != -1)
     netEventListeners.splice(netEventListeners.indexOf(listener),1);}
 
