@@ -28,13 +28,13 @@ function _checkNet() {
     });
     testsocket.on("error", err => {
         testsocket.end(); const oldState = online; online=false;
-        if (oldState != online) _broadcastNetChangedEvent(oldState);
+        if (oldState != online) _broadcastNetChangedEvent(oldState, err);
     })
 }
 
-const _broadcastNetChangedEvent = oldState => {
+const _broadcastNetChangedEvent = (oldState, err) => {
     LOG.info(`Network online state changed from ${oldState} to ${online}.`);
-    if (!online) LOG.error("Network just went offline."); else LOG.info("Network came online.");
+    if (!online) LOG.error(`Network just went offline, the error was ${err}`); else LOG.info("Network came online.");
     for (const listener of netEventListeners) listener(oldState, online);
 }
 
