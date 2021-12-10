@@ -1,0 +1,4 @@
+{
+    "netcheck_frequency": 1000,
+    "netcheck_host": "192.168.10.85:22"
+}

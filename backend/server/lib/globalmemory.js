@@ -1,7 +1,4 @@
 /** 
- * (C) 2020. TekMonks. All rights reserved.
- * License: See enclosed LICENSE file.
- * 
  * Maintains distributed memory across vertical and
  * horizontal cluster members. Can run a worldwide
  * memory grid, at internet scale.
@@ -18,6 +15,9 @@
  * received within a set time period and retries, and if the
  * node is set as a replication node (i.e. a master) then it
  * will try to restore the state from a replay file.
+ * 
+ * (C) 2020. TekMonks. All rights reserved.
+ * License: See enclosed LICENSE file.
  */
 const fs = require("fs");
 const fspromises = require("fs").promises;
@@ -35,16 +35,7 @@ async function init() {
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_setmemory"+server_id, _setMemory);
     BLACKBOARD.subscribe("__org_monkshu_distribued_memory_offer", _receivedMemoryOffer);
 
-    const sendMemSyncRequest = counter => {
-        if (!acceptedMemoryOffer && counter < conf.syncRetries) {
-            BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_offer", {id: server_id}); 
-            setTimeout(_=>{if (!acceptedMemoryOffer) sendMemSyncRequest(counter+1);}, conf.syncTimeout);
-        } else if (counter == conf.syncRetries) {   // no one replied to us
-            LOG.warn("No reply received to globalmemory sync requests.")
-            if (!conf.replication_node) _setMemoryInSync(Date.now()); // no log to replay so assume we are in sync
-            else _restoreGlobalMemoryFromFile();
-        }
-    }; sendMemSyncRequest(0);   // start trying to sync the memory
+    _syncMemory();
     
     if (conf.replication_node) { // replicate memory if configured via memory to memory replication first
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_offer", _getMemoryOffer);  
@@ -90,7 +81,7 @@ const _set = message =>  {
         if (message.value) _globalmemory[message.key] = message.value; else delete _globalmemory[message.key];
         timeOfLastUpdate = message.time;
         for (const [key, cb] of Object.entries(_listeners)) if (message.key == key) cb(message.key, message.value);
-    } else updateQueue.unshift(mesage);
+    } else updateQueue.unshift(message);
 }
 
 async function _setMemory(message) {
@@ -127,6 +118,19 @@ const _acceptMemoryOffer = message => {
             {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id, timeTill: timeOfLastUpdate}});    // TODO: chunk this
 }
 
+function _syncMemory() {
+    const sendMemSyncRequest = counter => {
+        if (!acceptedMemoryOffer && counter < conf.syncRetries) {
+            BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_offer", {id: server_id}); 
+            setTimeout(_=>{if (!acceptedMemoryOffer) sendMemSyncRequest(counter+1);}, conf.syncTimeout);
+        } else if (counter == conf.syncRetries) {   // no one replied to us
+            LOG.warn("No reply received to globalmemory sync requests.")
+            if (!conf.replication_node) _setMemoryInSync(Date.now()); // no log to replay so assume we are in sync
+            else _restoreGlobalMemoryFromFile();
+        }
+    }; sendMemSyncRequest(0);   // start trying to sync the memory
+}
+
 async function _restoreGlobalMemoryFromFile() {
     const _observeAndSyncGlobalMemory = timeTill => {
         _globalmemory = objectwatcher.observe(_globalmemory, globalmemlog); _setMemoryInSync(timeTill); }
@@ -149,6 +153,7 @@ function _setMemoryInSync(timeTill) {
 }
 
 function _replayPendingUpdates(timeTill) {
+    updateQueue.sort((a,b) => a.time<b.time?1:a.time>b.time?-1:0);  // sort in time decreasing order, earliest at end
     let message = updateQueue.pop(); while(message) {
         if (message.time > timeTill) _set(message); 
         message = updateQueue.pop();

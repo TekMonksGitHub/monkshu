@@ -25,6 +25,7 @@ exports.IPBLACKLIST = confdir + "/ipblacklist.json";
 exports.IPWHITELIST = confdir + "/ipwhitelist.json";
 exports.BLACKBOARDCONF = confdir + "/blackboard.json";
 exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
+exports.NETCHECKCONF = confdir + "/netcheck.json";
 exports.OBJOBSERVERCONF = confdir + "/objectobserver.json";
 exports.RELEASEFILE = rootdir + "/../../RELEASE";
 exports.MAX_LOG = 1024;

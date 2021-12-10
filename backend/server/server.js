@@ -25,6 +25,10 @@ async function bootstrap() {
 	/* Init the cluster memory */
 	LOG.info("Initializing the cluster memory.");
 	require(CONSTANTS.LIBDIR+"/clustermemory.js").init();
+	
+	/* Start the network check service */
+	LOG.info("Initializing the network checker.")
+	require(CONSTANTS.LIBDIR+"/netcheck.js").init();
 
 	/* Init the list of apps */
 	LOG.info("Initializing the apps list.");
