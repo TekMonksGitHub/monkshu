@@ -91,18 +91,23 @@ function _receivedMemoryOffer(message) {
     if ((!acceptedMemoryOffer) && (message.id != server_id)) 
         acceptedMemoryOffer = true; 
     else return;   // first one wins
+    LOG.info(`Accepted memory replication offer from ${message.id} -> to ${server_id}`);
     BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_accept", {id: message.id, receiver: server_id});
 }
 
 const _getMemoryOffer = message => {
-    if (memoryInSync && (message.id != server_id)) 
+    if (memoryInSync && (message.id != server_id)) {
+        LOG.info(`Replying and offering memory replication from ${server_id} -> to ${message.id}`);
         BLACKBOARD.publish("__org_monkshu_distribued_memory_offer", {id: server_id});
+    }
 }
 
 const _acceptMemoryOffer = message => {
-    if ((message.id == server_id) && (message.receiver != server_id)) 
+    if ((message.id == server_id) && (message.receiver != server_id))  {
+        LOG.info(`Received offer acceptance. Sending memory from this server. Replicating memory from ${server_id} -> to ${message.receiver}`);
         BLACKBOARD.publish("__org_monkshu_distribued_memory_setmemory"+message.receiver,
             {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id}});    // TODO: chunk this
+    }
 }
 
 async function _setMemory(message) {
