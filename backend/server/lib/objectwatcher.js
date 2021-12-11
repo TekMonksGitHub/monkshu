@@ -11,6 +11,8 @@ const readline = require("readline");
 const conf = require(CONSTANTS.OBJOBSERVERCONF);
 const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
 
+const WATCHKEY = "_org_monkshu_watched";
+
 /**
  * Observes an object, and serlizes all recorded changes to the given
  * file in NDJSON format. 
@@ -19,7 +21,9 @@ const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
  * @return Returns the proxy object which should then be used instead of the given object.
  */
 function observe(object, file) {
-    object._org_monkshu_watched = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8")};
+    if (isBeingObserved(object)) return;    // already being observed
+
+    object[WATCHKEY] = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8")};
     return new Proxy(object, {
         get: function(target, property) {return Reflect.get(target, property);},
         set: function(target, property, value) {
@@ -42,7 +46,7 @@ function observe(object, file) {
 async function restoreObject(object, file) {
     const readstream = fs.createReadStream(file), rl = readline.createInterface({input: readstream});
     let timeTill = 0; for await (const line of rl) {
-        if (object._org_monkshu_watched?.stopRestore) {delete object._org_monkshu_watched.stopRestore; break;}
+        if (object[WATCHKEY]?.stopRestore) {delete object[WATCHKEY].stopRestore; break;}
         if (line.trim() == "") continue;    // skip empty lines
 
         const change = JSON.parse(line); timeTill = change.time;
@@ -57,10 +61,12 @@ async function restoreObject(object, file) {
  * @param object    The object to stop restoring. Must be the same object that restoreObject
  *                  was called on before.
  */
-const stopRestoringObject = object => object._org_monkshu_watched.stopRestore = true;
+const stopRestoringObject = object => object[WATCHKEY].stopRestore = true;
 
 /** @return The keyname for special key added to observed objects */
-const getWatchedKeyName = _ => "_org_monkshu_watched";
+const getWatchedKeyName = _ => WATCHKEY;
+
+const isBeingObserved = object => object.watchKey != undefined;
 
 function _objectChanged(target, property, value) {
     const change = {op:"update", property, value, time: Date.now()}
@@ -69,4 +75,4 @@ function _objectChanged(target, property, value) {
         if (err) LOG.error("Object change serialization error "+err)});
 }
 
-module.exports = {observe, restoreObject, stopRestoringObject, getWatchedKeyName};
+module.exports = {observe, restoreObject, stopRestoringObject, getWatchedKeyName, isBeingObserved};

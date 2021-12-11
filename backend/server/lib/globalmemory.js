@@ -22,12 +22,12 @@
 const fs = require("fs");
 const fspromises = require("fs").promises;
 const conf = require(CONSTANTS.GLOBALMEMCONF);
+const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
 const objectwatcher = require(`${CONSTANTS.LIBDIR}/objectwatcher.js`);
 
-const _listeners = {}, _memInSyncListeners = [], server_id = require("crypto").randomUUID(), updateQueue = [],
+const _listeners = {}, _memInSyncListeners = [], server_id = require("crypto").randomUUID(), 
     globalmemlog = `${CONSTANTS.GLOBALMEMLOGDIR}/${conf.logfile}`;
-let _globalmemory = {}, memoryInSync = false, acceptedMemoryOffer = false, timeOfLastUpdate = 0, 
-    pendingSyncPromiseResolve;
+let _globalmemory = {}, memoryInSync = false, acceptedMemoryOffer = false, pendingSyncPromiseResolve;
 
 async function init() {
     global.DISTRIBUTED_MEMORY = this;
@@ -42,6 +42,8 @@ async function init() {
         BLACKBOARD.subscribe("__org_monkshu_distribued_memory_getmemory_accept", _acceptMemoryOffer);  
     }
 
+    netcheck.addNetEventListener(_netStateChanged); // we want to know if the network loses connectivity or comes back
+
     if (conf.startupWaitsForSync && (!memoryInSync)) return new Promise(resolve => pendingSyncPromiseResolve = resolve);
     else return Promise.resolve();
 }
@@ -50,14 +52,17 @@ async function init() {
  * Sets hash and its value in the global memory.
  * @param {string} key The key
  * @param {object} value The value
+ * @throws Memory not in sync error if Global Memory is not 
+ *         in sync due to network or other issues.
  */
 const set = (key, value) => BLACKBOARD.publish("__org_monkshu_distribued_memory_set", {key, value, time: Date.now()});  // publish to all via blackboard, including ourselves
+
 /**
  * Gets hash and its value from the global memory.
  * @param {string} key The key
  * @return The value if found, null if not.
  */
-const get = key => _globalmemory[key];
+const get = key => _globalmemory[key]?_globalmemory[key].value:undefined;
 /**
  * Listens to the changes in the value of the key 
  * @param {string} key The key
@@ -77,27 +82,9 @@ const listenMemInSync = listener => _memInSyncListeners.push(listener);
 const isMemoryInSync = _ => memoryInSync;
 
 const _set = message =>  {
-    if (memoryInSync) {
-        if (message.value) _globalmemory[message.key] = message.value; else delete _globalmemory[message.key];
-        timeOfLastUpdate = message.time;
-        for (const [key, cb] of Object.entries(_listeners)) if (message.key == key) cb(message.key, message.value);
-    } else updateQueue.unshift(message);
-}
-
-async function _setMemory(message) {
-    if (memoryInSync) {LOG.error(`Global memory coherence issue, got reply to sync after timeout. Global memory is now fragmented! Fragmented nodes are, this node -> ${server_id} and remote node -> ${message.__org_monkshu_distribued_memory_internals.server_id}.`); return; }  // we must have timedout before this server responded, ignore
-    else LOG.info(`Syncing memory from ${message.__org_monkshu_distribued_memory_internals.server_id} -> to ${server_id}`);
-
-    if (conf.replication_node) {    // we will restore from the offer
-        LOG.info("Global memory restore is from memory to memory replication."); 
-        try { await fspromises.unlink(globalmemlog); } catch(err) {} //  truncate replay log 
-        _globalmemory = objectwatcher.observe({}, globalmemlog); 
-    }
-    
-    for (const key in message) if (key != "__org_monkshu_distribued_memory_internals" && 
-        key != objectwatcher.getWatchedKeyName()) _globalmemory[key] = message[key];
-    if (message.__org_monkshu_distribued_memory_internals?.transfercomplete) 
-        _setMemoryInSync(message.__org_monkshu_distribued_memory_internals.timeTill);
+    if ((!_globalmemory[message.key]) || (_globalmemory[message.key].time < message.time)) 
+        _globalmemory[message.key] = {value: message.value, time: message.time};    // set only if we have a stale value
+    for (const [key, cb] of Object.entries(_listeners)) if (message.key == key) cb(message.key, message.value);
 }
 
 function _receivedMemoryOffer(message) {
@@ -115,49 +102,77 @@ const _getMemoryOffer = message => {
 const _acceptMemoryOffer = message => {
     if ((message.id == server_id) && (message.receiver != server_id)) 
         BLACKBOARD.publish("__org_monkshu_distribued_memory_setmemory"+message.receiver,
-            {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id, timeTill: timeOfLastUpdate}});    // TODO: chunk this
+            {..._globalmemory, __org_monkshu_distribued_memory_internals:{transfercomplete: true, server_id}});    // TODO: chunk this
 }
 
-function _syncMemory() {
+async function _setMemory(message) {
+    if (memoryInSync) {LOG.error(`Global memory coherence issue, got reply to sync after timeout. Global memory is now fragmented! Fragmented nodes are, this node -> ${server_id} and remote node -> ${message.__org_monkshu_distribued_memory_internals.server_id}.`); return; }  // we must have timedout before this server responded, ignore
+    else LOG.info(`Syncing memory from ${message.__org_monkshu_distribued_memory_internals.server_id} -> to ${server_id}`);
+
+    if (conf.replication_node) {    // we will restore from the offer
+        LOG.info("Replication node global memory restore is from memory to memory replication."); 
+        try { await fspromises.unlink(globalmemlog); } catch(err) {} //  truncate replay log 
+        _globalmemory = !objectwatcher.isBeingObserved(_globalmemory) ? objectwatcher.observe(_globalmemory, globalmemlog) : _globalmemory; 
+    }
+    
+    for (const key in message) if (key != "__org_monkshu_distribued_memory_internals" && 
+        key != objectwatcher.getWatchedKeyName()) { // merge network into our memory
+            if ((!_globalmemory[key]) || (_globalmemory[key].time < message[key].time)) _globalmemory[key] = message[key];
+    }
+    for (const key in _globalmemory) {  // merge our memory into the network
+        if ((!message[key]) || (_globalmemory[key].time > message[key].time)) {
+                BLACKBOARD.publish("__org_monkshu_distribued_memory_set", {key, value: _globalmemory[key].value, 
+                    time: _globalmemory[key].time}); // update the network, we have a more recent value
+                _globalmemory[key] = _globalmemory[key];    // updates our replay log
+        }
+    }
+    if (message.__org_monkshu_distribued_memory_internals?.transfercomplete) _setMemoryInSync();
+}
+
+function _syncMemory(dontSyncFromFile) {
+    memoryInSync = false;   // not in sync
     const sendMemSyncRequest = counter => {
         if (!acceptedMemoryOffer && counter < conf.syncRetries) {
             BLACKBOARD.publish("__org_monkshu_distribued_memory_getmemory_offer", {id: server_id}); 
             setTimeout(_=>{if (!acceptedMemoryOffer) sendMemSyncRequest(counter+1);}, conf.syncTimeout);
         } else if (counter == conf.syncRetries) {   // no one replied to us
             LOG.warn("No reply received to globalmemory sync requests.")
-            if (!conf.replication_node) _setMemoryInSync(Date.now()); // no log to replay so assume we are in sync
+            if ((!conf.replication_node) || (dontSyncFromFile)) _setMemoryInSync(); 
             else _restoreGlobalMemoryFromFile();
         }
     }; sendMemSyncRequest(0);   // start trying to sync the memory
 }
 
 async function _restoreGlobalMemoryFromFile() {
-    const _observeAndSyncGlobalMemory = timeTill => {
-        _globalmemory = objectwatcher.observe(_globalmemory, globalmemlog); _setMemoryInSync(timeTill); }
+    const _observeAndSyncGlobalMemory = _ => {
+        _globalmemory = objectwatcher.observe(_globalmemory, globalmemlog); _setMemoryInSync(); }
+    const _mergeMemories = (mergeFrom, mergeTo) => {
+        for (const key in mergeFrom) if ((!mergeTo[key]) || (mergeTo[key].time < mergeFrom[key].time))
+            mergeTo[key] = mergeFrom[key];
+    }
 
-    LOG.info("Restoring global memory from replay log."); const replayLogCheckTime = Date.now();
+    LOG.info("Restoring global memory from replay log."); 
     try {await fspromises.access(globalmemlog, fs.constants.R_OK)} catch (err) {
         LOG.info("No global memory replay log found. Assuming nothing needs to be restored."); 
-        _observeAndSyncGlobalMemory(replayLogCheckTime);
+        _observeAndSyncGlobalMemory();
         return;
     }
-    const timeTillRestored = await objectwatcher.restoreObject(_globalmemory, globalmemlog);
-    _observeAndSyncGlobalMemory(timeTillRestored);
+    const _tempRestoreObject = {}; await objectwatcher.restoreObject(_tempRestoreObject, globalmemlog);
+    _mergeMemories(_tempRestoreObject, _globalmemory); _observeAndSyncGlobalMemory();
 }
 
-function _setMemoryInSync(timeTill) {
-    _replayPendingUpdates(timeTill); memoryInSync = true;
+function _setMemoryInSync() {
+    memoryInSync = true;
     LOG.info("Global memory is in sync"); 
     if (pendingSyncPromiseResolve) pendingSyncPromiseResolve();
-    for (const listener of _memInSyncListeners) listener(); 
+    for (const listener of _memInSyncListeners) listener(true); 
 }
 
-function _replayPendingUpdates(timeTill) {
-    updateQueue.sort((a,b) => a.time<b.time?1:a.time>b.time?-1:0);  // sort in time decreasing order, earliest at end
-    let message = updateQueue.pop(); while(message) {
-        if (message.time > timeTill) _set(message); 
-        message = updateQueue.pop();
-    }
+function _netStateChanged(oldOnlineState, newOnlineState) {
+    if (oldOnlineState == undefined && newOnlineState) return;  // server probably is starting
+
+    if (newOnlineState) _syncMemory(true);  // we came back online, sync from network only, file is already in sync anyways
+    else {memoryInSync = false; for (const listener of _memInSyncListeners) listener(false);}
 }
 
 module.exports = {init, set, get, listen, listenMemInSync, isMemoryInSync};
