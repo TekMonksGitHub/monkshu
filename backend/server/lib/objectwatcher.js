@@ -9,7 +9,6 @@
 const fs = require("fs");
 const readline = require("readline");
 const conf = require(CONSTANTS.OBJOBSERVERCONF);
-const utils = require(`${CONSTANTS.LIBDIR}/utils.js`)
 const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
 
 const WATCHKEY = "_org_monkshu_watched";
@@ -26,7 +25,7 @@ function observe(object, file) {
 
     object[WATCHKEY] = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8")};
     return new Proxy(object, {
-        get: function(target, property) {if (property != WATCHKEY) return Reflect.get(target, property); else return undefined;},
+        get: function(target, property) {return Reflect.get(target, property);},
         set: function(target, property, value) {
             if (property != WATCHKEY) { // refuse changes to our watchkey
                 _objectChanged(target, property, value);
@@ -80,8 +79,8 @@ const isBeingObserved = object => object.watchKey != undefined;
 function _objectChanged(target, property, value) {
     const change = {op:"update", property, value, time: Date.now()}
     if (!value) {change.op = "delete"; delete change.value;}
-    target._org_monkshu_watched.filewriter.queuedWrite(JSON.stringify(change)+"\n", err => {
-        if (err) LOG.error("Object change serialization error "+err)});
+    const watchedObject = Reflect.get(target, WATCHKEY); watchedObject.filewriter.queuedWrite(
+        JSON.stringify(change)+"\n", err => {if (err) LOG.error("Object change serialization error "+err)});
 }
 
 module.exports = {observe, restoreObject, stopRestoringObject, getWatchedKeyName, isBeingObserved};

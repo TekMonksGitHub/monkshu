@@ -107,7 +107,7 @@ function _receivedMemoryOffer(message) {
         BLACKBOARD.publish(ACCEPT_OFFER, {offering_server: message.offering_server, receiver: server_id});
     }
     else {
-        _partialOffers[message.id] = _createPartialOfferObject(message.id);
+        _partialOffers[message.offering_server] = _createPartialOfferObject(message.offering_server);
         LOG.info(`Recorded partial memory replication offer from ${message.offering_server} -> to ${server_id}`);   
     }
 }
@@ -136,7 +136,7 @@ async function _setMemoryFromFullSync(message) {
     }
     if (message[INTERNAL_KEY]?.transfercomplete) for (const key in _globalmemory) {  // merge any more recent updates we have into the network
         if ((!fullSyncKeysReceived.includes(key)) || (_globalmemory[key].time > message[key].time)) {
-            BLACKBOARD.publish(SETMEM, {key, value: _globalmemory[key].value, time: _globalmemory[key].time}); // update the network, we have a more recent value
+            BLACKBOARD.publish(SETMEM, {key, value: _globalmemory[key].value, time: _globalmemory[key].time, id: server_id}); // update the network, we have a more recent value
             if (conf.replication_node) _globalmemory[key] = _globalmemory[key];    // updates our replay log if we are a replication node
         }
         _setMemoryInSync();
@@ -167,7 +167,8 @@ function _lastChanceToAcceptOffers() {
 
 function _publishMemoryAsSetOperationsForPartialSync() {
     for (const key in _globalmemory) BLACKBOARD.publish(SETMEM, {key, value: _globalmemory[key].value, 
-        time: _globalmemory[key].time, totalcountBeingSent: Object.keys(_globalmemory).length, isPartialSyncMessage: true}); 
+        time: _globalmemory[key].time, totalcountBeingSent: Object.keys(_globalmemory).length, isPartialSyncMessage: true, 
+        id: server_id}); 
 }
 
 async function _restoreGlobalMemoryFromFile() {
@@ -202,12 +203,13 @@ function _netStateChanged(oldOnlineState, newOnlineState) {
     else {memoryInSync = false; for (const listener of _memInSyncListeners) listener(false);}
 }
 
-function _addPartialSyncMessageReceived(id, setsExpected) {
+function _addPartialSyncMessageReceived(sender_id, setsExpected) {
     if (memoryInSync) return;   // nothing to do - we are in sync already, probably an expired server sending set messages late 
+    if (sender_id == server_id) return; // we can't be receiving or processing a partial offer from ourselves.
 
-    _partialOffers[id] = _partialOffers[id] ? _partialOffers[id] : _createPartialOfferObject(id);
-    _partialOffers[id].received = _partialOffers[id].received + 1; _partialOffers[id].lastSetReceived = Date.now();
-    if (_partialOffers[id].received == setsExpected) _partialOffers[id].complete = true;
+    _partialOffers[sender_id] = _partialOffers[sender_id] ? _partialOffers[sender_id] : _createPartialOfferObject(sender_id);
+    _partialOffers[sender_id].received = _partialOffers[sender_id].received + 1; _partialOffers[sender_id].lastSetReceived = Date.now();
+    if (_partialOffers[sender_id].received == setsExpected) _partialOffers[sender_id].complete = true;
     _setSyncIfAllReplicasComplete();
 }
 
