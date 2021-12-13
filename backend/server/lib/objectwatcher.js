@@ -9,6 +9,7 @@
 const fs = require("fs");
 const readline = require("readline");
 const conf = require(CONSTANTS.OBJOBSERVERCONF);
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`)
 const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
 
 const WATCHKEY = "_org_monkshu_watched";
@@ -25,14 +26,22 @@ function observe(object, file) {
 
     object[WATCHKEY] = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8")};
     return new Proxy(object, {
-        get: function(target, property) {return Reflect.get(target, property);},
+        get: function(target, property) {if (property != WATCHKEY) return Reflect.get(target, property); else return undefined;},
         set: function(target, property, value) {
-            _objectChanged(target, property, value);
-            return Reflect.set(target, property, value);
+            if (property != WATCHKEY) { // refuse changes to our watchkey
+                _objectChanged(target, property, value);
+                return Reflect.set(target, property, value);
+            }
         },
         deleteProperty: function(target, property) {
-            _objectChanged(target, property);
-            return Reflect.deleteProperty(target, property);
+            if (property != WATCHKEY) { // refuse changes to our watchkey
+                _objectChanged(target, property);
+                return Reflect.deleteProperty(target, property);
+            }
+        },
+        ownKeys: function(target) {
+            let keys = Reflect.ownKeys(target); keys.splice(keys.indexOf(WATCHKEY), 1);
+            return keys;
         }
     });
 }

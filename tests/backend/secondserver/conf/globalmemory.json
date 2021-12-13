@@ -3,5 +3,7 @@
     "syncRetries": 3,
     "syncTimeout": 1000,
     "logfile": "globalmemory2.log.ndjson",
-    "startupWaitsForSync": true
+    "startupWaitsForSync": true,
+    "partialSyncMaxWait": 5000,
+    "partialSyncCheckInterval": 100
 }
