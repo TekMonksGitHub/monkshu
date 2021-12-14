@@ -144,9 +144,10 @@ async function _setMemoryFromFullSync(message) {
 }
 
 function _syncMemory(dontSyncFromFile) {
-    memoryInSync = false;  fullSyncKeysReceived = []; // not in sync
+    memoryInSync = false;  fullSyncKeysReceived = []; acceptedMemoryOffer = false; // not in sync, no offers accepted yet
     const sendMemSyncRequest = counter => {
         if (!acceptedMemoryOffer && counter < conf.syncRetries) {
+            LOG.info("Requesting memory synchronization offers, request number is "+counter);
             BLACKBOARD.publish(GET_MEM_OFFERS, {id: server_id}); 
             setTimeout(_=>{if (!acceptedMemoryOffer) sendMemSyncRequest(counter+1);}, conf.syncTimeout);
         } else if (counter == conf.syncRetries && (!_lastChanceToAcceptOffers())) {   // no one replied to us

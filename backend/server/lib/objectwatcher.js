@@ -74,7 +74,11 @@ const stopRestoringObject = object => object[WATCHKEY].stopRestore = true;
 /** @return The keyname for special key added to observed objects */
 const getWatchedKeyName = _ => WATCHKEY;
 
-const isBeingObserved = object => object.watchKey != undefined;
+/** @return true if the object is already being observed, false otherwise */
+const isBeingObserved = object => {
+    const watchedObject = Reflect.get(object, WATCHKEY);
+    return watchedObject != undefined;
+}
 
 function _objectChanged(target, property, value) {
     const change = {op:"update", property, value, time: Date.now()}
