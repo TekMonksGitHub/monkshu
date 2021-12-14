@@ -7,12 +7,13 @@
  */
 
 const topics = {}
+const fs = require("fs");
 let conf = require(CONSTANTS.BLACKBOARDCONF);
 const API_BB_PATH = "/__org_monkshu__blackboard";
 const rest = require(`${CONSTANTS.LIBDIR}/rest.js`);
-const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg";
-const CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf";
-const writeFileAsync = require("util").promisify(require("fs").writeFile);
+const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
+
+const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf";
 
 function init() {
     global.BLACKBOARD = this;
@@ -22,7 +23,7 @@ function init() {
         else conf = confNew;
 
         // serialize to survive restarts
-        writeFileAsync(CONSTANTS.BLACKBOARDCONF, JSON.stringify(confNew));    // serialize
+        fs.writeFile(CONSTANTS.BLACKBOARDCONF, JSON.stringify(confNew));    // serialize
     });
     process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = msg.conf});
     process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
@@ -49,6 +50,14 @@ async function publish(topic, payload) {
     }
 }
 
+async function isEntireReplicaClusterOnline() {
+    for (const replica of conf.replicas) {
+        const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
+        const check = await netcheck.checkConnect(host, port); if (!check.result) return false;
+    }
+    return true;
+}
+
 function subscribe(topic, callback) {
     if (!topics[topic]) topics[topic] = [];
     topics[topic].push(callback);
@@ -59,4 +68,4 @@ function _broadcast(msg) {
     if (topics[topic]) for (const subscriber of topics[topic]) subscriber(msg.payload);
 }
 
-module.exports = {init, doService, publish, subscribe}
+module.exports = {init, doService, publish, subscribe, isEntireReplicaClusterOnline}
