@@ -133,7 +133,7 @@ async function _setMemoryFromFullSync(message) {
     
     for (const key in message) if (key != INTERNAL_KEY && key != objectwatcher.getWatchedKeyName()) { // merge network into our memory
             if ((!_globalmemory[key]) || (_globalmemory[key].time < message[key].time)) _globalmemory[key] = message[key];
-            else if (conf.replication_node) _globalmemory[key] = message[key]; // updates our replay log if we are a replication node
+            else if (conf.replication_node) _globalmemory[key] = _globalmemory[key]; // updates our replay log if we are a replication node
             fullSyncKeysReceived.push(key);
     }
     if (message[INTERNAL_KEY]?.transfercomplete) {
