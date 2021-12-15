@@ -126,18 +126,22 @@ async function _setMemoryFromFullSync(message) {
 
     if (conf.replication_node) {    // we will restore from the offer
         LOG.info("Replication node global memory restore is from memory to memory replication."); 
+        if (objectwatcher.isBeingObserved(_globalmemory)) _globalmemory = await objectwatcher.stopObserving(_globalmemory);
         try { await fspromises.unlink(globalmemlog); } catch(err) {} //  truncate replay log 
-        _globalmemory = !objectwatcher.isBeingObserved(_globalmemory) ? objectwatcher.observe(_globalmemory, globalmemlog) : _globalmemory; 
+        _globalmemory = objectwatcher.observe(_globalmemory, globalmemlog); 
     }
     
     for (const key in message) if (key != INTERNAL_KEY && key != objectwatcher.getWatchedKeyName()) { // merge network into our memory
             if ((!_globalmemory[key]) || (_globalmemory[key].time < message[key].time)) _globalmemory[key] = message[key];
+            else if (conf.replication_node) _globalmemory[key] = message[key]; // updates our replay log if we are a replication node
             fullSyncKeysReceived.push(key);
     }
-    if (message[INTERNAL_KEY]?.transfercomplete) for (const key in _globalmemory) {  // merge any more recent updates we have into the network
-        if ((!fullSyncKeysReceived.includes(key)) || (_globalmemory[key].time > message[key].time)) {
-            BLACKBOARD.publish(SETMEM, {key, value: _globalmemory[key].value, time: _globalmemory[key].time, id: server_id}); // update the network, we have a more recent value
-            if (conf.replication_node) _globalmemory[key] = _globalmemory[key];    // updates our replay log if we are a replication node
+    if (message[INTERNAL_KEY]?.transfercomplete) {
+        for (const key in _globalmemory) {  // merge any more recent updates we have into the network
+            if ((!fullSyncKeysReceived.includes(key)) || (_globalmemory[key].time > message[key].time)) {
+                BLACKBOARD.publish(SETMEM, {key, value: _globalmemory[key].value, time: _globalmemory[key].time, id: server_id}); // update the network, we have a more recent value
+                if (conf.replication_node) _globalmemory[key] = _globalmemory[key];    // updates our replay log if we are a replication node
+            }
         }
         _setMemoryInSync();
     }

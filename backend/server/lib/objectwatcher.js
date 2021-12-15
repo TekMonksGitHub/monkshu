@@ -21,10 +21,10 @@ const WATCHKEY = "_org_monkshu_watched";
  * @return Returns the proxy object which should then be used instead of the given object.
  */
 function observe(object, file) {
-    if (isBeingObserved(object)) return;    // already being observed
+    if (isBeingObserved(object)) return object;    // already being observed
 
-    object[WATCHKEY] = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8")};
-    return new Proxy(object, {
+    object[WATCHKEY] = {filewriter: ffs.createFileWriter(file, conf.fileCloseTimeOut, "utf8"), original_obj: object};
+    const revokableProxy = Proxy.revocable(object, {
         get: function(target, property) {return Reflect.get(target, property);},
         set: function(target, property, value) {
             if (property != WATCHKEY) { // refuse changes to our watchkey
@@ -43,6 +43,26 @@ function observe(object, file) {
             return keys;
         }
     });
+    object[WATCHKEY].revokableProxy = revokableProxy;
+    return revokableProxy.proxy;
+}
+
+/**
+ * Stops watching the given object and returns a non-proxied object.
+ * @param {object} proxy The object being watched
+ * @returns The original object.
+ */
+async function stopObserving(proxy) {
+    if (!isBeingObserved(proxy)) return proxy;   // nothing to do
+
+    return new Promise(resolve => {
+        const watchedObject = Reflect.get(proxy, WATCHKEY); 
+        watchedObject.filewriter.close(_=>{
+            watchedObject.revokableProxy.revoke(); 
+            delete watchedObject.original_obj[WATCHKEY]; 
+            resolve(watchedObject.original_obj)
+        }); 
+    });   
 }
 
 /**
@@ -87,4 +107,4 @@ function _objectChanged(target, property, value) {
         JSON.stringify(change)+"\n", err => {if (err) LOG.error("Object change serialization error "+err)});
 }
 
-module.exports = {observe, restoreObject, stopRestoringObject, getWatchedKeyName, isBeingObserved};
+module.exports = {observe, stopObserving, restoreObject, stopRestoringObject, getWatchedKeyName, isBeingObserved};

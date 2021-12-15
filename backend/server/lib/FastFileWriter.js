@@ -21,6 +21,11 @@ class FastFileWriter {
         this.pendingWrites = false;
     }
 
+    close(callback) {
+        if (this._env.fd) fs.close(this._env.fd, callback); else callback();
+        this._resetInternalEnv();
+    }
+
     _writeToFile(data, callback) {
         this._env.writesPending++;
         fs.writeFile(this._env.fd, data, this.encoding, e => {
