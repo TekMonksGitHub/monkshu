@@ -59,8 +59,7 @@ There is also a global event management system using a Publish/Subscribe global 
 
 NPMs needed
 ===========
-(1) Mustache.
-(2) sqlite3 and bcryptjs if using sample authentication based on SQLite3 and Bcrypt algorithms.
+We strive to minimize the use of external libraries. This keeps Monkshu secure, and also independent. Only Mustache for the out of the box deployment.
 
 Documentation
 ===========
