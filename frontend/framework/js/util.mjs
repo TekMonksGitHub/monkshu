@@ -176,7 +176,17 @@ function getChildByID(element, id) {
     return retNodes;
 }
 
+/**
+ * Calls the given function at the given intervals with the first call starting immediately.
+ * @param {function} functionToCall The function to call
+ * @param {number} interval The interval in milliseconds
+ * @return The timer
+ */
+ const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
+
+/** @return Fully resolved URL for given relative URL */
 const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName}
+    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName,
+    setIntervalImmediately}

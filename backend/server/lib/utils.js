@@ -251,8 +251,9 @@ function watchFile(path, opIfModified, frequency) {
  * Calls the given function at the given intervals with the first call starting immediately.
  * @param {function} functionToCall The function to call
  * @param {number} interval The interval in milliseconds
+ * @return The timer
  */
-const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); setInterval(functionToCall, interval)};
+ const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getObjectKeyValueCaseInsensitive, 
     getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getEmbeddedIPV4, 
