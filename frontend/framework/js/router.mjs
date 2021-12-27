@@ -84,11 +84,11 @@ async function loadPage(url, dataModels={}) {
 /**
  * Loads the given HTML page, renders it using data models.
  * @param url URL to load
- * @param dataModels Data models
+ * @param dataModels Data models, the default is an empty model
  * @param checkSecurity Whether to enforce security or not, default is true
  * @returns The loaded HTML
  */
-async function loadHTML(url, dataModels, checkSecurity = true) {
+async function loadHTML(url, dataModels={}, checkSecurity=true) {
 	const urlParsed = new URL(url); url = urlParsed.origin + urlParsed.pathname; 	// Parse
 	if (checkSecurity && !securityguard.isAllowed(url)) throw new Error("Not allowed: Security Exception");	// security block
 
