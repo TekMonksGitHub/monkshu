@@ -90,6 +90,10 @@ $$.importPlugin = (url, nocache) => {
     });
 }
 
+$$.isMobile = _ => (navigator.userAgent.toLowerCase().includes("mobile")||navigator.userAgent.toLowerCase().includes("opera mobi"));
+
+$$.isPortraitScreen = _ => window.screen.orientation?.type == "portrait-primary" || window.orientation == 0;
+
 $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
         headers: {'Content-Type': contentType||'text/plain'}});
