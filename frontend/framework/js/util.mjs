@@ -185,7 +185,7 @@ function getChildByID(element, id) {
  const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
 
 /** @return Fully resolved URL for given relative URL */
-const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.origin).href;
+const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.href).href;
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName,

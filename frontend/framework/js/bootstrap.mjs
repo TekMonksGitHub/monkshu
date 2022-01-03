@@ -3,13 +3,13 @@
  * License: See enclosed LICENSE file.
  */
 
-import {i18n} from "/framework/js/i18n.mjs";
 import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 
 export async function bootstrap(appPath) {
-	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS;
-	i18n.init(appPath);
-	window.monkshu_env = {components:{}, pageload_funcs:{}, pagedata_funcs:{}, frameworklibs:{}, apps:{}};
+	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS; window.monkshu_env = {components:{}, frameworklibs:{}, apps:{}};
+
+	const i18n = (await import("/framework/js/i18n.mjs")).i18n; i18n.init(appPath);
+	const router = (await import("/framework/js/router.mjs")).router; router.init();
 	await _loadFrameworkLibs();
 
 	let {application} = await import(`${appPath}/js/application.mjs`);											

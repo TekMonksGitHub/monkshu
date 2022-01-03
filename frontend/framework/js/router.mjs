@@ -3,12 +3,16 @@
  * (C) 2018 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
+import {util} from "/framework/js/util.mjs";
 import {i18n} from "/framework/js/i18n.mjs";
 import {session} from "/framework/js/session.mjs";
 import {pwasupport} from "/framework/js/pwasupport.mjs"
 import {securityguard} from "/framework/js/securityguard.mjs";
 
 const HS = "?.=", PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_data";
+
+/** Inits the router, called by bootstrap */
+const init = _ => window.monkshu_env.router = {pageload_funcs: [], urlRewriters: [], pagedata_funcs: []};
 
 /**
  * Sets the current app as PWA
@@ -32,7 +36,7 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  * @param url The URL to navigate to
  */
  function navigate(url) {
-	let normalizedUrl = new URL(url, window.location.href).href;	// normalize
+	let normalizedUrl = _getRewrittenURL(url).href;	// normalize
 	if (normalizedUrl.indexOf(HS) == -1) normalizedUrl = encodeURL(url);
 	window.location = normalizedUrl;
 }
@@ -43,7 +47,7 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  * @param dataModels Data models object
  */
 async function loadPage(url, dataModels={}) {
-	const urlParsed = new URL(url, window.location.href), baseURL = urlParsed.origin + urlParsed.pathname; url = urlParsed.href;	// normalize
+	const urlParsed = _getRewrittenURL(url); url = urlParsed.href;	// normalize
 
 	// in case of hard reloads etc we may have saved transient data
 	if (session.get(PAGE_TRANSIENT_DATA) && !Object.keys(dataModels).length) dataModels = session.get(PAGE_TRANSIENT_DATA);
@@ -72,9 +76,8 @@ async function loadPage(url, dataModels={}) {
 	document.close();
 
 	// notify those who want to know that a new page was loaded
-	if (window.monkshu_env.pageload_funcs[url]) for (const func of window.monkshu_env.pageload_funcs[url]) await func(dataModels, url);
-	if (window.monkshu_env.pageload_funcs[baseURL]) for (const func of window.monkshu_env.pageload_funcs[baseURL]) await func(dataModels, url);
-	if (window.monkshu_env.pageload_funcs["*"]) for (const func of window.monkshu_env.pageload_funcs["*"]) await func(dataModels, url);
+	if (window.monkshu_env.router.pageload_funcs[url]) for (const func of window.monkshu_env.router.pageload_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.router.pageload_funcs["*"]) for (const func of window.monkshu_env.router.pageload_funcs["*"]) await func(dataModels, url);
 
 	// inject PWA manifests if setup for this app
 	const appName = getCurrentAppName(url); 
@@ -89,7 +92,7 @@ async function loadPage(url, dataModels={}) {
  * @returns The loaded HTML
  */
 async function loadHTML(url, dataModels={}, checkSecurity=true) {
-	const urlParsed = new URL(url); url = urlParsed.origin + urlParsed.pathname; 	// Parse
+	const urlParsed = _getRewrittenURL(url); url = urlParsed.origin + urlParsed.pathname; 	// Parse
 	if (checkSecurity && !securityguard.isAllowed(url)) throw new Error("Not allowed: Security Exception");	// security block
 
 	try {
@@ -99,9 +102,6 @@ async function loadHTML(url, dataModels={}, checkSecurity=true) {
 		window.monkshu_env.frameworklibs["__org_monkshu_mustache"] = Mustache;
 
 		dataModels = await getPageData(urlParsed.href, dataModels);
-		if (window.monkshu_env.pagedata_funcs[urlParsed.href]) for (const func of window.monkshu_env.pagedata_funcs[urlParsed.href]) await func(dataModels, url);
-		if (window.monkshu_env.pagedata_funcs[url]) for (const func of window.monkshu_env.pagedata_funcs[url]) await func(dataModels, url);
-		if (window.monkshu_env.pagedata_funcs["*"]) for (const func of window.monkshu_env.pagedata_funcs["*"]) await func(dataModels, url);
 
 		Mustache.parse(html);
 		html = Mustache.render(html, dataModels);
@@ -145,6 +145,9 @@ async function getPageData(url=getCurrentURL(), dataModels) {
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
 	dataModels["__window"] = _ => (key, render) => window[render(key)];
 
+	if (window.monkshu_env.router.pagedata_funcs[util.resolveURL(url)]) for (const func of window.monkshu_env.router.pagedata_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.router.pagedata_funcs["*"]) for (const func of window.monkshu_env.router.pagedata_funcs["*"]) await func(dataModels, url);
+
 	return dataModels;
 }
 
@@ -175,7 +178,7 @@ async function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
  * @param url The URL in hash form
  * @returns true if we have navigated to this page before, else false
  */
-function isInHistory(url) {``
+function isInHistory(url) {
 	const history = session.get("__org_monkshu_router_history");
 	if (!history) return false;
 
@@ -212,30 +215,50 @@ function encodeURL(url) {
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to run
  */
-const addOnLoadPage = (url, func) => { if (window.monkshu_env.pageload_funcs[url]) 
-	window.monkshu_env.pageload_funcs[url].push(func); else window.monkshu_env.pageload_funcs[url] = [func]; }
+const addOnLoadPage = (url, func) => { url = util.resolveURL(url); 
+	if (window.monkshu_env.router.pageload_funcs[url]) window.monkshu_env.router.pageload_funcs[url].push(func); 
+	else window.monkshu_env.router.pageload_funcs[url] = [func]; }
 /**
  * Adds functions to run when the given page loads its data
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to run
  */
-const addOnLoadPageData = (url, func) => { if (window.monkshu_env.pagedata_funcs[url])
-	window.monkshu_env.pagedata_funcs[url].push(func); else window.monkshu_env.pagedata_funcs[url] = [func]; }
+const addOnLoadPageData = (url, func) => { url = util.resolveURL(url); 
+	if (window.monkshu_env.router.pagedata_funcs[url]) window.monkshu_env.router.pagedata_funcs[url].push(func); 
+	else window.monkshu_env.router.pagedata_funcs[url] = [func]; }
+/**
+ * Adds url rewriting functions
+ * @param url The URL on which to run the functions, hashed
+ * @param func The function to run
+ */
+const addURLRewriter = (url, func) => { url = util.resolveURL(url); 
+	if (window.monkshu_env.router.urlRewriters[url]) window.monkshu_env.router.urlRewriters[url].push(func); 
+	else window.monkshu_env.router.urlRewriters[url] = [func]; }
 
 /**
  * Removes functions to run when the given page loads
  * @param url The URL on which to run the functions, not hashed
- * @param func The function to run
+ * @param func The function to remove
  */
-const removeOnLoadPage = (url, func) => { if (window.monkshu_env.pageload_funcs[url] && window.monkshu_env.pageload_funcs[url].indexOf(func)!=-1) 
-	window.monkshu_env.pageload_funcs[url].splice(window.monkshu_env.pageload_funcs[url].indexOf(func)) }
+const removeOnLoadPage = (url, func) => { url = util.resolveURL(url); 
+	if (window.monkshu_env.router.pageload_funcs[url] && window.monkshu_env.router.pageload_funcs[url].indexOf(func)!=-1) 
+		window.monkshu_env.router.pageload_funcs[url].splice(window.monkshu_env.router.pageload_funcs[url].indexOf(func)) }
 /**
  * Removes functions to run when the given page loads its data
  * @param url The URL on which to run the functions, not hashed
- * @param func The function to run
+ * @param func The function to remove
  */
-const removeOnLoadPageData = (url, func) => { if (window.monkshu_env.pagedata_funcs[url] && window.monkshu_env.pagedata_funcs[url].indexOf(func)!=-1) 
-	window.monkshu_env.pagedata_funcs[url].splice(window.monkshu_env.pagedata_funcs[url].indexOf(func)) }
+const removeOnLoadPageData = (url, func) => {url = util.resolveURL(url); 
+	if (window.monkshu_env.router.pagedata_funcs[url] && window.monkshu_env.router.pagedata_funcs[url].indexOf(func)!=-1) 
+		window.monkshu_env.router.pagedata_funcs[url].splice(window.monkshu_env.router.pagedata_funcs[url].indexOf(func)) }
+/**
+ * Removes the given URL rewriter function
+ * @param url The URL on which to run the functions, hashed
+ * @param func The function to remove
+ */
+const removeURLRewriter = (url, func) => { url = util.resolveURL(url); 
+if (window.monkshu_env.router.urlRewriters[url] && window.monkshu_env.router.urlRewriters[url].indexOf(func)!=-1) 
+	window.monkshu_env.router.urlRewriters[url].splice(window.monkshu_env.router.urlRewriters[url].indexOf(func)) }
 
 /** Takes the framework back to the index page */
 const doIndexNavigation = _ => window.location = window.location.origin;
@@ -269,7 +292,16 @@ function getCurrentAppName(url) {	// relies on URL being in Monkshu standard for
 	return appName;
 }
 
+function _getRewrittenURL(url) {
+	const testURL = util.resolveURL(url); let newURL = testURL;
+	if (window.monkshu_env.router.urlRewriters && window.monkshu_env.router.urlRewriters[testURL]) 
+		for (const rewriter of window.monkshu_env.router.urlRewriters[testURL]) newURL = rewriter(testURL); 
+	if (window.monkshu_env.router.urlRewriters && window.monkshu_env.router.urlRewriters["*"])
+		for (const rewriter of window.monkshu_env.router.urlRewriters["*"]) newURL = rewriter(testURL);
+	return new URL(newURL, window.location.origin);
+}
+
 export const router = {navigate, loadPage, loadHTML, reload, hardreload, isInHistory, runShadowJSScripts, getPageData, 
 	expandPageData, decodeURL, encodeURL, addOnLoadPage, removeOnLoadPage, addOnLoadPageData, removeOnLoadPageData, 
-	getCurrentURL, getCurrentPageData, setCurrentPageData, doIndexNavigation, getLastSessionURL, getMustache, 
-	setAppAsPWA, getCurrentAppName};
+	addURLRewriter, removeURLRewriter, getCurrentURL, getCurrentPageData, setCurrentPageData, doIndexNavigation, 
+	getLastSessionURL, getMustache, setAppAsPWA, getCurrentAppName, init};
