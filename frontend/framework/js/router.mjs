@@ -215,7 +215,7 @@ function encodeURL(url) {
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to run
  */
-const addOnLoadPage = (url, func) => { url = util.resolveURL(url); 
+const addOnLoadPage = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pageload_funcs[url]) window.monkshu_env.router.pageload_funcs[url].push(func); 
 	else window.monkshu_env.router.pageload_funcs[url] = [func]; }
 /**
@@ -223,7 +223,7 @@ const addOnLoadPage = (url, func) => { url = util.resolveURL(url);
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to run
  */
-const addOnLoadPageData = (url, func) => { url = util.resolveURL(url); 
+const addOnLoadPageData = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pagedata_funcs[url]) window.monkshu_env.router.pagedata_funcs[url].push(func); 
 	else window.monkshu_env.router.pagedata_funcs[url] = [func]; }
 /**
@@ -231,7 +231,7 @@ const addOnLoadPageData = (url, func) => { url = util.resolveURL(url);
  * @param url The URL on which to run the functions, hashed
  * @param func The function to run
  */
-const addURLRewriter = (url, func) => { url = util.resolveURL(url); 
+const addURLRewriter = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.urlRewriters[url]) window.monkshu_env.router.urlRewriters[url].push(func); 
 	else window.monkshu_env.router.urlRewriters[url] = [func]; }
 
@@ -240,7 +240,7 @@ const addURLRewriter = (url, func) => { url = util.resolveURL(url);
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to remove
  */
-const removeOnLoadPage = (url, func) => { url = util.resolveURL(url); 
+const removeOnLoadPage = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pageload_funcs[url] && window.monkshu_env.router.pageload_funcs[url].indexOf(func)!=-1) 
 		window.monkshu_env.router.pageload_funcs[url].splice(window.monkshu_env.router.pageload_funcs[url].indexOf(func)) }
 /**
@@ -248,7 +248,7 @@ const removeOnLoadPage = (url, func) => { url = util.resolveURL(url);
  * @param url The URL on which to run the functions, not hashed
  * @param func The function to remove
  */
-const removeOnLoadPageData = (url, func) => {url = util.resolveURL(url); 
+const removeOnLoadPageData = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pagedata_funcs[url] && window.monkshu_env.router.pagedata_funcs[url].indexOf(func)!=-1) 
 		window.monkshu_env.router.pagedata_funcs[url].splice(window.monkshu_env.router.pagedata_funcs[url].indexOf(func)) }
 /**
@@ -256,7 +256,7 @@ const removeOnLoadPageData = (url, func) => {url = util.resolveURL(url);
  * @param url The URL on which to run the functions, hashed
  * @param func The function to remove
  */
-const removeURLRewriter = (url, func) => { url = util.resolveURL(url); 
+const removeURLRewriter = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 if (window.monkshu_env.router.urlRewriters[url] && window.monkshu_env.router.urlRewriters[url].indexOf(func)!=-1) 
 	window.monkshu_env.router.urlRewriters[url].splice(window.monkshu_env.router.urlRewriters[url].indexOf(func)) }
 
