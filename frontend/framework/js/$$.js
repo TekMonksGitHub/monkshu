@@ -94,6 +94,15 @@ $$.isMobile = _ => (navigator.userAgent.toLowerCase().includes("mobile")||naviga
 
 $$.isPortraitScreen = _ => window.screen.orientation?.type == "portrait-primary" || window.orientation == 0;
 
+$$.getOS = _ => {
+    if (/(iPhone|iPod|iPad)/i.test(navigator.userAgent)) return "ios";
+    if (/android/i.test(navigator.userAgent)) return "android";
+    if (/Macintosh/i.test(navigator.userAgent)) return "macos";
+    if (/Windows/i.test(navigator.userAgent)) return "windows";
+    if (/Linux/i.test(navigator.userAgent)) return "linux";
+    return "unknown";
+}
+
 $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
         headers: {'Content-Type': contentType||'text/plain'}});
