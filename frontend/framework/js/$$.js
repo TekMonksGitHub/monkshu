@@ -103,6 +103,13 @@ $$.getOS = _ => {
     return "unknown";
 }
 
+$$.copyTextToClipboard = text => {
+    if (navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    
+    const type = "text/plain", blob = new Blob([text], { type }), data = [new ClipboardItem({ [type]: blob })];
+    return navigator.clipboard.write(data);
+}
+
 $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
         headers: {'Content-Type': contentType||'text/plain'}});
