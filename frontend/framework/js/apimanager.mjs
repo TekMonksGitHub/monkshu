@@ -33,13 +33,18 @@ async function rest(url, type, req, sendToken, extractToken, canUseCache) {
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
-    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken), response = await fetch(urlToCall, fetchInit);
-    if (response.ok) {
-        const respObj = await response.json();
-        if (extractToken) _extractTokens(response, respObj);
-        if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
-        return respObj;   
-    } else return null;
+    try {
+        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken), response = await fetch(urlToCall, fetchInit);
+        if (response.ok) {
+            const respObj = await response.json();
+            if (extractToken) _extractTokens(response, respObj);
+            if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
+            return respObj;   
+        } else return null;
+    } catch (err) {
+        LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
+        return null;
+    }
 }
 
 /**
@@ -56,15 +61,21 @@ async function rest(url, type, req, sendToken, extractToken, canUseCache) {
  */
 async function blob(url, filename, type, req, sendToken, extractToken) {
     const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*");
-    const response = await fetch(urlToCall, fetchInit);
-    if (response.ok) {
-        if (extractToken) _extractTokens(response);
-        const respBlob = await response.blob();
-        const url = window.URL.createObjectURL(respBlob), link = document.createElement("a");
-        link.style.display = "none"; link.href = url; link.download = filename;
-        document.body.appendChild(link); link.click(); link.remove();  
-        return true;
-    } else return false;
+
+    try {
+        const response = await fetch(urlToCall, fetchInit);
+        if (response.ok) {
+            if (extractToken) _extractTokens(response);
+            const respBlob = await response.blob();
+            const url = window.URL.createObjectURL(respBlob), link = document.createElement("a");
+            link.style.display = "none"; link.href = url; link.download = filename;
+            document.body.appendChild(link); link.click(); link.remove();  
+            return true;
+        } else return false;
+    } catch (err) {
+        LOG.error(`Error in blob'ing ${url} for request ${JSON.stringify(req)} of type ${type} and filename ${filename} due to ${err}`);
+        return false;
+    }
 }
 
 /**
