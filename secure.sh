@@ -49,13 +49,15 @@ if ! certbot certonly --webroot -d $DOMAIN -w "$MONKSHU_PATH/frontend"; then
 	echo Certbot install failed. Exiting.
 	kill -9 $PID_CERTBOT_SERVER
 	rm -rf "$MONKSHU_PATH/frontend/server/certbot_tmp"
-        exit 1
+    exit 1
 else 
 	kill -9 $PID_CERTBOT_SERVER
 	rm -rf "$MONKSHU_PATH/frontend/server/certbot_tmp"
 	chmod 644 /etc/letsencrypt/live/$DOMAIN/privkey.pem
 	chmod 755 /etc/letsencrypt/archive/
 	chmod 755 /etc/letsencrypt/live/
+	ln -s "$MONKSHU_PATH/preLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/pre/monkshu_pre.sh
+	ln -s "$MONKSHU_PATH/postLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/post/monkshu_post.sh
 fi
 echo Done.
 
