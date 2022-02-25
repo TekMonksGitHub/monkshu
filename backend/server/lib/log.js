@@ -6,7 +6,8 @@
 const fs = require("fs");
 const log_conf = require(CONSTANTS.LOGSCONF);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
-const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`)
+const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`);
+const loggers = {};
 
 function initGlobalLoggerSync(logName) {
 	/* create the logger */
@@ -20,7 +21,21 @@ function initGlobalLoggerSync(logName) {
 	LOG.info("Logging subsystem initialized.", true);
 }
 
-exports.initGlobalLoggerSync = initGlobalLoggerSync;
+function doService(jsonReq, _servObject, _headers, _url, apiconf) {
+	if ((!jsonReq.level) || (!jsonReq.message)) {LOG.error(`Bad incoming remote log request ${JSON.stringify(jsonReq)}`); return;}
+	
+	let logger; if (apiconf.logpath) { LOG.error("Bad remote log config, need logpath, redirecting logs to main server log."); logger = LOG; } 
+	else {
+		if (!loggers[logpath]) loggers[logpath] = new Logger(apiconf.logpath, log_conf.max_log_mb*1024*1024, 
+			ffs.createFileWriter(apiconf.logpath, log_conf.fileCloseTimeOut, "utf8"));
+		logger = loggers[logpath];
+	}
+	try { logger[jsonReq.level](jsonReq.message); } catch (err) { 
+		logger.error(`Error logging, incoming request is ${JSON.stringify(jsonReq)}, message is: ${jsonReq.message}, error is ${err}.`);
+	}
+}
+
+module.exports = {initGlobalLoggerSync, doService};
 
 Logger = function(path, maxsize, filewriter) {
 	this.path = path;

@@ -14,6 +14,7 @@ exports.CONFDIR = confdir;
 exports.APPROOTDIR = rootdir + "/../apps";
 exports.LIBDIR = rootdir + "/lib";
 exports.LOGDIR = rootdir + "/logs";
+exports.JAVADIR = rootdir + "/java";
 exports.GLOBALMEMLOGDIR = rootdir+"/logs";
 exports.API_REGISTRY = confdir + "/apiregistry.json";
 exports.TRANSPORT = confdir + "/transport.json";

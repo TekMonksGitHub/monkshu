@@ -14,8 +14,10 @@ let decoders, encoders, headermanagers, securitycheckers;
 
 function initSync() {
 	let apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY) || JSON.parse(fs.readFileSync(CONSTANTS.API_REGISTRY));
-	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
 	if (!CLUSTER_MEMORY.get(API_REG_DISTM_KEY)) CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
+
+	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
+	for (const key in apireg) apireg[key] = fs.existsSync(apireg[key].split("?")[0]) ? apireg[key] : (`${CONSTANTS.ROOTDIR}/${apireg[key]}`);
 
 	const decoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_DECODERS_CONF, root: CONSTANTS.ROOTDIR}];
 	const encoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_ENCODERS_CONF, root: CONSTANTS.ROOTDIR}];
@@ -23,13 +25,16 @@ function initSync() {
 	const securitycheckersPathAndRoots = [{path: CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF, root: CONSTANTS.ROOTDIR}];
 
 	const apps = app.getApps();
+	const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep)
+
 	for (const appObj of apps) {
 		const app = Object.keys(appObj)[0];
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
-			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8").replace(/{{app}}/g, app);
+			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8").
+				replace(/{{app}}/g, app).replace(/{{server}}/g, _toPOSIXPath(CONSTANTS.ROOTDIR)).replace(/{{server_lib}}/g, _toPOSIXPath(CONSTANTS.LIBDIR));
 			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
-			Object.keys(regThis).forEach(key => regThis[key] = (`../apps/${app}/${regThis[key]}`));
+			for (const key in regThis) regThis[key] = fs.existsSync(regThis[key].split("?")[0]) ? regThis[key] : (`${CONSTANTS.ROOTDIR}/../apps/${app}/${regThis[key]}`);
 			apireg = {...apireg, ...regThis};
 		}
 
@@ -60,10 +65,16 @@ function initSync() {
 }
 
 function getAPI(url) {
+	const endPoint = new URL(url).pathname, apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
+	if (apireg[endPoint]) return path.resolve(_getAPIRegEntryAsURL(apireg[endPoint]).rawpathname);
+	else return;
+}
+
+function getAPIConf(url) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	if (apireg[endPoint]) return path.resolve(`${CONSTANTS.ROOTDIR}/${_getAPIRegEntryAsURL(apireg[endPoint]).rawpathname}`);
-	else return;
+	if (apireg[endPoint]) return _getAPIRegEntryAsURL(apireg[endPoint]).query;
+	else return null;
 }
 
 function decodeIncomingData(url, data, headers, servObject) {
@@ -164,4 +175,5 @@ function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL
 	retURL.path = retURL.rawpathname+retURL.search; return retURL;
 }
 
-module.exports = {initSync, getAPI, listAPIs, addAPI, editAPI, deleteAPI, decodeIncomingData, checkSecurity, injectResponseHeaders, encodeResponse, getExtension};
+module.exports = {initSync, getAPI, getAPIConf, listAPIs, addAPI, editAPI, deleteAPI, decodeIncomingData, checkSecurity, 
+	injectResponseHeaders, encodeResponse, getExtension};
