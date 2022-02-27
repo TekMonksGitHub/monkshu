@@ -1,6 +1,5 @@
 {
     "timeout": 120000,
-    "ssl": false,
     "enableGZIPEncoding": true,
     "headers": {
         "Access-Control-Allow-Origin": "*",
@@ -12,5 +11,8 @@
     "host" : "::",
     "port" : 9090,
     "ipblacklistRefresh": 5000,
-    "ipwhitelistRefresh": 5000
+    "ipwhitelistRefresh": 5000,
+    "ssl": false,
+    "sslKeyFile":"C:/Users/rvkapoor/source/etc/192.168.10.53_privkey.pem",
+	"sslCertFile":"C:/Users/rvkapoor/source/etc/192.168.10.53_fullchain.pem"
 }
