@@ -13,3 +13,4 @@ node_modules
 **/package-lock.json
 **/dist
 desktop/package.json
+backend/server/java/org/*
