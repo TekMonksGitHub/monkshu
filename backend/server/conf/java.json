@@ -1,3 +1,3 @@
 {
-    "classpath": ["{{{server}}}/java/monkshu.jar", "{{{server}}}/java/javax.json-1.1.4.jar", "{{{server}}}/apis"]
+    "classpath": ["{{{server}}}/java/monkshu.jar", "{{{server}}}/java/javax.json-1.1.4.jar", "{{{server}}}/java"]
 }
