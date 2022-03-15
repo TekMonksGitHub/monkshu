@@ -4,6 +4,7 @@
  */
 
 const fs = require("fs");
+const path = require("path");
 const log_conf = require(CONSTANTS.LOGSCONF);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const ffs = require(`${CONSTANTS.LIBDIR}/FastFileWriter.js`);
@@ -21,17 +22,23 @@ function initGlobalLoggerSync(logName) {
 	LOG.info("Logging subsystem initialized.", true);
 }
 
-function doService(jsonReq, _servObject, _headers, _url, apiconf) {
+function doService(jsonReq, servObject, _headers, _url, apiconf) {
 	if ((!jsonReq.level) || (!jsonReq.message)) {LOG.error(`Bad incoming remote log request ${JSON.stringify(jsonReq)}`); return;}
 	
-	let logger; if (apiconf.logpath) { LOG.error("Bad remote log config, need logpath, redirecting logs to main server log."); logger = LOG; } 
+	let logger; if (!apiconf.logpath) { LOG.error("Bad remote log config, need logpath, redirecting logs to main server log."); logger = LOG; } 
 	else {
-		if (!loggers[logpath]) loggers[logpath] = new Logger(apiconf.logpath, log_conf.max_log_mb*1024*1024, 
-			ffs.createFileWriter(apiconf.logpath, log_conf.fileCloseTimeOut, "utf8"));
+		const logpath = path.resolve(apiconf.logpath);
+		if (!loggers[logpath]) loggers[logpath] = new Logger(logpath, log_conf.max_log_mb*1024*1024, 
+			ffs.createFileWriter(logpath, log_conf.fileCloseTimeOut, "utf8"));
 		logger = loggers[logpath];
 	}
-	try { logger[jsonReq.level](jsonReq.message); } catch (err) { 
-		logger.error(`Error logging, incoming request is ${JSON.stringify(jsonReq)}, message is: ${jsonReq.message}, error is ${err}.`);
+	
+	try { 
+		logger[jsonReq.level](`[${utils.analyzeIPAddr(utils.getClientIP(servObject.req)).ip}] ${jsonReq.message}`); 
+		return CONSTANTS.TRUE_RESULT;
+	} catch (err) { 
+		LOG.error(`Error in remote logging, incoming request is ${JSON.stringify(jsonReq)}, message is: ${jsonReq.message}, error is ${err}.`);
+		return CONSTANTS.FALSE_RESULT;
 	}
 }
 

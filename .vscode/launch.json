@@ -42,7 +42,8 @@
             "name": "Launch Backend",
             "program": "${workspaceFolder}/backend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
-            "outFiles": ["${workspaceFolder}/backend/**/*.js"]
+            "outFiles": ["${workspaceFolder}/backend/**/*.js"],
+            "env": {"NODE_TLS_REJECT_UNAUTHORIZED": "0"}
         },
         {
             "type": "node",
@@ -51,7 +52,8 @@
             "program": "${workspaceFolder}/backend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/backend/**/*.js"],
-            "args": ["-c", "${workspaceFolder}/tests/backend/secondserver/conf"]
+            "args": ["-c", "${workspaceFolder}/tests/backend/secondserver/conf"],
+            "env": {"NODE_TLS_REJECT_UNAUTHORIZED": "0"}
         },
         {
             "name": "Launch Desktop App",

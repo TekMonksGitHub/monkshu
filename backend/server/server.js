@@ -56,7 +56,7 @@ async function bootstrap() {
 
 	/* Log the start */
 	LOG.info("Server started.");
-	LOG.console("Server started.");
+	LOG.console("\nServer started.");
 }
 
 function _initAndRunTransportLoop() {
