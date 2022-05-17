@@ -1,11 +1,8 @@
-/* 
- * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+/**
+ * The global namespace for the Monkshu framework frontend. 
+ * (C) 2015 - 2022 TekMonks. All rights reserved.
+ * See enclosed LICENSE file.
  */
-
-////////////////////////////////////////////////
-// The global namespace
-////////////////////////////////////////////////
 
 window.$$ = {};
 
