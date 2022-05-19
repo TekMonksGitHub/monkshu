@@ -29,9 +29,11 @@ fi
 
 echo Starting Monkshu on port 80 for Certbot challenge.
 mkdir "$MONKSHU_PATH/frontend/server/certbot_tmp/"
-cp "$MONKSHU_PATH/frontend/server/conf/httpd.json" "$MONKSHU_PATH/frontend/server/certbot_tmp/"
-sed -i -r -e 's/^([ \t])*"port":.+,[ \t]*$/\1"port": 80,/g' "$MONKSHU_PATH/frontend/server/certbot_tmp/httpd.json"
+cp "$MONKSHU_PATH/frontend/server/conf/httpd.json.letsencrypt" "$MONKSHU_PATH/frontend/server/certbot_tmp/httpd.json"
+pushd  ./ > /dev/null
+cd "$MONKSHU_PATH/frontend/server/" > /dev/null
 `which node` "$MONKSHU_PATH/frontend/server/server.js" -c "$MONKSHU_PATH/frontend/server/certbot_tmp" &
+popd > /dev/null
 PID_CERTBOT_SERVER=$!
 echo Certbot server started witl PID $PID_CERTBOT_SERVER
 echo Done.

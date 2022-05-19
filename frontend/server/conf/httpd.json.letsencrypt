@@ -1,0 +1,43 @@
+{
+	"COMMENT": "For Letsencrypt bots",
+	
+	"port": 80,
+	"host": "::",
+	"extensions": [],
+	"webroot": "./../",
+	"logdir": "./logs",
+	"libdir": "./lib",
+	"extdir": "./ext",
+	"confdir": "./certbot_tmp",
+	"accesslog": "./logs/access.log.json",
+	"errorlog": "./logs/error.log.json",
+	"indexfile": "index.html",
+	"ssl": false,
+	"httpdHeaders": {
+		"Server": "Monkshu HTTPD",
+		"X-Frame-Options": "deny",
+		"X-Content-Type-Options": "nosniff"
+	},
+	"mimeTypes" : {
+		".html":	"text/html",
+		".htm":		"text/html",
+		".thtml":	"text/html",
+		".css":		"text/css",
+		".js":		"application/javascript",
+		".json":	"application/json",
+		".mjs":		"application/javascript",
+		".page":	"text/plain",
+		".otf":		"font/otf",
+		".ttf":		"font/ttf",
+		".pdf":		"application/pdf",
+		".png":		["image/png", false],
+		".jpg":		["image/jpeg", false],
+		".jpeg":	["image/jpeg", false],
+		".gif":		["image/gif", false],
+		".md":		["text/markdown", true],
+		".svg":		"image/svg+xml",
+		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
+	},
+	"restrictServerTree": true,
+	"timeout": 120000
+}
