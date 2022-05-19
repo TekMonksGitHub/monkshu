@@ -40,7 +40,7 @@ function bootstrap() {
 }
 
 function _initConfSync() {
-	global.conf = require(`${args.getArgs().c||args.getArgs().conf||`${__dirname}/conf`}/httpd.json`);
+	global.conf = require(`${args.getArgs().c[0]||args.getArgs().conf[0]||`${__dirname}/conf`}/httpd.json`);
 
 	// normalize paths
 	conf.webroot = path.resolve(`${__dirname}/${conf.webroot}`);	
@@ -51,16 +51,18 @@ function _initConfSync() {
 	conf.errorlog = path.resolve(`${__dirname}/${conf.errorlog}`);
 	utils = require(conf.libdir+"/utils.js");
 
-	// merge web app conf files into main http server, for app specific configuration directives
-	if (fs.existsSync(`${__dirname}/../apps/`)) for (const app of fs.readdirSync(`${__dirname}/../apps/`)) if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
-		const appHTTPDConf = require(`${__dirname}/../apps/${app}/conf/httpd.json`);
-		for (const confKey of Object.keys(appHTTPDConf)) {
-			const value = appHTTPDConf[confKey];
-			if (!global.conf[confKey]) {global.conf[confKey] = value; continue;}	// not set, then just set it
-			if (Array.isArray(value)) global.conf[confKey] = utils.union(value, global.conf[confKey]);	// merge arrays
-			else if (typeof value === "object" && value !== null) global.conf[confKey] = {...global.conf[confKey], ...value};	// merge objects, app overrides
-			else global.conf[confKey] = value;	// override value
-		}
+	// merge web app conf files into main http server, for app specific configuration directives unless standalone is forced
+	if (fs.existsSync(`${__dirname}/../apps/`) && !args.getArgs().standalone) 
+		for (const app of fs.readdirSync(`${__dirname}/../apps/`)) 
+			if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
+				const appHTTPDConf = require(`${__dirname}/../apps/${app}/conf/httpd.json`);
+				for (const confKey of Object.keys(appHTTPDConf)) {
+					const value = appHTTPDConf[confKey];
+					if (!global.conf[confKey]) {global.conf[confKey] = value; continue;}	// not set, then just set it
+					if (Array.isArray(value)) global.conf[confKey] = utils.union(value, global.conf[confKey]);	// merge arrays
+					else if (typeof value === "object" && value !== null) global.conf[confKey] = {...global.conf[confKey], ...value};	// merge objects, app overrides
+					else global.conf[confKey] = value;	// override value
+			}
 	}
 }
 

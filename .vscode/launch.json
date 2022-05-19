@@ -39,6 +39,16 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch HTTPD - Second Server - Standalone",
+            "cwd": "${workspaceFolder}/frontend/server",
+            "program": "${workspaceFolder}/frontend/server/server.js",
+            "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
+            "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"],
+            "args": ["-c", "${workspaceFolder}/tests/frontend/secondserver/conf", "-standalone"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Backend",
             "program": "${workspaceFolder}/backend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
