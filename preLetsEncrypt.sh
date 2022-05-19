@@ -4,7 +4,7 @@ MONKSHU_PATH="$( cd "$( dirname "$0" )" && pwd )"
 MONKSHU_CERTBOT_RENEWAL_LOG=/tmp/monkshu_certbot_renewal.log
 MONKSHU_CERTBOT_RENEWAL_PID=/tmp/monkshu_certbot_renewal.pid
 
-rm -rf rm -rf $MONKSHU_CERTBOT_RENEWAL_LOG
+rm -rf $MONKSHU_CERTBOT_RENEWAL_LOG
 echo Stopping regular Monkshu server and cleanup. > $MONKSHU_CERTBOT_RENEWAL_LOG
 systemctl stop $MONKSHU_SERVICE_NAME
 rm -rf "$MONKSHU_PATH/frontend/server/certbot_tmp/"
