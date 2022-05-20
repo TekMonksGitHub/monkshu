@@ -40,7 +40,7 @@ function bootstrap() {
 }
 
 function _initConfSync() {
-	global.conf = require(`${args.getArgs().c[0]||args.getArgs().conf[0]||`${__dirname}/conf`}/httpd.json`);
+	global.conf = require(`${args.getArgs().c?.[0]||args.getArgs().conf?.[0]||`${__dirname}/conf`}/httpd.json`);
 
 	// normalize paths
 	conf.webroot = path.resolve(`${__dirname}/${conf.webroot}`);	
