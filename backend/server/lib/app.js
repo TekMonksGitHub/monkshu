@@ -9,7 +9,7 @@ const fs = require("fs");
 const appRoots = [];
 
 function initSync() {
-    for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
+    if (fs.existsSync(CONSTANTS.APPROOTDIR)) for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
         appThis = {}; appThis[app] = `${CONSTANTS.APPROOTDIR}/${app}`; 
         appRoots.push(appThis);
     }
