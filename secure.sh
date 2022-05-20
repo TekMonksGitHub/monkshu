@@ -58,6 +58,8 @@ else
 	chmod 644 /etc/letsencrypt/live/$DOMAIN/privkey.pem
 	chmod 755 /etc/letsencrypt/archive/
 	chmod 755 /etc/letsencrypt/live/
+	rm -rf /etc/letsencrypt/renewal-hooks/pre/monkshu_pre.sh
+	rm -rf /etc/letsencrypt/renewal-hooks/post/monkshu_post.sh
 	ln -s "$MONKSHU_PATH/preLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/pre/monkshu_pre.sh
 	ln -s "$MONKSHU_PATH/postLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/post/monkshu_post.sh
 fi
