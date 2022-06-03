@@ -11,6 +11,7 @@ const confdir = path.resolve(args["c"] || args["conf"] ? (args["c"] || args["con
 exports.ARGS = args;
 exports.ROOTDIR = rootdir;
 exports.CONFDIR = confdir;
+exports.HOSTNAME = require("fs").existsSync(`${confdir}/hostname.json`) ? require(`${confdir}/hostname.json`) : require("os").hostname();
 exports.APPROOTDIR = rootdir + "/../apps";
 exports.LIBDIR = rootdir + "/lib";
 exports.LOGDIR = rootdir + "/logs";

@@ -274,8 +274,13 @@ const setCurrentPageData = data => session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, d
 const getLastSessionURL = _ => session.get($$.MONKSHU_CONSTANTS.PAGE_URL);
 
 /** Returns the Mustache instance being used by the framework */
-const getMustache = _ => window.monkshu_env.frameworklibs["__org_monkshu_mustache"];
+const getMustache = async _ => {
+	if (!window.monkshu_env.frameworklibs["__org_monkshu_mustache"]) { await $$.require("/framework/3p/mustache.min.js");
+		window.monkshu_env.frameworklibs["__org_monkshu_mustache"] = Mustache; }
 
+	return window.monkshu_env.frameworklibs["__org_monkshu_mustache"];
+}
+	
 /** Reloads the page */
 function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
 

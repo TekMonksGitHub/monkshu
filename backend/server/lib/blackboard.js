@@ -8,9 +8,10 @@
 
 const topics = {}
 const fs = require("fs");
-let conf = require(CONSTANTS.BLACKBOARDCONF);
+const mustache = require("mustache");
 const API_BB_PATH = "/__org_monkshu__blackboard";
 const rest = require(`${CONSTANTS.LIBDIR}/rest.js`);
+let conf = _expandConf(require(CONSTANTS.BLACKBOARDCONF));
 const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
 
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf";
@@ -20,12 +21,12 @@ function init() {
     subscribe(CONF_UPDATE_MSG, confNew => {
         // update in memory working copy
         if (process.send) (process.send({type: CONF_UPDATE_MSG, conf: confNew}));
-        else conf = confNew;
+        else conf = _expandConf(confNew);
 
         // serialize to survive restarts
         fs.writeFile(CONSTANTS.BLACKBOARDCONF, JSON.stringify(confNew));    // serialize
     });
-    process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = msg.conf});
+    process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
     process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
 }
 
@@ -66,6 +67,11 @@ function subscribe(topic, callback) {
 function _broadcast(msg) {
     const topic = msg.topic;
     if (topics[topic]) for (const subscriber of topics[topic]) subscriber(msg.payload);
+}
+
+function _expandConf(conf) {
+    const retConf = JSON.parse(mustache.render(JSON.stringify(conf), {hostname: CONSTANTS.HOSTNAME}));
+    return retConf;
 }
 
 module.exports = {init, doService, publish, subscribe, isEntireReplicaClusterOnline}

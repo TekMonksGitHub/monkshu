@@ -12,10 +12,12 @@ export async function bootstrap(appPath) {
 	const router = (await import("/framework/js/router.mjs")).router; router.init();
 	await _loadFrameworkLibs();
 
-	let {application} = await import(`${appPath}/js/application.mjs`);											
-	if (application.init instanceof Function) await application.init();	// initialize the application
+	let hostname; try {hostname = await $$.requireJSON(`${appPath}/conf/hostname.json`);} catch (err) {try {await $$.requireJSON(`/framework/conf/hostname.json`);} catch (err){}}
 
-	application.main();
+	let {application} = await import(`${appPath}/js/application.mjs`);											
+	if (application.init instanceof Function) await application.init(hostname);	// initialize the application
+
+	application.main(hostname);
 }
 
 async function _loadFrameworkLibs() {
