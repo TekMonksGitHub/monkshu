@@ -7,6 +7,7 @@
     "framework/conf/cachelist.json",
     "framework/conf/default_app.json.README",
     "framework/conf/frameworklibs.json",
+    "framework/conf/hostname.json",
     "framework/css/error.css",
     "framework/error.html",
     "framework/img/logo_512.png",

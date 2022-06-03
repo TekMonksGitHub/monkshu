@@ -17,7 +17,7 @@ export async function bootstrap(appPath) {
 	let {application} = await import(`${appPath}/js/application.mjs`);											
 	if (application.init instanceof Function) await application.init(hostname);	// initialize the application
 
-	application.main(hostname);
+	application.main();
 }
 
 async function _loadFrameworkLibs() {
