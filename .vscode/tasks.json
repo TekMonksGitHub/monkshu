@@ -25,12 +25,27 @@
             "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genCacheableFilesList.xf.js\""}
         },
         {
+            "label": "Generate SSL Config",
+            "type": "shell",
+            "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o ${input:appname} -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg'"},
+            "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o ${input:appname} -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg'"},
+            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genSSLConfig.xf.js\" -o ${input:appname} -o \"${workspaceFolder}\\..\\etc\" -o \"${workspaceFolder}\\build\\openssl.cfg\""}
+        },
+        {
             "label": "Delete Electron Cache",
             "dependsOn": ["Real Delete Electron Cache", "Build Cachelists"]
         },
         {
             "label": "Delete Chrome Profile",
             "dependsOn": ["Real Delete Chrome Profile", "Build Cachelists"]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "appname",
+            "description": "App Name:",
+            "default": "monkshu_app",
+            "type": "promptString"
         },
     ]
 }

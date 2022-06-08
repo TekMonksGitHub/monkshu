@@ -1,4 +1,4 @@
-/*
+/**
  * XForge Build file to generate a list of cacheable files for web applications
  */
 const fs = require("fs");

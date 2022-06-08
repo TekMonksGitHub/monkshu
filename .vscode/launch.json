@@ -18,6 +18,18 @@
             "outFiles": ["${workspaceFolder}/frontend/**/*.js"]
         },
         {
+            "name": "Launch Frontend SSL",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "https://${input:GETIP}",
+            "webRoot": "${workspaceFolder}/frontend",
+            "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks"],
+            "smartStep": true,
+            "userDataDir": "${workspaceFolder}/.chrome",
+            "preLaunchTask": "Delete Chrome Profile",
+            "outFiles": ["${workspaceFolder}/frontend/**/*.js"]
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch HTTPD",
@@ -100,7 +112,25 @@
     "compounds": [
         {
             "name": "Launch All - Backend, HTTPD and Frontend",
-            "configurations": ["Launch Backend", "Launch HTTPD", "Launch Frontend"]
+            "configurations": ["Launch Backend", "Launch HTTPD", "Launch Frontend"],
+            "stopAll": true
+        },
+        {
+            "name": "Launch All - Backend, HTTPD and Frontend - SSL Support",
+            "configurations": ["Launch Backend", "Launch HTTPD", "Launch Frontend SSL"],
+            "stopAll": true,
+            "preLaunchTask": "Generate SSL Config"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "GETIP",
+            "type": "command",
+            "command": "shellCommand.execute",
+                "args": {
+                "command": "@echo off & for /f \"tokens=3 delims=: \" %i  in ('netsh interface ip show config name^=\"Ethernet\" ^| findstr \"IP Address\"') do echo %i",
+                "useFirstResult": "true",
+            }
         }
     ]
 }
