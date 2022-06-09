@@ -17,7 +17,7 @@ exports.make = async function(appname, etcdir, open_ssl_conf) {
         CONSTANTS.LOGINFO(`Detected IP as ${LOCAL_IP}.`);
 
         CONSTANTS.LOGINFO("Generating SSL certificates."); etcdir = path.resolve(etcdir); open_ssl_conf = path.resolve(open_ssl_conf);
-        await os_cmd(`openssl req -newkey rsa:2048 -nodes -keyout ${etcdir}/dnsip_privkey.pem -x509 -days 365 -subj "/CN=%NetworkIP%/C=US/L=San Fransisco/OU=Test/O=Test" -out ${etcdir}/dnsip_fullchain.pem`, 
+        await os_cmd(`openssl req -newkey rsa:2048 -nodes -keyout ${etcdir}/dnsip_privkey.pem -x509 -days 365 -subj "/CN=${LOCAL_IP}/C=US/L=San Fransisco/OU=Test/O=Test" -out ${etcdir}/dnsip_fullchain.pem`, 
             false, {OPENSSL_CONF: open_ssl_conf});
 
         CONSTANTS.LOGINFO("Setting hostnames");
