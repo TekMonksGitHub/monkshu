@@ -4,10 +4,10 @@
 const path = require("path");
 const fspromises = require("fs").promises;
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
-const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
 const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
-const LOCAL_IP = Object.values(require("os").networkInterfaces()).reduce((r, list) => 
-    r.concat(list.reduce((rr, i) => rr.concat(i.family=="IPv4" && !i.internal && i.address || []), [])), []);
+const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
+const LOCAL_IP = Object.values(require("os").networkInterfaces()).reduce((r, list) => r.concat(list.reduce((rr, i) => 
+    rr.concat(i.family=="IPv4" && !i.internal && i.address || []), [])), []);
  
 // build
 exports.make = async function(appname, etcdir, open_ssl_conf) {
