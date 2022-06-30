@@ -16,7 +16,7 @@ const JAVA_CALL_WRAPPER_CLASS = "org.monkshu.java.JavaCallWrapper";
 let jvmInitDone = false, compiledCodeFlags = {};
 
 /**
- * Executes the javan Java class' execute function. The input to the 
+ * Executes the given Java class' execute function. The input to the 
  * class is JsonObject input, and expected output is JsonObject as well. 
  * The method must be named execute.
  * @param {string} classToCall The fully qualified name of the Java class to call
