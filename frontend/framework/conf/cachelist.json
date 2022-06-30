@@ -11,6 +11,7 @@
     "framework/css/error.css",
     "framework/error.html",
     "framework/img/logo_512.png",
+    "framework/img/logo.png",
     "framework/js/$$.js",
     "framework/js/apimanager.mjs",
     "framework/js/blackboard.mjs",
