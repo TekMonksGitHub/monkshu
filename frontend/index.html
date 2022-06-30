@@ -19,8 +19,79 @@ The Monkshu Framework
 		}
 		redirect();
 	</script>
+
+	<style>
+		::-webkit-scrollbar {
+			width: 0.5em !important;
+			height: 0.5em !important;
+			scroll-behavior: smooth !important;
+		}
+
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+			box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+			margin: 5em;
+			border-radius: 1em !important;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background-color: darkgrey !important;
+			border-radius: 1em !important;
+			background-clip: padding-box;
+		}
+		body {font-family: sans-serif; margin:0;}
+		div#container{
+			display: flex;
+			flex-direction: row;
+			overflow: hidden;
+    		margin: 1em;
+		}
+		div#left {
+			width: 40%; 
+			display: flex;
+    		justify-content: space-around;
+		}
+		div#left > img {
+			width: 100%;
+			object-fit: contain;
+		}
+		div#right {
+			width: 60%; 
+			background-color: lightgray;
+			margin-left: 1em;
+		}
+		pre#release {padding: 1em;}
+
+		div#release {
+			overflow: auto;
+			font-family: monospace;
+		}
+		h1 {
+			margin: 2em 1em;
+			text-align: center;
+			color: darkred;
+		}
+	</style>
 </head>
 <body>
+	<div id="container">
+		<div id="left">
+			<img src="./framework/img/logo.png">
+		</div>
+
+		<div id="right">
+			<pre id="release">
+			<div id="release"></div>
+			</pre>
+		</div>
+	</div>
+
 	<h1>Monkshu is running, but not configured.</h1>
+
+	<script type="module">
+	import {getRelease} from "/framework/js/index.mjs";
+	const release = await getRelease();
+	document.querySelector("div#release").innerHTML = JSON.stringify(release, null, 4);
+	</script>
 </body>
 </html>

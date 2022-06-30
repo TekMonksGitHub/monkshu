@@ -12,3 +12,10 @@ export async function getDefaultRedirect() {
 		} else return null;
 	} catch (err) {return null};
 }
+
+export async function getRelease() {
+	try {
+		const release = await(await fetch("https://localhost:9090/__org_monkshu__release")).json();
+		return release;
+	} catch (err) {return "Error fetching release\n"+err.toString();}
+}
