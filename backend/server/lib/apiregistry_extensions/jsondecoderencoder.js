@@ -16,13 +16,21 @@ function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
 }
 
 function encodeResponse(apiregentry, _url, respObj, reqHeaders, respHeaders, _servObject) {
-    const acceptedEncodings = (utils.getObjectKeyValueCaseInsensitive(reqHeaders,"Accept") || "").toLowerCase();
-    if (acceptedEncodings != "application/json" && acceptedEncodings != "application/*" && 
-        acceptedEncodings != "*/*" || apiregentry.query.notRESTAPI) return respObj;   // can't handle
+    if (!acceptsJSON(apiregentry, reqHeaders)) return respObj;   // can't handle
 
     if (utils.getObjectKeyValueCaseInsensitive(respHeaders,"Content-Type").toLowerCase() != "application/json") return respObj;   // can't handle
 
     return JSON.stringify(respObj);
 }
 
-module.exports = {decodeIncomingData, encodeResponse}
+function acceptsJSON(apiregentry, reqHeaders) {
+    const acceptedEncodings = (utils.getObjectKeyValueCaseInsensitive(reqHeaders,"Accept") || "").toLowerCase().split(",");
+    let failedEncodings = 0; for (let acceptedEncoding of acceptedEncodings) {
+        acceptedEncoding = acceptedEncoding.split(";")[0];
+        if (acceptedEncoding != "application/json" && acceptedEncoding != "application/*" && 
+            acceptedEncoding != "*/*" || apiregentry.query.notRESTAPI) failedEncodings++;
+    }
+    if (failedEncodings == acceptedEncodings.length) return false; else return true;
+}
+
+module.exports = {decodeIncomingData, encodeResponse, acceptsJSON}

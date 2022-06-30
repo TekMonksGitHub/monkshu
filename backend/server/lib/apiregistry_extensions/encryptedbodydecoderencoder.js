@@ -17,9 +17,7 @@ function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
 function encodeResponse(apiregentry, _url, respObj, reqHeaders, _respHeaders, _servObject) {
     if (!utils.parseBoolean(apiregentry.query.encrypted)) return respObj;  // not encrypted
 
-    const acceptedEncodings = (reqHeaders["accept"] || "").toLowerCase();
-    const sendJSONBack = acceptedEncodings != "application/json" && acceptedEncodings != "application/*" && 
-        acceptedEncodings != "*/*" || apiregentry.query.notRESTAPI ? false : true;
+    const sendJSONBack = APIREGISTRY.getExtension("JSONDecoderEncoder").acceptsJSON(apiregentry, reqHeaders);
 
     return sendJSONBack ? JSON.stringify({data: crypt.encrypt(respObj, apiregentry.query.cryptkey)}) : crypt.encrypt(
         respObj, apiregentry.query.cryptkey);

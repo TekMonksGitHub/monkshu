@@ -6,4 +6,4 @@
 
 const release = require("fs").readFileSync(CONSTANTS.RELEASEFILE, "utf8");
 
-exports.doService = request => {return {"release": release, request}}
+exports.doService = (request, _servObject, headers, _url, _apiconf) => {return {"release": release, request, headers}}
