@@ -36,6 +36,7 @@
 		".jpeg":	["image/jpeg", false],
 		".gif":		["image/gif", false],
 		".md":		["text/markdown", true],
+		".mp3":		["audio/mpeg", false],
 		".svg":		"image/svg+xml",
 		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
 	},
