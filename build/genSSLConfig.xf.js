@@ -7,6 +7,7 @@ const fspromises = require("fs").promises;
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
 const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
+const BLACKBOARD_CONF_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/blackboard.json`);
 const LOCAL_IP = Object.values(require("os").networkInterfaces()).reduce((r, list) => r.concat(list.reduce((rr, i) => 
     rr.concat(i.family=="IPv4" && !i.internal && i.address || []), [])), []);
 const DEFAULT_APP_NAME = fs.existsSync(`${MONKSHU_PATH}/frontend/apps`) ? 
@@ -30,6 +31,9 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         await fspromises.writeFile(BACKEND_HOST_FILE, `"${LOCAL_IP}"`);
         CONSTANTS.LOGINFO("Writing hostname to "+frontend_host_file);
         await fspromises.writeFile(frontend_host_file, `"${LOCAL_IP}"`);
+        CONSTANTS.LOGINFO("Writing blackboard config to "+BLACKBOARD_CONF_FILE);
+        const blackboard_conf = (await fspromises.readFile(BLACKBOARD_CONF_FILE, "utf8")).replace(/\"secure\"\s*:\s*false/, `"secure": true`);
+        await fspromises.writeFile(BLACKBOARD_CONF_FILE, blackboard_conf);
 
         CONSTANTS.LOGSUCCESS();
     } catch (err) { 
