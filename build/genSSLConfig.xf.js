@@ -6,6 +6,7 @@ const path = require("path");
 const fspromises = require("fs").promises;
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
+const BACKEND_HTTPD_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/httpd.json`);
 const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
 const BLACKBOARD_CONF_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/blackboard.json`);
 const LOCAL_IP = Object.values(require("os").networkInterfaces()).reduce((r, list) => r.concat(list.reduce((rr, i) => 
@@ -34,6 +35,9 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         CONSTANTS.LOGINFO("Writing blackboard config to "+BLACKBOARD_CONF_FILE);
         const blackboard_conf = (await fspromises.readFile(BLACKBOARD_CONF_FILE, "utf8")).replace(/\"secure\"\s*:\s*false/, `"secure": true`);
         await fspromises.writeFile(BLACKBOARD_CONF_FILE, blackboard_conf);
+        await _modifyHTTPDConf(BACKEND_HTTPD_FILE, etcdir, false);
+        const frontend_httpd_file = path.resolve(`${MONKSHU_PATH}/frontend/apps/${appname||DEFAULT_APP_NAME}/conf/httpd.json`);
+        await _modifyHTTPDConf(frontend_httpd_file, etcdir, true);
 
         CONSTANTS.LOGSUCCESS();
     } catch (err) { 
@@ -41,5 +45,13 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         CONSTANTS.LOGHELP("app_name is the application name, cert_dir is the directory for generated certs, and open_ssl_conf is the path to the OpenSSL config file.");
         return CONSTANTS.HANDLE_BUILD_ERROR(err); 
     }
+}
+
+async function _modifyHTTPDConf(file, etcdir, setPort443) {
+    CONSTANTS.LOGINFO("Writing httpd SSL config to the file "+file);
+    let httpd_conf; try {httpd_conf = JSON.parse(await fspromises.readFile(file, "utf8"));} catch (err) {}; httpd_conf = httpd_conf||{};
+    httpd_conf.ssl = true; httpd_conf.sslKeyFile = path.resolve(`${etcdir}/dnsip_privkey.pem`);
+    httpd_conf.sslCertFile = path.resolve(`${etcdir}/dnsip_fullchain.pem`); if (setPort443) httpd_conf.port = 443;
+    await fspromises.writeFile(file, JSON.stringify(httpd_conf, null, 4));
 }
  
