@@ -54,4 +54,3 @@ async function _modifyHTTPDConf(file, etcdir, setPort443) {
     httpd_conf.sslCertFile = path.resolve(`${etcdir}/dnsip_fullchain.pem`); if (setPort443) httpd_conf.port = 443;
     await fspromises.writeFile(file, JSON.stringify(httpd_conf, null, 4));
 }
- 
