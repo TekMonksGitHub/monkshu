@@ -27,9 +27,9 @@
         {
             "label": "Generate SSL Config",
             "type": "shell",
-            "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o ${input:appname} -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg'"},
-            "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o ${input:appname} -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg'"},
-            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genSSLConfig.xf.js\" -o ${input:appname} -o \"${workspaceFolder}\\..\\etc\" -o \"${workspaceFolder}\\build\\openssl.cfg\""}
+            "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg' -o ${input:appname}"},
+            "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg' -o ${input:appname}"},
+            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genSSLConfig.xf.js\" -o \"${workspaceFolder}\\..\\etc\" -o \"${workspaceFolder}\\build\\openssl.cfg\" -o ${input:appname}"}
         },
         {
             "label": "Delete Electron Cache",
@@ -43,8 +43,8 @@
     "inputs": [
         {
             "id": "appname",
-            "description": "App Name:",
-            "default": "monkshu_app",
+            "description": "Application Name",
+            "default": "use_default_app",
             "type": "promptString"
         },
     ]

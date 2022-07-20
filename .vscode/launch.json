@@ -8,7 +8,7 @@
         {
             "name": "Launch Frontend",
             "request": "launch",
-            "type": "pwa-chrome",
+            "type": "chrome",
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}/frontend",
             "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks"],
@@ -20,7 +20,7 @@
         {
             "name": "Launch Frontend SSL",
             "request": "launch",
-            "type": "pwa-chrome",
+            "type": "chrome",
             "url": "https://${input:GETIP}",
             "webRoot": "${workspaceFolder}/frontend",
             "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks"],
