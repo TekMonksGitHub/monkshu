@@ -20,7 +20,7 @@ function initAppsSync() {
         const app = Object.keys(appEntry)[0];
         if (fs.existsSync(`${appEntry[app]}/lib/app.js`)) {
             LOG.info(`Initializing app: ${app}`);
-            const appThis = require(`${appEntry[app]}/lib/app.js`); if (appThis.initSync) appThis.initSync(); 
+            const appThis = require(`${appEntry[app]}/lib/app.js`); if (appThis.initSync) appThis.initSync(app); 
         }
     }
 }
