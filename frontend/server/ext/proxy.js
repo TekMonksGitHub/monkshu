@@ -14,9 +14,9 @@ exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, 
     const protocol = req.connection.encrypted ? "https" : "http",
         proxiedURL = _getProxiedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false;
 
-    const url = proxiedURL, method = req.method.toLowerCase(),
-        host = url.hostname, port = url.port, headers = {...req.headers, "host":url.host, "X-Forwarded-For":utils.getClientIP(req), "X-Forwarded-Port":utils.getClientPort(req), "X-Forwarded-Proto": protocol}, 
-        data = req.data, path = url.pathname + (url.search?url.search:""); if (!path.startsWith("/")) path = `/${path}`;
+    const url = proxiedURL, method = req.method.toLowerCase(), host = url.hostname, port = url.port, data = req.data,
+        headers = {...req.headers, "host":url.host, "X-Forwarded-For":utils.getClientIP(req), "X-Forwarded-Port":utils.getClientPort(req), "X-Forwarded-Proto": protocol};
+    let path = url.pathname + (url.search?url.search:""); if (!path.startsWith("/")) path = `/${path}`;
 
     if (url.protocol.toLowerCase() == "https:") method += "Https";           
     if (method == "delete") method = "deleteHttp";        // delete is a reserved word in JS
@@ -31,9 +31,9 @@ exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, 
 function _getProxiedURL(url) {
     if (!conf.proxies) return null; // no proxies configured
     for (const proxy of conf.proxies) {
-        const match = url.href.match(new RegExp(Object.keys(proxy)[0])); if (match) {
+        const urlHref = url.href, match = urlHref.match(new RegExp(Object.keys(proxy)[0])); if (match) {
             const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];
-            return new URL(mustache.render(proxy[Object.keys(proxy)[0]], data));
+            const urlParsed = mustache.render(Object.values(proxy)[0], data); return new URL(urlParsed);
         }
     }
     return null;    // nothing matched
