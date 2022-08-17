@@ -15,7 +15,7 @@ import {session} from "/framework/js/session.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
 
 function register(name, htmlTemplate, module) {
-    if (window.monkshu_env.components[name]) return;    // already regisered
+    if (window.monkshu_env.components[name]) return;    // already registered
     
     // allow binding of data and dynamic DOM updates
     module.bindData = async (data, id) => {
