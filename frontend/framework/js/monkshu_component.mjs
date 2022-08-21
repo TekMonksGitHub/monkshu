@@ -12,7 +12,10 @@
 
 import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
+import {blackboard} from "/framework/js/blackboard.mjs";
 import {securityguard} from "/framework/js/securityguard.mjs";
+
+const BLACKBOARD_MESSAGE_COMPONENT_RENDERED = "__org_monkshu_component_rendered";
 
 function register(name, htmlTemplate, module) {
     if (window.monkshu_env.components[name]) return;    // already registered
@@ -165,6 +168,7 @@ function register(name, htmlTemplate, module) {
 
             if (module.initialRender && initialRender) await module.initialRender(this);
             if (module.elementRendered) await module.elementRendered(this, initialRender);
+            blackboard.broadcastMessage(BLACKBOARD_MESSAGE_COMPONENT_RENDERED, `${name}#${this.id||"undefined"}`);
         }
 
         async connectedCallback() {
@@ -199,4 +203,4 @@ function register(name, htmlTemplate, module) {
     window.monkshu_env.components[name] = module;
 }
 
-export const monkshu_component = {register}
+export const monkshu_component = {register, BLACKBOARD_MESSAGE_COMPONENT_RENDERED}
