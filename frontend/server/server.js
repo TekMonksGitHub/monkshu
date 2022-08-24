@@ -33,8 +33,8 @@ function bootstrap() {
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	
-	access.info(`HTTP transport started on ${conf.host||"::"}:${conf.port}`);
-	console.log(`HTTP transport started on ${conf.host||"::"}:${conf.port}`);
+	access.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${conf.host||"::"}:${conf.port}`);
+	console.log(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${conf.host||"::"}:${conf.port}`);
 	access.info("Server started.");
 	console.log("Server started.");
 }

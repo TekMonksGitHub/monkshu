@@ -47,8 +47,8 @@ function initSync() {
 	server.timeout = conf.timeout;
 	server.listen(conf.port, host);
 
-	LOG.info(`HTTP transport started on ${host}:${conf.port}`);
-	LOG.console(`HTTP transport started on ${host}:${conf.port}`);
+	LOG.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${conf.port}`);
+	LOG.console(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${conf.port}`);
 }
 
 function onData(_data, _servObject) { }
