@@ -27,7 +27,7 @@ class NativeWrapper {   // allows proxying strings and numbers
     toString() {return this.native;}
     valueOf() {return this.native;}
     [Symbol.toPrimitive](_hint) {return this.native;}
-    toJson() {return this.native;}
+    toJSON() {return this.native;}
 }
 
 function _getProxy(object, key) {
@@ -39,9 +39,9 @@ function _getProxy(object, key) {
         },
 
         get(target, name) { // intercept for NativeWrappers to convert them to JSON
-            if (name == "toJSON") {return target.toJson} 
+            if (name == "toJSON") {return target.toJSON} 
             if (name == "_______org_monkshu_clientwebsession_wrapped_object_______") return object;
-            else if (typeof target[name] === 'object' && target[name] !== null) return new Proxy(target[name], handler);
+            else if (typeof target[name] === "object" && target[name] !== null) return new Proxy(target[name], handler);
             else return target[name];
         }
     }
