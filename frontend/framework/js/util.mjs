@@ -177,6 +177,12 @@ function getChildByID(element, id) {
 }
 
 /**
+ * Removes all child elements of the given element.
+ * @param {HTMLElement} element The HTMLElement whose child elements should be deleted
+ */
+const removeAllChildElements = element => {while (element.lastElementChild) element.removeChild(element.lastElementChild);}
+
+/**
  * Calls the given function at the given intervals with the first call starting immediately.
  * @param {function} functionToCall The function to call
  * @param {number} interval The interval in milliseconds
@@ -204,4 +210,4 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName,
-    setIntervalImmediately, generateUUID}
+    removeAllChildElements, setIntervalImmediately, generateUUID}
