@@ -120,7 +120,7 @@ async function _doService(data, servObject, headers, url) {
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 		} catch (error) {
-			LOG.debug(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
+			LOG.error(`API error: ${error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}, reqObj: jsonObj}); 
 		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
