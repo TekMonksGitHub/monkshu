@@ -2,12 +2,16 @@
  * (C) 2018-2021 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
+import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 
 let i18nCached = {};
 let appPath;
 
 const init = appPathIn => appPath = appPathIn;
+
+const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (await router.getMustache()).render(
+	await get(key, language, refresh), data);
 
 async function get(key, language=getSessionLang(), refresh=false) {
 	try {
@@ -31,4 +35,4 @@ const getSessionLang = _ => (session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en").
 
 const setSessionLang = lang => session.set($$.MONKSHU_CONSTANTS.LANG_ID, lang||"en");
 
-export const i18n = {init, get, getI18NObject, setI18NObject, getSessionLang, setSessionLang};
+export const i18n = {init, get, getRendered, getI18NObject, setI18NObject, getSessionLang, setSessionLang};
