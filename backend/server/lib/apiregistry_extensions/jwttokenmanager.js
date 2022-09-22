@@ -70,8 +70,8 @@ function injectResponseHeaders(apiregentry, url, response, requestHeaders, respo
 
 function injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
     const addsTokenParsed = _parseAddstokenString(apiregentry.query.addsToken, request, response);
-    if (addsTokenParsed.flag && !(utils.parseBoolean(addsTokenParsed.flag))) return; // failed to pass the API success test 
-    if ((!addsTokenParsed.flag) && (!response.result)) return; // failed to pass the API success test 
+    if (addsTokenParsed.tokenflag && !(utils.parseBoolean(addsTokenParsed.tokenflag))) return; // failed to pass the API success test 
+    if ((!addsTokenParsed.tokenflag) && (!response.result)) return; // failed to pass the API success test 
     
     const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), ...addsTokenParsed}; 
 
