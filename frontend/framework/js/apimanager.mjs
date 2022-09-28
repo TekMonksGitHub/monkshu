@@ -40,7 +40,10 @@ async function rest(url, type, req, sendToken, extractToken, canUseCache) {
             if (extractToken) _extractTokens(response, respObj);
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
             return respObj;   
-        } else return null;
+        } else {
+            LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+            return null;
+        }
     } catch (err) {
         LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
         return null;
@@ -71,7 +74,10 @@ async function blob(url, filename, type, req, sendToken, extractToken) {
             link.style.display = "none"; link.href = url; link.download = filename;
             document.body.appendChild(link); link.click(); link.remove();  
             return true;
-        } else return false;
+        } else {
+            LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+            return false;
+        }
     } catch (err) {
         LOG.error(`Error in blob'ing ${url} for request ${JSON.stringify(req)} of type ${type} and filename ${filename} due to ${err}`);
         return false;
