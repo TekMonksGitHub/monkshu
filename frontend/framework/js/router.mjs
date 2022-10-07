@@ -118,10 +118,8 @@ async function loadHTML(url, dataModels={}, checkSecurity=true) {
  * @returns The rendered text
  */
 async function expandPageData(text, url=getCurrentURL(), dataModels) {
-	dataModels = await getPageData(url, dataModels);
-
-	Mustache.parse(text);
-	const rendered = Mustache.render(text,dataModels);
+	const data = await getPageData(url, dataModels);
+	Mustache.parse(text); const rendered = Mustache.render(text, data);
 
 	return rendered;
 }
