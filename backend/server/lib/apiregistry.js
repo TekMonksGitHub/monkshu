@@ -1,6 +1,6 @@
 /** 
  * (C) 2015, 2016, 2017, 2018, 2019, 2020, 2021. TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  * 
  * This is our main API Manager class.
  */
