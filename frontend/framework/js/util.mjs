@@ -193,6 +193,9 @@ const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); 
 /** @return Fully resolved URL for given relative URL */
 const resolveURL = urlOrPartialPath => new URL(urlOrPartialPath, window.location.href).href;
 
+/** @return Fully just the URL for given relative URL or full URL with or without params */
+const baseURL = urlOrPartialPath => resolveURL(urlOrPartialPath).split("?")[0];
+
 /** @return Generated UUID */
 function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
     let d = new Date().getTime();//Timestamp
@@ -209,5 +212,5 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
 }
 
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL, safeURIDecode, getChildByID, getChildrenByTagName,
+    downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
     removeAllChildElements, setIntervalImmediately, generateUUID}

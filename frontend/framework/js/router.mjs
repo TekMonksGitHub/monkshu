@@ -76,7 +76,7 @@ async function loadPage(url, dataModels={}) {
 	document.close();
 
 	// notify those who want to know that a new page was loaded
-	if (window.monkshu_env.router.pageload_funcs[url]) for (const func of window.monkshu_env.router.pageload_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.router.pageload_funcs[util.baseURL(url)]) for (const func of window.monkshu_env.router.pageload_funcs[util.baseURL(url)]) await func(dataModels, url);
 	if (window.monkshu_env.router.pageload_funcs["*"]) for (const func of window.monkshu_env.router.pageload_funcs["*"]) await func(dataModels, url);
 
 	// inject PWA manifests if setup for this app
@@ -143,7 +143,7 @@ async function getPageData(url=getCurrentURL(), dataModels) {
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
 	dataModels["__window"] = _ => (key, render) => window[render(key)];
 
-	if (window.monkshu_env.router.pagedata_funcs[util.resolveURL(url)]) for (const func of window.monkshu_env.router.pagedata_funcs[url]) await func(dataModels, url);
+	if (window.monkshu_env.router.pagedata_funcs[util.baseURL(url)]) for (const func of window.monkshu_env.router.pagedata_funcs[util.baseURL(url)]) await func(dataModels, url);
 	if (window.monkshu_env.router.pagedata_funcs["*"]) for (const func of window.monkshu_env.router.pagedata_funcs["*"]) await func(dataModels, url);
 
 	return dataModels;
