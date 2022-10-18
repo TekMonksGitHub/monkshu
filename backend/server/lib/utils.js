@@ -114,6 +114,12 @@ function getTimeStamp() {
 }
 
 /**
+ * Returns current unix epoch.
+ * @returns Current unix epoch timestamp.
+ */
+const getUnixEpoch = _ => Math.floor(Date.now()/1000);
+
+/**
  * Returns the  object key value, if present, using name insensitive matching. 
  * @param {object} obj The object
  * @param {string} key The key
@@ -255,6 +261,6 @@ function watchFile(path, opIfModified, frequency) {
  */
  const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
 
-module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getObjectKeyValueCaseInsensitive, 
-    getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getEmbeddedIPV4, 
-    setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone };
+module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
+    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
+    getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone };
