@@ -29,7 +29,7 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * 
  * @return {Object} Javascript result object or null on error
  */
-async function rest(url, type, req, sendToken, extractToken, canUseCache) {
+async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false) {
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
