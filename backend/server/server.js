@@ -30,6 +30,10 @@ async function bootstrap() {
 	LOG.info("Initializing the network checker.")
 	require(CONSTANTS.LIBDIR+"/netcheck.js").init();
 
+	/* Start the queue executor */
+	LOG.info("Initializing the queue executor.");
+	require(CONSTANTS.LIBDIR+"/queueExecutor.js").init();
+
 	/* Init the list of apps */
 	LOG.info("Initializing the apps list.");
 	require(CONSTANTS.LIBDIR+"/app.js").initSync();
