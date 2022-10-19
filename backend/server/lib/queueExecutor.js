@@ -45,7 +45,7 @@ function _queueExecutionFunction() {
         if (workItem.isAsync) await workItem.functionToCall(...workItem.params);
         else workItem.functionToCall(...workItem.params);
         if (workItem.callback) workItem.callback(); 
-        if (workItem.promiseResolver) promiseResolver();
+        if (workItem.promiseResolver) workItem.promiseResolver();
         _runQueueLoop(); 
     }, workItem.delay);
 }
