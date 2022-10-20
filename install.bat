@@ -11,6 +11,7 @@ call npm install terser
 call npm install uglify-js
 call npm install html-minifier
 call npm install clean-css
+call npm install nodemailer
 
 npm install --save-dev electron
 popd

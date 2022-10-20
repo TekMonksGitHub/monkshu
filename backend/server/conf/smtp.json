@@ -1,0 +1,8 @@
+{
+    "server":   "smtp.mailgun.org",
+    "port":     465,
+    "secure":   true,
+    "user":     "noreply@tekmonks.com",
+    "password": "<add encrypted password here - using lib/crypt.js>",
+    "from":     "noreply@tekmonks.com"
+}

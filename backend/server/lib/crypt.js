@@ -8,8 +8,8 @@ const crypt = require(CONSTANTS.CRYPTCONF);
 
 /**
  * Encrypts the given string
- * @param {String or Buffer} text Text to encrypt, .toString is called if it is not one of these to convert (dangerous).
- * @param {String} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
+ * @param {string or Buffer} text Text to encrypt, .toString is called if it is not one of these to convert (dangerous).
+ * @param {string} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
  * @returns The encrypted text as string in UTF8 encoding
  */
 function encrypt(text, key = crypt.key) {
@@ -24,8 +24,8 @@ function encrypt(text, key = crypt.key) {
 
 /**
  * Decrypts the given string
- * @param {String or Buffer} text Text to decrypt, .toString is called if it is not one of these to convert (dangerous).
- * @param {String} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
+ * @param {string or Buffer} text Text to decrypt, .toString is called if it is not one of these to convert (dangerous).
+ * @param {string} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
  * @returns The decrypted text as string in UTF8 encoding
  */
 function decrypt(text, key = crypt.key) {
