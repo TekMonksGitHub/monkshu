@@ -42,7 +42,7 @@ exports.getQuery = async(cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
     dbConnectInfo = path.resolve(dbConnectInfo);
     if (!(await _initDB(dbConnectInfo, dbCreationSQLs))) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: DB Init Error`) ; return false;}
     params = Array.isArray(params)?params:[params];
-    try {return await dbAllAsync[dbConnectInfo](cmd, params);}
+    try {const rows = await dbAllAsync[dbConnectInfo](cmd, params); return rows}
     catch (err) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: ${err}`); return false;}
 }
 
