@@ -1,4 +1,7 @@
 /** 
+ * REST library using the old XMLHTTPRequest framework.
+ * Deprecated, use apimanager instead.
+ * 
  * (C) 2015 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  * 
