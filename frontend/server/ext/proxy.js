@@ -14,10 +14,11 @@ exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, 
     const protocol = req.connection.encrypted ? "https" : "http",
         proxiedURL = _getProxiedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false;
 
-    const url = proxiedURL, method = req.method.toLowerCase(), host = url.hostname, port = url.port, data = req.data,
+    const url = proxiedURL, host = url.hostname, port = url.port, data = req.data,
         headers = {...req.headers, "host":url.host, "X-Forwarded-For":utils.getClientIP(req), "X-Forwarded-Port":utils.getClientPort(req), "X-Forwarded-Proto": protocol};
     let path = url.pathname + (url.search?url.search:""); if (!path.startsWith("/")) path = `/${path}`;
 
+    let method = req.method.toLowerCase(); 
     if (url.protocol.toLowerCase() == "https:") method += "Https";           
     if (method == "delete") method = "deleteHttp";        // delete is a reserved word in JS
 
