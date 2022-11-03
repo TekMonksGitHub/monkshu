@@ -23,7 +23,7 @@
             "type": "chrome",
             "url": "https://${input:GETIP}",
             "webRoot": "${workspaceFolder}/frontend",
-            "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks"],
+            "runtimeArgs": ["--media-cache-size=1", "--disk-cache-size=1", "--preserve-symlinks", "--ignore-certificate-errors"],
             "smartStep": true,
             "userDataDir": "${workspaceFolder}/.chrome",
             "preLaunchTask": "Delete Chrome Profile",
@@ -36,7 +36,8 @@
             "cwd": "${workspaceFolder}/frontend/server",
             "program": "${workspaceFolder}/frontend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
-            "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"]
+            "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"],
+            "env": {"NODE_TLS_REJECT_UNAUTHORIZED": "0"}
         },
         {
             "type": "node",
@@ -46,7 +47,8 @@
             "program": "${workspaceFolder}/frontend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"],
-            "args": ["-c", "${workspaceFolder}/tests/frontend/secondserver/conf"]
+            "args": ["-c", "${workspaceFolder}/tests/frontend/secondserver/conf"],
+            "env": {"name": "NODE_TLS_REJECT_UNAUTHORIZED", "value": "0"}
         },
         {
             "type": "node",
@@ -56,7 +58,8 @@
             "program": "${workspaceFolder}/frontend/server/server.js",
             "runtimeArgs": ["--preserve-symlinks", "--trace-warnings"],
             "outFiles": ["${workspaceFolder}/frontend/server/**/*.js"],
-            "args": ["-c", "${workspaceFolder}/tests/frontend/secondserver/conf", "-standalone"]
+            "args": ["-c", "${workspaceFolder}/tests/frontend/secondserver/conf", "-standalone"],
+            "env": {"NODE_TLS_REJECT_UNAUTHORIZED": "0"}
         },
         {
             "type": "node",
@@ -85,6 +88,9 @@
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "preLaunchTask": "Delete Electron Cache",
             "windows": {
+                "name": "Launch Desktop App - Windows",
+                "type": "node",
+                "request": "launch",
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             },
             "args" : ["${workspaceFolder}/desktop/framework/main.js"],
