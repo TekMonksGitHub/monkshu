@@ -2,6 +2,8 @@
 
 MONKSHU_PATH="$( cd "$( dirname "$0" )" && pwd )"
 DOMAIN=${1:-`hostname --fqdn`}
+USER_MONKSHU=`stat -c "%U" "$MONKSHU_PATH/monkshu.js"`
+GROUP_MONKSHU=`stat -c "%G" "$MONKSHU_PATH/monkshu.js"`
 
 if [ "$EUID" -ne 0 ]; then 
 	echo Please run as root. E.g. sudo $0
@@ -92,6 +94,10 @@ echo Done.
 
 echo Setting NodeJS to bind to lower ports
 setcap 'cap_net_bind_service=+ep' `which node`
+echo Done.
+
+echo Setting permissions to use the user account
+chown -R $USER_MONKSHU:$GROUP_MONKSHU "$MONKSHU_PATH"
 echo Done.
 
 echo Starting Monkshu....
