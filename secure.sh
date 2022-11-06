@@ -89,6 +89,10 @@ sed -i -r -e $"s/^[ \t]*}[ \t]*$/\\t\"sslKeyFile\": \"\/etc\/letsencrypt\/live\/
 echo -e "\n\t\"sslCertFile\": \"/etc/letsencrypt/live/$DOMAIN/fullchain.pem\"\n}" >> "$MONKSHU_PATH/backend/server/conf/httpd.json"
 echo Done.
 
+echo Setting NodeJS to bind to lower ports
+setcap 'cap_net_bind_service=+ep' `which node`
+echo Done.
+
 echo Starting Monkshu....
 systemctl start monkshu
 echo Done.
