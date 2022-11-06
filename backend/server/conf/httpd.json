@@ -10,6 +10,7 @@
     },
     "host": "::",
     "port": 9090,
+    "ssl": false,
     "ipblacklistRefresh": 5000,
     "ipwhitelistRefresh": 5000
 }

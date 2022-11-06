@@ -12,6 +12,7 @@ if ! systemctl --all --type service | grep -q monkshu; then
     echo Monkshu service does not exist, exiting.
     exit 1
 fi
+systemctl daemon-reload #reload just in case Monkshu was updated
 
 if cat "$MONKSHU_PATH/frontend/server/conf/httpd.json" | grep -e '^\s*"ssl":\s*true'; then
     echo Already secured. Exiting.
