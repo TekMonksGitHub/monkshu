@@ -15,7 +15,7 @@ export async function getDefaultRedirect() {
 
 export async function getRelease() {
 	try {
-		const release = await(await fetch(`http://${window.location.hostname}:9090/__org_monkshu__release`)).json();
+		const release = await(await fetch(`${window.location.protocol}/${window.location.hostname}:9090/__org_monkshu__release`)).json();
 		return release;
 	} catch (err) {return "Error fetching release\n"+err.toString();}
 }
