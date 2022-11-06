@@ -2,8 +2,8 @@
 
 MONKSHU_PATH="$( cd "$( dirname "$0" )" && pwd )"
 DOMAIN=${1:-`hostname --fqdn`}
-USER_MONKSHU=`stat -c "%U" "$MONKSHU_PATH/monkshu.js"`
-GROUP_MONKSHU=`stat -c "%G" "$MONKSHU_PATH/monkshu.js"`
+USER_MONKSHU=`stat -c "%U" "$MONKSHU_PATH/monkshu.sh"`
+GROUP_MONKSHU=`stat -c "%G" "$MONKSHU_PATH/monkshu.sh"`
 
 if [ "$EUID" -ne 0 ]; then 
 	echo Please run as root. E.g. sudo $0
