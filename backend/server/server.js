@@ -6,6 +6,7 @@
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
+const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
 const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
 let _server;	// holds the transport 
@@ -77,6 +78,8 @@ function _initAndRunTransportLoop() {
 			_server.statusInternalError(servObject, error); _server.end(servObject);
 		}
 		
+		if (servObject.compressionFormat == CONSTANTS.GZIP && servObject.env.data) try {
+			servObject.env.data = await gunzipAsync(servObject.env.data); } catch (err) {send500(err); return;}
 		const {code, respObj, reqObj} = await _doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));

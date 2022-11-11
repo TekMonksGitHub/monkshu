@@ -32,7 +32,8 @@ function initSync() {
 			req.protocol = req.protocol || req.socket.encrypted?"https":"http";
 			const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
 			const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
-			const servObject = {req, res, env:{remoteHost:host, remotePort:port, remoteAgent: req.headers["user-agent"]}, server: module.exports}; 
+			const servObject = {req, res, env:{remoteHost:host, remotePort:port, remoteAgent: req.headers["user-agent"]}, 
+				server: module.exports, compressionFormat: req.headers["content-encoding"]?.toLowerCase().includes("gzip") ? CONSTANTS.GZIP : undefined}; 
 			for (const header of Object.keys(req.headers)) {
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;

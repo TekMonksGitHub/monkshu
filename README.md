@@ -59,7 +59,7 @@ There is also a global event management system using a Publish/Subscribe global 
 
 NPMs needed
 ===========
-We strive to minimize the use of external libraries. This keeps Monkshu secure, and also independent. Only Mustache for the out of the box deployment.
+We strive to minimize the use of external libraries. This keeps Monkshu secure, and also independent. Only Mustache, and Pako on the frontend, for the out of the box deployment.
 
 Documentation
 ===========

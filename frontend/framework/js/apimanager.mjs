@@ -14,6 +14,7 @@
  */
 
 import {session} from "/framework/js/session.mjs";
+import * as pako from "/framework/3p/pako.esm.min.mjs";
 
 const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
 
@@ -26,15 +27,17 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed
  * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call
  * @param {boolean} canUseCache Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
+ * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * 
  * @return {Object} Javascript result object or null on error
  */
-async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false) {
+async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false) {
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
     try {
-        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken), response = await fetch(urlToCall, fetchInit);
+        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP), 
+            response = await fetch(urlToCall, fetchInit);
         if (response.ok) {
             const respObj = await response.json();
             if (extractToken) _extractTokens(response, respObj);
@@ -53,17 +56,18 @@ async function rest(url, type, req, sendToken=false, extractToken=false, canUseC
 /**
  * Makes a BLOB API call, i.e. download a binary object.
  * 
- * @param {string} url The URL to call
- * @param {string} filename The downloaded file's name
+ * @param {string} url The URL to call.
+ * @param {string} filename The downloaded file's name.
  * @param {string} type  Can we GET, POST, DELETE etc.
- * @param {object} req Javascript/JSON object to send
- * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed
- * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call
+ * @param {object} req Javascript/JSON object to send.
+ * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed.
+ * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call.
+ * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * 
  * @return {Object} Downloads the BLOB
  */
-async function blob(url, filename, type, req, sendToken, extractToken) {
-    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*");
+async function blob(url, filename, type, req, sendToken, extractToken, dontGZIP=false) {
+    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP);
 
     try {
         const response = await fetch(urlToCall, fetchInit);
@@ -101,7 +105,7 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
  */
 const getJWTToken = (url, tokenType) => _getAPIManagerStorage().tokenManager[`${new URL(url).host}_${tokenType?tokenType:"access"}`];
 
-function _createFetchInit(url, type, req, sendToken, acceptHeader) {
+function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody) {
     type = type || "GET"; const urlHost = new URL(url).host; 
     const storage = _getAPIManagerStorage();
 
@@ -111,13 +115,13 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader) {
         if (jsonReq) {url += `?${jsonReq}`; jsonReq = null;}
     } else jsonReq = req && typeof (req) == "object" ? JSON.stringify(req) : req;
 
-    const headers = {"Accept":acceptHeader||"application/json"}; 
+    const headers = {"Accept":acceptHeader||"application/json", "Content-Encoding":(!dontGZIPPostBody)&&req?"gzip":"identity"};
     if (type.toUpperCase() != "GET" && type.toUpperCase() != "DELETE") headers["Content-type"] = "application/json";
     if (sendToken) headers.Authorization = `Bearer ${storage.tokenManager[`${urlHost}_${sendToken.type?sendToken.type:"access"}`]}`;
     if (storage.keys[url] || storage.keys["*"]) headers[storage.keyHeader] = storage.keys[url] ? storage.keys[url] : storage.keys["*"];
 
     const fetchInit = {method: type, credentials: "omit", headers, redirect: "follow", referrerPolicy: "origin"};
-    if (jsonReq) fetchInit.body =  jsonReq; return {fetchInit, url};
+    if (jsonReq) fetchInit.body = dontGZIPPostBody ? jsonReq : pako.gzip(jsonReq); return {fetchInit, url};
 }
 
 function _extractTokens(response, jsonResponseObj) {
