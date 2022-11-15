@@ -71,14 +71,15 @@ function _initAndRunTransportLoop() {
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
-	_server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? servObject.env.data + chunk : chunk;
+	_server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? (Buffer.isBuffer(servObject.env.data) ?
+		Buffer.concat([servObject.env.data, chunk]) : servObject.env.data + chunk) : chunk;
 	_server.onReqEnd = async (url, headers, servObject) => {
 		const send500 = error => {
 			LOG.info(`Sending Internal Error for: ${url}, due to ${error}${error.stack?"\n"+error.stack:""}`);
 			_server.statusInternalError(servObject, error); _server.end(servObject);
 		}
 		
-		if (servObject.compressionFormat == CONSTANTS.GZIP && servObject.env.data) try {
+		if (servObject.compressionFormat == CONSTANTS.GZIP && servObject.env.data && Buffer.isBuffer(servObject.env.data)) try {
 			servObject.env.data = await gunzipAsync(servObject.env.data); } catch (err) {send500(err); return;}
 		const {code, respObj, reqObj} = await _doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
