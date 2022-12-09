@@ -56,7 +56,7 @@ function getCipher(key = crypt.key, iv = Buffer.alloc(16, 0)) {
 }
 
 /**
- * Returns a decipher object which can encrypt
+ * Returns a decipher object which can decrypt
  * @param {string} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
  * @param {Buffer or HEX String} iv The initialization vector to use, a static vector is used if not provided
  * @returns The created decipher object
