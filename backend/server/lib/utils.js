@@ -27,6 +27,24 @@ async function copyFileOrFolder(from, to) {
 }
 
 /**
+ * Walks the given folder, recursively. Calls the function (expected async) for each file. The function
+ * completes (promise resolves) when the entire walk is completed. The functionToCall is called with the
+ * following params -> (full path to the entry, stats for the entry, relative path to the entry)
+ * @param {string} path The path to walk
+ * @param {function} functionToCall The function to call (async) for each entry
+ */
+async function walkFolder(path, functionToCall, root) {
+    if (!root) root = path; // entry call, so we are at the root of the tree
+    const entries = await fs.promises.readdir(path);
+    for (const entry of entries) {
+        const pathThisEntry = path.resolve(path+"/"+entry), stats = await lstatAsync(pathThisEntry);
+        if (functionToCall.constructor.name === "AsyncFunction") await functionToCall(pathThisEntry, stats, path.relative(root, pathThisEntry));    // if the function is async then await its execution
+        else functionToCall(pathThisEntry, stats, path.relative(root, pathThisEntry));
+        if (stats.isDirectory()) await walkFolder(pathThisEntry, functionToCall, root);
+    }
+}
+
+/**
  * Parses given value to a boolean
  * @param {string|object} value The value to convert
  * @returns The resulting boolean (true or false)
@@ -263,4 +281,4 @@ function watchFile(path, opIfModified, frequency) {
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
-    getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone };
+    getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder };

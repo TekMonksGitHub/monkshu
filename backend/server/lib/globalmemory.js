@@ -13,6 +13,9 @@
  * If only partial offers are received for sync requests then all the replication nodes will send each other their memories, 
  * and the cluster will sync with the union of latest updates from each replication node. 
  * 
+ * Note: get does not returned an observed object, so set must be called to update the memory across the cluster.
+ * This is on intention - to reduce update chatter on the network, and ensure the updates are intentional.
+ * 
  * (C) 2020. TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
@@ -53,20 +56,25 @@ async function init() {
 }
 
 /**
- * Sets hash and its value in the global memory.
+ * Sets the key and its value in the global memory.
  * @param {string} key The key
  * @param {object} value The value
- * @throws Memory not in sync error if Global Memory is not 
- *         in sync due to network or other issues.
  */
 const set = (key, value) => BLACKBOARD.publish(SETMEM, {key, value, time: Date.now(), id: server_id});  // publish to all via blackboard, including ourselves
 
 /**
- * Gets hash and its value from the global memory.
- * @param {string} key The key
- * @return The value if found, null if not.
+ * Given a key, returns its value from the global memory.
+ * @param {string} key The key.
+ * @param {boolean||object} initIfUndefined If an object is provided and the key is not defined, it will be set to 
+ *                                          this or an empty object if the value of this param is the boolean true.
+ * @return The value if found, undefined if not.
  */
-const get = key => _globalmemory[key]?_globalmemory[key].value:undefined;
+const get = (key, initIfUndefined) => {
+    if (_globalmemory[key]) return _globalmemory[key].value;
+    else if (initIfUndefined) { set(key, initIfUndefined === true ? {} : initIfUndefined); return initIfUndefined; }
+    else return undefined;
+}
+
 /**
  * Listens to the changes in the value of the key 
  * @param {string} key The key
