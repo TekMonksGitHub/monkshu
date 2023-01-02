@@ -105,8 +105,8 @@ async function addIPToIPList(file, listHolder, ip, op) {
 }
 
 function _isIPInList(req, listHolder) {
-	let clientIP = utils.getClientIP(req);
-	if (req.socket.remoteFamily == "IPv6") clientIP = utils.getEmbeddedIPV4(clientIP)||utils.expandIPv6Address(clientIP);
+	let clientIP = utils.getClientIP(req); const ipAnalysis = utils.analyzeIPAddr(clientIP);
+	if (ipAnalysis.ipv6) clientIP = utils.expandIPv6Address(clientIP); else clientIP = ipAnalysis.ip;
 
 	return listHolder.includes(clientIP.toLowerCase());
 }
