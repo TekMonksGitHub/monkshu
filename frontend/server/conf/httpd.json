@@ -2,7 +2,7 @@
 	"COMMENT": "Please see httpd.readme for a full list of options",
 	
 	"port": 8080,
-	"host": "::",
+	"host": "{{{hostname}}}",
 	"extensions": [],
 	"webroot": "./../",
 	"logdir": "./logs",

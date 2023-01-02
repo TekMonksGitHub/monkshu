@@ -12,6 +12,7 @@ const path = require("path");
 const http = require("http");
 const https = require("https");
 const fspromises = fs.promises;
+const mustache = require("mustache");
 const args = require(`${__dirname}/lib/processargs.js`);
 
 let access, error, utils;
@@ -22,9 +23,15 @@ exports.bootstrap = bootstrap;
 if (require("cluster").isMaster == true) bootstrap();	
 
 function bootstrap() {
-	_initConfSync();
-	_initLogsSync();
-	_initExtensions();
+	try {
+		_initConfSync();
+		_initLogsSync();
+		_initExtensions();
+	} catch (err) {
+		error.error(err);
+		error.error("Server init error, stopping.");
+		process.exit(1);
+	}
 
 	/* Start HTTP/S server */
 	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
@@ -40,7 +47,10 @@ function bootstrap() {
 }
 
 function _initConfSync() {
-	global.conf = require(`${args.getArgs().c?.[0]||args.getArgs().conf?.[0]||`${__dirname}/conf`}/httpd.json`);
+	const confdir = args.getArgs().c?.[0]||args.getArgs().conf?.[0]||`${__dirname}/conf`,
+		hostname = fs.existsSync(`${confdir}/hostname.json`) ? require(`${confdir}/hostname.json`) : require("os").hostname;
+	global.conf = require(`${confdir}/httpd.json`);
+	global.conf.host = mustache.render(global.conf.host, {hostname});	// override host as appropriate
 
 	// normalize paths
 	conf.webroot = path.resolve(`${__dirname}/${conf.webroot}`);	
@@ -56,6 +66,9 @@ function _initConfSync() {
 		for (const app of fs.readdirSync(`${__dirname}/../apps/`)) 
 			if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
 				const appHTTPDConf = require(`${__dirname}/../apps/${app}/conf/httpd.json`);
+				const appHostname = fs.existsSync(`${__dirname}/../apps/${app}/conf/hostname.json`) ?
+					require(`${__dirname}/../apps/${app}/conf/hostname.json`) : hostname;
+				if (appHTTPDConf.host) appHTTPDConf.host = mustache.render(appHTTPDConf.host, {hostname: appHostname});	// override host as appropriate
 				for (const confKey of Object.keys(appHTTPDConf)) {
 					const value = appHTTPDConf[confKey];
 					if (!global.conf[confKey]) {global.conf[confKey] = value; continue;}	// not set, then just set it
@@ -89,7 +102,7 @@ function _initExtensions() {
 
 async function _handleRequest(req, res) {
 	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
-	let fileRequested = path.resolve(conf.webroot+"/"+pathname);
+	let fileRequested = path.resolve(`${conf.webroot}/${pathname}`);
 
 	// don't allow reading outside webroot
 	if (!_isSubdirectory(fileRequested, conf.webroot))
@@ -116,7 +129,7 @@ async function _handleRequest(req, res) {
 		if (utils.etagsMatch(req.headers["if-none-match"], _genEtag(stats))) {
 			_sendCode(req, res, 304, "Not changed."); return; }
 		
-		_sendFile(fileRequested, req, res, stats);	// nothing matched, send the file
+		_sendFile(fileRequested, req, res, stats);	// nothing matched, send the file via disk IO
 	} catch (err) {_sendError(req, res, 404, "Path Not Found."); return;}
 }
 

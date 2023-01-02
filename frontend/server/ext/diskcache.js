@@ -38,7 +38,7 @@ exports.processRequest = async (req, res, dataSender, _errorSender, codeSender, 
 
     const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
 
-	let fileRequested = path.resolve(conf.webroot+"/"+pathname);
+	let fileRequested = path.resolve(`${conf.webroot}/${pathname}`);
     const indexRequested = path.resolve(fileRequested+"/"+conf.indexfile);
     if (!cache[fileRequested] && cache[indexRequested]) fileRequested = indexRequested; // is an index request
 

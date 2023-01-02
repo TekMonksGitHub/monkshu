@@ -183,6 +183,7 @@ const getClientIP = req =>
  * @returns The embedded IPv4 inside an IPv6 or null if none found.
  */
 function getEmbeddedIPV4(address) { 
+    if ((analyzeIPAddr(address)).ipv6 == false) return address; // it is an ipv4 
     const pattern = /\:\:ffff\:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/;
     const matches = address.match(pattern);
     return matches && matches[1] ? matches[1] : null;
