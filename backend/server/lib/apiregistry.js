@@ -19,10 +19,10 @@ function initSync() {
 	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
 	for (const key in apireg) apireg[key] = fs.existsSync(apireg[key].split("?")[0]) ? apireg[key] : (`${CONSTANTS.ROOTDIR}/${apireg[key]}`);
 
-	const decoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_DECODERS_CONF, root: CONSTANTS.ROOTDIR}];
-	const encoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_ENCODERS_CONF, root: CONSTANTS.ROOTDIR}];
-	const headermanagersPathAndRoots = [{path: CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF, root: CONSTANTS.ROOTDIR}];
-	const securitycheckersPathAndRoots = [{path: CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF, root: CONSTANTS.ROOTDIR}];
+	const decoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_DECODERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
+	const encoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_ENCODERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
+	const headermanagersPathAndRoots = [{path: CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
+	const securitycheckersPathAndRoots = [{path: CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
 
 	const apps = app.getApps();
 	const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep)
@@ -39,14 +39,14 @@ function initSync() {
 		}
 
 		const appRoot = appObj[app];
-		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`)) decoderPathAndRoots.push(
-			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF}`, root: appRoot});
-		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`)) encoderPathAndRoots.push(
-			{path: `${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF}`, root: appRoot});
-		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`)) headermanagersPathAndRoots.push(
-			{path: `${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF}`, root: appRoot});
-		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`)) securitycheckersPathAndRoots.push(
-			{path: `${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF_APPS}`)) decoderPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF_APPS}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF_APPS}`)) encoderPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF_APPS}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF_APPS}`)) headermanagersPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF_APPS}`, root: appRoot});
+		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF_APPS}`)) securitycheckersPathAndRoots.push(
+			{path: `${appRoot}/${CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF_APPS}`, root: appRoot});
 	}
 
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);

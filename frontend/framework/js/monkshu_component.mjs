@@ -20,18 +20,19 @@ const BLACKBOARD_MESSAGE_COMPONENT_RENDERED = "__org_monkshu_component_rendered"
 function register(name, htmlTemplate, module) {
     if (window.monkshu_env.components[name]) return;    // already registered
     
-    // allow binding of data and dynamic DOM updates
-    module.bindData = async (data, id) => {
-        if (module.dataBound) data = await module.dataBound(id?module.elements[id]:module.element, data);
-
-        if (id) {if (!module.datas) module.datas = {}; module.datas[id] = data;}
-        else module.data = data; 
+    module.bindData = async (data, id) => { // allow binding of data and dynamic DOM updates
+        if (module.dataBound) data = await module.dataBound(id?module.elements[id]:module.element, data);   // if a data bound listner is provided tell it we are about to rebind data
+        module.setData(id, data);
 
         if (id && module.elements && module.elements[id]) await module.elements[id].render(false);
         else if ((!id) && module.element) await module.element.render(false);
     }
+    module.bindDataByHost = (host, data) => module.bindData(host.id, data);
+    module.bindDataByContainedElement = (element, data) => module.bindData(module.getHostElementID(element), data);
 
     module.getData = id => id?module.datas?.[id]:module.data;
+    module.getDataByHost = host => module.getData(host.id);
+    module.getDataByContainedElement = element => module.getData(module.getHostElementID(element));
 
     module.getHostElementByID = id => id && module.elements && module.elements[id] ? module.elements[id] :  module.element;
     module.getHostElement = element => module.trueWebComponentMode ? element.getRootNode().host : element.closest(name);
