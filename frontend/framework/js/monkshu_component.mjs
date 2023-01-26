@@ -24,8 +24,8 @@ function register(name, htmlTemplate, module) {
         if (module.dataBound) data = await module.dataBound(id?module.elements[id]:module.element, data);   // if a data bound listner is provided tell it we are about to rebind data
         module.setData(id, data);
 
-        if (id && module.elements && module.elements[id]) await module.elements[id].render(false);
-        else if ((!id) && module.element) await module.element.render(false);
+        if (id && module.elements && module.elements[id]) await module.elements[id].render();
+        else if ((!id) && module.element) await module.element.render();
     }
     module.bindDataByHost = (host, data) => module.bindData(data, host.id);
     module.bindDataByContainedElement = (element, data) => module.bindData(module.getHostElementID(element), data);
@@ -124,6 +124,8 @@ function register(name, htmlTemplate, module) {
         return val;
     }
 
+    module.hasBeenRendered = host => host.__org_monkshu_hasBeenRendered?true:false;
+
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
@@ -134,7 +136,7 @@ function register(name, htmlTemplate, module) {
             dd.apply(oldDom, diff);
         }
 
-        async render(initialRender) {
+        async render(initialRender=this.__org_monkshu_hasBeenRendered?false:true) {
             // check security policy
             if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
 
@@ -167,6 +169,7 @@ function register(name, htmlTemplate, module) {
                 } else if (this.firstChild) await this.constructor._diffApplyDom(this.firstChild, templateRoot);
             }
 
+            this.__org_monkshu_hasBeenRendered = true;
             if (module.initialRender && initialRender) await module.initialRender(this);
             if (module.elementRendered) await module.elementRendered(this, initialRender);
             blackboard.broadcastMessage(BLACKBOARD_MESSAGE_COMPONENT_RENDERED, `${name}#${this.id||"undefined"}`);
@@ -184,7 +187,7 @@ function register(name, htmlTemplate, module) {
             if (this.hasAttribute("roles")) for (const role of JSON.parse(this.getAttribute("roles"))) 
                 securityguard.addPermission(this.id ? name+this.id : name, role);
             
-            this.render(true); 
+            this.render();  
         }
         
         disconnectedCallback() {
@@ -196,7 +199,10 @@ function register(name, htmlTemplate, module) {
         }
 
         async attributeChangedCallback(name, oldValue, newValue) {
-            if (module.attributeChanged) await module.attributeChanged(this, name, oldValue, newValue);
+            if (module.attributeChanged && module.hasBeenRendered(this)) 
+                await module.attributeChanged(this, name, oldValue, newValue);
+            else if (module.attributeChangedBeforeRendering) 
+                await module.attributeChangedBeforeRendering(this, name, oldValue, newValue);
         }
 
         static get observedAttributes() {
