@@ -27,7 +27,7 @@ function register(name, htmlTemplate, module) {
         if (id && module.elements && module.elements[id]) await module.elements[id].render(false);
         else if ((!id) && module.element) await module.element.render(false);
     }
-    module.bindDataByHost = (host, data) => module.bindData(host.id, data);
+    module.bindDataByHost = (host, data) => module.bindData(data, host.id);
     module.bindDataByContainedElement = (element, data) => module.bindData(module.getHostElementID(element), data);
 
     module.getData = id => id?module.datas?.[id]:module.data;
@@ -197,6 +197,11 @@ function register(name, htmlTemplate, module) {
 
         async attributeChangedCallback(name, oldValue, newValue) {
             if (module.attributeChanged) await module.attributeChanged(this, name, oldValue, newValue);
+        }
+
+        static get observedAttributes() {
+            if (module.getObservedAttributes) return module.getObservedAttributes(this);
+            else return [];
         }
     });
 
