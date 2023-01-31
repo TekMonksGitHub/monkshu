@@ -30,18 +30,21 @@ async function copyFileOrFolder(from, to) {
  * Walks the given folder, recursively. Calls the function (expected async) for each file. The function
  * completes (promise resolves) when the entire walk is completed. The functionToCall is called with the
  * following params -> (full path to the entry, stats for the entry, relative path to the entry)
- * @param {string} path The path to walk
- * @param {function} functionToCall The function to call (async) for each entry
+ * @param {string} pathIn The path to walk
+ * @param {function} functionToCall The function to call (can be async) for each entry
+ * @param {boolean} isCalledFunctionAsync Whether the walk function we are calling is async
+ * @param {function} functionOnEndOfWalk The function to call on the end of the walk
  */
-async function walkFolder(path, functionToCall, root) {
-    if (!root) root = path; // entry call, so we are at the root of the tree
-    const entries = await fs.promises.readdir(path);
+async function walkFolder(pathIn, functionToCall, isCalledFunctionAsync, functionOnEndOfWalk, root) {
+    if (!root) root = pathIn; // entry call, so we are at the root of the tree
+    const entries = await fs.promises.readdir(pathIn);
     for (const entry of entries) {
-        const pathThisEntry = path.resolve(path+"/"+entry), stats = await lstatAsync(pathThisEntry);
-        if (functionToCall.constructor.name === "AsyncFunction") await functionToCall(pathThisEntry, stats, path.relative(root, pathThisEntry));    // if the function is async then await its execution
+        const pathThisEntry = path.resolve(pathIn+"/"+entry), stats = await lstatAsync(pathThisEntry);
+        if (isCalledFunctionAsync) await functionToCall(pathThisEntry, stats, path.relative(root, pathThisEntry));    // if the function is async then await its execution
         else functionToCall(pathThisEntry, stats, path.relative(root, pathThisEntry));
-        if (stats.isDirectory()) await walkFolder(pathThisEntry, functionToCall, root);
+        if (stats.isDirectory()) await walkFolder(pathThisEntry, functionToCall, isCalledFunctionAsync, undefined, root);
     }
+    if (functionOnEndOfWalk) functionOnEndOfWalk();
 }
 
 /**
