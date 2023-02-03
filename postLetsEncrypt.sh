@@ -1,6 +1,6 @@
 #!/bin/bash
 MONKSHU_SERVICE_NAME="monkshu"
-MONKSHU_PATH="$( cd "$( dirname "$0" )" && pwd )"
+MONKSHU_PATH="$( cd "$( dirname "$(readlink -f "$0")" )" && pwd )"
 MONKSHU_CERTBOT_RENEWAL_LOG=/tmp/monkshu_certbot_renewal.log
 MONKSHU_CERTBOT_RENEWAL_PID=/tmp/monkshu_certbot_renewal.pid
 DOMAIN=${1:-`hostname --fqdn`}
