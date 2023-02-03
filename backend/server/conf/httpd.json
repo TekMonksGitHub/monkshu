@@ -8,7 +8,7 @@
         "Access-Control-Expose-Headers": "*",
         "Access-Control-Max-Age": 86400
     },
-    "host": "::",
+    "host": "{{{hostname}}}",
     "port": 9090,
     "ssl": false,
     "ipblacklistRefresh": 5000,
