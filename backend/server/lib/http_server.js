@@ -6,10 +6,11 @@
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const conf = require(`${CONSTANTS.HTTPDCONF}`);
+const mustache = require("mustache");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
+const conf = JSON.parse(mustache.render(fs.readFileSync(`${CONSTANTS.HTTPDCONF}`, "utf8"), {hostname: CONSTANTS.HOSTNAME}));
 let ipblacklist = [], ipwhitelist = [];
 
 function initSync() {
