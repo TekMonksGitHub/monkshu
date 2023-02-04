@@ -118,8 +118,7 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 	return conf.enableGZIPEncoding && acceptEncoding.toLowerCase().includes("gzip");
 }
 
-const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] 
-	= obj[key]; return clone;}
+const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
 	statusInternalError, statusOK, write, end, blacklistIP, whitelistIP}
