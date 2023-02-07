@@ -4,7 +4,7 @@
  * See enclosed LICENSE file.
  */
 
-window.$$ = {};
+window.$$ = {_slowNetwork: false};
 
 $$.ready = callback => {
     // in case the document is already rendered
@@ -99,6 +99,9 @@ $$.getOS = _ => {
     if (/Linux/i.test(navigator.userAgent)) return "linux";
     return "unknown";
 }
+
+$$.setSlowNetwork = slowNetworkFlag => window.$$["_slowNetwork"] = slowNetworkFlag?true:false;
+$$.isSlowNetwork = _ => window.$$["_slowNetwork"];
 
 $$.copyTextToClipboard = text => {
     if (navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
