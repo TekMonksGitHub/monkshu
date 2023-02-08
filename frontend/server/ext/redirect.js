@@ -10,7 +10,7 @@ const mustache = require("mustache");
 exports.name = "redirect";
 exports.processRequest = async (req, res, dataSender, _errorSender, _codeSender, access, _error) => {
 	const protocol = req.connection.encrypted ? "https" : "http",
-        {redirectedURL, code} = _getRedirectedURL(new URL(req.url, `${protocol}://${req.headers.host}/`))||{redirectedURL:null, code:null}; 
+        {redirectedURL, code} = _getRedirectedURL(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${protocol}://${req.headers[":authority"]}/` : `${protocol}://${req.headers.host}/`))||{redirectedURL:null, code:null}; // getting url for http2 or http1 based on configurations
 	if (!redirectedURL) return false;
 
 	access.info(`Redirecting, ${code}, ${req.url} to ${redirectedURL.href}`);
