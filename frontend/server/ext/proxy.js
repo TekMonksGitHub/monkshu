@@ -12,7 +12,7 @@ const httpClient = require(`${conf.libdir}/httpClient.js`);
 exports.name = "proxy";
 exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, access, _error) => {
     const protocol = req.connection.encrypted ? "https" : "http",
-        proxiedURL = _getProxiedURL(new URL(req.url, `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false;
+        proxiedURL = _getProxiedURL(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${protocol}://${req.headers[":authority"]}/` : `${protocol}://${req.headers.host}/`)); if (!proxiedURL) return false; // getting url for http2 or http1 based on configurations
 
     const url = proxiedURL, host = url.hostname, port = url.port, data = req.data,
         headers = {...req.headers, "host":url.host, "X-Forwarded-For":utils.getClientIP(req), "X-Forwarded-Port":utils.getClientPort(req), "X-Forwarded-Proto": protocol};

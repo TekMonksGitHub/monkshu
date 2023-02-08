@@ -13,6 +13,9 @@
 	"errorlog": "./logs/error.log.json",
 	"indexfile": "index.html",
 	"ssl": false,
+	"forceHTTP1": false,
+	"sslKeyFile":"/path/to/certificate/key.pem",
+	"sslCertFile":"/path/to/certificate/cert.pem",
 	"enableGZIPEncoding": true,
 	"httpdHeaders": {
 		"Server": "Monkshu HTTPD",

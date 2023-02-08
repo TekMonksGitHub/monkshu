@@ -17,6 +17,7 @@ const PROC_MEMORY = {};
 const http = require("http");
 const zlib = require("zlib");
 const https = require("https");
+const http2 = require("http2");
 const fspromises = require("fs").promises;
 const querystring = require("querystring");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
@@ -90,31 +91,59 @@ function _addHeaders(headers, body) {
 
 function _doCall(reqStr, options, secure, sslObj) {
     return new Promise(async (resolve, reject) => {
-        const caller = secure ? https : http;
+        const caller = secure && (!conf.forceHTTP1) ? http2.connect(`https://${options.headers.host}`) : secure ? https : http; // implementing http2 connect method
         let resp, ignoreEvents = false, resPiped;
-        if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
-        const req = caller.request(options, res => {
-            const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
-            if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
+        if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
+        if (secure && !conf.forceHTTP1) { // for http2 case
+            const sendError = (error) => { reject(error); ignoreEvents = true; };
+            const http2Headers = { ...options.headers }; // getting all the necessary headers to call the api for http2
+            [":method",":authority",":scheme",":path"].forEach( header => delete http2Headers[header] ); // deleting these as it is already there
+            http2Headers[":path"] = options.path; // setting the proxied path as pseudo header format (for http2)
+            caller.on("error", (error) => { sendError(error); })
+            const req = caller.request(http2Headers); // making request to the url/api
+            req.on("response", (headers) => {
+                const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
+                resPiped = req;
+                req.on("data", (chunk) => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; });
+                req.on("error", (error) => { sendError(error) });
+                req.on("error", (error) => { sendError(error) });
+                req.on("end", () => {
+                    if (ignoreEvents) return;
+                    const resHeaders = { ...headers }, status = resHeaders[":status"];
+                    const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
+                    delete resHeaders[":status"]; // done this because cannot set http2 pseudo headers
+                    resHeaders.status = status;
+                    if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
+                    else resolve({ error: null, data: resp, status, resHeaders });
+                });
+            });
+            if (reqStr) req.write(reqStr);
+            req.end();
+            req.on("error", (error) => reject(error));
+        } else {
+            if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
+            const req = caller.request(options, res => {
+                const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
+                if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
 
             resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp,chunk]) : chunk });
+                const sendError = error => { reject(error); ignoreEvents = true; };
+                res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
 
-            const sendError = error => { reject(error); ignoreEvents = true; };
-            res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
+                resPiped.on("end", () => {
+                    if (ignoreEvents) return;
+                    const status = res.statusCode, resHeaders = { ...res.headers };
+                    const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
 
-            resPiped.on("end", () => {
-                if (ignoreEvents) return;
-                const status = res.statusCode, resHeaders = { ...res.headers };
-                const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
-
-                if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
-                else resolve({ error: null, data: resp, status, resHeaders });
+                    if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
+                    else resolve({ error: null, data: resp, status, resHeaders });
+                });
             });
-        });
 
-        if (reqStr) req.write(reqStr);
-        req.end();
-        req.on("error", error => reject(error));
+            if (reqStr) req.write(reqStr);
+            req.end();
+            req.on("error", error => reject(error));
+        }
     });
 }
 
