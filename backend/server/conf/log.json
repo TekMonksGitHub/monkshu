@@ -1,5 +1,5 @@
 {
-    "debug": false,
+    "debug": true,
     "max_log_mb": 100,
     "fileCloseTimeOut": 30000,
     "sync_log": true
