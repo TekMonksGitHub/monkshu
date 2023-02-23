@@ -90,44 +90,52 @@ function _addHeaders(headers, body) {
 }
 
 function _doCall(reqStr, options, secure, sslObj) {
+    const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
+
     return new Promise(async (resolve, reject) => {
-        const caller = secure && (!conf.forceHTTP1) ? http2.connect(`https://${options.headers.host}`) : secure ? https : http; // implementing http2 connect method
+        const caller = secure && (!options.forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
+            secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
-        if (secure && !conf.forceHTTP1) { // for http2 case
-            const sendError = (error) => { reject(error); ignoreEvents = true; };
-            const http2Headers = { ...options.headers }; // getting all the necessary headers to call the api for http2
-            [":method",":authority",":scheme",":path"].forEach( header => delete http2Headers[header] ); // deleting these as it is already there
-            http2Headers[":path"] = options.path; // setting the proxied path as pseudo header format (for http2)
-            caller.on("error", (error) => { sendError(error); })
-            const req = caller.request(http2Headers); // making request to the url/api
-            req.on("response", (headers) => {
+        const sendError = (error) => { reject(error); ignoreEvents = true; };
+        options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
+
+        if (secure && (!options.forceHTTP1)) { // for http2 case
+            caller.on("error", error => sendError(error))
+
+            const http2Headers = { ...options.headers }; http2Headers[http2.constants.HTTP2_HEADER_PATH] = options.path;
+            http2Headers[http2.constants.HTTP2_HEADER_METHOD] = (_=>{switch (options.method) {
+                case "GET": return http2.constants.HTTP2_METHOD_GET;
+                case "PUT": return http2.constants.HTTP2_METHOD_PUT;
+                case "DELETE": return http2.constants.HTTP2_METHOD_DELETE;
+                case "POST": return http2.constants.HTTP2_METHOD_POST;
+                default: return http2.constants.HTTP2_METHOD_GET;
+            }})();
+            const req = caller.request(http2Headers); 
+            req.on("error", (error) => { sendError(error) });
+            req.on("response", headers => {
                 const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
-                resPiped = req;
-                req.on("data", (chunk) => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; });
-                req.on("error", (error) => { sendError(error) });
-                req.on("error", (error) => { sendError(error) });
-                req.on("end", () => {
+                if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
+                resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; });
+                resPiped.on("error", error => sendError(error)); 
+                resPiped.on("end", () => {
                     if (ignoreEvents) return;
-                    const resHeaders = { ...headers }, status = resHeaders[":status"];
+                    const resHeaders = { ...headers }, status = resHeaders[http2.constants.HTTP2_HEADER_STATUS];
+                    delete resHeaders[http2.constants.HTTP2_HEADER_STATUS]; resHeaders.status = status;
                     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
-                    delete resHeaders[":status"]; // done this because cannot set http2 pseudo headers
-                    resHeaders.status = status;
                     if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
                     else resolve({ error: null, data: resp, status, resHeaders });
                 });
             });
             if (reqStr) req.write(reqStr);
             req.end();
-            req.on("error", (error) => reject(error));
         } else {
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
                 const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
 
-            resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp,chunk]) : chunk });
-                const sendError = error => { reject(error); ignoreEvents = true; };
+                resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp,chunk]) : chunk });
                 res.on("error", error => sendError(error)); resPiped.on("error", error => sendError(error));
 
                 resPiped.on("end", () => {
@@ -139,10 +147,9 @@ function _doCall(reqStr, options, secure, sslObj) {
                     else resolve({ error: null, data: resp, status, resHeaders });
                 });
             });
-
+            req.on("error", error => reject(error));
             if (reqStr) req.write(reqStr);
             req.end();
-            req.on("error", error => reject(error));
         }
     });
 }
@@ -175,6 +182,7 @@ function main() {
         eval(args[0]).call( null, url.hostname, port, totalPath, headers, args[2], sslOptions, (err, data) => {
             const funcToWriteTo = err?console.error:out, dataToWrite = err ? err : (process.stdout.isTTY?data.toString("utf8"):data);
             funcToWriteTo(dataToWrite);
+            process.exit(err?1:0);
         });
     }
 }
