@@ -93,14 +93,15 @@ function _doCall(reqStr, options, secure, sslObj) {
     const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
     return new Promise(async (resolve, reject) => {
-        const caller = secure && (!options.forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
+        const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
         const sendError = (error) => { reject(error); ignoreEvents = true; };
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
-        if (secure && (!options.forceHTTP1)) { // for http2 case
+        if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
+            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
             caller.on("error", error => sendError(error))
 
             const http2Headers = { ...options.headers }; http2Headers[http2.constants.HTTP2_HEADER_PATH] = options.path;
@@ -130,6 +131,8 @@ function _doCall(reqStr, options, secure, sslObj) {
             if (reqStr) req.write(reqStr);
             req.end();
         } else {
+            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
+
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
                 const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
@@ -172,7 +175,7 @@ async function _addSecureOptions(options, sslObj) {
 if (require.main === module) main();
 
 function main() {
-    const args = process.argv.slice(2); if (args[0]) args[0] = args[0].toLowerCase();
+    const args = process.argv.slice(2); if (args[0]) args[0] = args[0].toLowerCase(); global.LOG = console;
     if (args.length == 0) console.error("Usage: httpClient.js <method> <url> <body> <headers> [ssl-options]");
     else {
         const url = new URL(args[1]); if (url.protocol == "https:") args[0] = args[0]+"Https"; if (args[0]=="delete") args[0] = "deleteHttp"; 
