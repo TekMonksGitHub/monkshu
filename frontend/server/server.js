@@ -11,6 +11,7 @@ const zlib = require("zlib");
 const path = require("path");
 const http = require("http");
 const https = require("https");
+const http2 = require("http2");
 const fspromises = fs.promises;
 const mustache = require("mustache");
 const args = require(`${__dirname}/lib/processargs.js`);
@@ -36,7 +37,7 @@ function bootstrap() {
 	/* Start HTTP/S server */
 	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
-	const httpd = options ? https.createServer(options, listener) : http.createServer(listener);
+	const httpd = options && (!conf.forceHTTP1) ? http2.createSecureServer(options, listener) : options ? https.createServer(options, listener) : http.createServer(listener); // create server for http2 or http1 based on configurations
 	httpd.setTimeout(conf.timeout);
 	httpd.listen(conf.port, conf.host||"::");
 	

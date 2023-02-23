@@ -6,6 +6,7 @@
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
+const http2 = require("http2");
 const mustache = require("mustache");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
@@ -40,12 +41,12 @@ function initSync() {
 				req.headers[header.toLowerCase()] = saved;
 			}
 			req.on("data", data => module.exports.onData(data, servObject));
-			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, `${req.protocol}://${req.headers.host}`).href, req.headers, servObject));
-			req.on("error", error => module.exports.onReqError(new URL(req.url, `${req.protocol}://${req.headers.host}`).href, req.headers, error, servObject));
+			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${req.protocol}://${req.headers[':authority']}` : `${req.protocol}://${req.headers.host}`).href, req.headers, servObject)); // getting url for http2 or http1 based on configurations
+            req.on("error", error => module.exports.onReqError(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${req.protocol}://${req.headers[':authority']}` : `${req.protocol}://${req.headers.host}`).href, req.headers, error, servObject));
 		}
 	};
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
-	const server = options ? https.createServer(options, listener) : http.createServer(listener);
+	const server = options && (!conf.forceHTTP1) ? http2.createSecureServer({...options, allowHTTP1: true}, listener) : options ? https.createServer(options, listener) : http.createServer(listener); // create server for http2 or http1 based on configurations
 	server.timeout = conf.timeout;
 	server.listen(conf.port, host);
 
