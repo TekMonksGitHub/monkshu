@@ -45,7 +45,8 @@
 		".dummy":   ["<put content mime type here>", "put true for compressable mime and false for not compressable"]
 	},
 	"restrictServerTree": true, <-- Don't serve anything outside webroot
-	"timeout": 120000 <-- Server timeout waiting for response
+	"timeout": 120000 <-- Server timeout waiting for response,
+	forceHTTP1: false <-- Use HTTP2 always
 }
 
 App Specific Redirects
