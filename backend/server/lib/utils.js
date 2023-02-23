@@ -17,12 +17,25 @@ let lastFileCheckTime = {};
  * Copies file or folder recursively.
  * @param {string} from The path to copy from
  * @param {string} to The path to copy to (will create directories if needed)
+ * @param {function} functionToCall The function to call (can be async) for each entry
+ * @param {boolean} isCalledFunctionAsync Whether the walk function we are calling is async
  */
-async function copyFileOrFolder(from, to) {
-    if ((await lstatAsync(from)).isFile()) await copyFileAsync(from, to);
-    else {
-        await mkdirAsync(to);
-        for (const element of await readdirAsync(from)) await copyFileOrFolder(path.join(from, element), path.join(to, element));
+async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync, rootFrom) {
+    if (!rootFrom) rootFrom = path.dirname(from); // entry call, so we are at the root of the tree
+
+    if ((await lstatAsync(from)).isFile()) {
+        if (!rootFrom) rootFrom = path.dirname(from);   // parent is the root directory
+        await copyFileAsync(from, to);
+    } else {
+        if (!rootFrom) rootFrom = from; // this is the root directory
+        await mkdirAsync(to); 
+        for (const entry of await readdirAsync(from)) await copyFileOrFolder(path.join(from, entry), 
+            path.join(to, entry), rootFrom);
+    }
+
+    if (functionToCall) {   // call function if provided for every entry
+        if (isCalledFunctionAsync) await functionToCall(from, to, path.relative(rootFrom, from));    // if the function is async then await its execution
+        else functionToCall(from, to, path.relative(rootFrom, from));
     }
 }
 
