@@ -179,9 +179,11 @@ function main() {
         const port = url.port && url.port != "" ? url.port : (url.protocol=="https:"?443:80), out = process.stdout.write.bind(process.stdout),
             headers = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, sslOptions = args[4] ? JSON.parse(args[4]):null,
             totalPath = url.pathname + (url.search?url.search:"");
-        eval(args[0]).call( null, url.hostname, port, totalPath, headers, args[2], sslOptions, (err, data) => {
-            const funcToWriteTo = err?console.error:out, dataToWrite = err ? err : (process.stdout.isTTY?data.toString("utf8"):data);
+        eval(args[0]).call( null, url.hostname, port, totalPath, headers, args[2], sslOptions, (err, data, status, headers) => {
+            const funcToWriteTo = err?console.error:out, dataToWrite = err ? err : data.toString("utf8");
             funcToWriteTo(dataToWrite);
+            funcToWriteTo(`\n\nResponse status ${status}`);
+            funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}`);
             process.exit(err?1:0);
         });
     }
