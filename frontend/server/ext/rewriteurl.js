@@ -6,11 +6,12 @@
  */
 
 const mustache = require("mustache");
+const utils = require(`${conf.libdir}/utils.js`);
 
 exports.name = "rewriteurl";
 exports.processRequest = async (req, _res, _dataSender, _errorSender, _codeSender, access, _error) => {
     const protocol = req.connection.encrypted ? "https" : "http",
-        rewrittenURL = _getRewrittenURL(new URL(req.url, `${protocol}://${req.headers.host}/`));
+        rewrittenURL = _getRewrittenURL(new URL(req.url, `${protocol}://${utils.getServerHost(req)}/`));
 
     if (rewrittenURL) {
         const rewrittenPath = rewrittenURL.pathname+rewrittenURL.search;

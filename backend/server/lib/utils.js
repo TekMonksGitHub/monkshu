@@ -6,6 +6,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const http2 = require("http2");
 const mkdirAsync = require("util").promisify(fs.mkdir);
 const lstatAsync = require("util").promisify(fs.lstat);
 const readdirAsync = require("util").promisify(fs.readdir);
@@ -188,10 +189,23 @@ const getTempFile = ext =>
  * @param {object} req Incoming HTTP request object.
  * @returns The client IP
  */
-const getClientIP = req =>
-    (typeof req.headers['x-forwarded-for'] === 'string'
-        && req.headers['x-forwarded-for'].split(',').shift())
-    || req.socket.remoteAddress;
+const getClientIP = req => req.headers['x-forwarded-for']?req.headers['x-forwarded-for'].split(",").shift():
+    req.headers['x-real-ip']?req.headers['x-real-ip'].split(",").shift():req.socket.remoteAddress;
+
+/**
+ * Returns client port, parsing out proxy headers, from an incoming HTTP req object.
+ * @param {object} req Incoming HTTP request object.
+ * @returns The client port
+ */
+const getClientPort = req => req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"].split(",").shift():
+    req.headers["x-real-port"]?req.headers["x-real-port"].split(",").shift():req.socket.remotePort;
+
+/**
+ * Returns the request's server host
+ * @param req The incoming HTTP request 
+ * @return The request's server host 
+ */
+const getServerHost = req => req.httpVersionMajor == 2 ? req.headers[http2.constants.HTTP2_HEADER_AUTHORITY] : req.headers.host;
 
 /**
  * Returns embedded IPv4 inside an IPv6.
@@ -297,5 +311,5 @@ function watchFile(path, opIfModified, frequency) {
  const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
-    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
-    getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder };
+    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getServerHost,
+    getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder };

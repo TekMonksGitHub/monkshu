@@ -36,7 +36,7 @@ exports.initSync = (_accessLog, errorLog) => {
 exports.processRequest = async (req, res, dataSender, _errorSender, codeSender, _access, _error) => {
     if (!conf.diskCache || conf.diskCache.refresh == 0) return false;   // disk caching is disabled
 
-    const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
+    const pathname = new URL(req.url, `http://${utils.getServerHost(req)}/`).pathname;
 
 	let fileRequested = path.resolve(`${conf.webroot}/${pathname}`);
     const indexRequested = path.resolve(fileRequested+"/"+conf.indexfile);

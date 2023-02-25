@@ -3,6 +3,7 @@
  */
 
 const fs = require("fs");
+const http2 = require("http2");
 
 let lastFileCheckTime = {};
 
@@ -116,5 +117,7 @@ function etagsMatch(etagHeader, etag) {
     return (etagsAllowed.includes(etag) || etagsAllowed.includes(`W/${etag}`));
 }
 
+const getServerHost = req => req.httpVersionMajor == 2 ? req.headers[http2.constants.HTTP2_HEADER_AUTHORITY] : req.headers.host;
+
 module.exports = { copyFile, getDateTime, getClientIP, getClientPort, getEmbeddedIPV4, union, setIntervalImmediately,
-    expandIPv6Address, watchFile, etagsMatch };
+    expandIPv6Address, watchFile, etagsMatch, getServerHost };

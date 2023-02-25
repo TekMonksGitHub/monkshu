@@ -32,17 +32,16 @@ function initSync() {
 			res.end();
 		} else {
 			req.protocol = req.protocol || req.socket.encrypted?"https":"http";
-			const host = req.headers["x-forwarded-for"]?req.headers["x-forwarded-for"]:req.headers["x-forwarded-host"]?req.headers["x-forwarded-host"]:req.socket.remoteAddress;
-			const port = req.headers["x-forwarded-port"]?req.headers["x-forwarded-port"]:req.socket.remotePort;
-			const servObject = {req, res, env:{remoteHost:host, remotePort:port, remoteAgent: req.headers["user-agent"]}, 
+			const remoteHost = utils.getClientIP(req), remotePort = utils.getClientPort(req);
+			const servObject = {req, res, env:{remoteHost, remotePort, remoteAgent: req.headers["user-agent"]}, 
 				server: module.exports, compressionFormat: req.headers["content-encoding"]?.toLowerCase().includes("gzip") ? CONSTANTS.GZIP : undefined}; 
 			for (const header of Object.keys(req.headers)) {
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;
 			}
-			req.on("data", data => module.exports.onData(data, servObject));
-			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${req.protocol}://${req.headers[':authority']}` : `${req.protocol}://${req.headers.host}`).href, req.headers, servObject)); // getting url for http2 or http1 based on configurations
-            req.on("error", error => module.exports.onReqError(new URL(req.url, conf.ssl && (!conf.forceHTTP1) ? `${req.protocol}://${req.headers[':authority']}` : `${req.protocol}://${req.headers.host}`).href, req.headers, error, servObject));
+			req.on("data", data => module.exports.onData(data, servObject)); 
+			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, servObject)); 
+            req.on("error", error => module.exports.onReqError(new URL(req.url, `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, error, servObject));
 		}
 	};
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;

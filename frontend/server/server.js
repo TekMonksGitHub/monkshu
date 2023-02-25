@@ -102,7 +102,7 @@ function _initExtensions() {
 }
 
 async function _handleRequest(req, res) {
-	const pathname = new URL(req.url, `http://${req.headers.host}/`).pathname;
+	const pathname = new URL(req.url, `http://${utils.getServerHost(req)}/`).pathname;
 	let fileRequested = path.resolve(`${conf.webroot}/${pathname}`);
 
 	// don't allow reading outside webroot
