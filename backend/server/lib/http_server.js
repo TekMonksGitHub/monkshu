@@ -40,8 +40,8 @@ function initSync() {
 				req.headers[header.toLowerCase()] = saved;
 			}
 			req.on("data", data => module.exports.onData(data, servObject)); 
-			req.on("end", _ => module.exports.onReqEnd(new URL(req.url, `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, servObject)); 
-            req.on("error", error => module.exports.onReqError(new URL(req.url, `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, error, servObject));
+			req.on("end", _ => module.exports.onReqEnd(new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, servObject)); 
+            req.on("error", error => module.exports.onReqError(new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, error, servObject));
 		}
 	};
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
@@ -119,6 +119,7 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 }
 
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
+const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
 	statusInternalError, statusOK, write, end, blacklistIP, whitelistIP}
