@@ -31,7 +31,7 @@ async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync,
         if (!rootFrom) rootFrom = from; // this is the root directory
         await mkdirAsync(to); 
         for (const entry of await readdirAsync(from)) await copyFileOrFolder(path.join(from, entry), 
-            path.join(to, entry), rootFrom);
+            path.join(to, entry), functionToCall, isCalledFunctionAsync, rootFrom);
     }
 
     if (functionToCall) {   // call function if provided for every entry
