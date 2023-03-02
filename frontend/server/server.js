@@ -189,14 +189,14 @@ function _sendData(res, code, headers, data) {
 	res.end();
 }
 
-function _isSubdirectory(child, parent) { // from: https://stackoverflow.com/questions/37521893/determine-if-a-path-is-subdirectory-of-another-in-node-js
-	child = path.resolve(child); parent = path.resolve(parent);
-
-	if (parent.toLowerCase() == child.toLowerCase()) return true;	// a directory is its own subdirectory (remember ./)
-
-	const relative = path.relative(parent, child);
-	const isSubdir = !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
-	return isSubdir;
+function _isSubdirectory(to, from) {
+	to = path.resolve(to).replace(/\\/g,"/").toLowerCase(); from = path.resolve(from).replace(/\\/g,"/").toLowerCase(); 
+	if (to==from) return true;	// a directory is its own subdirectory
+	const pathSplits = to.split("/"); for (const [i, _val] of pathSplits.entries()) {
+		const test = pathSplits.slice(0, i).join("/");
+		if (test==from) return true;
+	}
+	return false;
 }
 
 function _getReqHost(req) {
