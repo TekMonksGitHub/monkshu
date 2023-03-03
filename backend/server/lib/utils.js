@@ -189,8 +189,11 @@ const getTempFile = ext =>
  * @param {object} req Incoming HTTP request object.
  * @returns The client IP
  */
-const getClientIP = req => req.headers['x-forwarded-for']?req.headers['x-forwarded-for'].split(",").shift():
-    req.headers['x-real-ip']?req.headers['x-real-ip'].split(",").shift():req.socket.remoteAddress;
+const getClientIP = req => {
+    const clientIP = req.headers['x-forwarded-for']?req.headers['x-forwarded-for'].split(",").shift():
+        req.headers['x-real-ip']?req.headers['x-real-ip'].split(",").shift():req.socket.remoteAddress;
+    return clientIP;
+}
 
 /**
  * Returns client port, parsing out proxy headers, from an incoming HTTP req object.
