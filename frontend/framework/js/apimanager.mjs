@@ -2,7 +2,7 @@
  * @module apimanager
  * 
  * (C) 2020 TekMonks. All rights reserved.
- * License: MIT - see enclosed license.txt file.
+ * License: See enclosed LICENSE file.
  * 
  * This is a front-side API manager for Monkshu. It is hard
  * to manage keys and JWT tokens for a frontend without a
