@@ -18,8 +18,8 @@ const SERVER_CONF = require(`${CONSTANTS.CONFDIR}/smtp.json`);
  * @param {string} email_text The email's TEXT format text
  * @param {Object} conf A config object that contains {server, port, secure (true|false), from email address}. If not
  *                      provided then conf/smtp.json should contain the right settings.
- * @param {Object} auth An auth object that contains {user, password} for the SMTP server. If not provided then 
- *                      conf/smtp.json should contain the right settings.
+ * @param {Object} auth An auth object that contains {user: [user id], pass: [password]} for the SMTP server. 
+ *                      If not provided then conf/smtp.json should contain the right settings.
  * @returns true on success, and false on failure.
  */
 module.exports.email = async function(to, title, email_html, email_text, conf, auth) {
