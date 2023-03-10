@@ -58,22 +58,22 @@ function onReqError(_url, _headers, error, servObject) { statusInternalError(ser
 function onReqEnd(_url, _headers, servObject) { statusNotFound(servObject); end(servObject); }
 
 function statusNotFound(servObject, _error) {
-	servObject.res.writeHead(404, {...HEADER_ERROR, ...conf.headers});
+	servObject.res.writeHead(404, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
 	servObject.res.write("404 Not Found\n");
 }
 
 function statusUnauthorized(servObject, _error) {
-	servObject.res.writeHead(403, {...HEADER_ERROR, ...conf.headers});
+	servObject.res.writeHead(403, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
 	servObject.res.write("403 Unauthorized or forbidden\n");
 }
 
 function statusThrottled(servObject, _error) {
-	servObject.res.writeHead(429, {...HEADER_ERROR, ...conf.headers});
+	servObject.res.writeHead(429, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
 	servObject.res.write("429 Too many requests\n");
 }
 
 function statusInternalError(servObject, _error) {
-	servObject.res.writeHead(500, {...HEADER_ERROR, ...conf.headers});
+	servObject.res.writeHead(500, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
 	servObject.res.write("Internal error\n");
 }
 
@@ -82,7 +82,7 @@ function statusOK(headers, servObject, dontGZIP) {
 	const headersIn = _cloneLowerCase(headers);
 
 	const respHeaders = {...headersIn, ...confHeaders, "content-encoding":_shouldWeGZIP(servObject, dontGZIP)?"gzip":"identity"};
-	servObject.res.writeHead(200, respHeaders);
+	servObject.res.writeHead(200, _squishHeaders(respHeaders));
 }
 
 async function write(data, servObject, encoding, dontGZIP) {
@@ -120,6 +120,7 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
 const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
+const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
 	statusInternalError, statusOK, write, end, blacklistIP, whitelistIP}

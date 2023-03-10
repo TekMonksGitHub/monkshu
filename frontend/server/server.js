@@ -140,7 +140,9 @@ function _getServerHeaders(headers, stats) {
 		headers["Last-Modified"] = stats.mtime.toGMTString();
 		headers["ETag"] = _genEtag(stats);
 	}
-	return headers;
+
+	const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
+	return _squishHeaders(headers);
 }
 
 const _genEtag = stats => `${stats.ino}-${stats.mtimeMs}-${stats.size}`;
