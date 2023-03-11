@@ -14,6 +14,8 @@ const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
 const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
 
+const BASE_64_HEADER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
+
 let conf, alreadyInit = false;
 
 function initSync() {
@@ -73,22 +75,21 @@ function injectResponseHeadersInternal(apiregentry, url, response, requestHeader
     if (addsTokenParsed.tokenflag && !(utils.parseBoolean(addsTokenParsed.tokenflag))) return; // failed to pass the API success test 
     if ((!addsTokenParsed.tokenflag) && (!response.result)) return; // failed to pass the API success test 
     
-    const claims = {iss: "Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), ...addsTokenParsed}; 
+    const claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), ...addsTokenParsed}; 
 
     const claimB64 = Buffer.from(JSON.stringify(claims)).toString("base64"); 
-    const headerB64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
-    const tokenClaimHeader = claimB64+"."+headerB64;
+    const tokenClaimHeader = claimB64+"."+BASE_64_HEADER;
 
     const sig64 = cryptmod.createHmac("sha256", cryptmod.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
-    const token = `${headerB64}.${claimB64}.${sig64}`;
+    const token = `${BASE_64_HEADER}.${claimB64}.${sig64}`;
 
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
     
     // inject the JWT token into the response headers
-    responseHeaders.access_token = token; responseHeaders.token_type = "bearer";
+    responseHeaders.access_token = token; responseHeaders.token_type = "bearer"; responseHeaders.authorization = `Bearer ${token}`;
     for (const tokenListener of _jwttokenListeners) tokenListener("token_generated", {token, apiregentry, url, response, requestHeaders, responseHeaders, servObject});
 }
 

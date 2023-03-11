@@ -127,8 +127,12 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
 function _extractTokens(response, jsonResponseObj) {
     const urlHost = new URL(response.url).host, headersBack = {}; 
     for (const headerBack of response.headers) headersBack[headerBack[0]] = headerBack[1];
-    if (jsonResponseObj && jsonResponseObj.access_token) _extractAddToken(jsonResponseObj.access_token, urlHost);
-    else if (headersBack.access_token) _extractAddToken(headersBack.access_token, urlHost);
+    if (jsonResponseObj && jsonResponseObj.access_token && jsonResponseObj.token_type == "bearer") 
+        _extractAddToken(jsonResponseObj.access_token, urlHost);
+    else if (headersBack.access_token && headersBack.token_type == "bearer") 
+        _extractAddToken(headersBack.access_token, urlHost);
+    else if (headersBack.authorization && headersBack.authorization.toLowerCase().startsWith("bearer "))
+        _extractAddToken(headersBack.headersBack.authorization.substring(7).trim(), urlHost);
 }
 
 function _getKeyValAsURLParam(key, val) {

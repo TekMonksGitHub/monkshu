@@ -62,6 +62,32 @@ async function walkFolder(pathIn, functionToCall, isCalledFunctionAsync, functio
 }
 
 /**
+ * Deletes a given file or directory.
+ * @param {string} path The path to delete
+ * @returns true on success, false on failure.
+ */
+async function rmrf(path) {
+    const fspromises = fs.promises;
+    try {fspromises.access(path, fs.constants.W_OK | fs.constants.R_OK);} catch (err) {
+        if (err.code == "ENOENT") return true;  // path doesn't exist so it is already deleted anyways!
+        else {LOG.error(`Can't access path for rmrf ${path}, error is ${err}.`); return false;} // can't operate on this path.
+    }
+
+	if ((await fspromises.stat(path)).isFile()) { try{await fspromises.unlink(path); return true;} catch (err) {
+        LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; } }
+
+	const entries = await fspromises.readdir(path);
+	for (const entry of entries) {
+		const pathThis = `${path}/${entry}`, stats = await fspromises.stat(pathThis);
+		if (stats.isFile()) { try {await fspromises.unlink(pathThis);} catch (err) {
+            LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false;} }
+		else if (stats.isDirectory()) if (!await rmrf(pathThis)) LOG.error(`Error deleting path ${path}.`); return false;
+	}
+	try {await fspromises.rmdir(path); return true;} catch (err) { 
+        LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false; }
+}
+
+/**
  * Parses given value to a boolean
  * @param {string|object} value The value to convert
  * @returns The resulting boolean (true or false)
@@ -315,4 +341,4 @@ function watchFile(path, opIfModified, frequency) {
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getServerHost,
-    getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder };
+    getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder, rmrf };
