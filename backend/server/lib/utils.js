@@ -68,7 +68,7 @@ async function walkFolder(pathIn, functionToCall, isCalledFunctionAsync, functio
  */
 async function rmrf(path) {
     const fspromises = fs.promises;
-    try {fspromises.access(path, fs.constants.W_OK | fs.constants.R_OK);} catch (err) {
+    try {await fspromises.access(path, fs.constants.W_OK | fs.constants.R_OK);} catch (err) {
         if (err.code == "ENOENT") return true;  // path doesn't exist so it is already deleted anyways!
         else {LOG.error(`Can't access path for rmrf ${path}, error is ${err}.`); return false;} // can't operate on this path.
     }
