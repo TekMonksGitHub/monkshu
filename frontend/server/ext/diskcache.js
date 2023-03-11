@@ -116,9 +116,10 @@ async function _cacheThis(pathThis, stats, hits) {
 
     if (_canCompress(mime)) data = await gzipAsync(data);
 
+    const _getMimeType = mime => Array.isArray(mime) ? mime[0] : mime;
     cache[path.resolve(pathThis)] = {
         modified: stats.mtime.toUTCString(), mtimeMs: stats.mtimeMs,
-        mime, data, encoding: _canCompress(mime)?"gzip":"identity",
+        mime: _getMimeType(mime), data, encoding: _canCompress(mime)?"gzip":"identity",
         etag: crypto.createHash("md5").update(data).digest("hex"),
         size: data.length, hits, sizeUncompressed
     }
@@ -134,4 +135,4 @@ async function _tryToCache(pathThis, hits) {
     if (entryToEvict && leastHits < hits) {delete cache[entryToEvict]; await _cacheThis(pathThis, null, hits);}
 }
 
-const _canCompress = mime => mime && (!Array.isArray(mime) || Array.isArray(mime) && mime[1]);
+const _canCompress = mime => mime && (!Array.isArray(mime) || (Array.isArray(mime) && mime[1]));
