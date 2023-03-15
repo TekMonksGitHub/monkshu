@@ -46,6 +46,15 @@ exports.getQuery = async(cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
     catch (err) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: ${err}`); return false;}
 }
 
+/**
+ * Inits the database.
+ * @param {string} dbConnectInfo DB connection info. For this driver it is the path to the DB file.
+ * @param {array} dbCreationSQLs The DB creation SQLs as string array
+ */
+exports.init = async (dbConnectInfo, dbCreationSQLs) => {
+    if (!await _initDB(path.resolve(dbConnectInfo), dbCreationSQLs)) throw "DB initialization failed.";
+}
+
 async function _initDB(dbPath, dbCreationSQLs) {
     if (!(await _createDB(dbPath, dbCreationSQLs))) return false;
     if (!(await _openDB(dbPath))) return false; else return true;
