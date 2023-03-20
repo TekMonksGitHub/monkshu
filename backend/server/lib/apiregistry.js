@@ -130,7 +130,7 @@ function listAPIs() {
 
 async function addAPI(path, apiregentry, app) {
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	apireg[path] = app?`../apps/${app}/${apiregentry}`:apiregentry;
+	apireg[path] = app?`${CONSTANTS.APPROOTDIR}/${app}/${apiregentry}`:apiregentry;
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
 	const regFile = app?`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
 	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
