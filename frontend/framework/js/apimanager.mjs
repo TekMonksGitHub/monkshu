@@ -28,10 +28,11 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call
  * @param {boolean} canUseCache Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
+ * @param {boolean} sendErrResp Optional: true or false - if true then on error javascript error object will be returned, else return null.
  * 
  * @return {Object} Javascript result object or null on error
  */
-async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false) {
+async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, sendErrResp=false) {
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
@@ -45,7 +46,7 @@ async function rest(url, type, req, sendToken=false, extractToken=false, canUseC
             return respObj;   
         } else {
             LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
-            return null;
+            return sendErrResp ?  {respErr: {status: response.status, statusText: response.statusText}} :  null; // sending error response
         }
     } catch (err) {
         LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
