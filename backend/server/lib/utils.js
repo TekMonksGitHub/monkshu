@@ -207,8 +207,8 @@ function getObjectKeyNameCaseInsensitive(obj, key) {
  * @param {string} ext The extension of the file.
  * @returns The path to a temp file we can use.
  */
-const getTempFile = ext =>
-    `${os.tmpdir()+"/"+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`;
+const getTempFile = (ext, preferredDir, preferredPrefix) =>
+    path.resolve(`${(preferredDir||os.tmpdir())+"/"+(preferredPrefix||"")+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`);
 
 /**
  * Returns client IP, parsing out proxy headers, from an incoming HTTP req object.
