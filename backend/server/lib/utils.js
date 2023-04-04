@@ -337,8 +337,57 @@ function watchFile(path, opIfModified, frequency) {
  * @param {number} interval The interval in milliseconds
  * @return The timer
  */
- const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
+const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
+
+/**
+ * Sets nested object property.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @param {object|native} value The value to set it to
+ */
+function setObjProperty(object, path, value) {
+    let currentPathObj = object; 
+    const pathSplits = _getObjectPathSplits(path), pathsToWalk = pathSplits.slice(0, -1), 
+      lastElement = pathSplits[pathSplits.length-1];
+    for (const pathElement of pathsToWalk) {
+      if (currentPathObj[pathElement]) currentPathObj = currentPathObj[pathElement];
+      else {currentPathObj[pathElement] = {}; currentPathObj = currentPathObj[pathElement];}
+    }
+    currentPathObj[lastElement] = value;
+} 
+
+/**
+ * Returns nested object property.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @return The property requested or null if it doesn't exist
+ */
+function getObjProperty(object, path) {
+    let currentPathObj = object; 
+    const pathSplits = _getObjectPathSplits(path), pathsToWalk = pathSplits.slice(0, -1), 
+      lastElement = pathSplits[pathSplits.length-1];
+    for (const pathElement of pathsToWalk) {
+      if (currentPathObj[pathElement]) currentPathObj = currentPathObj[pathElement];
+      else return null; // found null in-between
+    }
+    return currentPathObj[lastElement];
+}
+
+/**
+ * Returns object path splits as an array. Internal only.
+ * @param {string} path The object path
+ * @returns The object path splits as an array.
+ */
+function _getObjectPathSplits(path) {
+    const dotSplits = path.split("."), final = []; 
+    for (const element of dotSplits) for (const indexElement of element.split("[")) if (indexElement.endsWith("]")) {   // handle array type indexes
+        const index = indexElement.substring(0, indexElement.length-1);
+        final.push(parseInt(index, 10).toString() === index.toString()?parseInt(index, 10):index); 
+    } else final.push(indexElement); 
+    return final;
+}
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
-    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getServerHost,
-    getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder, rmrf };
+    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
+    getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty };
