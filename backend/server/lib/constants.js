@@ -30,6 +30,7 @@ exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
 exports.NETCHECKCONF = confdir + "/netcheck.json";
 exports.OBJOBSERVERCONF = confdir + "/objectobserver.json";
 exports.RELEASEFILE = rootdir + "/../../RELEASE";
+exports.BUILD_NUMBER_FILE = rootdir + "/../../build_number";
 exports.MAX_LOG = 1024;
 exports.GZIP = "gzip";
 
