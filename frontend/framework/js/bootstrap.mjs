@@ -5,14 +5,14 @@
 
 import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 
-export async function bootstrap(appPath) {
+export async function bootstrap(appPath, confPath) {
 	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS; window.monkshu_env = {components:{}, frameworklibs:{}, apps:{}};
 
 	const i18n = (await import("/framework/js/i18n.mjs")).i18n; i18n.init(appPath);
 	const router = (await import("/framework/js/router.mjs")).router; router.init();
 	await _loadFrameworkLibs();
 
-	let hostname; try {hostname = await $$.requireJSON(`${appPath}/conf/hostname.json`);} catch (err) {try {await $$.requireJSON(`/framework/conf/hostname.json`);} catch (err){}}
+	let hostname; try {hostname = await $$.requireJSON(`${confPath||(appPath+"conf")}/hostname.json`);} catch (err) {try {await $$.requireJSON(`/framework/conf/hostname.json`);} catch (err){}}
 
 	let {application} = await import(`${appPath}/js/application.mjs`);											
 	if (application.init instanceof Function) await application.init(hostname);	// initialize the application

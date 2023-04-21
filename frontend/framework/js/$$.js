@@ -117,8 +117,8 @@ $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     else return response;
 }
 
-$$.boot = async appPath => {
+$$.boot = async (appPath, confPath) => {
     $$.LOG = (await import("/framework/js/log.mjs")).LOG;
     const {bootstrap} = await import("/framework/js/bootstrap.mjs");
-    bootstrap(appPath);
+    bootstrap(appPath, confPath);
 }
