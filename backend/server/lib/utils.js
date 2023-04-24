@@ -374,6 +374,17 @@ function getObjProperty(object, path) {
 }
 
 /**
+ * Will reload the module if debug mode is on. 
+ * @param {string} modulePath The path to the module
+ * @param {boolean} isDebugOn true if debug is on
+ * @returns The module requested, throws standard require exceptions on module load errors.
+ */
+function requireWithDebug(modulePath, isDebugOn) {
+    if (isDebugOn) delete require.cache[require.resolve(modulePath)];
+    return require(modulePath);
+}
+
+/**
  * Returns object path splits as an array. Internal only.
  * @param {string} path The object path
  * @returns The object path splits as an array.
@@ -390,4 +401,4 @@ function _getObjectPathSplits(path) {
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
-    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty };
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug };
