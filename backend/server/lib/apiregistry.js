@@ -12,11 +12,11 @@ const app = require(`${CONSTANTS.LIBDIR}/app.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
 let decoders, encoders, headermanagers, securitycheckers;
 
-function initSync() {
+function initSync(notVerbose) {
 	let apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY) || JSON.parse(fs.readFileSync(CONSTANTS.API_REGISTRY));
 	if (!CLUSTER_MEMORY.get(API_REG_DISTM_KEY)) CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
 
-	LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
+	if (!notVerbose) LOG.info(`Read API registry: ${JSON.stringify(apireg)}`);
 	for (const key in apireg) apireg[key] = fs.existsSync(apireg[key].split("?")[0]) ? apireg[key] : (`${CONSTANTS.ROOTDIR}/${apireg[key]}`);
 
 	const decoderPathAndRoots = [{path: CONSTANTS.API_MANAGER_DECODERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
@@ -32,7 +32,7 @@ function initSync() {
 		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
 			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8").
 				replace(/{{app}}/g, app).replace(/{{server}}/g, _toPOSIXPath(CONSTANTS.ROOTDIR)).replace(/{{server_lib}}/g, _toPOSIXPath(CONSTANTS.LIBDIR));
-			LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
+			if (!notVerbose) LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
 			for (const key in regThis) regThis[key] = fs.existsSync(regThis[key].split("?")[0]) ? regThis[key] : (`${CONSTANTS.ROOTDIR}/../apps/${app}/${regThis[key]}`);
 			apireg = {...apireg, ...regThis};

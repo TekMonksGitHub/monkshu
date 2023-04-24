@@ -6,10 +6,11 @@
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
+
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
+const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
 const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
-const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
 let _server;	// holds the transport 
 
 // support starting in stand-alone config
@@ -23,6 +24,12 @@ async function bootstrap() {
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
 	LOG.overrideConsole();
+
+	/* Warn if in debug mode */
+	if (conf.debug_mode) {
+		LOG.warn("**** Server is in debug mode, expect severe performance degradation.");
+		LOG.console("**** Server is in debug mode, expect severe performance degradation.\n");
+	}
 
 	/* Init the cluster memory */
 	LOG.info("Initializing the cluster memory.");
@@ -111,6 +118,7 @@ function _initAndRunTransportLoop() {
 async function _doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
 	
+	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the regsitry on every request"); APIREGISTRY.initSync(true); }
 	const api = APIREGISTRY.getAPI(url);
 	LOG.info("Looked up service, calling: " + api);
 	

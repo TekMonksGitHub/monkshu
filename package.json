@@ -23,9 +23,11 @@
   },
   "homepage": "https://github.com/TekMonks/monkshu#readme",
   "dependencies": {
+    "bcryptjs": "latest",
     "clean-css": "latest",
     "html-minifier": "latest",
     "mustache": "latest",
+    "nodemailer": "latest",
     "sqlite3": "latest",
     "terser": "latest",
     "uglify-js": "latest"
