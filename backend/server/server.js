@@ -6,6 +6,7 @@
  */
 
 global.CONSTANTS = require(__dirname + "/lib/constants.js");
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
 const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
@@ -124,7 +125,7 @@ async function _doService(data, servObject, headers, url) {
 			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}, reqObj: jsonObj}); }
 
 		try { 
-			const apiModule = require(api), apiconf = APIREGISTRY.getAPIConf(url);
+			const apiModule = utils.requireWithDebug(api, conf.debug_mode), apiconf = APIREGISTRY.getAPIConf(url);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 		} catch (error) {
