@@ -40,6 +40,8 @@ exports.SHARED_PROC_MEMORY = {};
 /* Result objects */
 exports.FALSE_RESULT = {"result":false};
 exports.TRUE_RESULT = {"result":true};
+exports.WAIT_RESULT = {"result":"wait"};
+
 
 /* API Manager Constants */
 exports.API_MANAGER_HEADERS_KEY = "__org_monkshu_apimanager_headers"

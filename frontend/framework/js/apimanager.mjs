@@ -16,7 +16,7 @@
 import {session} from "/framework/js/session.mjs";
 import * as pako from "/framework/3p/pako.esm.min.mjs";
 
-const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
+const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000;
 
 /**
  * Makes a REST API call.
@@ -29,15 +29,16 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager";
  * @param {boolean} canUseCache Optional: true or false - if true, API Manager may use cached response if available (dangerous!)
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * @param {boolean} sendErrResp Optional: true or false - if true then on error javascript error object will be returned, else return null.
+ * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
  * 
  * @return {Object} Javascript result object or null on error
  */
-async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, sendErrResp=false) {
+async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, sendErrResp=false, timeout=DEFAULT_TIMEOUT) {
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
     try {
-        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP), 
+        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP, timeout), 
             response = await fetch(urlToCall, fetchInit);
         if (response.ok) {
             const respObj = await response.json();
@@ -64,11 +65,12 @@ async function rest(url, type, req, sendToken=false, extractToken=false, canUseC
  * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed.
  * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call.
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
+ * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
  * 
  * @return {Object} Downloads the BLOB
  */
-async function blob(url, filename, type, req, sendToken, extractToken, dontGZIP=false) {
-    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP);
+async function blob(url, filename, type, req, sendToken, extractToken, dontGZIP=false, timeout=DEFAULT_TIMEOUT) {
+    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP, timeout);
 
     try {
         const response = await fetch(urlToCall, fetchInit);
@@ -106,7 +108,7 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
  */
 const getJWTToken = (url, tokenType) => _getAPIManagerStorage().tokenManager[`${new URL(url).host}_${tokenType?tokenType:"access"}`];
 
-function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody) {
+function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout) {
     type = type || "GET"; const urlHost = new URL(url).host; 
     const storage = _getAPIManagerStorage();
 
@@ -121,7 +123,8 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
     if (sendToken) headers.Authorization = `Bearer ${storage.tokenManager[`${urlHost}_${sendToken.type?sendToken.type:"access"}`]}`;
     if (storage.keys[url] || storage.keys["*"]) headers[storage.keyHeader] = storage.keys[url] ? storage.keys[url] : storage.keys["*"];
 
-    const fetchInit = {method: type, credentials: "omit", headers, redirect: "follow", referrerPolicy: "origin"};
+    const fetchInit = {method: type, credentials: "omit", headers, redirect: "follow", 
+        referrerPolicy: "origin", timeout};
     if (jsonReq) fetchInit.body = dontGZIPPostBody ? jsonReq : pako.gzip(jsonReq); return {fetchInit, url};
 }
 
