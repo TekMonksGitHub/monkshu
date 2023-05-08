@@ -380,7 +380,10 @@ function getObjProperty(object, path) {
  * @returns The module requested, throws standard require exceptions on module load errors.
  */
 function requireWithDebug(modulePath, isDebugOn) {
-    if (isDebugOn) delete require.cache[require.resolve(modulePath)];
+    if (isDebugOn) {
+        LOG.debug(`requireWithDebug is forcing a reload of the module ${modulePath}.`);
+        delete require.cache[require.resolve(modulePath)];
+    }
     return require(modulePath);
 }
 

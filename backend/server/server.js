@@ -119,7 +119,7 @@ async function _doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
 	
 	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the regsitry on every request"); APIREGISTRY.initSync(true); }
-	const api = APIREGISTRY.getAPI(url);
+	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
@@ -133,7 +133,8 @@ async function _doService(data, servObject, headers, url) {
 			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}, reqObj: jsonObj}); }
 
 		try { 
-			const apiModule = utils.requireWithDebug(api, conf.debug_mode), apiconf = APIREGISTRY.getAPIConf(url);
+			const apiModule = apiConf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(api) :
+				utils.requireWithDebug(api, conf.debug_mode), apiconf = APIREGISTRY.getAPIConf(url);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 		} catch (error) {

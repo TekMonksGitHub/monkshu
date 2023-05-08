@@ -97,7 +97,8 @@ const _set = message =>  {
     if ((!_globalmemory[message.key]) || (_globalmemory[message.key].time < message.time)) {    // set only if we have a stale value
         _globalmemory[message.key] = {value: message.value, time: message.time};    
         for (const [key, cb] of Object.entries(_listeners)) if (message.key == key) cb(message.key, message.value);
-    }
+        LOG.debug(`Global memory set new key value for ${message.key} for time ${message.time}.`);
+    } else LOG.warn(`Global memory skipped the set message for key ${message.key} as the current time for this key is newer than the message time.`);
     if (message.isPartialSyncMessage) _addPartialSyncMessageReceived(message.id, message.totalcountBeingSent);
 }
 
