@@ -12,6 +12,12 @@
  * @param {string} cmd The command to run
  * @param {array} params The params for SQL
  * @return true on success, and false on error
+ * 
+ * async function runTransaction(cmdObjs)
+ * Runs the given commands as an ACID transaction. If it returns false then
+ * it would roll the transaction back automatically.
+ * @param {array} cmdObjs Array of {cmd: "command_to_run", params: []} objects which will be run as a single transaction.
+ * @return true on success, and false on error
  *
  * async function getQuery(cmd, params=[])
  * Runs the given query e.g. select and returns the rows from the result.
@@ -35,6 +41,7 @@ exports.getDBDriver = (driver, dbConnectInfo, dbCreationSQLs) => {
     return { 
         init: _ => dbDriver.init(dbConnectInfo, dbCreationSQLs),
         runCmd: (cmd, params) => dbDriver.runCmd(cmd, params, dbConnectInfo, dbCreationSQLs),
-        getQuery: (cmd, params) => dbDriver.getQuery(cmd, params, dbConnectInfo, dbCreationSQLs)
+        getQuery: (cmd, params) => dbDriver.getQuery(cmd, params, dbConnectInfo, dbCreationSQLs),
+        runTransaction: cmdObjs => dbDriver.runTransaction(cmdObjs, dbConnectInfo, dbCreationSQLs)
     };
 }

@@ -55,6 +55,20 @@ exports.init = async (dbConnectInfo, dbCreationSQLs) => {
     if (!await _initDB(path.resolve(dbConnectInfo), dbCreationSQLs)) throw "DB initialization failed.";
 }
 
+/**
+ * Runs the given array of commands as an ACID transaction.
+ * @param {array} cmdObjs Array of {cmd: "command_to_run", params: []} objects which will be run as a single transaction.
+ * @param {string} dbConnectInfo DB connection info. For this driver it is the path to the DB file.
+ * @param {array} dbCreationSQLs The DB creation SQLs as string array
+ * @returns true on success, and false on error
+ */
+exports.runTransaction = async (cmdObjs, dbConnectInfo, dbCreationSQLs) => {
+    const cmdsToRun = [{cmd: "BEGIN TRANSACTION", params: []}, ...cmdObjs, {cmd: "COMMIT", params: []}];
+    for (const cmdObj of cmdsToRun) if (!(await exports.runCmd(cmdObj.cmd, cmdObj.params, dbConnectInfo, dbCreationSQLs)))
+        {await exports.runCmd("ROLLBACK", [], dbConnectInfo, dbCreationSQLs); return false;}
+    return true;
+}
+
 async function _initDB(dbPath, dbCreationSQLs) {
     if (!(await _createDB(dbPath, dbCreationSQLs))) return false;
     if (!(await _openDB(dbPath))) return false; else return true;

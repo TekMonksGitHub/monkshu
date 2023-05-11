@@ -1,4 +1,5 @@
 {
     "logfile": "server.log.ndjson",
-    "accesslog": "server.log.ndjson"
+    "accesslog": "server.log.ndjson",
+    "debug_mode": true
 }

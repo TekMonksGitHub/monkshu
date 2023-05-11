@@ -207,8 +207,8 @@ function getObjectKeyNameCaseInsensitive(obj, key) {
  * @param {string} ext The extension of the file.
  * @returns The path to a temp file we can use.
  */
-const getTempFile = ext =>
-    `${os.tmpdir()+"/"+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`;
+const getTempFile = (ext, preferredDir, preferredPrefix) =>
+    path.resolve(`${(preferredDir||os.tmpdir())+"/"+(preferredPrefix||"")+(Math.random().toString(36)+'00000000000000000').slice(2, 11)}.${getTimeStamp()}${ext?`.${ext}`:""}`);
 
 /**
  * Returns client IP, parsing out proxy headers, from an incoming HTTP req object.
@@ -337,8 +337,87 @@ function watchFile(path, opIfModified, frequency) {
  * @param {number} interval The interval in milliseconds
  * @return The timer
  */
- const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
+const setIntervalImmediately = (functionToCall, interval) => {functionToCall(); return setInterval(functionToCall, interval)};
+
+/**
+ * Sets nested object property.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @param {object|native} value The value to set it to
+ */
+function setObjProperty(object, path, value) {
+    let currentPathObj = object; 
+    const pathSplits = _getObjectPathSplits(path), pathsToWalk = pathSplits.slice(0, -1), 
+      lastElement = pathSplits[pathSplits.length-1];
+    for (const pathElement of pathsToWalk) {
+      if (currentPathObj[pathElement]) currentPathObj = currentPathObj[pathElement];
+      else {currentPathObj[pathElement] = {}; currentPathObj = currentPathObj[pathElement];}
+    }
+    currentPathObj[lastElement] = value;
+} 
+
+/**
+ * Returns nested object property.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @return The property requested or null if it doesn't exist
+ */
+function getObjProperty(object, path) {
+    let currentPathObj = object; 
+    const pathSplits = _getObjectPathSplits(path), pathsToWalk = pathSplits.slice(0, -1), 
+      lastElement = pathSplits[pathSplits.length-1];
+    for (const pathElement of pathsToWalk) {
+      if (currentPathObj[pathElement]) currentPathObj = currentPathObj[pathElement];
+      else return null; // found null in-between
+    }
+    return currentPathObj[lastElement];
+}
+
+/**
+ * Will reload the module if debug mode is on. 
+ * @param {string} modulePath The path to the module
+ * @param {boolean} isDebugOn true if debug is on
+ * @returns The module requested, throws standard require exceptions on module load errors.
+ */
+function requireWithDebug(modulePath, isDebugOn) {
+    if (isDebugOn) {
+        LOG.debug(`requireWithDebug is forcing a reload of the module ${modulePath}.`);
+        delete require.cache[require.resolve(modulePath)];
+    }
+    return require(modulePath);
+}
+
+/**
+ * Returns object path splits as an array. Internal only.
+ * @param {string} path The object path
+ * @returns The object path splits as an array.
+ */
+function _getObjectPathSplits(path) {
+    const dotSplits = path.split("."), final = []; 
+    for (const element of dotSplits) for (const indexElement of element.split("[")) if (indexElement.endsWith("]")) {   // handle array type indexes
+        const index = indexElement.substring(0, indexElement.length-1);
+        final.push(parseInt(index, 10).toString() === index.toString()?parseInt(index, 10):index); 
+    } else final.push(indexElement); 
+    return final;
+}
+
+/** @return Generated UUID */
+function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+    const {performance} = require("perf_hooks");
+    let d = new Date().getTime();//Timestamp
+    let d2 = ((typeof performance !== "undefined") && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        let r = Math.random() * 16;//random number between 0 and 16
+        if(d > 0){//Use timestamp until depleted
+            r = (d + r)%16 | 0; d = Math.floor(d/16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r)%16 | 0; d2 = Math.floor(d2/16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
-    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, getServerHost,
-    getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, watchFile, clone, walkFolder, rmrf };
+    getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
+    getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID };

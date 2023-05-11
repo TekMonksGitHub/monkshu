@@ -113,12 +113,12 @@ $$.copyTextToClipboard = text => {
 $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
         headers: {'Content-Type': contentType||'text/plain'}});
-    if (!response.ok) throw new Error(`Issue in fetch, status returned is ${response.status} ${response.statusText}`);
+    if (!response.ok) throw new Error(`Issue in fetch for URL ${url}, status returned is ${response.status} ${response.statusText}`);
     else return response;
 }
 
-$$.boot = async appPath => {
+$$.boot = async (appPath, confPath) => {
     $$.LOG = (await import("/framework/js/log.mjs")).LOG;
     const {bootstrap} = await import("/framework/js/bootstrap.mjs");
-    bootstrap(appPath);
+    bootstrap(appPath, confPath);
 }

@@ -29,8 +29,8 @@ function bootstrap() {
 		_initLogsSync();
 		_initExtensions();
 	} catch (err) {
-		error.error(err);
-		error.error("Server init error, stopping.");
+		(error||console).error(err);
+		(error||console).error("Server init error, stopping.");
 		process.exit(1);
 	}
 

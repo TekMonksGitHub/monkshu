@@ -74,9 +74,9 @@ function main() {
 	const args = process.argv.slice(2);
 
 	if (args.length < 2 || !module.exports[args[0]]) {
-		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt>");
+		console.log("Usage: crypt <encyrpt|decrypt> <text to encrypt or decrypt> [crypt key]");
 		process.exit(1);
 	}
 
-	console.log(module.exports[args[0]](args[1]));
+	console.log(module.exports[args[0]](args[1], args[2]));
 }
