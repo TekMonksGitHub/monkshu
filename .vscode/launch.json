@@ -134,8 +134,8 @@
             "type": "command",
             "command": "shellCommand.execute",
                 "args": {
-                "command": "@echo off & for /f \"tokens=3 delims=: \" %i  in ('netsh interface ip show config name^=\"Ethernet\" ^| findstr \"IP Address\"') do echo %i",
-                "useFirstResult": "true",
+                "command": "@echo off & for /f \"tokens=3 delims=: \" %i  in ('netsh interface ip show config ^| findstr \"IP Address\"') do echo %i",
+                "useFirstResult": "true"
             }
         }
     ]
