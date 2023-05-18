@@ -8,12 +8,14 @@ const fs = require("fs");
 const path = require("path");
 const SERVER_ROOT = path.resolve(`${__dirname}/../../../server`);
 
-function runTestsAsync(argv) {
+async function runTestsAsync(argv) {
     const allfiles = fs.readdirSync(__dirname);
-    for (const fileEntry of allfiles) 
-        if (fileEntry.toLowerCase().startsWith("test") && fileEntry.toLowerCase().endsWith(".js")  && 
-                (fileEntry != path.basename(__filename)))
-            require(`${__dirname}/${fileEntry}`).runTestsAsync(argv);
+    for (const fileEntry of allfiles) if (fileEntry.toLowerCase().startsWith("test") && 
+			fileEntry.toLowerCase().endsWith(".js")  && (fileEntry != path.basename(__filename))) {
+
+		const testModule = require(`${__dirname}/${fileEntry}`);
+		await testModule.runTestsAsync(argv);
+	}
 }
 
 function setupServerEnvironmentForTesting() {
