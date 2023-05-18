@@ -1,0 +1,1 @@
+node  --preserve-symlinks .\testMain.js
