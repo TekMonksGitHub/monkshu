@@ -8,12 +8,12 @@ const fs = require("fs");
 const path = require("path");
 const SERVER_ROOT = path.resolve(`${__dirname}/../../../server`);
 
-function runTestsSync(argv) {
+function runTestsAsync(argv) {
     const allfiles = fs.readdirSync(__dirname);
     for (const fileEntry of allfiles) 
         if (fileEntry.toLowerCase().startsWith("test") && fileEntry.toLowerCase().endsWith(".js")  && 
                 (fileEntry != path.basename(__filename)))
-            require(`${__dirname}/${fileEntry}`).runTestsSync(argv);
+            require(`${__dirname}/${fileEntry}`).runTestsAsync(argv);
 }
 
 function setupServerEnvironmentForTesting() {
@@ -58,17 +58,32 @@ function setupServerEnvironmentForTesting() {
 	/* Init the built in blackboard server */
 	LOG.info("Initializing the distributed blackboard.");
 	require(CONSTANTS.LIBDIR+"/blackboard.js").init();
+
+	/* Init the global memory */
+	LOG.info("Initializing the global memory.");
+	require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
+	
+	/* Try to init the apps themselves */
+	LOG.info("Initializing the apps.");
+	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();} catch (err) {
+		LOG.console(`Error initializing the apps ${err}.`);
+		LOG.error(`Error initializing the apps ${err}.`);
+	}
+
+	/* Log the start */
+	LOG.info("Server testing environment initialized.");
+	LOG.console("\nServer testing environment initialized.\n");
 }
 
-function main(argv) {
+async function main(argv) {
     setupServerEnvironmentForTesting();    // init the server environment only
 
-    runTestsSync(argv); // run the tests
+    await runTestsAsync(argv); // run the tests
 
-    exit(); // exit
+    shouldExit = true; // exit
 }
 
 const exit = _ => process.exit(0);
 
-
-if (require.main === module) main(process.argv.slice(2));
+let shouldExit = false;
+if (require.main === module) {main(process.argv.slice(2)); setInterval(_=>{if (shouldExit) exit();}, 100 );}
