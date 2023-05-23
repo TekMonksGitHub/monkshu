@@ -10,7 +10,10 @@ const appPaths = [];
 
 const init = (appsPathIn) => appPaths.push(...(Array.isArray(appsPathIn)?appsPathIn:[appsPathIn]));
 
-const addPath = additionalPath => appPaths.push(additionalPath);
+const addPath = additionalPath => {
+	if (appPaths.includes(additionalPath)) return; 
+	appPaths.push(additionalPath); i18nCached = {};	/* need to recache */
+}
 
 const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (
 	await router.getMustache()).render(await get(key, language, refresh), data);
