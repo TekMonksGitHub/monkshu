@@ -417,7 +417,24 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
     });
 }
 
+/**
+ * Creates an async function which executes the given code.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const asyncFunction = util.createAsyncFunction(code);
+ * await asyncFunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Asynchronous function (or sync) which executes the
+ *          given code when called.
+ */
+const createAsyncFunction = code => {
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
+    return newFunction;
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
-    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID };
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
+    createAsyncFunction };
