@@ -434,15 +434,17 @@ function createAsyncFunction(code) {
 }
 
 /**
- * Returns the machine's local IPs, as a string array.
- * @returns The machine's local IPs, as a string array.
+ * Returns the machine's local IPs, as a string array. IPv4 addresses are listed first.
+ * @param {boolean} v4Only If set to true then will only return IPv4 addresses.
+ * @returns The machine's local IPs, as a string array. IPv4 addresses are listed first.
  */
 function getLocalIPs(v4Only) {
     const networkInterfaces = os.networkInterfaces();
-    const localIPs = []; for (const networkInterface of Object.values(networkInterfaces)) for (const ipaddress of networkInterface)
-        if (((v4Only && (ipaddress.family==="IPv4"))||(!v4Only)) && (!ipaddress.internal) && ipaddress.address) 
-            localIPs.push(ipaddress.address);
-    return localIPs;
+    const ipV4s = [], ipv6s = []; 
+    for (const networkInterface of Object.values(networkInterfaces)) for (const ipaddress of networkInterface)
+        if ((!ipaddress.internal) && ipaddress.address) ((ipaddress.family==="IPv4") ? ipV4s : ipv6s).push(
+            ipaddress.address);
+    return v4Only?ipV4s:[...ipV4s, ...ipv6s];
 }
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
