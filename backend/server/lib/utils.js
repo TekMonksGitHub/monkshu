@@ -427,14 +427,26 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
  * @returns Asynchronous function (or sync) which executes the
  *          given code when called.
  */
-const createAsyncFunction = code => {
+function createAsyncFunction(code) {
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
     const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
     return newFunction;
+}
+
+/**
+ * Returns the machine's local IPs, as a string array.
+ * @returns The machine's local IPs, as a string array.
+ */
+function getLocalIPs(v4Only) {
+    const networkInterfaces = os.networkInterfaces();
+    const localIPs = []; for (const networkInterface of Object.values(networkInterfaces)) for (const ipaddress of networkInterface)
+        if (((v4Only && (ipaddress.family==="IPv4"))||(!v4Only)) && (!ipaddress.internal) && ipaddress.address) 
+            localIPs.push(ipaddress.address);
+    return localIPs;
 }
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
-    createAsyncFunction };
+    createAsyncFunction, getLocalIPs };
