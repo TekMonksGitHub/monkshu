@@ -41,13 +41,19 @@ async function doService(request) {
 async function publish(topic, payload) {
     const poster = conf.secure?rest.postHttps:rest.post;
 
+    let failedReplicas = 0;
     for (const replica of conf.replicas) {
         const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
         try {
             await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:{topic, payload}}, (err,result) => {
                 if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
             });
-        } catch (err) {LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}`);}
+        } catch (err) { LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}.`); failedReplicas++; }
+    }
+
+    if (failedReplicas == conf.replicas.length) {   // if network is down or if all replicas are misconfigured, then at least broadcast to the local node so that applications relying on the blackboard keep running
+        LOG.error(`Failed to reach all replicas. Assuming network isolated topology. Broadcasting the message locally.`);
+        _broadcast({topic, payload});
     }
 }
 

@@ -65,7 +65,10 @@ async function bootstrap() {
 	
 	/* Init the apps themselves */
 	LOG.info("Initializing the apps.");
-	require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();
+	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync()} catch (err) {
+		LOG.error(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack:""}`);
+		throw err;	// stop the server as app init failed
+	}
 
 	/* Log the start */
 	LOG.info("Server started.");
