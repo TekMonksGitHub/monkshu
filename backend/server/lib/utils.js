@@ -1,6 +1,6 @@
 /** 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  */
 
 const fs = require("fs");
@@ -18,13 +18,15 @@ let lastFileCheckTime = {};
  * Copies file or folder recursively.
  * @param {string} from The path to copy from
  * @param {string} to The path to copy to (will create directories if needed)
- * @param {function} functionToCall The function to call (can be async) for each entry
+ * @param {function} functionToCall The function to call (can be async) for each entry, receives
+ *      from, to, relativePath (from the initial fromPath), and stats for the original file copied.
  * @param {boolean} isCalledFunctionAsync Whether the walk function we are calling is async
  */
 async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync, rootFrom) {
     if (!rootFrom) rootFrom = path.dirname(from); // entry call, so we are at the root of the tree
 
-    if ((await lstatAsync(from)).isFile()) {
+    const statsFrom = await lstatAsync(from);
+    if (statsFrom.isFile()) {
         if (!rootFrom) rootFrom = path.dirname(from);   // parent is the root directory
         await copyFileAsync(from, to);
     } else {
@@ -35,8 +37,8 @@ async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync,
     }
 
     if (functionToCall) {   // call function if provided for every entry
-        if (isCalledFunctionAsync) await functionToCall(from, to, path.relative(rootFrom, from));    // if the function is async then await its execution
-        else functionToCall(from, to, path.relative(rootFrom, from));
+        if (isCalledFunctionAsync) await functionToCall(from, to, path.relative(rootFrom, from), statsFrom);    // if the function is async then await its execution
+        else functionToCall(from, to, path.relative(rootFrom, from), statsFrom);
     }
 }
 
