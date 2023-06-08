@@ -1,3 +1,4 @@
 {
-    "debug.javascript.warnOnLongPrediction": false
+    "debug.javascript.warnOnLongPrediction": false,
+    "css.validate": false
 }

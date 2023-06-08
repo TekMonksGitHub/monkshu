@@ -1,6 +1,6 @@
 /** 
  * (C) 2015 TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+ * License: See enclosed LICENSE file.
  */
 
 const fs = require("fs");
@@ -18,13 +18,15 @@ let lastFileCheckTime = {};
  * Copies file or folder recursively.
  * @param {string} from The path to copy from
  * @param {string} to The path to copy to (will create directories if needed)
- * @param {function} functionToCall The function to call (can be async) for each entry
+ * @param {function} functionToCall The function to call (can be async) for each entry, receives
+ *      from, to, relativePath (from the initial fromPath), and stats for the original file copied.
  * @param {boolean} isCalledFunctionAsync Whether the walk function we are calling is async
  */
 async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync, rootFrom) {
     if (!rootFrom) rootFrom = path.dirname(from); // entry call, so we are at the root of the tree
 
-    if ((await lstatAsync(from)).isFile()) {
+    const statsFrom = await lstatAsync(from);
+    if (statsFrom.isFile()) {
         if (!rootFrom) rootFrom = path.dirname(from);   // parent is the root directory
         await copyFileAsync(from, to);
     } else {
@@ -35,8 +37,8 @@ async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync,
     }
 
     if (functionToCall) {   // call function if provided for every entry
-        if (isCalledFunctionAsync) await functionToCall(from, to, path.relative(rootFrom, from));    // if the function is async then await its execution
-        else functionToCall(from, to, path.relative(rootFrom, from));
+        if (isCalledFunctionAsync) await functionToCall(from, to, path.relative(rootFrom, from), statsFrom);    // if the function is async then await its execution
+        else functionToCall(from, to, path.relative(rootFrom, from), statsFrom);
     }
 }
 
@@ -417,7 +419,38 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
     });
 }
 
+/**
+ * Creates an async function which executes the given code.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const asyncFunction = util.createAsyncFunction(code);
+ * await asyncFunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Asynchronous function (or sync) which executes the
+ *          given code when called.
+ */
+function createAsyncFunction(code) {
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
+    return newFunction;
+}
+
+/**
+ * Returns the machine's local IPs, as a string array. IPv4 addresses are listed first.
+ * @param {boolean} v4Only If set to true then will only return IPv4 addresses.
+ * @returns The machine's local IPs, as a string array. IPv4 addresses are listed first.
+ */
+function getLocalIPs(v4Only) {
+    const networkInterfaces = os.networkInterfaces();
+    const ipV4s = [], ipv6s = []; 
+    for (const networkInterface of Object.values(networkInterfaces)) for (const ipaddress of networkInterface)
+        if ((!ipaddress.internal) && ipaddress.address) ((ipaddress.family==="IPv4") ? ipV4s : ipv6s).push(
+            ipaddress.address);
+    return v4Only?ipV4s:[...ipV4s, ...ipv6s];
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
-    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID };
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
+    createAsyncFunction, getLocalIPs };

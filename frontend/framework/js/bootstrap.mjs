@@ -8,7 +8,7 @@ import {MONKSHU_CONSTANTS} from "/framework/js/constants.mjs";
 export async function bootstrap(appPath, confPath) {
 	$$.MONKSHU_CONSTANTS = MONKSHU_CONSTANTS; window.monkshu_env = {components:{}, frameworklibs:{}, apps:{}};
 
-	const i18n = (await import("/framework/js/i18n.mjs")).i18n; i18n.init(appPath);
+	const i18n = (await import("/framework/js/i18n.mjs")).i18n; i18n.init(appPath.href);
 	const router = (await import("/framework/js/router.mjs")).router; router.init();
 	await _loadFrameworkLibs();
 

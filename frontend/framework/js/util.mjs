@@ -211,6 +211,22 @@ function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/q
     });
 }
 
+/**
+ * Creates an async function which executes the given code.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const asyncFunction = util.createAsyncFunction(code);
+ * await asyncFunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Asynchronous function (or sync) which executes the
+ *          given code when called.
+ */
+const createAsyncFunction = code => {
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
+    return newFunction;
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
-    removeAllChildElements, setIntervalImmediately, generateUUID}
+    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction}

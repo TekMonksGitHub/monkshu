@@ -5,12 +5,19 @@
 import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 
+const APP_PATHS_SESSION_KEY = "__org_monkshu_i18n_app_paths";
+
 let i18nCached = {};
-const appPaths = [];
 
-const init = (appsPathIn) => appPaths.push(...(Array.isArray(appsPathIn)?appsPathIn:[appsPathIn]));
+const init = appPathsIn => {
+	for (const appPath of Array.isArray(appPathsIn)?appPathsIn:[appPathsIn]) addPath(appPath); }
 
-const addPath = additionalPath => appPaths.push(additionalPath);
+const addPath = additionalPath => {
+	const appPaths = session.get(APP_PATHS_SESSION_KEY)||[];
+	if (appPaths.includes(additionalPath)) return; 
+	appPaths.push(additionalPath); i18nCached = {};	/* need to recache */
+	session.set(APP_PATHS_SESSION_KEY, appPaths);
+}
 
 const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (
 	await router.getMustache()).render(await get(key, language, refresh), data);
@@ -23,7 +30,8 @@ async function get(key, language=getSessionLang(), refresh=false) {
 }
 
 async function getI18NObject(language=getSessionLang(), refresh=false) {
-	if (!i18nCached[language] || refresh) {
+	const appPaths = session.get(APP_PATHS_SESSION_KEY);
+	if ((!i18nCached[language]) || refresh) {
 		i18nCached[language] = {i18n:{}};
 		for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
@@ -33,7 +41,7 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 			} catch (err) {LOG.error(`Error importing i18n bundle for apppath ${appPath}. Error is ${err}.`);}
 		}
 	} 
-	
+
 	return i18nCached[language].i18n;
 }
 

@@ -22,14 +22,20 @@
             "type": "shell",
             "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genCacheableFilesList.xf.js'"},
             "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genCacheableFilesList.xf.js'"},
-            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genCacheableFilesList.xf.js\""}
+            "windows": {
+                "command": "cmd.exe",
+                "args": ["/c", "'\\\"${workspaceFolder}\\..\\xforge\\xforge.bat\\\" -c -f \\\"${workspaceFolder}\\build\\genCacheableFilesList.xf.js\\\"'"]
+            }
         },
         {
             "label": "Generate SSL Config",
             "type": "shell",
             "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg' -o ${input:appname}"},
             "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/genSSLConfig.xf.js' -o '${workspaceFolder}/../etc' -o '${workspaceFolder}/../etc/openssl.cfg' -o ${input:appname}"},
-            "windows": {"command": "\"${workspaceFolder}/../xforge/xforge.bat\" -c -f \"${workspaceFolder}\\build\\genSSLConfig.xf.js\" -o \"${workspaceFolder}\\..\\etc\" -o \"${workspaceFolder}\\build\\openssl.cfg\" -o ${input:appname}"}
+            "windows": {
+                "command": "cmd.exe",
+                "args": ["/c", "'\\\"${workspaceFolder}\\..\\xforge\\xforge.bat\\\" -c -f \\\"${workspaceFolder}\\build\\genSSLConfig.xf.js\\\" -o \\\"${workspaceFolder}\\..\\etc\\\" -o \\\"${workspaceFolder}\\build\\openssl.cfg\\\" -o \\\"${input:appname}\\\"'"]
+            }
         },
         {
             "label": "Delete Electron Cache",
