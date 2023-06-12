@@ -13,9 +13,9 @@ const set = (key, item) => {
     const value = JSON.stringify(item);
     if (key && item) {_internalHash[key] = item; sessionStorage.setItem(key, value);}
 }
-const get = key => {
+const get = (key, initIfUndefined) => {
     if ((!_internalHash[key]) && sessionStorage.getItem(key)) _internalHash[key] = JSON.parse(sessionStorage.getItem(key));
-    return _internalHash[key]?_getProxy(_internalHash[key], key):undefined;
+    return _internalHash[key]?_getProxy(_internalHash[key], key):initIfUndefined?_getProxy(initIfUndefined):undefined;
 }
 const remove = key => {delete _internalHash[key]; sessionStorage.removeItem(key);}
 const destroy = _ => {sessionStorage.clear(); _internalHash = {};}
