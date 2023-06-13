@@ -5,9 +5,7 @@
 import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 
-const APP_PATHS_SESSION_KEY = "__org_monkshu_i18n_app_paths";
-
-let i18nCached = {};
+const i18n_SESSION_KEY = "__org_monkshu_i18n_session_key__", APP_PATHS_SESSION_KEY = "__org_monkshu_i18n_app_paths";
 
 const init = appPathsIn => {
 	for (const appPath of Array.isArray(appPathsIn)?appPathsIn:[appPathsIn]) addPath(appPath); }
@@ -15,23 +13,27 @@ const init = appPathsIn => {
 const addPath = additionalPath => {
 	const appPaths = session.get(APP_PATHS_SESSION_KEY)||[];
 	if (appPaths.includes(additionalPath)) return; 
-	appPaths.push(additionalPath); i18nCached = {};	/* need to recache */
+	appPaths.push(additionalPath); 
 	session.set(APP_PATHS_SESSION_KEY, appPaths);
+
+	const i18nObject = _getI18NSessionObject(); i18nObject.reload = true;
+	_setI18NSessionObject(i18nObject);	/* need to recache */
 }
 
-const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (
-	await router.getMustache()).render(await get(key, language, refresh), data);
+const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (await router.getMustache()).render(
+	await get(key, language, refresh), data);
 
 async function get(key, language=getSessionLang(), refresh=false) {
 	try {
-		const i18nObject = await getI18NObject(language, refresh);
-		return i18nObject[key]
+		const i18nObject = await getI18NObject(language, refresh); _setI18NSessionObject({});
+		return i18nObject[key];
 	} catch (err) {throw err}
 }
 
 async function getI18NObject(language=getSessionLang(), refresh=false) {
-	const appPaths = session.get(APP_PATHS_SESSION_KEY);
-	if ((!i18nCached[language]) || refresh) {
+	const appPaths = session.get(APP_PATHS_SESSION_KEY), i18nCached = _getI18NSessionObject();
+	
+	if ((!i18nCached) || (i18nCached.reload) || (!i18nCached[language]) || refresh) {
 		i18nCached[language] = {i18n:{}};
 		for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
@@ -40,15 +42,25 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 				i18nCached[language].i18n = {...i18nCached[language].i18n, ...i18nBundle.i18n};
 			} catch (err) {LOG.error(`Error importing i18n bundle for apppath ${appPath}. Error is ${err}.`);}
 		}
+		i18nCached.reload = false;
+		_setI18NSessionObject(i18nCached);
 	} 
 
 	return i18nCached[language].i18n;
 }
 
-const setI18NObject = (language, i18n) => i18nCached[language] = {i18n:{...i18nCached[language].i18n, ...i18n}};
+const setI18NObject = (language, i18n) => {
+	const i18nCached = _getI18NSessionObject();
+	i18nCached[language] = {i18n:{...i18nCached[language].i18n, ...i18n}};
+	_setI18NSessionObject(i18nCached);
+}
 
 const getSessionLang = _ => (session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en").toString();
 
 const setSessionLang = lang => session.set($$.MONKSHU_CONSTANTS.LANG_ID, lang||"en");
+
+const _getI18NSessionObject = _ => session.get(i18n_SESSION_KEY, {});
+const _setI18NSessionObject = i18nCached => session.set(i18n_SESSION_KEY, i18nCached);
+
 
 export const i18n = {init, get, getRendered, getI18NObject, setI18NObject, getSessionLang, setSessionLang, addPath};
