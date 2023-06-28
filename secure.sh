@@ -61,11 +61,13 @@ else
 	chmod 644 /etc/letsencrypt/live/$DOMAIN/privkey.pem
 	chmod 755 /etc/letsencrypt/archive/
 	chmod 755 /etc/letsencrypt/live/
-	rm -rf /etc/letsencrypt/renewal-hooks/pre/monkshu_pre.sh
-	rm -rf /etc/letsencrypt/renewal-hooks/post/monkshu_post.sh
-	ln -s "$MONKSHU_PATH/preLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/pre/monkshu_pre.sh
-	ln -s "$MONKSHU_PATH/postLetsEncrypt.sh" /etc/letsencrypt/renewal-hooks/post/monkshu_post.sh
 fi
+echo Done.
+
+echo Setting Certificates to autorenew daily.
+systemctl enable cron
+rm /etc/cron.daily/certbot_renew_monkshu &> /dev/null
+ln -s "$MONKSHU_PATH/certbot.renew.sh" /etc/cron.daily/certbot_renew_monkshu
 echo Done.
 
 read -p "OK to modify Monkshu's httpd.json files to use SSL? [Y|N] " -n 1 -r ; echo
