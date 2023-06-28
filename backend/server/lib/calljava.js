@@ -61,10 +61,12 @@ exports.compileJava = async pathToJava => {
 
 /**
  * Returns the instance of the JVM. Call this method to avoid multiple JVMs.
+ * @param classpath Optional: additional classpath
+ * @param asyncJVM Optional: if true, then Java methods can be called using Async suffix to return promises
  * @returns Initialized JVM
  */
-exports.getJava = async _ => {
-    if (!jvmInitDone) {await _initJVM(); jvmInitDone = true; await ensureJVMAsync();};
+exports.getJava = async (classpath, asyncJVM) => {
+    if (!jvmInitDone) {await _initJVM(classpath, asyncJVM); jvmInitDone = true; await ensureJVMAsync();};
     return java;
 }
 
@@ -86,10 +88,17 @@ exports.newInstance = async function (javaClassName, args) {
 const _executeCallWrapper = (callWrapper, classToCall, strInput) => new Promise((resolve, reject) => 
     callWrapper.execute(classToCall, strInput, (err, result) => {if (err) reject(err); else resolve(result);} ));
 
-async function _initJVM() {
-    const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep)
+async function _initJVM(classpath=[], asyncJVM=false) {
+    const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep);
 
     const javaConf = Mustache.render(await fspromises.readFile(`${CONSTANTS.CONFDIR}/java.json`, "utf8"),
         {server: _toPOSIXPath(CONSTANTS.ROOTDIR)});
-    java.classpath.push(...JSON.parse(javaConf).classpath);
+    java.classpath.push(...JSON.parse(javaConf).classpath, ...classpath);
+
+    if (asyncJVM) java.asyncOptions = {
+        asyncSuffix: "",            // No suffix for node-style methods taking callbacks
+        syncSuffix: "Sync",         // Sync methods use the Sync suffix
+        promiseSuffix: "Async",     // Generate methods returning promises, using the suffix Async.
+        promisify: util.promisify   
+    };
 }
