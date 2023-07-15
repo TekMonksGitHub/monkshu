@@ -83,6 +83,28 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
+async function fetch(url, options, callback) {
+    const headers = options.headers||{}, urlObj = new URL(url); let method = options.method || "get";
+    if (urlObj.protocol == "https:") method = method+"Https"; if (method=="delete") method = "deleteHttp"; 
+    const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
+        sslOptions = options.ssl_options, totalPath = urlObj.pathname + (urlObj.search?urlObj.search:""), 
+        body = options.body;
+
+    const { error, data, status, resHeaders } = await module.exports[method](
+        urlObj.hostname, port, totalPath, headers, body, sslOptions);
+
+    if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
+            ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
+
+        if (resHeaders.location) return fetch(resHeaders.location, options, callback);   
+        else LOG.error(`URL ${url} sent a redirect with no location specified (location header not found).`);
+    }
+    
+    const result = {ok: error?false:true, status, data, headers: resHeaders, buffer: _ => data, 
+        text: encoding => data.toString(encoding||"utf8"), json: _ => JSON.parse(data)}
+    if (callback) callback(result); else return result;
+}
+
 function _addHeaders(headers, body) {
     if (body) headers["content-type"] = utils.getObjectKeyValueCaseInsensitive(headers, "content-type") || "application/x-www-form-urlencoded";
     if (body) headers["content-length"] = Buffer.byteLength(body, "utf8");
@@ -172,24 +194,24 @@ async function _addSecureOptions(options, sslObj) {
     }
 }
 
+module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, fetch, main };
+
 if (require.main === module) main();
 
 function main() {
     const args = process.argv.slice(2); if (args[0]) args[0] = args[0].toLowerCase(); global.LOG = console;
     if (args.length == 0) console.error("Usage: httpClient.js <method> <url> <body> <headers> [ssl-options]");
     else {
-        const url = new URL(args[1]); if (url.protocol == "https:") args[0] = args[0]+"Https"; if (args[0]=="delete") args[0] = "deleteHttp"; 
-        const port = url.port && url.port != "" ? url.port : (url.protocol=="https:"?443:80), out = process.stdout.write.bind(process.stdout),
-            headers = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, sslOptions = args[4] ? JSON.parse(args[4]):null,
-            totalPath = url.pathname + (url.search?url.search:"");
-        eval(args[0]).call( null, url.hostname, port, totalPath, headers, args[2], sslOptions, (err, data, status, headers) => {
-            const funcToWriteTo = err?console.error:out, dataToWrite = err ? err : data.toString("utf8");
+        const reqHeaders = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, 
+            sslOptions = args[4] ? JSON.parse(args[4]):null, body = args[2], url = args[1], method = args[0];
+        fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body}, result => {
+            const {error, data, status, headers} = result;
+            const funcToWriteTo = error?console.error:process.stdout.write.bind(process.stdout), 
+                dataToWrite = error ? error : data.toString("utf8");
             funcToWriteTo(dataToWrite);
             funcToWriteTo(`\n\nResponse status ${status}`);
             funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}`);
-            process.exit(err?1:0);
+            process.exit(error?1:0);
         });
     }
 }
-
-module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, main };
