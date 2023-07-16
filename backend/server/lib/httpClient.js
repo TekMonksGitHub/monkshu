@@ -143,14 +143,14 @@ const _squishHeaders = headers => {const squished = {}; for ([key,value] of Obje
 
 function _doCall(reqStr, options, secure, sslObj) {
     return new Promise(async (resolve, reject) => {
-        const caller = secure && (sslObj && !sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
+        const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
         const sendError = (error) => { reject(error); ignoreEvents = true; };
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
-        if (secure && sslObj && (!sslObj._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
+        if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
             LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
             caller.on("error", error => sendError(error))
 
@@ -232,7 +232,7 @@ function main() {
     else {
         const reqHeaders = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, 
             sslOptions = args[4] ? JSON.parse(args[4]):null, body = args[2], url = args[1], method = args[0];
-        fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body, undici: true, callback: result => {
+        fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body, undici: false, callback: result => {
             const {error, data, status, headers} = result;
             const funcToWriteTo = error?console.error:process.stdout.write.bind(process.stdout), 
                 dataToWrite = error ? error : data.toString("utf8");
