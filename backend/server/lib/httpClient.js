@@ -115,7 +115,7 @@ async function _undiciRequest(url, options) {
     LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
 
     const res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0,
-        headers: _addHeaders(options.headers||{"accept":"text/html"}, options.body)});  // default accept is HTML only
+        headers: _addHeaders(options.headers||{}, options.body)});  // default accept is HTML only
     
     const status = res.statusCode, resHeaders = { ...res.headers };
     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
