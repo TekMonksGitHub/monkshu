@@ -22,6 +22,9 @@ const fspromises = require("fs").promises;
 const querystring = require("querystring");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const crypt = require(CONSTANTS.LIBDIR + "/crypt.js");
+const gunzipAsync = require("util").promisify(zlib.gunzip);
+
+let undiciMod;  // holds the undici module if it is available
 
 function post(host, port, path, headers, req, sslObj, callback) {
     headers = headers||{}; const body = req; _addHeaders(headers, body);
@@ -83,20 +86,21 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-async function fetch(url, options, callback) {
+async function fetch(url, options) {    // somewhat fetch compatible API
     const headers = options.headers||{}, urlObj = new URL(url); let method = options.method || "get";
     if (urlObj.protocol == "https:") method = method+"Https"; if (method=="delete") method = "deleteHttp"; 
     const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
         sslOptions = options.ssl_options, totalPath = urlObj.pathname + (urlObj.search?urlObj.search:""), 
-        body = options.body;
+        body = options.body, callback = options.callback, undici = options.undici && _haveUndiciModule();
 
-    const { error, data, status, resHeaders } = await module.exports[method](
-        urlObj.hostname, port, totalPath, headers, body, sslOptions);
+    if (options.undici && (!_haveUndiciModule())) LOG.warn(`HTTP client told to use Undici in fetch for URL ${url}. But Undici NPM is not installed. Falling back to the native HTTP clients.`);
+    const { error, data, status, resHeaders } = undici ? await _undiciRequest(url, options) : 
+        await module.exports[method](urlObj.hostname, port, totalPath, headers, body, sslOptions);
 
     if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
             ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
 
-        if (resHeaders.location) return fetch(resHeaders.location, options, callback);   
+        if (resHeaders.location) return fetch(resHeaders.location, options);   
         else LOG.error(`URL ${url} sent a redirect with no location specified (location header not found).`);
     }
     
@@ -105,15 +109,39 @@ async function fetch(url, options, callback) {
     if (callback) callback(result); else return result;
 }
 
+const _haveUndiciModule = _ => { if (undiciMod) return true; try {undiciMod = require("undici"); return true;} catch (err) {return false;}}
+
+async function _undiciRequest(url, options) {
+    LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
+
+    const res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0,
+        headers: _addHeaders(options.headers||{"accept":"text/html"}, options.body)});  // default accept is HTML only
+    
+    const status = res.statusCode, resHeaders = { ...res.headers };
+    const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
+    const dataArrayBuffer = res.body ? await res.body.arrayBuffer() : [];
+    let dataBuffer = Buffer.from(dataArrayBuffer);
+    if (_squishHeaders(res.headers)["content-encoding"] == "gzip") try {
+        dataBuffer = await gunzipAsync(dataBuffer); 
+    } catch (err) {
+        LOG.error(`Gunzip decompression error for Undici request to the URL ${url}.`);
+        return {error: `Bad response. Body decompress error ${err}.`, data: Buffer.from([]), status, resHeaders}
+    }
+
+    if (!statusOK) return({ error: `Bad status: ${status}`, data: dataBuffer, status, resHeaders });
+    else return({ error: null, data: dataBuffer, status, resHeaders });
+}
+
 function _addHeaders(headers, body) {
     if (body) headers["content-type"] = utils.getObjectKeyValueCaseInsensitive(headers, "content-type") || "application/x-www-form-urlencoded";
     if (body) headers["content-length"] = Buffer.byteLength(body, "utf8");
     headers["accept"] = utils.getObjectKeyValueCaseInsensitive(headers, "accept") || "*/*";
+    headers["accept-encoding"] = "gzip,identity";   // we will accept gzip
 }
 
-function _doCall(reqStr, options, secure, sslObj) {
-    const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
+const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
+function _doCall(reqStr, options, secure, sslObj) {
     return new Promise(async (resolve, reject) => {
         const caller = secure && (sslObj && !sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
@@ -122,7 +150,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         const sendError = (error) => { reject(error); ignoreEvents = true; };
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
-        if (secure && (sslObj && !sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
+        if (secure && sslObj && (!sslObj._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
             LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
             caller.on("error", error => sendError(error))
 
@@ -204,14 +232,14 @@ function main() {
     else {
         const reqHeaders = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, 
             sslOptions = args[4] ? JSON.parse(args[4]):null, body = args[2], url = args[1], method = args[0];
-        fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body}, result => {
+        fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body, undici: true, callback: result => {
             const {error, data, status, headers} = result;
             const funcToWriteTo = error?console.error:process.stdout.write.bind(process.stdout), 
                 dataToWrite = error ? error : data.toString("utf8");
             funcToWriteTo(dataToWrite);
             funcToWriteTo(`\n\nResponse status ${status}`);
-            funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}`);
+            funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}\n`);
             process.exit(error?1:0);
-        });
+        }});
     }
 }
