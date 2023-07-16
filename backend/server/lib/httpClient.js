@@ -232,13 +232,16 @@ function main() {
     else {
         const reqHeaders = args[3] && args[3] != "" ? JSON.parse(args[3]):{}, 
             sslOptions = args[4] ? JSON.parse(args[4]):null, body = args[2], url = args[1], method = args[0];
+        const timeStart = Date.now();
         fetch(url, {method, headers: reqHeaders, ssl_options: sslOptions, body, undici: false, callback: result => {
+            const timeEnd = Date.now();
             const {error, data, status, headers} = result;
             const funcToWriteTo = error?console.error:process.stdout.write.bind(process.stdout), 
                 dataToWrite = error ? error : data.toString("utf8");
             funcToWriteTo(dataToWrite);
-            funcToWriteTo(`\n\nResponse status ${status}`);
+            funcToWriteTo(`\n\nResponse status ${status}\n`);
             funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}\n`);
+            funcToWriteTo(`Time start: ${timeStart}. Time ended: ${timeEnd}. Time taken: ${timeEnd - timeStart} milliseconds.\n`);
             process.exit(error?1:0);
         }});
     }
