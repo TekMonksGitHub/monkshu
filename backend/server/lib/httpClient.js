@@ -86,8 +86,8 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-async function fetch(url, options) {    // somewhat fetch compatible API
-    const headers = options.headers||{}, urlObj = new URL(url); let method = options.method.toLowerCase() || "get";
+async function fetch(url, options={}) {    // somewhat fetch compatible API
+    const headers = options.headers||{}, urlObj = new URL(url); let method = options.method?.toLowerCase() || "get";
     if (urlObj.protocol == "https:") method = method+"Https"; if (method=="delete") method = "deleteHttp"; 
     const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
         sslOptions = options.ssl_options, totalPath = urlObj.pathname + (urlObj.search?urlObj.search:""), 
