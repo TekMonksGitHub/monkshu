@@ -117,13 +117,14 @@ async function _undiciRequest(url, options) {
     const res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0,
         headers: _addHeaders(options.headers||{}, options.body)});  // default accept is HTML only
     
-    const status = res.statusCode, resHeaders = { ...res.headers };
+    const status = res.statusCode, resHeaders = _squishHeaders({ ...res.headers });
     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
+    if (!_checkRequestResponseContentTypesMatch(options.headers, resHeaders)) return({ 
+        error: `Content type doesn't match acceptable content. Requested ${options.headers.accept} != resHeaders["content-type"].`, 
+            data: null, status, resHeaders });
     const dataArrayBuffer = res.body ? await res.body.arrayBuffer() : [];
     let dataBuffer = Buffer.from(dataArrayBuffer);
-    if (_squishHeaders(res.headers)["content-encoding"] == "gzip") try {
-        dataBuffer = await gunzipAsync(dataBuffer); 
-    } catch (err) {
+    if (resHeaders["content-encoding"] == "gzip") try {dataBuffer = await gunzipAsync(dataBuffer)} catch (err) {
         LOG.error(`Gunzip decompression error for Undici request to the URL ${url}.`);
         return {error: `Bad response. Body decompress error ${err}.`, data: Buffer.from([]), status, resHeaders}
     }
@@ -165,6 +166,11 @@ function _doCall(reqStr, options, secure, sslObj) {
             const req = caller.request(http2Headers); 
             req.on("error", (error) => { sendError(error) });
             req.on("response", headers => {
+                if (!_checkRequestResponseContentTypesMatch(options.headers, headers)) {
+                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
+                    return;
+                }
+
                 const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
                 resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; });
@@ -185,6 +191,11 @@ function _doCall(reqStr, options, secure, sslObj) {
 
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
+                if (!_checkRequestResponseContentTypesMatch(options.headers, res.headers)) {
+                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
+                    return;
+                }
+
                 const encoding = utils.getObjectKeyValueCaseInsensitive(res.headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); res.pipe(resPiped); } else resPiped = res;
 
@@ -205,6 +216,14 @@ function _doCall(reqStr, options, secure, sslObj) {
             req.end();
         }
     });
+}
+
+function _checkRequestResponseContentTypesMatch(requestHeaders, responseHeaders) {
+    if (!requestHeaders.enforce_mime) return true;  // enforce only if asked to
+    const headersReq = _squishHeaders(requestHeaders), headersRes = _squishHeaders(responseHeaders);
+    if (headersReq.accept && headersReq.accept != "*/*" && headersReq.accept != "*" && 
+        headersReq.accept != headersRes["content-type"])
+    return false; else return true;
 }
 
 async function _addSecureOptions(options, sslObj) {
@@ -237,7 +256,7 @@ function main() {
             const timeEnd = Date.now();
             const {error, data, status, headers} = result;
             const funcToWriteTo = error?console.error:process.stdout.write.bind(process.stdout), 
-                dataToWrite = error ? error : data.toString("utf8");
+                dataToWrite = error ? error : data? data.toString("utf8") : "";
             funcToWriteTo(dataToWrite);
             funcToWriteTo(`\n\nResponse status ${status}\n`);
             funcToWriteTo(`\n\nResponse headers ${JSON.stringify(headers, null, 2)}\n`);
