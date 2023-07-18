@@ -13,6 +13,8 @@ const queue = [];
 const DEFAULT_QUEUE_CHECK_INTERVAL = 500;
 const conf = require(`${CONSTANTS.CONFDIR}/queueexecutor.json`);
 
+let queueInitialized = false;   // to support server independent apps
+
 /**
  * Run the given function as a queued task.
  * @param {function} functionToCall The function to call.
@@ -28,6 +30,7 @@ const conf = require(`${CONSTANTS.CONFDIR}/queueexecutor.json`);
  *          promise which resolves when it has been exectued, else nothing.
  */
 exports.add = (functionToCall, params=[], isAsync=false, delay=0, callback) => {
+    if (!queueInitialized) exports.init();   // to support server independent apps
     let promiseResolver, promiseToReturn; if (isAsync && !callback) promiseToReturn = new Promise(resolve=>promiseResolver = resolve);
     if (conf.enabled) queue.unshift({functionToCall, params, isAsync, delay, callback, promiseResolver});
     else throw (`Server's queue executor is disabled, and add task to the queue was called for function ${functionToCall.toString()}. Please enable it in conf/queueexecutor.json file and restart.`); 
