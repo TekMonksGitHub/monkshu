@@ -113,7 +113,7 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
 const _haveUndiciModule = _ => { if (undiciMod) return true; try {undiciMod = require("undici"); return true;} catch (err) {return false;}}
 
 async function _undiciRequest(url, options) {
-    if (!options.silent) LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
+    LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
 
     const reqHeaders = _addHeaders(options.headers||{}, options.body), 
         res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0, headers: reqHeaders});  // default accept is HTML only
@@ -154,7 +154,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
         if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
-            if (!options.silent) LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
+            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
             caller.on("error", error => sendError(error))
 
             const http2Headers = { ...options.headers }; http2Headers[http2.constants.HTTP2_HEADER_PATH] = options.path;
@@ -189,7 +189,7 @@ function _doCall(reqStr, options, secure, sslObj) {
             if (reqStr) req.write(reqStr);
             req.end();
         } else {
-            if (!options.silent) LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
+            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
 
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
