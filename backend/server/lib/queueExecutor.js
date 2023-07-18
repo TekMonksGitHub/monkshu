@@ -38,7 +38,7 @@ exports.add = (functionToCall, params=[], isAsync=false, delay=0, callback) => {
 }
 
 /** Starts the queue loop. */
-exports.init = _ => {if (conf.enabled) _queueExecutionFunction();}  // starts the queue processing loop
+exports.init = _ => {if (conf.enabled) _queueExecutionFunction(); queueInitialized = true;}  // starts the queue processing loop
 
 function _queueExecutionFunction() {
     if (!queue.length) {_runQueueLoop(); return;}  // no tasks
@@ -49,7 +49,7 @@ function _queueExecutionFunction() {
         else workItem.functionToCall(...workItem.params);
         if (workItem.callback) workItem.callback(); 
         if (workItem.promiseResolver) workItem.promiseResolver();
-        _runQueueLoop(); 
+        _queueExecutionFunction();  // run the next item now
     }, workItem.delay);
 }
 
