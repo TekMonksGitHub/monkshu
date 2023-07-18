@@ -92,6 +92,7 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
     const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
         sslOptions = options.ssl_options, totalPath = urlObj.pathname + (urlObj.search?urlObj.search:""), 
         body = options.body, callback = options.callback, undici = options.undici && _haveUndiciModule();
+    if (!options.method) options.method = "get";
 
     if (options.undici && (!_haveUndiciModule())) LOG.warn(`HTTP client told to use Undici in fetch for URL ${url}. But Undici NPM is not installed. Falling back to the native HTTP clients.`);
     const { error, data, status, resHeaders } = undici ? await _undiciRequest(url, options) : 
@@ -112,15 +113,15 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
 const _haveUndiciModule = _ => { if (undiciMod) return true; try {undiciMod = require("undici"); return true;} catch (err) {return false;}}
 
 async function _undiciRequest(url, options) {
-    LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
+    if (!options.silent) LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
 
-    const res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0,
-        headers: _addHeaders(options.headers||{}, options.body)});  // default accept is HTML only
+    const reqHeaders = _addHeaders(options.headers||{}, options.body), 
+        res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0, headers: reqHeaders});  // default accept is HTML only
     
     const status = res.statusCode, resHeaders = _squishHeaders({ ...res.headers });
     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
-    if (!_checkRequestResponseContentTypesMatch(options.headers, resHeaders)) return({ 
-        error: `Content type doesn't match acceptable content. Requested ${options.headers.accept} != resHeaders["content-type"].`, 
+    if (!_checkRequestResponseContentTypesMatch(reqHeaders, resHeaders)) return({ 
+        error: `Content type doesn't match acceptable content. Requested ${reqHeaders.accept} != resHeaders["content-type"].`, 
             data: null, status, resHeaders });
     const dataArrayBuffer = res.body ? await res.body.arrayBuffer() : [];
     let dataBuffer = Buffer.from(dataArrayBuffer);
@@ -138,6 +139,7 @@ function _addHeaders(headers, body) {
     if (body) headers["content-length"] = Buffer.byteLength(body, "utf8");
     headers["accept"] = utils.getObjectKeyValueCaseInsensitive(headers, "accept") || "*/*";
     headers["accept-encoding"] = "gzip,identity";   // we will accept gzip
+    return headers;
 }
 
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
@@ -152,7 +154,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
         if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
-            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
+            if (!options.silent) LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP2.`);
             caller.on("error", error => sendError(error))
 
             const http2Headers = { ...options.headers }; http2Headers[http2.constants.HTTP2_HEADER_PATH] = options.path;
@@ -187,7 +189,7 @@ function _doCall(reqStr, options, secure, sslObj) {
             if (reqStr) req.write(reqStr);
             req.end();
         } else {
-            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
+            if (!options.silent) LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
 
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
