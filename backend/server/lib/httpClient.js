@@ -101,7 +101,7 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
     if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
             ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
 
-        if (resHeaders.location) return fetch(resHeaders.location, options);   
+        if (resHeaders.location) return fetch(new URL(resHeaders.location, url).href, options);   
         else LOG.error(`URL ${url} sent a redirect with no location specified (location header not found).`);
     }
     
@@ -224,9 +224,10 @@ function _checkRequestResponseContentTypesMatch(requestHeaders, responseHeaders)
     if ((!requestHeaders.enforce_mime)) return true;  // enforce only if asked to
     const headersReq = _squishHeaders(requestHeaders), headersRes = _squishHeaders(responseHeaders);
     if (!headersReq.accept) return true;    // nothing to check
-    const headersAccept = headersReq.accept.split(",").map(value => value.trim())
+    const headersAccept = headersReq.accept.split(",").map(value => value.trim()), 
+        responseContentType = headersRes["content-type"]?headersRes["content-type"].split(";")[0] : "text/html";
     for (const headerAccept of headersAccept) if ((headerAccept.accept == "*/*") || 
-        (headerAccept.accept == "*") || (headerAccept == headersRes["content-type"])) return true;
+        (headerAccept.accept == "*") || (headerAccept == responseContentType)) return true;
     return false;
 }
 
