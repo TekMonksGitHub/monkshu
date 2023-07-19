@@ -92,7 +92,7 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
     const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
         sslOptions = options.ssl_options, totalPath = urlObj.pathname + (urlObj.search?urlObj.search:""), 
         body = options.body, callback = options.callback, undici = options.undici && _haveUndiciModule();
-    if (!options.method) options.method = "get";
+    if (!options.method) options.method = "get"; if (options.enforce_mime) headers.enforce_mime = true;
 
     if (options.undici && (!_haveUndiciModule())) LOG.warn(`HTTP client told to use Undici in fetch for URL ${url}. But Undici NPM is not installed. Falling back to the native HTTP clients.`);
     const { error, data, status, resHeaders } = undici ? await _undiciRequest(url, options) : 
@@ -194,7 +194,7 @@ function _doCall(reqStr, options, secure, sslObj) {
             if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
                 if (!_checkRequestResponseContentTypesMatch(options.headers, res.headers)) {
-                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
+                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${res.headers["content-type"]}.`);
                     return;
                 }
 
