@@ -221,11 +221,13 @@ function _doCall(reqStr, options, secure, sslObj) {
 }
 
 function _checkRequestResponseContentTypesMatch(requestHeaders, responseHeaders) {
-    if (!requestHeaders.enforce_mime) return true;  // enforce only if asked to
+    if ((!requestHeaders.enforce_mime)) return true;  // enforce only if asked to
     const headersReq = _squishHeaders(requestHeaders), headersRes = _squishHeaders(responseHeaders);
-    if (headersReq.accept && headersReq.accept != "*/*" && headersReq.accept != "*" && 
-        headersReq.accept != headersRes["content-type"])
-    return false; else return true;
+    if (!headersReq.accept) return true;    // nothing to check
+    const headersAccept = headersReq.accept.split(",").map(value => value.trim())
+    for (const headerAccept of headersAccept) if ((headerAccept.accept == "*/*") || 
+        (headerAccept.accept == "*") || (headerAccept == headersRes["content-type"])) return true;
+    return false;
 }
 
 async function _addSecureOptions(options, sslObj) {
