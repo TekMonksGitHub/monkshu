@@ -449,8 +449,32 @@ function getLocalIPs(v4Only) {
     return v4Only?ipV4s:[...ipV4s, ...ipv6s];
 }
 
+/**
+ * Waits for the given promise, if it resolves returns the result (or true on success). On
+ * failure it returns false.
+ * @param {promise} promiseToWait The promise to wait for.
+ * @returns If it resolves returns the result (or true on success). On failure it returns false.
+ */
+const promiseExceptionToBoolean = async promiseToWait => {
+    try{const result = await promiseToWait; return result||true;} catch(err) {return false;} }
+
+
+/**
+ * Creates the given path recursively if it doesn't exist.
+ * @param {string} inpath The path to create
+ * @returns true on success (including on if the path already existed), false on errors.
+ */
+async function createDirectory(inpath) {
+    const fullpath = path.resolve(inpath);
+	const dirExists = await (async pathIn => await fspromises.access(pathIn).then(()=>true).catch(()=>false))(fullpath);
+	if (dirExists) {console.warn("Told to create a folder which already exists, ignorning: "+fullpath); return false;}
+	try {await fspromises.mkdir(fullpath, {recursive: true})} catch (err) {
+        LOG.error(`Error creating directory ${inpath}: ${err}`); return false; }
+	return true;
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
-    createAsyncFunction, getLocalIPs };
+    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory };
