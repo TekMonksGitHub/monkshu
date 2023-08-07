@@ -466,9 +466,9 @@ const promiseExceptionToBoolean = async promiseToWait => {
  */
 async function createDirectory(inpath) {
     const fullpath = path.resolve(inpath);
-	const dirExists = await (async pathIn => await fspromises.access(pathIn).then(()=>true).catch(()=>false))(fullpath);
+	const dirExists = await (async pathIn => await fs.promises.access(pathIn).then(()=>true).catch(()=>false))(fullpath);
 	if (dirExists) {console.warn("Told to create a folder which already exists, ignorning: "+fullpath); return false;}
-	try {await fspromises.mkdir(fullpath, {recursive: true})} catch (err) {
+	try {await fs.promises.mkdir(fullpath, {recursive: true})} catch (err) {
         LOG.error(`Error creating directory ${inpath}: ${err}`); return false; }
 	return true;
 }
