@@ -473,8 +473,22 @@ async function createDirectory(inpath) {
 	return true;
 }
 
+/**
+ * Literally nodejs exists replacement, as a useful function has been deprecated!
+ * @param {string} fullpath The path to check
+ * @returns true if it exists, else false
+ */
+const exists = async fullpath => await (async pathIn => await fs.promises.access(pathIn).then(()=>true).catch(()=>false))(fullpath);
+
+/**
+ * Converts a path to UNIX style.
+ * @param {string} pathIn The incoming path to convert
+ * @returns The same path in UNIX style.
+ */
+const convertToUnixPathEndings = pathIn => pathIn.split(path.sep).join(path.posix.sep);
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
-    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory };
+    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings };
