@@ -105,7 +105,10 @@ function checkSecurity(url, req, headers, servObject, reason) {
 	let apiregentry = apireg[endPoint]; if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
 	apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
-	for (const securitycheckerThis of securitycheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
+	const allSecurityCheckers = [...securitycheckers];
+	if (apiregentry.query.customSecurity) for (const securityCheckerCustom of utils.escapedSplit(apiregentry.query.customSecurity, ","))
+		allSecurityCheckers.push(global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[securityCheckerCustom]);
+	for (const securitycheckerThis of allSecurityCheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
 		req, headers, servObject, reason)) { 
 			reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
 			return false; 
@@ -113,6 +116,10 @@ function checkSecurity(url, req, headers, servObject, reason) {
 
 	return true;
 }
+
+const addCustomSecurityChecker = (name, module) => global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[name] = module;
+
+const removeCustomSecurityChecker = name => delete global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[name];
 
 function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject, reqObj) {
 	const endPoint = new URL(url).pathname;
@@ -176,4 +183,5 @@ function _getAPIRegEntryAsURL(endPoint) {	// parses endpoint and converts to URL
 }
 
 module.exports = {initSync, getAPI, getAPIConf, listAPIs, addAPI, editAPI, deleteAPI, decodeIncomingData, checkSecurity, 
-	injectResponseHeaders, encodeResponse, getExtension};
+	injectResponseHeaders, encodeResponse, getExtension, ENV: {CUSTOM_SECURITY_CHECKERS: {}}, 
+	addCustomSecurityChecker, removeCustomSecurityChecker};
