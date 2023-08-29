@@ -403,12 +403,17 @@ function _getObjectPathSplits(path) {
     return final;
 }
 
-/** @return Generated UUID */
-function generateUUID() { // Public Domain/MIT: from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+/**
+ * Generates a UUID and returns it.
+ * @param {boolean} useDashes Optional: Default is true, seperates the UUID with "-" (more readable).
+ * @return The generated UUID as a String.
+ * */
+function generateUUID(useDashes=true) { // Public Domain/MIT: from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
     const {performance} = require("perf_hooks");
     let d = new Date().getTime();//Timestamp
     let d2 = ((typeof performance !== "undefined") && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+    return (useDashes?"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":"xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx").replace(/[xy]/g, 
+            function(c) {
         let r = Math.random() * 16;//random number between 0 and 16
         if(d > 0){//Use timestamp until depleted
             r = (d + r)%16 | 0; d = Math.floor(d/16);
