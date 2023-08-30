@@ -9,6 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const querystring = require("querystring");
 const app = require(`${CONSTANTS.LIBDIR}/app.js`);
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
 let decoders, encoders, headermanagers, securitycheckers;
 
@@ -99,7 +100,7 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	return encoded;
 }
 
-function checkSecurity(url, req, headers, servObject, reason) {
+async function checkSecurity(url, req, headers, servObject, reason) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
 	let apiregentry = apireg[endPoint]; if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
@@ -108,8 +109,8 @@ function checkSecurity(url, req, headers, servObject, reason) {
 	const allSecurityCheckers = [...securitycheckers];
 	if (apiregentry.query.customSecurity) for (const securityCheckerCustom of utils.escapedSplit(apiregentry.query.customSecurity, ","))
 		allSecurityCheckers.push(global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[securityCheckerCustom]);
-	for (const securitycheckerThis of allSecurityCheckers) if (!securitycheckerThis.checkSecurity(apiregentry, endPoint, 
-		req, headers, servObject, reason)) { 
+	for (const securitycheckerThis of allSecurityCheckers) if (!(await securitycheckerThis.checkSecurity(apiregentry, endPoint, 
+		req, headers, servObject, reason))) { 
 			reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
 			return false; 
 	}

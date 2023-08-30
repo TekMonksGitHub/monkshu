@@ -132,7 +132,7 @@ async function _doService(data, servObject, headers, url) {
 			LOG.info("APIREGISTRY error: " + error); return ({code: 500, respObj: {result: false, error}}); }
 
 		let reason = {};
-		if (!APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason)) {
+		if (!(await APIREGISTRY.checkSecurity(url, jsonObj, headers, servObject, reason))) {
 			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}, reqObj: jsonObj}); }
 
 		try { 
