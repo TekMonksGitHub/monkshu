@@ -488,9 +488,13 @@ const exists = async fullpath => await (async pathIn => await fs.promises.access
 /**
  * Converts a path to UNIX style.
  * @param {string} pathIn The incoming path to convert
+ * @param {boolean} normalize If true, empty paths are dropped
  * @returns The same path in UNIX style.
  */
-const convertToUnixPathEndings = pathIn => pathIn.split(path.sep).join(path.posix.sep);
+const convertToUnixPathEndings = (pathIn, normalize) => {
+    const parts = []; for (const part of pathIn.split(path.sep)) if (!normalize) parts.push(part); else if (part.trim() != "") parts.push(part);
+    return parts.join(path.posix.sep);
+}
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
