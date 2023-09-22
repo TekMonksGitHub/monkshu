@@ -16,6 +16,8 @@ const fspromises = fs.promises;
 const mustache = require("mustache");
 const args = require(`${__dirname}/lib/processargs.js`);
 
+const HTTPD_CONF_EXPANDS = ["appname", "serverroot", "hostname"];
+
 let access, error, utils;
 
 exports.bootstrap = bootstrap;
@@ -60,16 +62,21 @@ function _initConfSync() {
 	conf.confdir = path.resolve(`${__dirname}/${conf.confdir}`);
 	conf.accesslog = path.resolve(`${__dirname}/${conf.accesslog}`);
 	conf.errorlog = path.resolve(`${__dirname}/${conf.errorlog}`);
+	conf.serverroot = path.resolve(`${__dirname}/../../`);
 	utils = require(conf.libdir+"/utils.js");
 
 	// merge web app conf files into main http server, for app specific configuration directives unless standalone is forced
 	if (fs.existsSync(`${__dirname}/../apps/`) && !args.getArgs().standalone) 
 		for (const app of fs.readdirSync(`${__dirname}/../apps/`)) 
 			if (fs.existsSync(`${__dirname}/../apps/${app}/conf/httpd.json`)) {
-				const appHTTPDConf = require(`${__dirname}/../apps/${app}/conf/httpd.json`);
 				const appHostname = fs.existsSync(`${__dirname}/../apps/${app}/conf/hostname.json`) ?
 					require(`${__dirname}/../apps/${app}/conf/hostname.json`) : hostname;
-				if (appHTTPDConf.host) appHTTPDConf.host = mustache.render(appHTTPDConf.host, {hostname: appHostname});	// override host as appropriate
+				let appHTTPDConf = fs.readFileSync(`${__dirname}/../apps/${app}/conf/httpd.json`, "utf8");
+				const replacers = {hostname: appHostname, serverroot: conf.serverroot, appname: app};
+				for (const escapedValue of HTTPD_CONF_EXPANDS) appHTTPDConf = appHTTPDConf.replaceAll(`{{{${escapedValue}}}}`,
+					replacers[escapedValue]).replaceAll(`{{${escapedValue}}}`,replacers[escapedValue]);
+				appHTTPDConf = JSON.parse(appHTTPDConf);
+				
 				for (const confKey of Object.keys(appHTTPDConf)) {
 					const value = appHTTPDConf[confKey];
 					if (!global.conf[confKey]) {global.conf[confKey] = value; continue;}	// not set, then just set it
