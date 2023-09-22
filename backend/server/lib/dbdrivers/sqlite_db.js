@@ -80,7 +80,7 @@ async function _createDB(dbPath, dbCreationSQLs) {
         return true;
     } catch (err) {  // db doesn't exist
         LOG.error("DB doesn't exist, creating and initializing");
-        try{await mkdirAsync(APP_CONSTANTS.DB_DIR)} catch(err){if (err.code != "EEXIST") {LOG.error(`Error creating DB dir, ${err}`); return false;}}   
+        try{await mkdirAsync(path.dirname(dbPath))} catch(err){if (err.code != "EEXIST") {LOG.error(`Error creating DB dir, ${err}`); return false;}}   
         if (!(await _openDB(dbPath))) return false; // creates the DB file
         
         for (const dbCreationSQL of dbCreationSQLs) {
