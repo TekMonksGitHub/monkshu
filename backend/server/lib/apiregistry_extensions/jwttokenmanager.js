@@ -31,8 +31,10 @@ function initSync() {
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
 
+const checkHeaderToken = headers => checkSecurity({query:{needsToken: true}}, undefined, {}, headers, undefined, {});
+
 function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
-    if ((!apiregentry.query.needsToken) || apiregentry.query.needsToken.toLowerCase() == "false") return true;	// no token needed
+    if ((!apiregentry.query.needsToken) || (apiregentry.query.needsToken.toLowerCase() == "false")) return true;	// no token needed
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(/[ \t]+/):[];
@@ -60,9 +62,14 @@ function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
         reason.code = 403; return false;
     }
 
+    addToken(token);
+    return true;
+}
+
+function addToken(token) {
+    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();   // update last access
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
-    return true;
 }
 
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
@@ -120,4 +127,4 @@ function _parseAddstokenString(addsTokenString, request, response) {
 }
 
 module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
-    addListener, removeListener };
+    addListener, removeListener, checkHeaderToken, addToken };
