@@ -224,6 +224,7 @@ const addOnLoadPage = (url, func) => { if (url != "*") url = util.resolveURL(url
 const addOnLoadPageData = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pagedata_funcs[url]) window.monkshu_env.router.pagedata_funcs[url].push(func); 
 	else window.monkshu_env.router.pagedata_funcs[url] = [func]; }
+
 /**
  * Adds url rewriting functions
  * @param url The URL on which to run the functions, hashed
@@ -241,6 +242,7 @@ const addURLRewriter = (url, func) => { if (url != "*") url = util.resolveURL(ur
 const removeOnLoadPage = (url, func) => { if (url != "*") url = util.resolveURL(url); 
 	if (window.monkshu_env.router.pageload_funcs[url] && window.monkshu_env.router.pageload_funcs[url].indexOf(func)!=-1) 
 		window.monkshu_env.router.pageload_funcs[url].splice(window.monkshu_env.router.pageload_funcs[url].indexOf(func)) }
+
 /**
  * Removes functions to run when the given page loads its data
  * @param url The URL on which to run the functions, not hashed
