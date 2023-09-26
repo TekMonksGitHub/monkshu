@@ -72,6 +72,12 @@ function addToken(token) {
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
 }
 
+function releaseToken(token) {
+    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
+    if (token && activeTokens[token]) delete activeTokens[token];
+    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+}
+
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
     if (!apiregentry.query.addsToken) return;   // nothing to do
     else injectResponseHeadersInternal(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request);
@@ -133,4 +139,4 @@ function _parseAddstokenString(addsTokenString, request, response) {
 }
 
 module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
-    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken };
+    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken, releaseToken };
