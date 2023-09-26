@@ -82,7 +82,20 @@ function injectResponseHeadersInternal(apiregentry, url, response, requestHeader
     if (addsTokenParsed.tokenflag && !(utils.parseBoolean(addsTokenParsed.tokenflag))) return; // failed to pass the API success test 
     if ((!addsTokenParsed.tokenflag) && (!response.result)) return; // failed to pass the API success test 
     
-    const claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), ...addsTokenParsed}; 
+    const token = createSignedJWTToken(addsTokenParsed);
+    
+    // inject the JWT token into the response headers
+    responseHeaders.access_token = token; responseHeaders.token_type = "bearer"; responseHeaders.authorization = `Bearer ${token}`;
+    for (const tokenListener of _jwttokenListeners) tokenListener("token_generated", {token, apiregentry, url, response, requestHeaders, responseHeaders, servObject});
+}
+
+const addListener = listener => _jwttokenListeners.push(listener);
+const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) != -1)
+    _jwttokenListeners.splice(_jwttokenListeners.indexOf(listener),1); }
+
+function createSignedJWTToken(jwtproperties) {
+    const claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), 
+        ...jwtproperties}; 
 
     const claimB64 = Buffer.from(JSON.stringify(claims)).toString("base64"); 
     const tokenClaimHeader = claimB64+"."+BASE_64_HEADER;
@@ -94,15 +107,8 @@ function injectResponseHeadersInternal(apiregentry, url, response, requestHeader
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
-    
-    // inject the JWT token into the response headers
-    responseHeaders.access_token = token; responseHeaders.token_type = "bearer"; responseHeaders.authorization = `Bearer ${token}`;
-    for (const tokenListener of _jwttokenListeners) tokenListener("token_generated", {token, apiregentry, url, response, requestHeaders, responseHeaders, servObject});
+    return token;
 }
-
-const addListener = listener => _jwttokenListeners.push(listener);
-const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) != -1)
-    _jwttokenListeners.splice(_jwttokenListeners.indexOf(listener),1); }
 
 function _cleanTokens() {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
@@ -127,4 +133,4 @@ function _parseAddstokenString(addsTokenString, request, response) {
 }
 
 module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
-    addListener, removeListener, checkHeaderToken, addToken };
+    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken };

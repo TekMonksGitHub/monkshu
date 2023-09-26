@@ -136,8 +136,8 @@ async function getPageData(url=getCurrentURL(), dataModels) {
 
 	dataModels["lang"] = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
 	
-	dataModels["url"] = {url};
-	new URL(url).searchParams.forEach((value, name) => dataModels["url"][name] = value);
+	const urlObject = new URL(url); dataModels["url"] = {url, url_search: urlObject.search.trim()!=""?urlObject.search.trim():undefined};
+	if (urlObject.searchParams.size) for (const [name, value] of urlObject.searchParams.entries()) dataModels["url"][name] = value;
 
 	dataModels["_org_monkshu_makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
