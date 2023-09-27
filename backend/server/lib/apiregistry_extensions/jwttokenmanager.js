@@ -74,8 +74,10 @@ function addToken(token) {
 
 function releaseToken(token) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
-    if (token && activeTokens[token]) delete activeTokens[token];
-    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    if (token && activeTokens[token]) {
+        delete activeTokens[token];
+        CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    }
 }
 
 function injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, request) {
