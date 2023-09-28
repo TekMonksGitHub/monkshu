@@ -102,8 +102,8 @@ const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) !=
     _jwttokenListeners.splice(_jwttokenListeners.indexOf(listener),1); }
 
 function createSignedJWTToken(jwtproperties) {
-    const claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Date.now(), jti: cryptmod.randomBytes(16).toString("hex"), 
-        ...jwtproperties}; 
+    const timenow = Date.now(), claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Math.round(timenow/1000), iatms: timenow,
+        jti: cryptmod.randomBytes(16).toString("hex"), ...jwtproperties}; 
 
     const claimB64 = Buffer.from(JSON.stringify(claims)).toString("base64"); 
     const tokenClaimHeader = claimB64+"."+BASE_64_HEADER;
