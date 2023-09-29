@@ -86,7 +86,7 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-async function fetch(url, options={}) {    // somewhat fetch compatible API
+async function fetch(url, options={}, redirected=false) {    // somewhat fetch compatible API
     const headers = options.headers||{}, urlObj = new URL(url); let method = options.method?.toLowerCase() || "get";
     if (urlObj.protocol == "https:") method = method+"Https"; if (method=="delete") method = "deleteHttp"; 
     const port = urlObj.port && urlObj.port != "" ? urlObj.port : (urlObj.protocol=="https:"?443:80), 
@@ -101,12 +101,12 @@ async function fetch(url, options={}) {    // somewhat fetch compatible API
     if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
             ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
 
-        if (resHeaders.location) return fetch(new URL(resHeaders.location, url).href, options);   
+        if (resHeaders.location) return fetch(new URL(resHeaders.location, url).href, options, true);   
         else LOG.error(`URL ${url} sent a redirect with no location specified (location header not found).`);
     }
     
     const result = {ok: error?false:true, status, data, headers: resHeaders, buffer: _ => data, 
-        text: encoding => data.toString(encoding||"utf8"), json: _ => JSON.parse(data)}
+        text: encoding => data.toString(encoding||"utf8"), json: _ => JSON.parse(data), redirected, url}
     if (callback) callback(result); else return result;
 }
 
