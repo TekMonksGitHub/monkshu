@@ -1,9 +1,9 @@
 #!/bin/bash
-npm -g install mustache
-npm -g install sqlite3
-npm -g install terser
-npm -g install uglify-js
-npm -g install html-minifier
-npm -g install clean-css
-npm -g install nodemailer
-npm -g install --save-dev electron
+npm install mustache
+npm install sqlite3
+npm install terser
+npm install uglify-js
+npm install html-minifier
+npm install clean-css
+npm install nodemailer
+npm install --save-dev electron
