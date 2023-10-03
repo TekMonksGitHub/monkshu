@@ -6,6 +6,7 @@
  */
 
 const extensions = [];
+const os = require("os");
 const fs = require("fs");
 const zlib = require("zlib");
 const path = require("path");
@@ -40,11 +41,12 @@ function bootstrap() {
 	const listener = async (req, res) => { try{await _handleRequest(req, res);} catch(e){error.error(e.stack?e.stack.toString():e.toString()); _sendError(req,res,500,e);} }
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
 	const httpd = options && (!conf.forceHTTP1) ? http2.createSecureServer(options, listener) : options ? https.createServer(options, listener) : http.createServer(listener); // create server for http2 or http1 based on configurations
+	const hostinterface = os.platform!="darwin"?(conf.host||"::"):"::";	// Mac won't let app bind to lower ports unless it listens to the wildcard host
 	httpd.setTimeout(conf.timeout);
-	httpd.listen(conf.port, conf.host||"::");
+	httpd.listen(conf.port, hostinterface);	
 	
-	access.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${conf.host||"::"}:${conf.port}`);
-	console.log(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${conf.host||"::"}:${conf.port}`);
+	access.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${hostinterface}:${conf.port}`);
+	console.log(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${hostinterface}:${conf.port}`);
 	access.info("Server started.");
 	console.log("Server started.");
 }

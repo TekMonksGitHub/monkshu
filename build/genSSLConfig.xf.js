@@ -6,11 +6,11 @@ const path = require("path");
 const fspromises = require("fs").promises;
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
+const BUILD_CONF = require(`${MONKSHU_PATH}/build/build.json`);
 const BACKEND_HTTPD_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/httpd.json`);
 const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
+const LOCAL_IP = require(`${MONKSHU_PATH}/backend/server/lib/utils.js`).getLocalIPs(true)[0];
 const BLACKBOARD_CONF_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/blackboard.json`);
-const LOCAL_IP = Object.values(require("os").networkInterfaces()).reduce((r, list) => r.concat(list.reduce((rr, i) => 
-    rr.concat(i.family=="IPv4" && !i.internal && i.address || []), [])), []);
 const DEFAULT_APP_NAME = _resolveDefaultAppNameSync();
  
 // build
@@ -23,7 +23,7 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
 
         CONSTANTS.LOGINFO("Generating SSL certificates."); etcdir = path.resolve(etcdir); open_ssl_conf = path.resolve(open_ssl_conf);
         if (!await CONSTANTS.SHELL.test("-e", etcdir)) await CONSTANTS.SHELL.mkdir("-p", etcdir);  // create the cert directory if it doesn't exist
-        await os_cmd(`openssl req -newkey rsa:2048 -nodes -keyout "${etcdir}/dnsip_privkey.pem" -x509 -days 365 -subj "/CN=${LOCAL_IP}/C=US/L=San Fransisco/OU=Test/O=Test" -out "${etcdir}/dnsip_fullchain.pem"`, 
+        await os_cmd(`openssl req${BUILD_CONF.OPENSSLCONF?` -config ${BUILD_CONF.OPENSSLCONF}`:""} -newkey rsa:2048 -nodes -keyout "${etcdir}/dnsip_privkey.pem" -x509 -days 365 -subj "/CN=${LOCAL_IP}/C=US/L=San Fransisco/OU=Test/O=Test" -out "${etcdir}/dnsip_fullchain.pem"`, 
             false, {OPENSSL_CONF: open_ssl_conf});
 
         CONSTANTS.LOGINFO("Setting hostnames");
