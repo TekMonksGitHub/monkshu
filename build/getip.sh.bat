@@ -7,5 +7,4 @@ GOTO :CMDSCRIPT
 exit 0
 
 :CMDSCRIPT
-@echo off & for /f \"tokens=3 delims=: \" %i  in ('netsh interface ip show config ^| findstr \"IP Address\"') do echo %i
-
+for /f "tokens=3 delims=: " %%i  in ('netsh interface ip show config ^| findstr "IP Address"') do echo %%i
