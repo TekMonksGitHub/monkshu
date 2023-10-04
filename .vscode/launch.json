@@ -88,9 +88,6 @@
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "preLaunchTask": "Delete Electron Cache",
             "windows": {
-                "name": "Launch Desktop App - Windows",
-                "type": "node",
-                "request": "launch",
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             },
             "args" : ["${workspaceFolder}/desktop/framework/main.js"],
@@ -134,7 +131,7 @@
             "type": "command",
             "command": "shellCommand.execute",
                 "args": {
-                "command": "@echo off & for /f \"tokens=3 delims=: \" %i  in ('netsh interface ip show config ^| findstr \"IP Address\"') do echo %i",
+                "command": "${workspaceFolder}/build/getip.sh.bat",
                 "useFirstResult": "true"
             }
         }
