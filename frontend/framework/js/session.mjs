@@ -46,7 +46,9 @@ function _getProxy(object, key) {
         }
     }
 
-    return new Proxy(typeof object == "string" || typeof object == "number" || typeof object == "boolean" || typeof object == "bigint"?new NativeWrapper(object):object, handler);
+    const isProxyAlready = object["_______org_monkshu_clientwebsession_wrapped_object_______"] != null;
+    if (isProxyAlready) return object; else return new Proxy(
+        typeof object == "string" || typeof object == "number" || typeof object == "boolean" || typeof object == "bigint"?new NativeWrapper(object):object, handler);
 }
 
 export const session = {set, get, remove, destroy, contains, keys};

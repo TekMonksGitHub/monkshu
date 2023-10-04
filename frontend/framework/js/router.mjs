@@ -9,7 +9,8 @@ import {session} from "/framework/js/session.mjs";
 import {pwasupport} from "/framework/js/pwasupport.mjs"
 import {securityguard} from "/framework/js/securityguard.mjs";
 
-const HS = "?.=", PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_data";
+const PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_data", 
+	ROUTER_HISTORY_KEY = "__org_monkshu_router_history", HASH_PARAM=".";
 
 /** Inits the router, called by bootstrap */
 const init = _ => window.monkshu_env.router = {pageload_funcs: [], urlRewriters: [], pagedata_funcs: []};
@@ -36,9 +37,9 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  * @param url The URL to navigate to
  */
  function navigate(url) {
-	let normalizedUrl = _getRewrittenURL(url).href;	// normalize
-	if (normalizedUrl.indexOf(HS) == -1) normalizedUrl = encodeURL(url);
-	window.location = normalizedUrl;
+	let normalizedUrl = _getRewrittenURL(url);	// normalize
+	if (!_isEncodedURL(normalizedUrl.href)) normalizedUrl = encodeURL(url);
+	window.location.assign(normalizedUrl.href);
 }
 
 /**
@@ -53,20 +54,22 @@ async function loadPage(url, dataModels={}) {
 	if (session.get(PAGE_TRANSIENT_DATA) && !Object.keys(dataModels).length) dataModels = session.get(PAGE_TRANSIENT_DATA);
 	if (session.get(PAGE_TRANSIENT_DATA)) session.remove(PAGE_TRANSIENT_DATA);
 
-	if (!session.get("__org_monkshu_router_history")) session.set("__org_monkshu_router_history", {});
-	const history = session.get("__org_monkshu_router_history"); let hash;
+	if (!session.get(ROUTER_HISTORY_KEY)) session.set(ROUTER_HISTORY_KEY, {});
+	const history = session.get(ROUTER_HISTORY_KEY); let hash;
 
-	if (url.indexOf(HS) == -1) {
-		hash = btoa(url);
-		window.history.pushState(null, null, new URL(window.location.href).pathname+HS+hash);
+	if (!_isEncodedURL(url)) {
+		hash = btoa(url); const currenturl = new URL(new URL(window.location.href).pathname, window.location.href); 
+		currenturl.searchParams.set(HASH_PARAM, hash);
+		window.history.pushState(null, null, currenturl.href);
 		history[hash] = [url, dataModels];
 	} else {
 		window.history.pushState(null, null, url);
-		hash = url.substring(url.indexOf(HS)+HS.length);
+		hash = new URL(url).searchParams.get(HASH_PARAM);
 		url = new URL(atob(hash), window.location).href;
-		if (!history[hash]) history[hash] = [url,"en",{}];
+		if (!history[hash]) history[hash] = [url, dataModels];
 	}
 
+	session.set(ROUTER_HISTORY_KEY, history);
 	session.set($$.MONKSHU_CONSTANTS.PAGE_URL, url);
 	session.set($$.MONKSHU_CONSTANTS.PAGE_DATA, dataModels);
 	
@@ -177,12 +180,11 @@ async function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
  * @returns true if we have navigated to this page before, else false
  */
 function isInHistory(url) {
-	const history = session.get("__org_monkshu_router_history");
+	const history = session.get(ROUTER_HISTORY_KEY);
 	if (!history) return false;
 
-	if (url.indexOf(HS) == -1) return false;
-	
-	let hash = url.substring(url.indexOf(HS)+HS.length);
+	const hash = new URL(url, window.location.href).searchParams.get(HASH_PARAM);
+	if (!hash) return false;	
 	if (!history[hash]) return false; else return true;
 }
 
@@ -192,20 +194,23 @@ function isInHistory(url) {
  * @returns The actual URL of the page embedded into a Monkshu hash URL
  */
 function decodeURL(url) {
-	const retURL = new URL(url, window.location.href).href;	// normalize
-	if (retURL.indexOf(HS) == -1) return retURL; 
-	const decoded = atob(retURL.substring(retURL.indexOf(HS)+HS.length)); return decoded;
+	const urlObject = new URL(url, window.location.href); 
+	if (!urlObject.searchParams.get(HASH_PARAM)) return urlObject.href; 
+	const decoded = new URL(atob(urlObject.searchParams.get(HASH_PARAM)), window.location.href).href; 
+	urlObject.searchParams.delete(HASH_PARAM);	// delete the hash param as it is internal, rest are pass-through
+	if (urlObject.searchParams.size) decoded = decoded+urlObject.search; return decoded;
 }
 
 /**
- * Converts the given URL into a navigatable monkshu hashed URL
+ * Converts the given URL into a navigable monkshu hashed URL
  * @param url The actual URL
  * @returns The hashed URL
  */
 function encodeURL(url) {
-	url = new URL(url, window.location).href;
-	const encodedURL = new URL(new URL(window.location.href).pathname+HS+btoa(url), window.location); 
-	return encodedURL.toString();
+	const normalizedurl = new URL(url, window.location).href;
+	const encodedURL = new URL(new URL(window.location.href).pathname, window.location.href); 
+	encodedURL.searchParams.set(HASH_PARAM, btoa(normalizedurl));
+	return encodedURL.href;
 }
 
 /**
@@ -304,6 +309,11 @@ function _getRewrittenURL(url) {
 	if (window.monkshu_env.router.urlRewriters && window.monkshu_env.router.urlRewriters["*"])
 		for (const rewriter of window.monkshu_env.router.urlRewriters["*"]) newURL = rewriter(testURL);
 	return new URL(newURL, window.location.origin);
+}
+
+function _isEncodedURL(url) {
+	const testURL = new URL(url, window.location);
+	return testURL.searchParams.get(HASH_PARAM) != null;
 }
 
 export const router = {navigate, loadPage, loadHTML, reload, hardreload, isInHistory, runShadowJSScripts, getPageData, 
