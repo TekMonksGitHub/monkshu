@@ -145,6 +145,7 @@ async function getPageData(url=getCurrentURL(), dataModels) {
 	dataModels["_org_monkshu_makeLink"] = _ => (text, render) => router.encodeURL(render(text));
 	dataModels["_org_monkshu_session"] = _ => (key, render) => session.get(render(key));
 	dataModels["__window"] = _ => (key, render) => window[render(key)];
+	dataModels["_org_monkshu_encodeURIComponent"] = _ => (text, render) => encodeURIComponent(render(text));
 
 	if (window.monkshu_env.router.pagedata_funcs[util.baseURL(url)]) for (const func of window.monkshu_env.router.pagedata_funcs[util.baseURL(url)]) await func(dataModels, url);
 	if (window.monkshu_env.router.pagedata_funcs["*"]) for (const func of window.monkshu_env.router.pagedata_funcs["*"]) await func(dataModels, url);
