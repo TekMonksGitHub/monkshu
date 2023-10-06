@@ -208,9 +208,9 @@ function decodeURL(url) {
  * @returns The hashed URL
  */
 function encodeURL(url) {
-	const normalizedurl = new URL(url, window.location).href;
+	const normalizedurl = new URL(url, window.location).href, btoaNormURL = btoa(normalizedurl);
 	const encodedURL = new URL(new URL(window.location.href).pathname, window.location.href); 
-	encodedURL.searchParams.set(HASH_PARAM, btoa(normalizedurl));
+	encodedURL.searchParams.set(HASH_PARAM, btoaNormURL);
 	return encodedURL.href;
 }
 

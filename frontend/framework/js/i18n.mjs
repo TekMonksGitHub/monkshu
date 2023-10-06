@@ -35,7 +35,7 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 	
 	if ((!i18nCached) || (i18nCached.reload) || (!i18nCached[language]) || refresh) {
 		i18nCached[language] = {i18n:{}};
-		for (const appPath of appPaths) {
+		if (appPaths) for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
 			try {
 				const i18nBundle = await import(i18nThisAppPath);
