@@ -197,7 +197,7 @@ function isInHistory(url) {
 function decodeURL(url) {
 	const urlObject = new URL(url, window.location.href); 
 	if (!urlObject.searchParams.get(HASH_PARAM)) return urlObject.href; 
-	const decoded = new URL(atob(urlObject.searchParams.get(HASH_PARAM)), window.location.href).href; 
+	let decoded = new URL(atob(urlObject.searchParams.get(HASH_PARAM)), window.location.href).href; 
 	urlObject.searchParams.delete(HASH_PARAM);	// delete the hash param as it is internal, rest are pass-through
 	if (urlObject.searchParams.size) decoded = decoded+urlObject.search; return decoded;
 }
