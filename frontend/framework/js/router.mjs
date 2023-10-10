@@ -38,7 +38,7 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  */
  function navigate(url) {
 	let normalizedUrl = _getRewrittenURL(url);	// normalize
-	if (!_isEncodedURL(normalizedUrl.href)) normalizedUrl = encodeURL(url);
+	if (!_isEncodedURL(normalizedUrl.href)) normalizedUrl = new URL(encodeURL(url));
 	window.location.assign(normalizedUrl.href);
 }
 
