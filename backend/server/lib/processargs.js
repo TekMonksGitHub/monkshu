@@ -13,6 +13,23 @@
 let args;
 
 /**
+ * Prints help usage.
+ * @param {Object} propMap The arg property map
+ * @param {Array} errorKeys In case of errors, the error keys in the prop map above
+ */
+function printHelp(propMap, errorKeys) {
+    if (!propMap || (!Object.keys(propMap).length)) return;
+
+    const consoleOut = errorKeys ? console.error : console.log;
+    if (propMap.__description) consoleOut(propMap.__description);
+    let usage = `Usage: ${process.argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
+        if (key.startsWith("__")) continue; else usage += `[-${key}${value.long?`, --${value.long}`:""}] `;
+    consoleOut(usage);
+    for (const [key, value] of Object.entries(propMap)) if (((errorKeys && errorKeys.includes(key)) || (!errorKeys)) && 
+        value.help) consoleOut(`    -${key}${value.long?`, --${value.long}`:""}: ${value.help}`);
+}
+
+/**
  * @param {Object} propMap The map of properties to expect, named and required.
  * @returns The process args as a key-value pair object. All values are arrays.
  */
@@ -33,16 +50,18 @@ function getArgs(propMap) {
     if (propMap) for (const key of Object.keys(propMap)) if (propMap[key].required && args[_getArgsKey(key)] && 
         (!args[_getArgsKey(key)].length)) errorKeys.push(key);
 
-    if (errorKeys.length) {
-        console.error(propMap.description||"");
-        for (const errorKey of errorKeys) console.error(`${errorKey}: ${propMap[errorKey].help||`Missing value for ${errorKey}.`}`);
-        return null;
-    } else return args;
+    if (errorKeys.length) { printHelp(propMap, errorKeys); return null;} else return args;
 }
 
-module.exports = {getArgs, reset: _=>args=undefined};
+module.exports = {getArgs, printHelp, reset: _=>args=undefined};
 
 if (require.main === module) {
+    const propMap = { "__description": "\nTest program. (C) 2022 Tekmonks.",
+        "c": "color", 
+        "f": {long: "file", required: true, help: "Filepath. The value is required if specified."},
+        "u": {long: "user", required: true, help: "User ID. The value is required if specified."} };
+
     console.log(getArgs()); module.exports.reset();
-    console.log(getArgs({"c": "color", "f": {long: "file", required: true, help: "Filepath. The value is required if specified."}})||"Error in the input arguments.");
+    console.log(getArgs(propMap)||"\nError in the input arguments.");
+    printHelp(propMap);
 }
