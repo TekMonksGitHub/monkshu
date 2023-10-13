@@ -13,15 +13,27 @@
 let args;
 
 /**
+ * Sends back string containing help information.
+ * @param {Object} propMap The arg property map
+ * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
+ */
+function helpInformation(propMap, argv=process.argv) {
+    let output = ""; const _outputcollector = s => output += "\n"+s;
+    printHelp(propMap, undefined, _outputcollector, argv);
+    return output.trim();
+}
+
+/**
  * Prints help usage.
  * @param {Object} propMap The arg property map
  * @param {Array} errorKeys In case of errors, the error keys in the prop map above
  * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
+ * @param {Function} outputcollector Optional: The output collector, if givem the function is called with UTF-8 output strings.
  */
-function printHelp(propMap, errorKeys, argv=process.argv) {
+function printHelp(propMap, errorKeys, outputcollector, argv=process.argv) {
     if (!propMap || (!Object.keys(propMap).length)) return;
 
-    const consoleOut = errorKeys ? console.error : console.log;
+    const consoleOut = outputcollector || (errorKeys ? console.error : console.log);
     if (propMap.__description) consoleOut(propMap.__description);
     let usage = `Usage: ${argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
         if (key.startsWith("__")) continue; else usage += `[-${key}${value.long?`, --${value.long}`:""}] `;
@@ -35,7 +47,7 @@ function printHelp(propMap, errorKeys, argv=process.argv) {
  * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
  * @returns The process args as a key-value pair object. All values are arrays.
  */
-function getArgs(propMap, argv=process.argv) {
+function getArgs(propMap, argv=process.argv, outputcollector) {
     if (args) return args; else args = {};
 
     const _getArgsKey = argOption => 
@@ -52,10 +64,10 @@ function getArgs(propMap, argv=process.argv) {
     if (propMap) for (const key of Object.keys(propMap)) if (propMap[key].required && args[_getArgsKey(key)] && 
         (!args[_getArgsKey(key)].length)) errorKeys.push(key);
 
-    if (errorKeys.length) { printHelp(propMap, errorKeys); return null;} else return args;
+    if (errorKeys.length) { printHelp(propMap, errorKeys, argv, outputcollector); return null;} else return args;
 }
 
-module.exports = {getArgs, printHelp, reset: _=>args=undefined};
+module.exports = {getArgs, printHelp, helpInformation, reset: _=>args=undefined};
 
 if (require.main === module) {
     const propMap = { "__description": "\nTest program. (C) 2022 Tekmonks.",
@@ -67,4 +79,5 @@ if (require.main === module) {
     console.log(getArgs()); module.exports.reset();
     console.log(getArgs(propMap)||"\nError in the input arguments.");
     printHelp(propMap);
+    console.log("\n"+helpInformation(propMap));
 }
