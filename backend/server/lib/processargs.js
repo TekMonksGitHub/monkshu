@@ -16,13 +16,14 @@ let args;
  * Prints help usage.
  * @param {Object} propMap The arg property map
  * @param {Array} errorKeys In case of errors, the error keys in the prop map above
+ * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
  */
-function printHelp(propMap, errorKeys) {
+function printHelp(propMap, errorKeys, argv=process.argv) {
     if (!propMap || (!Object.keys(propMap).length)) return;
 
     const consoleOut = errorKeys ? console.error : console.log;
     if (propMap.__description) consoleOut(propMap.__description);
-    let usage = `Usage: ${process.argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
+    let usage = `Usage: ${argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
         if (key.startsWith("__")) continue; else usage += `[-${key}${value.long?`, --${value.long}`:""}] `;
     consoleOut(usage);
     for (const [key, value] of Object.entries(propMap)) if (((errorKeys && errorKeys.includes(key)) || (!errorKeys)) && 
@@ -31,16 +32,17 @@ function printHelp(propMap, errorKeys) {
 
 /**
  * @param {Object} propMap The map of properties to expect, named and required.
+ * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
  * @returns The process args as a key-value pair object. All values are arrays.
  */
-function getArgs(propMap) {
+function getArgs(propMap, argv=process.argv) {
     if (args) return args; else args = {};
 
     const _getArgsKey = argOption => 
         propMap && propMap[argOption] ? propMap[argOption].long||propMap[argOption] : argOption;
 
-    const argv = process.argv.slice(2);
-    let currKey; for (const arg of argv) {
+    const argvSliced = argv.slice(2);
+    let currKey; for (const arg of argvSliced) {
         if (arg.startsWith("-")||(process.platform=="win32" && arg.startsWith("/"))||(arg.startsWith("--"))) {
             currKey = _getArgsKey(arg.substring(arg.startsWith("--")?2:1)); args[currKey] = args[currKey]||[];
         } else if (currKey) args[currKey].push(arg);
@@ -61,6 +63,7 @@ if (require.main === module) {
         "f": {long: "file", required: true, help: "Filepath. The value is required if specified."},
         "u": {long: "user", required: true, help: "User ID. The value is required if specified."} };
 
+    console.log(getArgs(propMap, ["", "", "-c", "red", "--file", "TestFile", "-user", "TestUser"])); module.exports.reset();
     console.log(getArgs()); module.exports.reset();
     console.log(getArgs(propMap)||"\nError in the input arguments.");
     printHelp(propMap);
