@@ -32,7 +32,7 @@
 /**
  * Returns the DB driver requested.
  * @param {string} driver The DB driver needed.
- * @param {string} dbConnectInfo DB connection info. For this driver it is the path to the DB file.
+ * @param {string} dbConnectInfo DB connection info. For example, for SQLite it is the path to the DB file.
  * @param {array} dbCreationSQLs The DB creation SQLs as string array, else default is used from the constants.
  * @returns Returns the DB driver requested, throws an exception if not found.
  */

@@ -10,8 +10,6 @@
  * License: See enclosed LICENSE file.
  */
 
-let args;
-
 /**
  * Sends back string containing help information.
  * @param {Object} propMap The arg property map
@@ -48,7 +46,7 @@ function printHelp(propMap, errorKeys, outputcollector, argv=process.argv) {
  * @returns The process args as a key-value pair object. All values are arrays.
  */
 function getArgs(propMap, argv=process.argv, outputcollector) {
-    if (args) return args; else args = {};
+    const args = {};
 
     const _getArgsKey = argOption => 
         propMap && propMap[argOption] ? propMap[argOption].long||propMap[argOption] : argOption;
@@ -67,7 +65,7 @@ function getArgs(propMap, argv=process.argv, outputcollector) {
     if (errorKeys.length) { printHelp(propMap, errorKeys, argv, outputcollector); return null;} else return args;
 }
 
-module.exports = {getArgs, printHelp, helpInformation, reset: _=>args=undefined};
+module.exports = {getArgs, printHelp, helpInformation};
 
 if (require.main === module) {
     const propMap = { "__description": "\nTest program. (C) 2022 Tekmonks.",
@@ -75,8 +73,8 @@ if (require.main === module) {
         "f": {long: "file", required: true, help: "Filepath. The value is required if specified."},
         "u": {long: "user", required: true, help: "User ID. The value is required if specified."} };
 
-    console.log(getArgs(propMap, ["", "", "-c", "red", "--file", "TestFile", "-user", "TestUser"])); module.exports.reset();
-    console.log(getArgs()); module.exports.reset();
+    console.log(getArgs(propMap, ["", "", "-c", "red", "--file", "TestFile", "-user", "TestUser"])); 
+    console.log(getArgs()); 
     console.log(getArgs(propMap)||"\nError in the input arguments.");
     printHelp(propMap);
     console.log("\n"+helpInformation(propMap));
