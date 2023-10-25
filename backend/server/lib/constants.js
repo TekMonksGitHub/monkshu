@@ -5,8 +5,8 @@
 
 const path = require("path");
 const rootdir = path.resolve(__dirname+"/../");
-const args = require(`${rootdir}/lib/processargs.js`).getArgs();
-const confdir = path.resolve(args["c"] || args["conf"] ? (args["c"] || args["conf"])[0] : rootdir+"/conf");
+const args = require(`${rootdir}/lib/processargs.js`).getArgs({"c": "conf"});
+const confdir = path.resolve(args["conf"] ? args["conf"][0] : rootdir+"/conf");
 
 exports.ARGS = args;
 exports.ROOTDIR = rootdir;
