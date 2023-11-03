@@ -62,7 +62,7 @@ function getArgs(propMap, argv=process.argv, outputcollector) {
     if (propMap) for (const key of Object.keys(propMap)) if (propMap[key].required && args[_getArgsKey(key)] && 
         (!args[_getArgsKey(key)].length)) errorKeys.push(key);
 
-    if (errorKeys.length) { printHelp(propMap, errorKeys, argv, outputcollector); return null;} else return args;
+    if (errorKeys.length) { printHelp(propMap, errorKeys, outputcollector, argv); return null;} else return args;
 }
 
 module.exports = {getArgs, printHelp, helpInformation};

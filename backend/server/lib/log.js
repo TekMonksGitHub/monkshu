@@ -1,4 +1,5 @@
-/* 
+/**
+ * Global logger. 
  * (C) 2015 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
