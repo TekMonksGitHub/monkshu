@@ -40,6 +40,9 @@ exports.add = (functionToCall, params=[], isAsync=false, delay=0, callback) => {
 /** Starts the queue loop. */
 exports.init = _ => {if (conf.enabled) _queueExecutionFunction(); queueInitialized = true;}  // starts the queue processing loop
 
+/** @returns The current queue depth, that is jobs waiting to execute. */
+exports.getQueueDepth = _ => queue.length;
+
 function _queueExecutionFunction() {
     if (!queue.length) {_runQueueLoop(); return;}  // no tasks
     

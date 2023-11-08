@@ -54,3 +54,14 @@ exports.API_MANAGER_DECODERS_CONF_APPS = "conf/apiregistry.decoders.json";
 exports.API_MANAGER_ENCODERS_CONF_APPS = "conf/apiregistry.encoders.json";
 exports.API_MANAGER_SECURITYCHECKERS_CONF_APPS = "conf/apiregistry.securitycheckers.json";
 exports.API_MANAGER_HEADERMANAGERS_CONF_APPS = "conf/apiregistry.headermanagers.json";
+
+function overrideConstants() {
+    const _isPath = key => { for (const ending of ["dir", "conf", "apiregistry"]) if (key.toLowerCase().endsWith(ending)) return true; return false;}
+    const currentConstants = {...module.exports}; for (const [key, value] of Object.entries(currentConstants))
+        if (_isPath(key)) currentConstants[key] = require(`${__dirname}/utils.js`).convertToUnixPathEndings(value, true);
+    const overridesText = require("mustache").render(require("fs").readFileSync(`${exports.CONFDIR}/constants.json`, "utf8"),
+        currentConstants), overrides = JSON.parse(overridesText);
+    for (const [key, value] of Object.entries(overrides)) if (key.toLowerCase() == "_comment_") continue; 
+        else exports[key] = _isPath(key) ? path.resolve(value) : value;
+}
+overrideConstants();
