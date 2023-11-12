@@ -13,8 +13,8 @@
  * If only partial offers are received for sync requests then all the replication nodes will send each other their memories, 
  * and the cluster will sync with the union of latest updates from each replication node. 
  * 
- * Note: get does not returned an observed object, so set must be called to update the memory across the cluster.
- * This is on intention - to reduce update chatter on the network, and ensure the updates are intentional.
+ * Note: get does not return an observed object, so set must be called to update the memory across the cluster.
+ * This is on intention - to reduce update chatter on the network, and to ensure the updates are intentional.
  * 
  * (C) 2020. TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.

@@ -26,7 +26,7 @@ function initSync() {
 
     try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
-    conf.expiryTime = conf.expiryTime || 600000; conf.tokenGCInterval = conf.tokenGCInterval || 1800000;
+    conf.expiryInterval = conf.expiryInterval || 600000; conf.tokenGCInterval = conf.tokenGCInterval || 1800000;
 
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
@@ -47,26 +47,28 @@ function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
     const lastAccess = activeTokens[token]; // this automatically verifies token integrity too, and is a stronger check than rehashing and checking the hash signature
     if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
 
-    const timeDiff = Date.now() - lastAccess;
-    if (timeDiff > conf.expiryTime) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
+    let claims; try{ claims = JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8")); } catch (err) {
+        LOG.error(`Error parsing claims ${err}`); 
+        {reason.reason = "JWT Token Error, claims are not parseable"; reason.code = 403; return false;}
+    } 
 
-    let claims; try{ claims = JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8")); } catch (err) {LOG.error(`Error parsing claims ${err}`); return false;} 
+    if (Date.now() - lastAccess > claims.expiryInterval) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
 
     if (accessNeeded && accessNeeded.toLowerCase() != "true" && (!utils.escapedSplit(accessNeeded, ",").includes(claims.sub))) {
         reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
         reason.code = 403; return false;
-    } 
+    }
 
     if (checkClaims) for (const key of checkClaims.split(",")) if (claims[key] != req[key]) {
         reason.reason = `JWT Token Error, claims check failed. Claims keys is ${key}, found JWT claim ${claims[key]}, request claims ${req[key]}.`; 
         reason.code = 403; return false;
     }
 
-    addToken(token);
+    updateLastAccessOrAddToken(token);
     return true;
 }
 
-function addToken(token) {
+function updateLastAccessOrAddToken(token) {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
     activeTokens[token] = Date.now();   // update last access
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
@@ -102,8 +104,12 @@ const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) !=
     _jwttokenListeners.splice(_jwttokenListeners.indexOf(listener),1); }
 
 function createSignedJWTToken(jwtproperties) {
-    const timenow = Date.now(), claims = {iss: TOKENMANCONF.iss||"Monkshu", iat: Math.round(timenow/1000), iatms: timenow,
-        jti: cryptmod.randomBytes(16).toString("hex"), ...jwtproperties}; 
+    const timenow = Date.now(), timenowEPOCH = Math.round(timenow/1000), 
+        expiryInterval = parseInt(jwtproperties.expiryInterval || conf.expiryInterval), claims = {
+            iss: TOKENMANCONF.iss||"Monkshu", 
+            iat: timenowEPOCH, iatms: timenow, nbf: timenowEPOCH, exp: timenowEPOCH+expiryInterval, 
+            jti: cryptmod.randomBytes(16).toString("hex"), expiryInterval, ...jwtproperties
+        }; 
 
     const claimB64 = Buffer.from(JSON.stringify(claims)).toString("base64"); 
     const tokenClaimHeader = claimB64+"."+BASE_64_HEADER;
@@ -111,18 +117,26 @@ function createSignedJWTToken(jwtproperties) {
     const sig64 = cryptmod.createHmac("sha256", cryptmod.randomBytes(32).toString("hex")).update(tokenClaimHeader).digest("hex");
 
     const token = `${BASE_64_HEADER}.${claimB64}.${sig64}`;
-
-    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
-    activeTokens[token] = Date.now();
-    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    updateLastAccessOrAddToken(token);
+    
     return token;
 }
 
+const getClaims = headersOrToken => {
+    const token = (typeof headersOrToken === "string") ? headersOrToken : getToken(headers); if (!token) return {}; 
+    try {return JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8"))} catch (err) {return {};}
+}
+
+const getToken = headers => headers["authorization"];
+
 function _cleanTokens() {
     const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
-    for (let token of Object.keys(activeTokens)) if (Date.now() - activeTokens[token] > conf.expiryTime) {
-        delete activeTokens[token];
-        for (const tokenListener of _jwttokenListeners) tokenListener("token_expireed", token);
+    for (let token of Object.keys(activeTokens)) {
+        const claims = getClaims(token);
+        if (Date.now() - activeTokens[token] > claims.expiryInterval) {
+            delete activeTokens[token];
+            for (const tokenListener of _jwttokenListeners) tokenListener("token_expireed", token);
+        }
     }
     CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
     
@@ -141,4 +155,4 @@ function _parseAddstokenString(addsTokenString, request, response) {
 }
 
 module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
-    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken, releaseToken };
+    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken: updateLastAccessOrAddToken, releaseToken, getToken, getClaims };

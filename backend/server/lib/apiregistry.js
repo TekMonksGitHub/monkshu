@@ -29,17 +29,16 @@ function initSync(notVerbose) {
 	const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep)
 
 	for (const appObj of apps) {
-		const app = Object.keys(appObj)[0];
-		if (fs.existsSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`)) {
-			let regThisRaw = fs.readFileSync(`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`, "utf8").
+		const app = Object.keys(appObj)[0], appRoot = appObj[app];
+		if (fs.existsSync(`${appRoot}/conf/apiregistry.json`)) {
+			let regThisRaw = fs.readFileSync(`${appRoot}/conf/apiregistry.json`, "utf8").
 				replace(/{{app}}/g, app).replace(/{{server}}/g, _toPOSIXPath(CONSTANTS.ROOTDIR)).replace(/{{server_lib}}/g, _toPOSIXPath(CONSTANTS.LIBDIR));
 			if (!notVerbose) LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
-			for (const key in regThis) regThis[key] = fs.existsSync(regThis[key].split("?")[0]) ? regThis[key] : (`${CONSTANTS.ROOTDIR}/../apps/${app}/${regThis[key]}`);
+			for (const key in regThis) regThis[key] = fs.existsSync(regThis[key].split("?")[0]) ? regThis[key] : (`${appRoot}/${regThis[key]}`);
 			apireg = {...apireg, ...regThis};
 		}
 
-		const appRoot = appObj[app];
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF_APPS}`)) decoderPathAndRoots.push(
 			{path: `${appRoot}/${CONSTANTS.API_MANAGER_DECODERS_CONF_APPS}`, root: appRoot});
 		if (fs.existsSync(`${appRoot}/${CONSTANTS.API_MANAGER_ENCODERS_CONF_APPS}`)) encoderPathAndRoots.push(
@@ -137,10 +136,10 @@ function listAPIs() {
 }
 
 async function addAPI(path, apiregentry, app) {
-	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	apireg[path] = app?`${CONSTANTS.APPROOTDIR}/${app}/${apiregentry}`:apiregentry;
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), apps = app.getApps(), approot = apps[app];
+	apireg[path] = approot?`${approot}/${apiregentry}`:apiregentry;
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
-	const regFile = app?`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
+	const regFile = approot?`${approot}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
 	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
 	regFileObj[path] = apiregentry; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
 }
@@ -148,10 +147,10 @@ async function addAPI(path, apiregentry, app) {
 const editAPI = addAPI;
 
 async function deleteAPI(path, app) {
-	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), apps = app.getApps(), approot = apps[app]
 	if (apireg[path]) delete apireg[path];
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
-	const regFile = app?`${CONSTANTS.APPROOTDIR}/${app}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
+	const regFile = approot?`${approot}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
 	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
 	if (regFileObj[path]) delete regFileObj[path]; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
 }

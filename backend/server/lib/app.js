@@ -9,8 +9,10 @@ const fs = require("fs");
 const appRoots = [];
 
 function initSync() {
-    if (fs.existsSync(CONSTANTS.APPROOTDIR)) for (const app of fs.readdirSync(CONSTANTS.APPROOTDIR)) {
-        appThis = {}; appThis[app] = `${CONSTANTS.APPROOTDIR}/${app}`; 
+    for (const approotdir of (CONSTANTS.APPROOTDIRS||[CONSTANTS.APPROOTDIR])) if (fs.existsSync(approotdir)) 
+            for (const app of fs.readdirSync(approotdir)) {
+        
+                appThis = {}; appThis[app] = `${approotdir}/${app}`; 
         appRoots.push(appThis);
     }
 }
