@@ -123,7 +123,7 @@ function createSignedJWTToken(jwtproperties) {
 }
 
 const getClaims = headersOrToken => {
-    const token = (typeof headersOrToken === "string") ? headersOrToken : getToken(headers); if (!token) return {}; 
+    const token = (typeof headersOrToken === "string") ? headersOrToken : getToken(headersOrToken); if (!token) return {}; 
     try {return JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8"))} catch (err) {return {};}
 }
 
