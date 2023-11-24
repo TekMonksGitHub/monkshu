@@ -108,6 +108,13 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
  */
 const getJWTToken = (url, tokenType) => _getAPIManagerStorage().tokenManager[`${new URL(url).host}_${tokenType?tokenType:"access"}`];
 
+/**
+ * Returns the API key for the given URL if setup
+ * @param {string} url The URL for which we need the key
+ * @returns The API key for the given URL if setup
+ */
+const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
+
 function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout) {
     type = type || "GET"; const urlHost = new URL(url).host; 
     const storage = _getAPIManagerStorage();
@@ -178,4 +185,4 @@ function _modifyAPIManagerStorage(key, value) {
     storage[key] = value;
 }
 
-export const apimanager = {rest, blob, registerAPIKeys, getJWTToken};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, getAPIKeyFor};

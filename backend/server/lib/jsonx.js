@@ -43,6 +43,6 @@ exports.parseFile = async function(path, encoding="utf8", _sync) {
  */
 exports.parseJSONX = function(jsonxContents, encoding="utf8") {
     const contentString = Buffer.isBuffer(jsonxContents) ? jsonxContents.toString(encoding) : jsonxContents;
-    const jsonContents = contentString.replace(/\s\\[\r\n]+/g, " ").replace(/\s\\[\n]/g, " ").replace(/[ \t]+[#//].*?[\r\n]/g, "");
+    const jsonContents = contentString.replace(/\s\\[\r\n]+/g, " ").replace(/\s\\[\n]/g, " ").replace(/[ \t]*[#//].*?[\r\n]/g, "").replace(/[ \t]*[#//].*?[\n]/g, "").trim();
     return JSON.parse(jsonContents);
 }

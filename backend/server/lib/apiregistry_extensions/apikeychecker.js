@@ -9,10 +9,12 @@ const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 
 const APIKEYS = ["x-api-key", "org_monkshu_apikey"];
 
-function checkSecurity(apiregentry, _url, _req, headers, _servObject, reason) {
+function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
     const keysExpected = apiregentry.query.keys?utils.escapedSplit(apiregentry.query.keys, ","):[];
     if (!keysExpected.length) return true; 
-    else for (const apiKeyHeaderName of APIKEYS) if (keysExpected.includes(headers[apiKeyHeaderName])) return true;
+    for (const apiKeyHeaderName of APIKEYS) if (keysExpected.includes(headers[apiKeyHeaderName])) return true;
+    for (const [key, value] of Object.entries(req)) 
+        if (APIKEYS.includes(key.toLowerCase()) && keysExpected.includes(value)) return true;
     
     reason.reason = "API Key Error"; reason.code = 403; return false;   // key not found in the headers
 }
