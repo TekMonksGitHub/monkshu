@@ -180,15 +180,17 @@ async function _sendFile(fileRequested, req, res, stats) {
 	}
 }
 
+const _getStringOrObjectJSON = o => {const ret = typeof o === "string"?o:JSON.stringify(o); return ret;}
+
 function _sendError(req, res, code, message) {
-	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}${message.stack?", Stack: "+message.stack:""}`);
+	error.error(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${_getStringOrObjectJSON(message)}${message.stack?", Stack: "+message.stack:""}`);
 	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();
 }
 
 function _sendCode(req, res, code, message) {
-	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${message}`);
+	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${_getStringOrObjectJSON(message)}`);
 	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
 	res.write(`${code} ${message}\n`);
 	res.end();

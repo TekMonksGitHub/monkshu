@@ -8,6 +8,8 @@ const rootdir = path.resolve(__dirname+"/../");
 const args = require(`${rootdir}/lib/processargs.js`).getArgs({"c": "conf"});
 const confdir = path.resolve(args["conf"] && args["conf"][0] ? args["conf"][0] : rootdir+"/conf");
 
+exports.MONKSHU_BACKEND = true;
+
 exports.ARGS = args;
 exports.ROOTDIR = rootdir;
 exports.CONFDIR = confdir;

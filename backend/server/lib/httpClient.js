@@ -11,7 +11,13 @@
  * Returned data is a Buffer object. It should be converted based on
  * returned MIME headers.
  */
-if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
+
+const INDEPENDENT_EXECUTION = global.CONSTANTS?.MONKSHU_BACKEND != true;    // support independent execution
+let CONSTANTS, LOG;
+if (INDEPENDENT_EXECUTION) {
+    CONSTANTS = {LIBDIR: __dirname};
+    LOG = {info: s => console.info(s), error: s => console.error(s), warn: s => console.warn(s)};
+} else {CONSTANTS = global.CONSTANTS; LOG = global.LOG;}
 
 const PROC_MEMORY = {};
 const http = require("http");
@@ -182,7 +188,7 @@ function _doCall(reqStr, options, secure, sslObj) {
                     const resHeaders = { ...headers }, status = resHeaders[http2.constants.HTTP2_HEADER_STATUS];
                     delete resHeaders[http2.constants.HTTP2_HEADER_STATUS]; resHeaders.status = status;
                     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
-                    if (!statusOK) resolve({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
+                    if (!statusOK) reject({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
                     else resolve({ error: null, data: resp, status, resHeaders });
                 });
             });
