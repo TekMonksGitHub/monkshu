@@ -33,8 +33,8 @@ async function get(key, language=getSessionLang(), refresh=false) {
 async function getI18NObject(language=getSessionLang(), refresh=false) {
 	const appPaths = session.get(APP_PATHS_SESSION_KEY), i18nCached = _getI18NSessionObject();
 	
-	if ((!i18nCached) || (i18nCached.reload) || (!i18nCached[language]) || refresh) {
-		i18nCached[language] = {i18n:{}};
+	if ((!i18nCached) || (i18nCached.reload) || (!i18nCached[language]) || refresh || _debugReloadNeeded()) {
+		i18nCached[language] = {i18n:{}}; 
 		if (appPaths) for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
 			try {
@@ -61,6 +61,13 @@ const setSessionLang = lang => session.set($$.MONKSHU_CONSTANTS.LANG_ID, lang||"
 
 const _getI18NSessionObject = _ => session.get(i18n_SESSION_KEY, {});
 const _setI18NSessionObject = i18nCached => session.set(i18n_SESSION_KEY, i18nCached);
+const _debugReloadNeeded = _ => {
+	const navigationType = window.performance?(window.performance.getEntriesByType("navigation")[0]).type:undefined;
+	if (navigationType == "reload" && (
+		$$.MONKSHU_CONSTANTS.getDebugLevel() == $$.MONKSHU_CONSTANTS.DEBUG_LEVELS.refreshOnReload || 
+		$$.MONKSHU_CONSTANTS.getDebugLevel() == $$.MONKSHU_CONSTANTS.DEBUG_LEVELS.refreshAlways)) return true;
+	return false; 
+}
 
 
 export const i18n = {init, get, getRendered, getI18NObject, setI18NObject, getSessionLang, setSessionLang, addPath};
