@@ -157,7 +157,9 @@ function _doCall(reqStr, options, secure, sslObj) {
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
-        const sendError = (error) => { reject(error); ignoreEvents = true; };
+        const sendError = (error) => { 
+            reject(error); ignoreEvents = true; 
+        };
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
         if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
@@ -190,13 +192,14 @@ function _doCall(reqStr, options, secure, sslObj) {
                     sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
                     return;
                 }
-                const statusOK = Math.trunc(headers.status / 200) == 1 && headers.status % 200 < 100;
+                let status; try{status = parseInt(headers[http2.constants.HTTP2_HEADER_STATUS]||headers.status)} catch(err) {status=500}; 
+                const statusOK = (Math.trunc(status / 200) == 1) && (status % 200 < 100);
                 if (!statusOK) sendError(`Bad status, ${headers.status}.`); else _skipProtocolErrors = true;
 
                 const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
                 resPiped.on("data", chunk => { 
-                    if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; 
+                    if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; else return;
                     if (resp.length == utils.getObjectKeyValueCaseInsensitive(headers, "content-length")) _processEnd();
                 });
                 resPiped.on("error", error => sendError(error)); 
