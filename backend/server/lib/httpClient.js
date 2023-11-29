@@ -122,7 +122,8 @@ async function _undiciRequest(url, options) {
     LOG.info(`httpClient connecting to URL ${url} via HTTP1.1 using Undici.`);
 
     const reqHeaders = _addHeaders(options.headers||{}, options.body), 
-        res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0, headers: reqHeaders});  // default accept is HTML only
+        res = await undiciMod.request(url, { method: options.method.toUpperCase(), maxRedirections: 0, 
+            headers: reqHeaders, body: options.body});  // default accept is HTML only
     
     const status = res.statusCode, resHeaders = _squishHeaders({ ...res.headers });
     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
@@ -154,7 +155,7 @@ function _doCall(reqStr, options, secure, sslObj) {
     return new Promise(async (resolve, reject) => {
         const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
-        let resp, ignoreEvents = false, resPiped;
+        let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
         const sendError = (error) => { reject(error); ignoreEvents = true; };
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
@@ -172,25 +173,34 @@ function _doCall(reqStr, options, secure, sslObj) {
                 default: return http2.constants.HTTP2_METHOD_GET;
             }})();
             const req = caller.request(http2Headers); 
-            req.on("error", (error) => { sendError(error) });
+            req.on("error", (error) => { 
+                if (_skipProtocolErrors && error.code == "ERR_HTTP2_STREAM_ERROR") return; else sendError(error) });
             req.on("response", headers => {
-                if (!_checkRequestResponseContentTypesMatch(options.headers, headers)) {
-                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
-                    return;
-                }
-
-                const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
-                if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
-                resPiped.on("data", chunk => { if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; });
-                resPiped.on("error", error => sendError(error)); 
-                resPiped.on("end", () => {
+                const _processEnd = _ => {
                     if (ignoreEvents) return;
                     const resHeaders = { ...headers }, status = resHeaders[http2.constants.HTTP2_HEADER_STATUS];
                     delete resHeaders[http2.constants.HTTP2_HEADER_STATUS]; resHeaders.status = status;
                     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
                     if (!statusOK) reject({ error: `Bad status: ${status}`, data: resp, status, resHeaders });
                     else resolve({ error: null, data: resp, status, resHeaders });
+                    caller.destroy();
+                }
+
+                if (!_checkRequestResponseContentTypesMatch(options.headers, headers)) {
+                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
+                    return;
+                }
+                const statusOK = Math.trunc(headers.status / 200) == 1 && headers.status % 200 < 100;
+                if (!statusOK) sendError(`Bad status, ${headers.status}.`); else _skipProtocolErrors = true;
+
+                const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
+                if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
+                resPiped.on("data", chunk => { 
+                    if (!ignoreEvents) resp = resp ? Buffer.concat([resp, chunk]) : chunk; 
+                    if (resp.length == utils.getObjectKeyValueCaseInsensitive(headers, "content-length")) _processEnd();
                 });
+                resPiped.on("error", error => sendError(error)); 
+                resPiped.on("end", _ => _processEnd());
             });
             if (reqStr) req.write(reqStr);
             req.end();
