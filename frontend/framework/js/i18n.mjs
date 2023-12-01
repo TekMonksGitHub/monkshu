@@ -34,7 +34,7 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 	const appPaths = session.get(APP_PATHS_SESSION_KEY), i18nCached = _getI18NSessionObject();
 	
 	if ((!i18nCached) || (i18nCached.reload) || (!i18nCached[language]) || refresh || _debugReloadNeeded()) {
-		i18nCached[language] = {i18n:{}}; 
+		i18nCached[language] = (_debugReloadNeeded && i18nCached && i18nCached[language])?i18nCached[language]:{i18n:{}}; 
 		if (appPaths) for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
 			try {
@@ -49,10 +49,12 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 	return i18nCached[language].i18n;
 }
 
-const setI18NObject = (language, i18n) => {
-	const i18nCached = _getI18NSessionObject();
-	i18nCached[language] = {i18n:{...i18nCached[language].i18n, ...i18n}};
-	_setI18NSessionObject(i18nCached);
+const setI18NObject = async (language, i18n) => {
+	const i18nCachedLanguage = await getI18NObject(language);
+	const newi18nCachedLanguage = {...i18nCachedLanguage, ...i18n};
+	const cached18nSessionObject = _getI18NSessionObject();
+	cached18nSessionObject[language].i18n = newi18nCachedLanguage;
+	_setI18NSessionObject(cached18nSessionObject);
 }
 
 const getSessionLang = _ => (session.get($$.MONKSHU_CONSTANTS.LANG_ID) || "en").toString();
