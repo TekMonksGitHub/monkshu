@@ -108,6 +108,17 @@ function registerAPIKeys(apikeys, apiKeyHeaderName) {
  */
 const getJWTToken = (url, tokenType) => _getAPIManagerStorage().tokenManager[`${new URL(url).host}_${tokenType?tokenType:"access"}`];
 
+/** 
+ * Adds JWT token (if present) for the given URL and response headers and incoming JSON response 
+ * @param {string} url The URL from which we got the token
+ * @param {Object} headers The HTTP response headers in {key: value} format
+ * @param {Object} jsonResponseObj The JSON response from the API
+ * */
+const addJWTToken = (url, headers, jsonResponseObj) => {
+    const httpResponseCompatibleHeaders = []; for (const [key, value] of Object.entries(headers)) httpResponseCompatibleHeaders.push([key, value]);
+    _extractTokens({url, headers: httpResponseCompatibleHeaders}, jsonResponseObj); 
+}
+
 /**
  * Returns the API key for the given URL if setup
  * @param {string} url The URL for which we need the key
@@ -185,4 +196,4 @@ function _modifyAPIManagerStorage(key, value) {
     storage[key] = value;
 }
 
-export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, getAPIKeyFor};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor};
