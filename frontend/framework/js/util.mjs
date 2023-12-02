@@ -232,6 +232,28 @@ const createAsyncFunction = code => {
     return newFunction;
 }
 
+/**
+ * Converts unicode string to Base64.
+ * @param {string} text The unicode string to convert to Base64.
+ * @returns Base64 of the string
+ */
+function stringToBase64(text) {
+    const bytes = new TextEncoder().encode(text);
+    const binString = String.fromCodePoint(...bytes);
+    return btoa(binString);
+}
+
+/**
+ * Converts base64 back to unicode string.
+ * @param {string} base64 Base 64 text
+ * @returns The original string in unicode.
+ */
+function base64ToString(base64) {
+    const binString = atob(base64);
+    const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+    return new TextDecoder().decode(bytes);
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
-    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction}
+    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString};
