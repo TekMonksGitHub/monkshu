@@ -13,7 +13,7 @@ function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
     const keysExpected = apiregentry.query.keys?utils.escapedSplit(apiregentry.query.keys, ","):[];
     if (!keysExpected.length) return true; 
     for (const apiKeyHeaderName of APIKEYS) if (keysExpected.includes(headers[apiKeyHeaderName])) return true;
-    for (const [key, value] of Object.entries(req)) 
+    if (utils.isObject(req)) for (const [key, value] of Object.entries(req)) 
         if (APIKEYS.includes(key.toLowerCase()) && keysExpected.includes(value)) return true;
     
     reason.reason = "API Key Error"; reason.code = 403; return false;   // key not found in the headers

@@ -254,6 +254,17 @@ function base64ToString(base64) {
     return new TextDecoder().decode(bytes);
 }
 
+/**
+ * Encodes HTML entities in the given text.
+ * @param {string} text The text to encode
+ * @returns The encoded text
+ */
+function encodeHTMLEntities(text) {
+    const textArea = document.createElement('textarea'); textArea.innerText = text;
+    return textArea.innerHTML;
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
-    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString};
+    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
+    encodeHTMLEntities};

@@ -7,6 +7,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const http2 = require("http2");
+const crypto = require("crypto");
 const mkdirAsync = require("util").promisify(fs.mkdir);
 const lstatAsync = require("util").promisify(fs.lstat);
 const readdirAsync = require("util").promisify(fs.readdir);
@@ -496,8 +497,33 @@ const convertToUnixPathEndings = (pathIn, normalize) => {
     return parts.join(path.posix.sep);
 }
 
+/**
+ * Returns true if the given argument is a Javascript object.
+ * @param {*} obj Argument to test
+ * @returns true if the given argument is a Javascript object, false otherwise.
+ */
+function isObject(obj) {
+    const isNotNative = obj === Object(obj);
+    const isNotFunction = typeof obj !== "function";
+    const isNotArray = !Array.isArray(obj);
+    return isNotArray && isNotFunction && isNotNative;
+}
+
+/**
+ * Returns a hash for the object. Same object properties should hash the 
+ * same.
+ * @param {Object} obj The object to hash.
+ * @returns The MD5 hash.
+ */
+function hashObject(obj) { 
+    let combinedString = "";
+    for (const key of Object.keys(obj).sort()) combinedString += `${key}:${obj[key]}`;
+    return crypto.createHash("md5").update(combinedString).digest("hex");
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
-    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings };
+    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings,
+    isObject, hashObject };
