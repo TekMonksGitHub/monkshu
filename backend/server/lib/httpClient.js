@@ -32,63 +32,69 @@ const gunzipAsync = require("util").promisify(zlib.gunzip);
 
 let undiciMod;  // holds the undici module if it is available
 
-function post(host, port, path, headers, req, sslObj, callback) {
+function post(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; const body = req; _addHeaders(headers, body);
     const optionspost = { host, port, path, method: 'POST', headers };
-    const result = _doCall(body, optionspost, false, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(body, optionspost, false, sslObj, proxy) : _doCall(body, optionspost, false, sslObj); 
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function postHttps(host, port, path, headers, req, sslObj, callback) {
+function postHttps(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; const body = req; _addHeaders(headers, body);
     const optionspost = { host, port, path, method: 'POST', headers };
-    const result = _doCall(body, optionspost, true, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(body, optionspost, true, sslObj, proxy) : _doCall(body, optionspost, true, sslObj);
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function put(host, port, path, headers, req, sslObj, callback) {
+function put(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; const body = req; _addHeaders(headers, body);
     const optionsput = { host, port, path, method: 'PUT', headers };
-    const result = _doCall(body, optionsput, false, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(body, optionsput, false, sslObj, proxy) : _doCall(body, optionsput, false, sslObj);
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function putHttps(host, port, path, headers, req, sslObj, callback) {
+function putHttps(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; const body = req; _addHeaders(headers, body);
     const optionsput = { host, port, path, method: 'PUT', headers };
-    const result = _doCall(body, optionsput, true, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(body, optionsput, true, sslObj, proxy) : _doCall(body, optionsput, true, sslObj);
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function get(host, port, path, headers, req, sslObj, callback) {
+function get(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; _addHeaders(headers, null);
     if (req && typeof req == "object") req = querystring.stringify(req); if (req && req.trim() !== "") path += `?${req}`; 
     const optionsget = { host, port, path, method: 'GET', headers };
-    const result = _doCall(null, optionsget, false, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(null, optionsget, false, sslObj, proxy) : _doCall(null, optionsget, false, sslObj);
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function getHttps(host, port, path, headers = {}, req, sslObj, callback) {
+function getHttps(host, port, path, headers = {}, req, proxy, sslObj, callback) {
     headers = headers||{}; _addHeaders(headers, null);
     if (req && typeof req == "object") req = querystring.stringify(req); if (req && req.trim() !== "") path += `?${req}`; 
     const optionsget = { host, port, path, method: 'GET', headers };
-    const result = _doCall(null, optionsget, true, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(null, optionsget, true, sslObj, proxy) : _doCall(null, optionsget, true, sslObj);
+    if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function deleteHttp(host, port, path, headers, req, sslObj, callback) {
+function deleteHttp(host, port, path, headers, req, proxy, sslObj, callback) {
     headers = headers||{}; _addHeaders(headers, null);
     if (req && typeof req == "object") req = querystring.stringify(req); if (req && req.trim() !== "") path += `?${req}`; 
     const optionsdelete = { host, port, path, method: 'DELETE', headers };
-    const result = _doCall(null, optionsdelete, false, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(null, optionsdelete, false, sslObj, proxy) : _doCall(null, optionsdelete, false, sslObj); if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
-function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
+function deleteHttps(host, port, path, headers = {}, req, proxy, sslObj, callback) {
     headers = headers||{}; _addHeaders(headers, null);
     if (req && typeof req == "object") req = querystring.stringify(req); if (req && req.trim() !== "") path += `?${req}`; 
     const optionsdelete = { host, port, path, method: 'DELETE', headers };
-    const result = _doCall(null, optionsdelete, true, sslObj); if (!callback) return result;
+    const result = proxy? _connectProxy(null, optionsdelete, true, sslObj, proxy) :_doCall(null, optionsdelete, true, sslObj); if (!callback) return result;
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
@@ -151,9 +157,49 @@ function _addHeaders(headers, body) {
 
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
-function _doCall(reqStr, options, secure, sslObj) {
+function _connectProxy(reqStr, options, secure, sslObj, proxy) {
     return new Promise(async (resolve, reject) => {
-        const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
+        const proxyOptions = {
+            hostname: proxy.host,
+            port: proxy.port,
+            method: 'CONNECT',
+            path: `${options.host}:${options.port}`,
+            headers: {
+                'Proxy-Connection': 'keep-alive',
+            },
+        };
+
+        //Connect to proxy server on HTTP/1.1
+        LOG.info(`Connecting to proxy server on ${proxyOptions.hostname}:${proxyOptions.port} via HTTP/1.1`)
+        const proxyReq = proxy.secure ? https.request(proxyOptions) : http.request(proxyOptions);
+        proxyReq.end();
+
+        
+        proxyReq.on('connect', (res, socket) => {
+            proxyStatus = res.statusCode;
+            LOG.info(`Status of the proxy connect ${proxyStatus}`);
+            if (proxyStatus === 200) {
+                _doCall(reqStr, options, secure, sslObj, socket)
+                .then(({ data, status, resHeaders, error }) => resolve({error, data, status, resHeaders}))
+                .catch(error => reject({error: error}));
+            }
+            else {
+                LOG.error('Connection to the proxy failed');
+                reject({error: `Bad status ${proxyStatus}`, data: res, status: proxyStatus, resHeaders: null});
+            }
+        });
+
+        proxyReq.on('error', (err) => {
+            LOG.error('Error connecting to the proxy:', err);
+            reject(err);
+        });
+    });
+
+}
+
+function _doCall(reqStr, options, secure, sslObj, socket) {
+    return new Promise(async (resolve, reject) => {
+        const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`, { socket }) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false;
         if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };

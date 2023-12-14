@@ -13,62 +13,62 @@ if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	
 
 const httpClient = require(CONSTANTS.LIBDIR + "/httpClient.js");
 
-async function post(host, port, path, headers, req, sslObj, callback) {
+async function post(host, port, path, headers, req, proxy, sslObj, callback) {
     const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; headers = _getRESTHeaders(headers);
     try {
-        const result = await httpClient.post(host, port, path, headers, jsonStr, sslObj); 
+        const result = await httpClient.post(host, port, path, headers, jsonStr, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function postHttps(host, port, path, headers, req, sslObj, callback) {
+async function postHttps(host, port, path, headers, req, proxy, sslObj, callback) {
     const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; headers = _getRESTHeaders(headers);
     try {
-        const result = await httpClient.postHttps(host, port, path, headers, jsonStr, sslObj); 
+        const result = await httpClient.postHttps(host, port, path, headers, jsonStr, proxy, sslObj); 
         if ((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function put(host, port, path, headers, req, sslObj, callback) {
+async function put(host, port, path, headers, req, proxy, sslObj, callback) {
     const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req; headers = _getRESTHeaders(headers);
     try {
-        const result = await httpClient.put(host, port, path, headers, jsonStr, sslObj); 
+        const result = await httpClient.put(host, port, path, headers, jsonStr, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function putHttps(host, port, path, headers, req, sslObj, callback) {
+async function putHttps(host, port, path, headers, req, proxy, sslObj, callback) {
     const jsonStr = typeof (req) == "object" ? JSON.stringify(req) : req;  headers = _getRESTHeaders(headers);
     try {
-        const result = await httpClient.putHttps(host, port, path, headers, jsonStr, sslObj); 
+        const result = await httpClient.putHttps(host, port, path, headers, jsonStr, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function get(host, port, path, headers, req, sslObj, callback) {
+async function get(host, port, path, headers, req, proxy, sslObj, callback) {
     try {
-        const result = await httpClient.get(host, port, path, headers, req, sslObj); 
+        const result = await httpClient.get(host, port, path, headers, req, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function getHttps(host, port, path, headers, req, sslObj, callback) {
+async function getHttps(host, port, path, headers, req, proxy, sslObj, callback) {
     try {
-        const result = await httpClient.getHttps(host, port, path, headers, req, sslObj); 
+        const result = await httpClient.getHttps(host, port, path, headers, req, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function deleteHttp(host, port, path, headers, _req, sslObj, callback) {
+async function deleteHttp(host, port, path, headers, _req, proxy, sslObj, callback) {
     try {
-        const result = await httpClient.deleteHttp(host, port, path, headers, _req, sslObj); 
+        const result = await httpClient.deleteHttp(host, port, path, headers, _req, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
 
-async function deleteHttps(host, port, path, headers, _req, sslObj, callback) {
+async function deleteHttps(host, port, path, headers, _req, proxy, sslObj, callback) {
     try {
-        const result = await httpClient.deleteHttps(host, port, path, headers, _req, sslObj); 
+        const result = await httpClient.deleteHttps(host, port, path, headers, _req, proxy, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
 }
