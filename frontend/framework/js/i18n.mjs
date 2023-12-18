@@ -25,7 +25,7 @@ const getRendered = async (key, data, language=getSessionLang(), refresh=false) 
 
 async function get(key, language=getSessionLang(), refresh=false) {
 	try {
-		const i18nObject = await getI18NObject(language, refresh); _setI18NSessionObject({});
+		const i18nObject = await getI18NObject(language, refresh); 
 		return i18nObject[key];
 	} catch (err) {throw err}
 }
@@ -38,8 +38,9 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 		if (appPaths) for (const appPath of appPaths) {
 			const i18nThisAppPath = `${appPath}/i18n/i18n_${language}.mjs`;
 			try {
-				const i18nBundle = await import(i18nThisAppPath);
-				i18nCached[language].i18n = {...i18nCached[language].i18n, ...i18nBundle.i18n};
+				const i18nBundle = await import(i18nThisAppPath), loadedBundle = i18nBundle.i18n, 
+					cachedObject = i18nCached[language].i18n;
+				i18nCached[language].i18n = {...cachedObject, ...loadedBundle};
 			} catch (err) {LOG.error(`Error importing i18n bundle for apppath ${appPath}. Error is ${err}.`);}
 		}
 		i18nCached.reload = false;

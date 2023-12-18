@@ -22,5 +22,8 @@ export async function bootstrap(appPath, confPath) {
 
 async function _loadFrameworkLibs() {
 	const libs = await $$.requireJSON(`${$$.MONKSHU_CONSTANTS.CONFDIR}/frameworklibs.json`);
-	for (const lib of libs) window.monkshu_env.frameworklibs[lib] = (await import(`${$$.MONKSHU_CONSTANTS.LIBDIR}/${lib}.mjs`))[lib];
+	for (const lib of libs) {
+		window.monkshu_env.frameworklibs[lib] = (await import(`${$$.MONKSHU_CONSTANTS.LIBDIR}/${lib}.mjs`))[lib];
+		$$[`lib${lib}`] = window.monkshu_env.frameworklibs[lib];
+	}
 }

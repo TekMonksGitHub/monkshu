@@ -30,25 +30,31 @@ class NativeWrapper {   // allows proxying strings and numbers
     toJSON() {return this.native;}
 }
 
-function _getProxy(object, key) {
+function _getProxy(object, sessionKey) {
+    const _isProxyAlready = object => object["_______org_monkshu_clientwebsession_wrapped_object_______"] != null;
+    const _getObjectToWrap = object => typeof object == "string" || typeof object == "number" || 
+        typeof object == "boolean" || typeof object == "bigint" ? new NativeWrapper(object) : object;
+    
     const handler = {
         set(target, property, value) {  // modify session object
             target[property] = value;
-            session.set(key, object);
+            session.set(sessionKey, object);
             return true;    // we were able to modify the property
         },
 
-        get(target, name) { // intercept for NativeWrappers to convert them to JSON
-            if (name == "toJSON") {return target.toJSON} 
-            if (name == "_______org_monkshu_clientwebsession_wrapped_object_______") return object;
-            else if (typeof target[name] === "object" && target[name] !== null) return new Proxy(target[name], handler);
-            else return target[name];
+        get(target, property) { // intercept for NativeWrappers to convert them to JSON
+            if (property == "toJSON") {return target.toJSON} 
+            if (property == "_______org_monkshu_clientwebsession_wrapped_object_______") return target;
+            else if ( (typeof target[property] === "object") && (target[property] !== null) ) {
+                const objectToWrap = _getObjectToWrap(target[property]);
+                if (_isProxyAlready(objectToWrap)) return objectToWrap; else return new Proxy(objectToWrap, handler);
+            }
+            else return target[property];
         }
     }
 
-    const isProxyAlready = object["_______org_monkshu_clientwebsession_wrapped_object_______"] != null;
-    if (isProxyAlready) return object; else return new Proxy(
-        typeof object == "string" || typeof object == "number" || typeof object == "boolean" || typeof object == "bigint"?new NativeWrapper(object):object, handler);
+    const objectToWrap = _getObjectToWrap(object);
+    if (_isProxyAlready(objectToWrap)) return objectToWrap; else return new Proxy(objectToWrap, handler);
 }
 
 export const session = {set, get, remove, destroy, contains, keys};
