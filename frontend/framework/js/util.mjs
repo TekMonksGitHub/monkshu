@@ -264,7 +264,12 @@ function encodeHTMLEntities(text) {
     return textArea.innerHTML;
 }
 
+function htmlToDOMNodes(html) {
+    const throwAwayElement= document.createElement("div"); throwAwayElement.innerHTML= html;
+    const domNodes = throwAwayElement.childNodes; return domNodes;
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
     removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
-    encodeHTMLEntities};
+    encodeHTMLEntities, htmlToDOMNodes};
