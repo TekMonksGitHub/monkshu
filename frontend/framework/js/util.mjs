@@ -264,12 +264,48 @@ function encodeHTMLEntities(text) {
     return textArea.innerHTML;
 }
 
+/**
+ * Returns nested object property.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @return The property requested or null if it doesn't exist
+ */
+function getObjProperty(object, path) {
+    let currentPathObj = object; 
+    const pathSplits = _getObjectPathSplits(path), pathsToWalk = pathSplits.slice(0, -1), 
+      lastElement = pathSplits[pathSplits.length-1];
+    for (const pathElement of pathsToWalk) {
+      if (currentPathObj[pathElement]) currentPathObj = currentPathObj[pathElement];
+      else return null; // found null in-between
+    }
+    return currentPathObj[lastElement];
+}
+
+/**
+ * Parses HTML to DOM nodes.
+ * @param {string} html HTML to parse
+ * @returns DOM nodes as a NodeList
+ */
 function htmlToDOMNodes(html) {
     const throwAwayElement= document.createElement("div"); throwAwayElement.innerHTML= html;
     const domNodes = throwAwayElement.childNodes; return domNodes;
 }
 
+/**
+ * Returns object path splits as an array. Internal only.
+ * @param {string} path The object path
+ * @returns The object path splits as an array.
+ */
+function _getObjectPathSplits(path) {
+    const dotSplits = path.split("."), final = []; 
+    for (const element of dotSplits) for (const indexElement of element.split("[")) if (indexElement.endsWith("]")) {   // handle array type indexes
+        const index = indexElement.substring(0, indexElement.length-1);
+        final.push(parseInt(index, 10).toString() === index.toString()?parseInt(index, 10):index); 
+    } else final.push(indexElement); 
+    return final;
+}
+
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
     removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
-    encodeHTMLEntities, htmlToDOMNodes};
+    encodeHTMLEntities, htmlToDOMNodes, getObjProperty};
