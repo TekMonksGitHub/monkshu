@@ -516,8 +516,8 @@ function isObject(obj) {
  * @returns The MD5 hash.
  */
 function hashObject(obj) { 
-    let combinedString = "";
-    for (const key of Object.keys(obj).sort()) combinedString += `${key}:${obj[key]}`;
+    const combinedString = typeof obj !== "object" ? obj.toString() : 
+        Object.entries(obj).reduce((accumulator, [key, value]) => accumulator += `${key}:${value.toString()}`, "");
     return crypto.createHash("md5").update(combinedString).digest("hex");
 }
 
