@@ -437,7 +437,7 @@ function generateUUID(useDashes=true) { // Public Domain/MIT: from https://stack
  */
 function createAsyncFunction(code) {
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-    const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
+    const newFunction = context => new AsyncFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
     return newFunction;
 }
 
@@ -516,6 +516,7 @@ function isObject(obj) {
  * @returns The MD5 hash.
  */
 function hashObject(obj) { 
+    if (!obj) return undefined;
     const combinedString = typeof obj !== "object" ? obj.toString() : 
         Object.entries(obj).reduce((accumulator, [key, value]) => accumulator += `${key}:${value.toString()}`, "");
     return crypto.createHash("md5").update(combinedString).digest("hex");

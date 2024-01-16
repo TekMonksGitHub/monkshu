@@ -108,10 +108,10 @@ async function checkSecurity(url, req, headers, servObject, reason) {
 	const allSecurityCheckers = [...securitycheckers];
 	if (apiregentry.query.customSecurity) for (const securityCheckerCustom of utils.escapedSplit(apiregentry.query.customSecurity, ","))
 		allSecurityCheckers.push(global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[securityCheckerCustom]);
-	for (const securitycheckerThis of allSecurityCheckers) if (!(await securitycheckerThis.checkSecurity(apiregentry, endPoint, 
-		req, headers, servObject, reason))) { 
-			reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
-			return false; 
+	for (const securitycheckerThis of allSecurityCheckers) if (securitycheckerThis && 
+			(!(await securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject, reason)))) { 
+		reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
+		return false; 
 	}
 
 	return true;

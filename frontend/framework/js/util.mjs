@@ -228,7 +228,7 @@ function generateUUID(useDashes=true) { // Public Domain/MIT: from https://stack
  */
 const createAsyncFunction = code => {
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-    const newFunction = context => new AsyncFunction(Object.keys(context).join(","), code)(...Object.values(context));
+    const newFunction = context => new AsyncFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
     return newFunction;
 }
 
