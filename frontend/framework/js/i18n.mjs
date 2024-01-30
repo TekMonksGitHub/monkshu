@@ -2,7 +2,6 @@
  * (C) 2018-2021 TekMonks. All rights reserved.
  * License: See enclosed LICENSE file.
  */
-import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 
 const i18n_SESSION_KEY = "__org_monkshu_i18n_session_key__", APP_PATHS_SESSION_KEY = "__org_monkshu_i18n_app_paths";
@@ -20,8 +19,10 @@ const addPath = additionalPath => {
 	_setI18NSessionObject(i18nObject);	/* need to recache */
 }
 
-const getRendered = async (key, data, language=getSessionLang(), refresh=false) => (await router.getMustache()).render(
-	await get(key, language, refresh), data);
+const getRendered = async (key, data, language=getSessionLang(), refresh=false) => {
+	const {router} = await import("/framework/js/router.mjs");
+	return (await router.getMustache()).render(await get(key, language, refresh), data); 
+}
 
 async function get(key, language=getSessionLang(), refresh=false) {
 	try {

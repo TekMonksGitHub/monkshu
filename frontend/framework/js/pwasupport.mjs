@@ -4,7 +4,6 @@
  * License: See enclosed LICENSE file.
  */
 import {util} from "./util.mjs";
-import {router} from "./router.mjs";
 import {blackboard} from "/framework/js/blackboard.mjs";
 
 const FRAMEWORK_FILELIST = `/framework/${$$.MONKSHU_CONSTANTS.CACHELIST_SUFFIX}`, 
@@ -125,6 +124,7 @@ async function _versionChecker(appName, manifestOld, manifestNew, listOfFilesToC
         serviceWorker.postMessage({id: $$.MONKSHU_CONSTANTS.CACHEWORKER_MSG, op: "unserveAllVersionsExcept", 
             appName, except_version: manifestNew.version});
 
+        const {router} = await import("/framework/js/router.mjs");
         if (postSwitchActions.length) for (const action of postSwitchActions) action();
         else setTimeout(router.hardreload, PAGE_RELOAD_ON_UPGRADE_INTERVAL);    // else hard reload in 0.5 seconds - this gives time to the service worker to switch cache and request handlers
     });
