@@ -86,7 +86,7 @@ Logger.prototype.overrideConsole = function() {
 	}
 	process.on("uncaughtException", function(err) {
 		parentLogObject.error(err && err.stack ? err.stack : err, true);
-		const currentStack = new Error().stack; parentLogObject.error(currentStack);
+		const currentStack = new Error().stack; parentLogObject.error(currentStack, true);
 		parentLogObject.error("EXIT ON CRITICAL ERROR!!!", true);
 		parentLogObject._oldStderrWrite.call(process.stderr, "EXIT ON CRITICAL ERROR!!! Check Logs.\n");
 		process.exit(1);
