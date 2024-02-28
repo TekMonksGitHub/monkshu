@@ -194,7 +194,7 @@ function _doCall(reqStr, options, secure, sslObj) {
                 }
                 let status; try{status = parseInt(headers[http2.constants.HTTP2_HEADER_STATUS]||headers.status)} catch(err) {status=500}; 
                 const statusOK = (Math.trunc(status / 200) == 1) && (status % 200 < 100);
-                if (!statusOK) sendError(`Bad status, ${headers.status}.`); else _skipProtocolErrors = true;
+                if (!statusOK) sendError({ message: `Bad status: ${status}`, status }); else _skipProtocolErrors = true;
 
                 const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;

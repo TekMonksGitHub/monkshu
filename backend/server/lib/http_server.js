@@ -77,6 +77,11 @@ function statusInternalError(servObject, _error) {
 	servObject.res.write("Internal error\n");
 }
 
+function statusTimeOut(servObject) {
+    servObject.res.writeHead(504, _squishHeaders({...HEADER_ERROR, ...conf.headers,status:504}));
+    servObject.res.write("Api Timeout\n");
+}
+
 function statusOK(headers, servObject, dontGZIP) {
 	const confHeaders = _cloneLowerCase(conf.headers);
 	const headersIn = _cloneLowerCase(headers);
@@ -123,4 +128,4 @@ const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
-	statusInternalError, statusOK, write, end, blacklistIP, whitelistIP}
+	statusInternalError, statusTimeOut, statusOK, write, end, blacklistIP, whitelistIP}
