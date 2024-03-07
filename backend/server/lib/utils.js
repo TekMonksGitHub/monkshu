@@ -462,7 +462,7 @@ function getLocalIPs(v4Only) {
  * @returns If it resolves returns the result (or true on success). On failure it returns false.
  */
 const promiseExceptionToBoolean = async promiseToWait => {
-    try{const result = await promiseToWait; return result||true;} catch(err) {return false;} }
+    try{const result = await promiseToWait; return result||true;} catch(err) {LOG.error(err); return false;} }
 
 
 /**
