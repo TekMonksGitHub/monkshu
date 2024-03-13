@@ -48,10 +48,11 @@ function _queueExecutionFunction() {
     
     const workItem = queue.pop(); 
     setTimeout(async _=> {
-        if (workItem.isAsync) await workItem.functionToCall(...workItem.params);
-        else workItem.functionToCall(...workItem.params);
-        if (workItem.callback) workItem.callback(); 
-        if (workItem.promiseResolver) workItem.promiseResolver();
+        let functionReturnedValue;
+        if (workItem.isAsync) functionReturnedValue = await workItem.functionToCall(...workItem.params);
+        else functionReturnedValue = workItem.functionToCall(...workItem.params);
+        if (workItem.callback) workItem.callback(functionReturnedValue); 
+        if (workItem.promiseResolver) workItem.promiseResolver(functionReturnedValue);
         _queueExecutionFunction();  // run the next item now
     }, workItem.delay);
 }
