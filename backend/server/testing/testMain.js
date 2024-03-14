@@ -1,20 +1,28 @@
 /**
- * Tests the vector DB and algorithms within it.
+ * Runs embedded app's test cases.
  * 
  * (C) 2023 Tekmonks. All rights reserved.
  */
 
 const fs = require("fs");
 const path = require("path");
-const SERVER_ROOT = path.resolve(`${__dirname}/../../../server`);
+const SERVER_ROOT = path.resolve(`${__dirname}/../`);
 
 async function runTestsAsync(argv) {
-    const allfiles = fs.readdirSync(__dirname);
+	const testCasesDir = path.resolve(argv[0]);
+    const allfiles = fs.readdirSync(testCasesDir);
     for (const fileEntry of allfiles) if (fileEntry.toLowerCase().startsWith("test") && 
-			fileEntry.toLowerCase().endsWith(".js")  && (fileEntry != path.basename(__filename))) {
+		fileEntry.toLowerCase().endsWith(".js") && (fileEntry != path.basename(__filename))) {
 
-		const testModule = require(`${__dirname}/${fileEntry}`);
-		await testModule.runTestsAsync(argv);
+		const testModule = require(`${testCasesDir}/${fileEntry}`);
+		if (testModule.runTestsAsync) try {await testModule.runTestsAsync(argv.slice(1));} catch (err) {
+			LOG.error(`Testcase ${fileEntry} failed with error ${err}\n`);
+			LOG.console(`Testcase ${fileEntry} failed with error ${err}\n`);
+		}
+		else {
+			const errorMsg = `Skipping ${fileEntry} as it is not a proper test case module.`;
+			LOG.warn(errorMsg); LOG.console(errorMsg);
+		}
 	}
 }
 
@@ -67,9 +75,10 @@ function setupServerEnvironmentForTesting() {
 	
 	/* Try to init the apps themselves */
 	LOG.info("Initializing the apps.");
-	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync();} catch (err) {
-		LOG.console(`Error initializing the apps ${err}.`);
-		LOG.error(`Error initializing the apps ${err}.`);
+	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync()} catch (err) {
+		LOG.console(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack+"\n":""}`);
+		LOG.error(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack:""}`);
+		throw err;	// stop the test environment as app init failed
 	}
 
 	/* Log the start */
@@ -78,6 +87,10 @@ function setupServerEnvironmentForTesting() {
 }
 
 async function main(argv) {
+	if (!argv[0]) {
+		console.error(`Usage: ${__filename} [app tests folder path] [...other params]`);
+		exit(1);
+	}
     setupServerEnvironmentForTesting();    // init the server environment only
 
     await runTestsAsync(argv); // run the tests
