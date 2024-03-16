@@ -9,5 +9,5 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 pushd .
 cd "$DIR"
-node "$DIR/server.js" $*
+node --preserve-symlinks --trace-warnings "$DIR/server.js" $*
 popd
