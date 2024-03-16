@@ -15,12 +15,17 @@ async function runTestsAsync(argv) {
 		fileEntry.toLowerCase().endsWith(".js") && (fileEntry != path.basename(__filename))) {
 
 		const testModule = require(`${testCasesDir}/${fileEntry}`);
-		if (testModule.runTestsAsync) try {await testModule.runTestsAsync(argv.slice(1));} catch (err) {
-			LOG.error(`Testcase ${fileEntry} failed with error ${err}\n`);
-			LOG.console(`Testcase ${fileEntry} failed with error ${err}\n`);
+		if (testModule.runTestsAsync) try {
+			let result; 
+			if (await testModule.runTestsAsync(argv.slice(1))) result = `Testcase ${fileEntry} succeeded.\n\n`;
+			else result = `Testcase ${fileEntry} failed with error false\n\n`;
+			LOG.error(result); LOG.console(result);
+		} catch (err) {
+			const error = `Testcase ${fileEntry} failed with error ${err}\n\n`;
+			LOG.error(error); LOG.console(error);
 		}
 		else {
-			const errorMsg = `Skipping ${fileEntry} as it is not a proper test case module.`;
+			const errorMsg = `Skipping ${fileEntry} as it is not a proper test case module.\n\n`;
 			LOG.warn(errorMsg); LOG.console(errorMsg);
 		}
 	}
