@@ -101,7 +101,8 @@ Logger.prototype.getLogContents = function(callback) {
 }
 
 Logger.prototype.writeFile = function(level, s, sync) {
-	const msg = JSON.stringify({ts: utils.getDateTime(), level, message: s})+"\n";
+	const caller = _getCaller(), fileInfo = `${caller.filename}:${caller.line}:${caller.column}`;
+	const msg = JSON.stringify({ts: utils.getDateTime(), level, file: fileInfo, message: s})+"\n";
 	const _errorHandler = err => {
 		this._origLog("Logger error!\n"+err);
 		this._origLog(msg);
@@ -121,3 +122,14 @@ Logger.prototype.writeFile = function(level, s, sync) {
 Logger.prototype.flush = function(callback) {
 	const timer = setInterval(_=>{if (!this.filewriter.areTherePendingWrites()) {clearInterval(timer); callback();}}, 100);
 }
+
+function _getCaller() {
+	const e = new Error(); let callingFileLine;
+	for (const stackLine of e.stack.toString().split("\n").slice(1)) 
+		if (stackLine.indexOf(__filename) == -1) {callingFileLine = stackLine; break;}
+	if (!callingFileLine) callingFileLine = e.stack.toString().split("\n")[2];
+	const regex = /^.+\s[(]?(.*):(\d+):(\d+)[)]?$/;
+	const match = regex.exec(callingFileLine);
+	if (match) return {filename: match[1], line: match[2], column: match[3]}; 
+	else return {filename: "unknown", line: -1, column: -1}
+  }
