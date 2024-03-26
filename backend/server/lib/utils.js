@@ -522,9 +522,31 @@ function hashObject(obj) {
     return crypto.createHash("md5").update(combinedString).digest("hex");
 }
 
+/**
+ * Converts unicode string to Base64.
+ * @param {string} text The unicode string to convert to Base64.
+ * @returns Base64 of the string
+ */
+function stringToBase64(text) {
+    const bytes = new TextEncoder().encode(text);
+    const binString = String.fromCodePoint(...bytes);
+    return btoa(binString);
+}
+
+/**
+ * Converts base64 back to unicode string.
+ * @param {string} base64 Base 64 text
+ * @returns The original string in unicode.
+ */
+function base64ToString(base64) {
+    const binString = atob(base64);
+    const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+    return new TextDecoder().decode(bytes);
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings,
-    isObject, hashObject };
+    isObject, hashObject, stringToBase64, base64ToString };
