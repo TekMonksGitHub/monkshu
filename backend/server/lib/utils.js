@@ -544,9 +544,25 @@ function base64ToString(base64) {
     return new TextDecoder().decode(bytes);
 }
 
+/**
+ * Returns memory size in bytes of the object.
+ * @param {object} object Object whose memory size if needed
+ * @returns The memory size in bytes of the object.
+ */
+function objectMemSize(object) {
+    if (typeof object === "number") return 8;
+    if (typeof object === "string") return 2*object.length;
+    if (typeof object === "boolean") return 4;
+    if (typeof object === "object") {
+        let size = 0; for (const value of Object.values(object)) size += sizeof(value);
+        return size;
+    }
+    return object.toString().length*2;
+}
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings,
-    isObject, hashObject, stringToBase64, base64ToString };
+    isObject, hashObject, stringToBase64, base64ToString, objectMemSize };
