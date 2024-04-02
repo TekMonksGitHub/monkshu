@@ -18,7 +18,7 @@ function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
 function encodeResponse(apiregentry, _url, respObj, reqHeaders, respHeaders, _servObject) {
     if (!acceptsJSON(apiregentry, reqHeaders)) return respObj;   // can't handle
 
-    if (utils.getObjectKeyValueCaseInsensitive(respHeaders,"Content-Type").toLowerCase() != "application/json") return respObj;   // can't handle
+    if (!utils.getObjectKeyValueCaseInsensitive(respHeaders,"Content-Type").toLowerCase().includes("application/json")) return respObj;   // can't handle
 
     return JSON.stringify(respObj);
 }
