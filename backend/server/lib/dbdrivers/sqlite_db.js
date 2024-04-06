@@ -94,14 +94,22 @@ async function _createDB(dbPath, dbCreationSQLs) {
 }
 
 function _openDB(dbPath) {
-    return new Promise(resolve => {
-        if (!dbInstance[dbPath]) dbInstance[dbPath] = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE|sqlite3.OPEN_CREATE, err => {
-            if (err) {LOG.error(`Error opening DB, ${err}`); dbInstance[dbPath] = null; resolve(false);} 
-            else {
-                dbRunAsync[dbPath] = util.promisify(dbInstance[dbPath].run.bind(dbInstance[dbPath])); 
-                dbAllAsync[dbPath] = util.promisify(dbInstance[dbPath].all.bind(dbInstance[dbPath])); 
-                resolve(true);
-            }
-        }); else resolve(true);
+    const dbOpenPromise = new Promise(async resolve => {
+        if (!dbInstance[dbPath]) {
+            const dbInstanceTemp = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE|sqlite3.OPEN_CREATE, err => {
+                if (err) {LOG.error(`Error opening DB, ${err}`); dbInstance[dbPath] = null; resolve(false);} 
+                else {
+                    dbRunAsync[dbPath] = util.promisify(dbInstanceTemp.run.bind(dbInstanceTemp)); 
+                    dbAllAsync[dbPath] = util.promisify(dbInstanceTemp.all.bind(dbInstanceTemp)); 
+                    dbInstance[dbPath] = dbInstanceTemp;
+                    resolve(true);
+                }
+            }); 
+        } 
+        else if (dbInstance[dbPath] instanceof Promise) {
+            const result = await dbInstance[dbPath]; resolve(result) }
+        else return resolve(true);  
     });
+    if (!dbInstance[dbPath]) dbInstance[dbPath] = dbOpenPromise;
+    return dbOpenPromise;
 }
