@@ -554,7 +554,7 @@ function objectMemSize(object) {
     if (typeof object === "string") return 2*object.length;
     if (typeof object === "boolean") return 4;
     if (typeof object === "object") {
-        let size = 0; for (const value of Object.values(object)) size += sizeof(value);
+        let size = 0; for (const value of Object.values(object)) size += objectMemSize(value);
         return size;
     }
     return object.toString().length*2;
