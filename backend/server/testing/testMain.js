@@ -16,10 +16,10 @@ async function runTestsAsync(argv) {
 
 		const testModule = require(`${testCasesDir}/${fileEntry}`);
 		if (testModule.runTestsAsync) try {
-			let result; 
-			if (await testModule.runTestsAsync(argv.slice(1))) result = `Testcase ${fileEntry} succeeded.\n\n`;
-			else result = `Testcase ${fileEntry} failed with error false\n\n`;
-			LOG.error(result); LOG.console(result);
+			let resultLog; const testResult = await testModule.runTestsAsync(argv.slice(1));
+			if (testResult) resultLog = `Testcase ${fileEntry} succeeded.\n\n`;
+			else resultLog = `Testcase ${fileEntry} failed with error false\n\n`;
+			LOG[testResult?"info":"error"](resultLog); LOG.console(resultLog);
 		} catch (err) {
 			const error = `Testcase ${fileEntry} failed with error ${err}\n\n`;
 			LOG.error(error); LOG.console(error);
