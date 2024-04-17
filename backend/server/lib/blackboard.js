@@ -28,10 +28,11 @@ function init() {
     });
     process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
     process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
+    if (!conf.replicas) conf.replicas = []; // init to empty list if not provided
 }
 
-async function doService(request) {
-    if (request.type == BLACKBOARD_MSG) {
+async function doService(request) { 
+    if (request.type == BLACKBOARD_MSG) {   // received network message
         if (process.send) (process.send({type: BLACKBOARD_MSG, msg: request.msg}));
         else _broadcast(request.msg);
         return CONSTANTS.TRUE_RESULT;
@@ -51,9 +52,10 @@ async function publish(topic, payload) {
         } catch (err) { LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}.`); failedReplicas++; }
     }
 
-    if (failedReplicas == conf.replicas.length) {   // if network is down or if all replicas are misconfigured, then at least broadcast to the local node so that applications relying on the blackboard keep running
+    if ((!conf.replicas.length) || (failedReplicas == conf.replicas.length)) {   // if network is down or if all replicas are misconfigured, then at least broadcast to the local node so that applications relying on the blackboard keep running
         LOG.error(`Failed to reach all replicas. Assuming network isolated topology. Broadcasting the message locally.`);
-        _broadcast({topic, payload});
+        if (process.send) process.send({type: BLACKBOARD_MSG, msg:{topic, payload}});   // broadcast to the local cluster if no replicas working
+        else _broadcast({topic, payload});  // if no local cluster then just give up and send to the local applications
     }
 }
 
