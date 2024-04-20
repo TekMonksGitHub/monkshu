@@ -77,10 +77,10 @@ function _broadcast(msg) {
     const topic = msg.topic;
     if (topics[topic]) for (const subscriber of topics[topic]) {
         const {callback, options} = subscriber;
-        if (!options) callback(msg.payload);    // no options means receive all the time
-        else if (options[module.exports.LOCAL_ONLY]) {if (msg.processid == process.pid) callback(msg.payload); continue;}
-        else if (options[module.exports.EXTERNAL_ONLY]) {if (msg.processid != process.pid) callback(msg.payload); continue;}
-        else callback(msg.payload); // no valid option - so send it out still
+        if (!options) {callback(msg.payload); continue;}  // no options means receive all the time
+        if (options[module.exports.LOCAL_ONLY]) {if (msg.processid == process.pid) callback(msg.payload); continue;}
+        if (options[module.exports.EXTERNAL_ONLY]) {if (msg.processid != process.pid) callback(msg.payload); continue;}
+        callback(msg.payload); // no valid option - so send it out still
     }
 }
 
