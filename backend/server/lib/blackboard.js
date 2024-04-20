@@ -78,8 +78,8 @@ function _broadcast(msg) {
     if (topics[topic]) for (const subscriber of topics[topic]) {
         const {callback, options} = subscriber;
         if (!options) callback(msg.payload);    // no options means receive all the time
-        else if (options[module.exports.LOCAL_ONLY]) {if (msg.processid == process.pid) callback(msg.payload); return;}
-        else if (options[module.exports.EXTERNAL_ONLY]) {if (msg.processid != process.pid) callback(msg.payload); return;}
+        else if (options[module.exports.LOCAL_ONLY]) {if (msg.processid == process.pid) callback(msg.payload); continue;}
+        else if (options[module.exports.EXTERNAL_ONLY]) {if (msg.processid != process.pid) callback(msg.payload); continue;}
         else callback(msg.payload); // no valid option - so send it out still
     }
 }
