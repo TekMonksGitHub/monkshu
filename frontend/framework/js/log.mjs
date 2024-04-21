@@ -5,6 +5,7 @@
  */
 import {apimanager as apiman} from "/framework/js/apimanager.mjs";
 
+const __filename = new URL(import.meta.url).pathname.split("/").pop();
 let debugFlag = true, remoteFlag = false, remoteAPI, lastRemotelogErrorTime;
 
 const debug = s => {if (debugFlag) console.debug(_getLogLine("DEBUG", s)); if (remoteFlag) _logremote("debug", s);}
@@ -22,7 +23,21 @@ const _logremote = (level, message) => {
         } else console.log("Remote log had a recent error. Waiting before retrying, skipping remote logging.");
     } catch (err) { console.log("Remote log error"+err); lastRemotelogErrorTime = Date.now(); } 
 }
-const _getLogLine = (level, message) => {const now = new Date(); return `[${level}] [${now.toLocaleString()}] ${message}`;}
+const _getLogLine = (level, message) => {
+    const now = new Date(), caller = _getCaller(), fileInfo = `${caller.filename}:${caller.line}:${caller.column}`
+    return `[${level}] [${now.toLocaleString()}] [${fileInfo}] ${message}`;
+}
+
+function _getCaller() {
+	const e = new Error(); let callingFileLine;
+	for (const stackLine of e.stack.toString().split("\n").slice(1)) 
+		if (stackLine.indexOf(__filename) == -1) {callingFileLine = stackLine; break;}
+	if (!callingFileLine) callingFileLine = e.stack.toString().split("\n")[2];
+	const regex = /^.+\s[(]?(.*):(\d+):(\d+)[)]?$/;
+	const match = regex.exec(callingFileLine);
+	if (match) return {filename: match[1], line: match[2], column: match[3]}; 
+	else return {filename: "unknown", line: -1, column: -1}
+}
 
 export const log = {debug, info, error, warn, setDebug, setRemote};
 export const LOG = log; // for backwards compatibility

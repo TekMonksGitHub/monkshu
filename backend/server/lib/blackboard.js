@@ -73,6 +73,14 @@ function subscribe(topic, callback, options) {
     topics[topic].push({callback, options});
 }
 
+function unsubscribe(topic, callback) {
+    const topicSubscribersArray = topics[topic]; if (!topicSubscribersArray) return;    // no subscribers exist
+    let indexFound = -1;
+    for (const [i, subscriber] of topicSubscribersArray.entries()) {
+        if (subscriber.callback === callback) {indexFound = i; break;} }
+    if (indexFound != -1) topicSubscribersArray.splice(indexFound, 1);
+}
+
 function _broadcast(msg) {
     const topic = msg.topic;
     if (topics[topic]) for (const subscriber of topics[topic]) {
@@ -89,5 +97,5 @@ function _expandConf(conf) {
     return retConf;
 }
 
-module.exports = {init, doService, publish, subscribe, isEntireReplicaClusterOnline, LOCAL_ONLY: "localonly", 
-    EXTERNAL_ONLY: "externalonly"};
+module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, 
+    LOCAL_ONLY: "localonly", EXTERNAL_ONLY: "externalonly"};

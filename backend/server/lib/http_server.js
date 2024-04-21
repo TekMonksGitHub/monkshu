@@ -110,6 +110,14 @@ async function addIPToIPList(file, listHolder, ip, op) {
 	await fs.promises.writeFile(file, JSON.stringify(listHolder, null, 4), "utf8");
 }
 
+const getSerializableServObject = servObject => {
+	return {req: {headers: _cloneLowerCase(servObject.req.headers)}, res: {}, env: servObject.env, server: {}, compressionFormat: servObject.compressionFormat};
+}
+
+const inflateServObject = servObject => {
+	return {req: servObject.req, res: servObject.res, env: servObject.env, server: module.exports, compressionFormat: servObject.compressionFormat};
+}
+
 function _isIPInList(req, listHolder) {
 	let clientIP = utils.getClientIP(req); const ipAnalysis = utils.analyzeIPAddr(clientIP);
 	if (ipAnalysis.ipv6) clientIP = utils.expandIPv6Address(clientIP); else clientIP = ipAnalysis.ip;
@@ -128,4 +136,5 @@ const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
 module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
-	statusInternalError, statusTimeOut, statusOK, write, end, blacklistIP, whitelistIP}
+	statusInternalError, statusTimeOut, statusOK, write, end, blacklistIP, whitelistIP, getSerializableServObject,
+	inflateServObject}

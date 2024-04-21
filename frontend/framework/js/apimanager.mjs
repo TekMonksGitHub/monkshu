@@ -21,7 +21,7 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000
 /**
  * Makes a REST API call.
  * 
- * @param {string} url The URL to call
+ * @param {string|object} urlOrOptions The URL to call or an options object which contains all the parameters
  * @param {string} type  Can we GET, POST, DELETE etc.
  * @param {object} req Javascript/JSON object to send
  * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed
@@ -30,24 +30,38 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * @param {boolean} sendErrResp Optional: true or false - if true then on error javascript error object will be returned, else return null.
  * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
+ * @param {object} headers Optional: The custom headers to send
+ * @param {booleab} provideHeaders Optional: Response should return response headers as an object 
  * 
- * @return {Object} Javascript result object or null on error
+ * @return {Object} If provideHeaders is true then {response, headers} where response is the Javascript result object 
+ *                  or null on error. If it is false then just response, which is the Javascript result object or null.
  */
-async function rest(url, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, sendErrResp=false, timeout=DEFAULT_TIMEOUT) {
+async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, 
+        sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false) {
+
+    let url; if (typeof urlOrOptions === "object") {
+        url = urlOrOptions.url; type = urlOrOptions.type; req = urlOrOptions.req; sendToken =urlOrOptions.sendToken||false; 
+        extractToken = urlOrOptions.extractToken||false; canUseCache = urlOrOptions.canUseCache||false; 
+        dontGZIP = urlOrOptions.dontGZIP||false; sendErrResp = urlOrOptions.sendErrResp||false; 
+        timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; headers = urlOrOptions.headers||{}; 
+        provideHeaders = urlOrOptions.provideHeaders||false;
+    } else url = urlOrOptions;
+
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
 
     try {
-        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP, timeout), 
+        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP, timeout, headers), 
             response = await fetch(urlToCall, fetchInit);
         if (response.ok) {
             const respObj = await response.json();
             if (extractToken) _extractTokens(response, respObj);
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
-            return respObj;   
+            return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;   
         } else {
             LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
-            return sendErrResp ?  {respErr: {status: response.status, statusText: response.statusText}} :  null; // sending error response
+            const errResp = {respErr: {status: response.status, statusText: response.statusText}};
+            return sendErrResp ? (provideHeaders?{response: errResp, headers: _getFetchResponseHeadersAsObject(response)}:errResp) : null; // sending error response
         }
     } catch (err) {
         LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
@@ -58,7 +72,7 @@ async function rest(url, type, req, sendToken=false, extractToken=false, canUseC
 /**
  * Makes a BLOB API call, i.e. download a binary object.
  * 
- * @param {string} url The URL to call.
+ * @param {string|object} urlOrOptions The URL to call or an options object which contains all the parameters
  * @param {string} filename The downloaded file's name.
  * @param {string} type  Can we GET, POST, DELETE etc.
  * @param {object} req Javascript/JSON object to send.
@@ -66,11 +80,21 @@ async function rest(url, type, req, sendToken=false, extractToken=false, canUseC
  * @param {boolean} extractToken Optional: true or false to extract incoming tokens as a result of the API call.
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
+ * @param {object} headers Optional: The custom headers to send
  * 
  * @return {Object} Downloads the BLOB
  */
-async function blob(url, filename, type, req, sendToken, extractToken, dontGZIP=false, timeout=DEFAULT_TIMEOUT) {
-    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP, timeout);
+async function blob(urlOrOptions, filename, type, req, sendToken=false, extractToken=false, dontGZIP=false, 
+        timeout=DEFAULT_TIMEOUT, headers={}) {
+
+    let url; if (typeof urlOrOptions === "object") {
+        url = urlOrOptions.url; filename = urlOrOptions.filename; type = urlOrOptions.type; req = urlOrOptions.req; 
+        sendToken = urlOrOptions.sendToken||false; extractToken = urlOrOptions.extractToken||false; 
+        dontGZIP = urlOrOptions.dontGZIP||false; timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; 
+        headers = urlOrOptions.headers||{};
+    } else url = urlOrOptions;
+
+    const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP, timeout, headers);
 
     try {
         const response = await fetch(urlToCall, fetchInit);
@@ -126,7 +150,7 @@ const addJWTToken = (url, headers, jsonResponseObj) => {
  */
 const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
 
-function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout) {
+function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout, additional_headers) {
     type = type || "GET"; const urlHost = new URL(url).host; 
     const storage = _getAPIManagerStorage();
 
@@ -136,7 +160,8 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
         if (jsonReq) {url += `?${jsonReq}`; jsonReq = null;}
     } else jsonReq = req && typeof (req) == "object" ? JSON.stringify(req) : req;
 
-    const headers = {"Accept":acceptHeader||"application/json", "Content-Encoding":(!dontGZIPPostBody)&&req?"gzip":"identity"};
+    const headers = {"Accept":acceptHeader||"application/json", 
+        "Content-Encoding":(!dontGZIPPostBody)&&req?"gzip":"identity", ...additional_headers};
     if (type.toUpperCase() != "GET" && type.toUpperCase() != "DELETE") headers["Content-type"] = "application/json";
     if (sendToken) headers.Authorization = `Bearer ${storage.tokenManager[`${urlHost}_${sendToken.type?sendToken.type:"access"}`]}`;
     if (storage.keys[url] || storage.keys["*"]) headers[storage.keyHeader] = storage.keys[url] ? storage.keys[url] : storage.keys["*"];
@@ -147,14 +172,19 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
 }
 
 function _extractTokens(response, jsonResponseObj) {
-    const urlHost = new URL(response.url).host, headersBack = {}; 
-    for (const headerBack of response.headers) headersBack[headerBack[0]] = headerBack[1];
+    const urlHost = new URL(response.url).host, headersBack = _getFetchResponseHeadersAsObject(response); 
     if (jsonResponseObj && jsonResponseObj.access_token && jsonResponseObj.token_type == "bearer") 
         _extractAddToken(jsonResponseObj.access_token, urlHost);
     else if (headersBack.access_token && headersBack.token_type == "bearer") 
         _extractAddToken(headersBack.access_token, urlHost);
     else if (headersBack.authorization && headersBack.authorization.toLowerCase().startsWith("bearer "))
         _extractAddToken(headersBack.headersBack.authorization.substring(7).trim(), urlHost);
+}
+
+function _getFetchResponseHeadersAsObject(response) {
+    const headersBack = {}; 
+    for (const headerBack of response.headers) headersBack[headerBack[0].toLowerCase()] = headerBack[1];
+    return headersBack;
 }
 
 function _getKeyValAsURLParam(key, val) {

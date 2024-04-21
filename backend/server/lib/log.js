@@ -102,7 +102,7 @@ Logger.prototype.getLogContents = function(callback) {
 
 Logger.prototype.writeFile = function(level, s, sync) {
 	const caller = _getCaller(), fileInfo = `${caller.filename}:${caller.line}:${caller.column}`;
-	const msg = JSON.stringify({ts: utils.getDateTime(), level, file: fileInfo, message: s})+"\n";
+	const msg = JSON.stringify({ts: utils.getDateTime(), level, file: fileInfo, pid: process.pid, message: s})+"\n";
 	const _errorHandler = err => {
 		this._origLog("Logger error!\n"+err);
 		this._origLog(msg);
@@ -132,4 +132,4 @@ function _getCaller() {
 	const match = regex.exec(callingFileLine);
 	if (match) return {filename: match[1], line: match[2], column: match[3]}; 
 	else return {filename: "unknown", line: -1, column: -1}
-  }
+}

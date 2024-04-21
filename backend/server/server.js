@@ -9,8 +9,11 @@ global.CONSTANTS = require(__dirname + "/lib/constants.js");
 
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
+const blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
 const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
+const SERVER_STAMP = utils.generateUUID(false), SERVER_IPC_TOPIC_REQUEST = "_____org_monkshu_server_ipc__request",
+	SERVER_IPC_TOPIC_RESPONSE = "_____org_monkshu_server_ipc__response", SERVER_ID_HEADER = "x_monkshu_serverid";
 let _server;	// holds the transport 
 
 // support starting in stand-alone config
@@ -54,7 +57,7 @@ async function bootstrap() {
 
 	/* Init the built in blackboard server */
 	LOG.info("Initializing the distributed blackboard.");
-	require(CONSTANTS.LIBDIR+"/blackboard.js").init();
+	blackboard.init();
 
 	/* Run the transport */
 	_initAndRunTransportLoop();
@@ -62,6 +65,10 @@ async function bootstrap() {
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
 	await require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
+
+	/* Setup inter-server IPC */
+	LOG.info("Initializing inter-server communications.");
+	_initInterServerIPC();
 	
 	/* Init the apps themselves */
 	LOG.info("Initializing the apps.");
@@ -92,10 +99,11 @@ function _initAndRunTransportLoop() {
 		
 		if (servObject.compressionFormat == CONSTANTS.GZIP && servObject.env.data && Buffer.isBuffer(servObject.env.data)) try {
 			servObject.env.data = await gunzipAsync(servObject.env.data); } catch (err) {send500(err); return;}
-		const {code, respObj, reqObj} = await _doService(servObject.env.data, servObject, headers, url);
+		const {code, respObj, reqObj} = await doService(servObject.env.data, servObject, headers, url);
 		if (code == 200) {
 			LOG.debug("Got result: " + LOG.truncate(JSON.stringify(respObj)));
 			let respHeaders = {}; APIREGISTRY.injectResponseHeaders(url, respObj, headers, respHeaders, servObject, reqObj);
+			respHeaders[SERVER_ID_HEADER] = SERVER_STAMP;
 
 			try {
 				_server.statusOK(respHeaders, servObject);
@@ -122,10 +130,14 @@ function _initAndRunTransportLoop() {
 	}
 }
 
-async function _doService(data, servObject, headers, url) {
+async function doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
+	if (headers[SERVER_ID_HEADER] && (headers[SERVER_ID_HEADER] != SERVER_STAMP)) {
+		const ipcServerReply = await _getResponseViaInternalIPC(data, servObject, headers, url);
+		return ipcServerReply;
+	}
 	
-	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the regsitry on every request"); APIREGISTRY.initSync(true); }
+	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
 	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
 	LOG.info("Looked up service, calling: " + api);
 	
@@ -151,4 +163,26 @@ async function _doService(data, servObject, headers, url) {
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
 }
 
-module.exports = {bootstrap};
+function _getResponseViaInternalIPC(data, servObject, headers, url) {
+	return new Promise(resolve => {
+		const bboptions = {}; bboptions[blackboard.EXTERNAL_ONLY] = true;
+		const id = utils.generateUUID(false);
+		blackboard.subscribe(SERVER_IPC_TOPIC_RESPONSE, function(result) {
+			if ((result.id != id) || (result.stamp != headers[SERVER_ID_HEADER])) return;
+			blackboard.unsubscribe(SERVER_IPC_TOPIC_RESPONSE, this); resolve(result);
+		}, bboptions);
+		blackboard.publish(SERVER_IPC_TOPIC_REQUEST, {data, servObject: _server.getSerializableServObject(servObject),
+			headers, url, id, stamp: headers[SERVER_ID_HEADER]});
+	});
+}
+
+function _initInterServerIPC() {
+	const bboptions = {}; bboptions[blackboard.EXTERNAL_ONLY] = true;
+	blackboard.subscribe(SERVER_IPC_TOPIC_REQUEST, async request => {
+		if (request.stamp != SERVER_STAMP) return;	// not for us
+		const result = await doService(request.data, _server.inflateServObject(request.servObject), request.headers, request.url);
+		blackboard.publish(SERVER_IPC_TOPIC_RESPONSE, {...result, id: request.id, stamp: SERVER_STAMP}); 
+	}, bboptions);
+}
+
+module.exports = {bootstrap, doService};
