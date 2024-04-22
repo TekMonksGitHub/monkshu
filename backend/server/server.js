@@ -133,8 +133,11 @@ function _initAndRunTransportLoop() {
 
 async function doService(data, servObject, headers, url) {
 	LOG.info(`Got request. From: [${servObject.env.remoteHost}]:${servObject.env.remotePort} Agent: ${servObject.env.remoteAgent} URL: ${url}`);
-	if (headers[SERVER_ID_HEADER] && (headers[SERVER_ID_HEADER] != SERVER_STAMP)) {
-		const ipcServerReply = await _getResponseViaInternalIPC(data, servObject, headers, url);
+	
+	const urlParams = new URL(url).searchParams, headersPlusURLParams = {...headers};
+	for (const urlParam of urlParams) if (urlParam[0] == SERVER_ID_HEADER) headersPlusURLParams[urlParam[0]] = urlParam[1];
+	if (headersPlusURLParams[SERVER_ID_HEADER] && (headersPlusURLParams[SERVER_ID_HEADER] != SERVER_STAMP)) {
+		const ipcServerReply = await _getResponseViaInternalIPC(data, servObject, headersPlusURLParams, url);
 		return ipcServerReply;
 	}
 	
