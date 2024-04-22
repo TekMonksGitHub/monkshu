@@ -9,12 +9,12 @@ global.CONSTANTS = require(__dirname + "/lib/constants.js");
 
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
-const blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
 const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
 const SERVER_STAMP = utils.generateUUID(false), SERVER_IPC_TOPIC_REQUEST = "_____org_monkshu_server_ipc__request",
 	SERVER_IPC_TOPIC_RESPONSE = "_____org_monkshu_server_ipc__response", SERVER_ID_HEADER = "x_monkshu_serverid";
 let _server;	// holds the transport 
+let blackboard; // for server IPC
 
 // support starting in stand-alone config
 if (require("cluster").isMaster == true) bootstrap();	
@@ -51,12 +51,13 @@ async function bootstrap() {
 	require(CONSTANTS.LIBDIR+"/app.js").initSync();
 
 	/* Init the API registry */
-	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
 	LOG.info("Initializing the API registry.");
+	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
 	apireg.initSync();
 
 	/* Init the built in blackboard server */
 	LOG.info("Initializing the distributed blackboard.");
+	blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
 	blackboard.init();
 
 	/* Run the transport */
