@@ -18,8 +18,14 @@ if (cluster.isMaster) {
 		else numWorkers = numCPUs;
 	}
 
-	const _forkWorker = _ => 
-		cluster.fork().on("message", msg => {for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)});
+	const _forkWorker = _ => {
+		const worker = cluster.fork();
+		worker.on("message", msg => {
+			if (msg.type == "cluster.count") 
+				worker.send({count: Object.keys(cluster.workers).length, id: msg.id});
+			else for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)
+		});
+	};
 	
 	// Fork workers.
 	console.log(`Starting ${numWorkers} workers.`);
@@ -29,6 +35,5 @@ if (cluster.isMaster) {
 		console.log("[TCP] Worker server with PID: " + worker.process.pid + " died.");
 		console.log("[TCP] Forking a new process to compensate.");
 		_forkWorker();
-	});
-	
+	});	
 } else require(`${__dirname}/server.js`).bootstrap();
