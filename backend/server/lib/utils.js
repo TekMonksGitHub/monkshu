@@ -550,6 +550,7 @@ function base64ToString(base64) {
  * @returns The memory size in bytes of the object.
  */
 function objectMemSize(object) {
+    if (!object) return 0;
     if (typeof object === "number") return 8;
     if (typeof object === "string") return 2*object.length;
     if (typeof object === "boolean") return 4;
