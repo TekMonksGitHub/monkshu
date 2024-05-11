@@ -328,7 +328,11 @@ function watchFile(path, opIfModified, frequency) {
  * @param skipProperties Optional: Properties to skip while cloning
  */
  function clone(object, skipProperties=[]) {
-    if (!skipProperties.length) return JSON.parse(JSON.stringify(object));
+    if (typeof object !== "object") {LOG.error(`Asked to clone non-object ${object.toString()}, returning same back.`); return object;}
+    if (!skipProperties.length) try {return JSON.parse(JSON.stringify(object))} catch (err) {
+        LOG.error(`Error cloning object ${object.toString()}, returning shallow clone.`);
+        return {...object}
+    };
 
     const clone = {}; for (const key in object) if (!skipProperties.includes(key)) clone[key] = JSON.parse(JSON.stringify(object[key]));
     return clone;
