@@ -76,18 +76,20 @@ async function rmrf(path) {
         else {LOG.error(`Can't access path for rmrf ${path}, error is ${err}.`); return false;} // can't operate on this path.
     }
 
-	if ((await fspromises.stat(path)).isFile()) { try{await fspromises.unlink(path); return true;} catch (err) {
-        LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; } }
+	if ((await fspromises.stat(path)).isFile()) try{await fspromises.unlink(path); return true;} catch (err) {
+        if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; } }    // multiprocessing can cause ENOENT if another processes deleted it midway
 
 	const entries = await fspromises.readdir(path);
 	for (const entry of entries) {
 		const pathThis = `${path}/${entry}`, stats = await fspromises.stat(pathThis);
-		if (stats.isFile()) { try {await fspromises.unlink(pathThis);} catch (err) {
-            LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false;} }
-		else if (stats.isDirectory()) if (!await rmrf(pathThis)) LOG.error(`Error deleting path ${path}.`); return false;
+		if (stats.isFile()) try {await fspromises.unlink(pathThis);} catch (err) {
+            if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false;} }
+		else if (stats.isDirectory()) {
+            const result = await rmrf(pathThis); if (!result) {LOG.error(`Error deleting path ${path}.`); return false;}
+        }
 	}
 	try {await fspromises.rmdir(path); return true;} catch (err) { 
-        LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false; }
+        if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false; }}
 }
 
 /**
