@@ -11,7 +11,7 @@
 
 const queue = []; 
 const DEFAULT_QUEUE_CHECK_INTERVAL = 500;
-const conf = require(`${CONSTANTS.CONFDIR}/queueexecutor.json`);
+let conf; try {conf = require(`${CONSTANTS.CONFDIR}/queueexecutor.json`)} catch (err) {conf = {enabled: true}};
 
 let queueInitialized = false;   // to support server independent apps
 

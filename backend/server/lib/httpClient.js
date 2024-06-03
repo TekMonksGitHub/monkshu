@@ -156,7 +156,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
         let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false;
-        if (sslObj & typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
+        if (sslObj && typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
         const sendError = (error) => { 
             reject(error); ignoreEvents = true; 
         };
@@ -210,7 +210,7 @@ function _doCall(reqStr, options, secure, sslObj) {
         } else {
             LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
 
-            if (sslObj & typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
+            if (sslObj && typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
                 if (!_checkRequestResponseContentTypesMatch(options.headers, res.headers)) {
                     sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${res.headers["content-type"]}.`);
@@ -263,6 +263,8 @@ async function _addSecureOptions(options, sslObj) {
         options.cert = await _cacheReadFile(ssl.certPath);
         options.key = crypt.decrypt(await _cacheReadFile(ssl.encryptedKeyPath), sslObj.encryptionKey);
     }
+
+    if (sslObj.rejectUnauthorized !== undefined) options.rejectUnauthorized = sslObj.rejectUnauthorized;
 }
 
 module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, fetch, main };
