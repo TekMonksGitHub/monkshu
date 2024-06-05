@@ -37,7 +37,7 @@
  * @returns Returns the DB driver requested, throws an exception if not found.
  */
 exports.getDBDriver = (driver, dbConnectInfo, dbCreationSQLs) => {
-    const dbDriver = require(`${CONSTANTS.LIBDIR}/dbdrivers/${driver}_db.js`);
+    const dbDriver = require(`${global.CONSTANTS?.MONKSHU_BACKEND?CONSTANTS.LIBDIR:__dirname}/dbdrivers/${driver}_db.js`);
     return { 
         init: _ => dbDriver.init(dbConnectInfo, dbCreationSQLs),
         runCmd: (cmd, params) => dbDriver.runCmd(cmd, params, dbConnectInfo, dbCreationSQLs),
