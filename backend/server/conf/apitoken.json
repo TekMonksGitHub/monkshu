@@ -2,5 +2,5 @@
     "expiryInterval": 3600000,
     "tokenGCInterval": 1800000,
     "iss": "Monkshu",
-    "useGlobalMemory": true
+    "useGlobalMemory": false
 }

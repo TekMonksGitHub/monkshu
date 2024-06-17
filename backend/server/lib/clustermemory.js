@@ -7,7 +7,7 @@
  * License: See enclosed LICENSE file.
  */
 
-const clusterconf = require(CLUSTERMEMCONF);
+const clusterconf = require(CONSTANTS.CLUSTERMEMCONF);
 
 let _clusterMemory = {};
 const  _listeners = {}, SET_MSG = "__org_monkshu_cluster_memory_set",
