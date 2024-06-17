@@ -5,6 +5,11 @@
  * Tokens are in JWT & JWS format - RFCs 7515 & 7519. 
  * https://datatracker.ietf.org/doc/html/rfc7515
  * https://datatracker.ietf.org/doc/html/rfc7519
+ * 
+ * Token manager can use distributed or cluster memory.
+ * By default uses cluster memory for backwards compatibility.
+ * This can be changed by setting useGlobalMemory=true in
+ * conf/apitoken.json file.
  */
 
 const _jwttokenListeners = [];
@@ -12,38 +17,38 @@ const cryptmod = require("crypto");
 const mustache = require("mustache");
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const TOKENMANCONF = CONSTANTS.ROOTDIR+"/conf/apitoken.json";
-const API_TOKEN_CLUSTERMEM_KEY = "__org_monkshu_jwttokens_key";
+const API_TOKEN_MEM_KEY = "__org_monkshu_jwttokens_key";
 
 const BASE_64_HEADER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
-
-let conf, alreadyInit = false;
+const DEFAULT_TOKEN_EXPIRY = 600000, DEFAULT_GC_INTERVAL = 1800000;
+let conf, alreadyInit = false, TOKEN_MEMORY;
 
 function initSync() {
     if (alreadyInit) return; else alreadyInit = true;
 
-    // Init tokens in Cluster Memory
-    if (!CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY)) CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, {});
+    if (TOKENMANCONF.useGlobalMemory) TOKEN_MEMORY = DISTRIBUTED_MEMORY; else TOKEN_MEMORY = CLUSTER_MEMORY;
 
     try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
-    conf.expiryInterval = conf.expiryInterval || 600000; conf.tokenGCInterval = conf.tokenGCInterval || 1800000;
+    conf.expiryInterval = conf.expiryInterval || DEFAULT_TOKEN_EXPIRY; 
+    conf.tokenGCInterval = conf.tokenGCInterval || DEFAULT_GC_INTERVAL;
 
     setInterval(_cleanTokens, conf.tokenGCInterval);   
 }
 
 const checkHeaderToken = headers => checkSecurity({query:{needsToken: true}}, undefined, {}, headers, undefined, {});
 
-function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
+async function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
     if ((!apiregentry.query.needsToken) || (apiregentry.query.needsToken.toLowerCase() == "false")) return true;	// no token needed
 
     const incomingToken = headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(/[ \t]+/):[];
-    if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return checkToken(token_splits[1], reason, apiregentry.query.needsToken, apiregentry.query.checkClaims, req);
+    if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return await checkToken(token_splits[1], reason, apiregentry.query.needsToken, apiregentry.query.checkClaims, req);
     else {reason.reason = `JWT malformatted. Got token ${incomingToken}`; reason.code = 403; return false;}	// missing or badly formatted token
 }
 
-function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
-    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
+async function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
+    const activeTokens = await TOKEN_MEMORY.get(API_TOKEN_MEM_KEY, {}, true); // init the memory if needed and poll replicas
     const lastAccess = activeTokens[token]; // this automatically verifies token integrity too, and is a stronger check than rehashing and checking the hash signature
     if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
 
@@ -68,17 +73,17 @@ function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
     return true;
 }
 
-function updateLastAccessOrAddToken(token) {
-    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
+async function updateLastAccessOrAddToken(token) {
+    const activeTokens = await TOKEN_MEMORY.get(API_TOKEN_MEM_KEY, {}, true);
     activeTokens[token] = Date.now();   // update last access
-    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    TOKEN_MEMORY.set(API_TOKEN_MEM_KEY, activeTokens)  // update tokens across workers
 }
 
 function releaseToken(token) {
-    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
+    const activeTokens = TOKEN_MEMORY.get(API_TOKEN_MEM_KEY)||{};
     if (token && activeTokens[token]) {
         delete activeTokens[token];
-        CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+        TOKEN_MEMORY.set(API_TOKEN_MEM_KEY, activeTokens)  // update tokens across workers
     }
 }
 
@@ -130,7 +135,7 @@ const getClaims = headersOrToken => {
 const getToken = headers => headers["authorization"];
 
 function _cleanTokens() {
-    const activeTokens = CLUSTER_MEMORY.get(API_TOKEN_CLUSTERMEM_KEY);
+    const activeTokens = TOKEN_MEMORY.get(API_TOKEN_MEM_KEY)||{};
     for (let token of Object.keys(activeTokens)) {
         const claims = getClaims(token);
         if (Date.now() - activeTokens[token] > claims.expiryInterval) {
@@ -138,7 +143,7 @@ function _cleanTokens() {
             for (const tokenListener of _jwttokenListeners) tokenListener("token_expireed", token);
         }
     }
-    CLUSTER_MEMORY.set(API_TOKEN_CLUSTERMEM_KEY, activeTokens)  // update tokens across workers
+    TOKEN_MEMORY.set(API_TOKEN_MEM_KEY, activeTokens)  // update tokens across workers
     
 }
 
@@ -155,4 +160,5 @@ function _parseAddstokenString(addsTokenString, request, response) {
 }
 
 module.exports = { checkSecurity, injectResponseHeaders, injectResponseHeadersInternal, initSync, checkToken,
-    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken: updateLastAccessOrAddToken, releaseToken, getToken, getClaims };
+    createSignedJWTToken, addListener, removeListener, checkHeaderToken, addToken: updateLastAccessOrAddToken, 
+    releaseToken, getToken, getClaims };

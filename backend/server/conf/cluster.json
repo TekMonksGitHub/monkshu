@@ -1,4 +1,5 @@
 {
-"workers" : 0,
-"min_workers" : 2
+"workers" : 2,
+"min_workers" : 2,
+"cluster_replication_timeout": 500
 }

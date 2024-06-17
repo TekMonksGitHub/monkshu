@@ -28,6 +28,7 @@ exports.HTTPDCONF = confdir + "/httpd.json";
 exports.IPBLACKLIST = confdir + "/ipblacklist.json";
 exports.IPWHITELIST = confdir + "/ipwhitelist.json";
 exports.BLACKBOARDCONF = confdir + "/blackboard.json";
+exports.CLUSTERMEMCONF = confdir + "/cluster.json";
 exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
 exports.NETCHECKCONF = confdir + "/netcheck.json";
 exports.OBJOBSERVERCONF = confdir + "/objectobserver.json";

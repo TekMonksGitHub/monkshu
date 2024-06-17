@@ -7,9 +7,16 @@
  * License: See enclosed LICENSE file.
  */
 
-const _clusterMemory = {}, _listeners = {}, SET_MSG = "__org_monkshu_cluster_memory_set",
-    POLL_VALUE_RESPONSE = "__org_monkshu_cluster_pollvalue_response", DEFAULT_POLL_TIMEOUT = 200,
-    POLL_VALUE_REQUEST = "__org_monkshu_cluster_pollvalue_request", CLUSTER_COUNT = "cluster.count";
+const clusterconf = require(CLUSTERMEMCONF);
+
+let _clusterMemory = {};
+const  _listeners = {}, SET_MSG = "__org_monkshu_cluster_memory_set",
+    POLL_VALUE_RESPONSE = "__org_monkshu_cluster_pollvalue_response", 
+    DEFAULT_POLL_TIMEOUT = clusterconf.cluster_replication_timeout,
+    POLL_VALUE_REQUEST = "__org_monkshu_cluster_pollvalue_request", CLUSTER_COUNT = "cluster.count",
+    REPLICATE_MEMORY_REQUEST = "__org_monkshu_cluster_replicate_request", 
+    REPLICATE_MEMORY_RESPONSE = "__org_monkshu_cluster_replicate_response", 
+    REPLICATE_MEMORY_KEY = "__org_monkshu_cluster_replicate_key";
 
 /**
  * Inits the cluster memory
@@ -20,7 +27,15 @@ function init() {
         if (msg.type == POLL_VALUE_REQUEST) {
             process.send({type: POLL_VALUE_RESPONSE, key: msg.key, id: msg.id, value: _clusterMemory[msg.key]});
         }
+        if (msg.type == REPLICATE_MEMORY_REQUEST) {
+            if (Object.keys(_clusterMemory).length) process.send({type: REPLICATE_MEMORY_RESPONSE, 
+                key: REPLICATE_MEMORY_KEY, id: msg.id, value: _clusterMemory}); // only reply if we have something to replicate
+        }
     });
+
+    const restoreClusterMemory = async _ => {try {await _replicateClusterMemory();} catch (err) {LOG.error(`Error restoring clustered memory - ${err}`)}};
+    restoreClusterMemory(); // this is async so server will take time to stabilize by replicating cluster memory
+
     global.CLUSTER_MEMORY = this;
 }
 
@@ -65,26 +80,9 @@ function set(key, value, ensureReplicated, replicationTimeout=DEFAULT_POLL_TIMEO
  */
 const get = (key, initIfUndefined, pollReplicas, polltimeout=DEFAULT_POLL_TIMEOUT) => {
     if ((!_clusterMemory[key]) && pollReplicas && process.send) return new Promise(async resolve => {
-        let repliesReceived = 0, resolved = false;
-        const clusterCount = await _getClusterCount(polltimeout);
-        if (!clusterCount) {if (initIfUndefined) set(key, initIfUndefined); resolve(null||initIfUndefined); return;} // error or timeout
-        const requestID = _createRequestID(), msgListener = function(msg) { 
-            if ((msg.type == POLL_VALUE_RESPONSE) && (msg.key == key) && (msg.id == requestID) && (!resolved)) {
-                repliesReceived++;
-                if (msg.value) {
-                    _clusterMemory[key] = msg.value; resolved = true; 
-                    process.removeListener("message", this); resolve(msg.value); 
-                } else if (repliesReceived == clusterCount) {
-                    resolved = true; process.removeListener("message", msgListener); 
-                    if (initIfUndefined) set(key, initIfUndefined); resolve(null||initIfUndefined); 
-                }
-            } 
-        }
-        process.on("message", msgListener); process.send({type: POLL_VALUE_REQUEST, key, id: requestID});
-        setTimeout(_=>{ if (!resolved) {
-            resolved = true; process.removeListener("message", msgListener);
-            if (initIfUndefined) set(key, initIfUndefined); resolve(null||initIfUndefined);
-        } }, polltimeout);
+        const value = await _getPolledReplyForKey(key, polltimeout, POLL_VALUE_REQUEST, POLL_VALUE_RESPONSE);
+        if (value) {_clusterMemory[key] = value; resolve(value);} 
+        else {if (initIfUndefined) {set(key, initIfUndefined); resolve(initIfUndefined);} else resolve(undefined);}
     });
 
     if ((!_clusterMemory[key]) && initIfUndefined) {set(key, initIfUndefined); return initIfUndefined;}
@@ -113,6 +111,40 @@ function _getClusterCount(timeout) {
         }
         process.on("message", msgListener); process.send({type: CLUSTER_COUNT, id: requestID});
         setTimeout(_=>{if (!resolved) {process.removeListener("message", msgListener); resolve(null)}}, timeout);
+    });
+}
+
+async function _replicateClusterMemory() {
+    try {
+        const replicatedClusterMemory = await _getPolledReplyForKey(
+            REPLICATE_MEMORY_KEY, DEFAULT_POLL_TIMEOUT, REPLICATE_MEMORY_REQUEST, REPLICATE_MEMORY_RESPONSE);
+        if (replicatedClusterMemory) {LOG.info("Restoring cluster memory as replicated memory received."); _clusterMemory = replicatedClusterMemory;}
+        else LOG.warn("Starting from a new cluster memory as replicated memory not received.");
+    } catch (err) {
+        LOG.error(`Error replicating cluster memory, the error is ${err}. Using new cluster memory.`); _clusterMemory = {};
+    }
+}
+
+function _getPolledReplyForKey(key, polltimeout, sendtype, responsetype) {
+    return new Promise(async resolve => {
+        let repliesReceived = 0, resolved = false;
+        let clusterCount; try {clusterCount = await _getClusterCount(polltimeout);} catch(err) {LOG.error(`Error ${err} in cluster counting.`);}
+        if (!clusterCount) {LOG.error("Cluster count failed in polled key value fetch."); resolve(null); return;} // error or timeout
+        const requestID = _createRequestID(), msgListener = function(msg) { 
+            if ((msg.type == responsetype) && (msg.key == key) && (msg.id == requestID) && (!resolved)) {
+                repliesReceived++;
+                if (msg.value) {
+                    resolved = true; process.removeListener("message", msgListener); resolve(msg.value); 
+                } else if (repliesReceived == clusterCount) {
+                    resolved = true; process.removeListener("message", msgListener); resolve(null); 
+                }
+            } 
+        }
+        process.on("message", msgListener); process.send({type: sendtype, key, id: requestID});
+        setTimeout(_=>{ if (!resolved) {
+            LOG.error("Cluster reply timed out in polled key value fetch.");
+            resolved = true; process.removeListener("message", msgListener); resolve(null);
+        } }, polltimeout);
     });
 }
 
