@@ -6,6 +6,7 @@
  */
 
 const cluster = require("cluster");
+const CLUSTER_COUNT = "cluster.count";
 
 if (cluster.isMaster) {
 	const conf = require(`${__dirname}/conf/cluster.json`);
@@ -21,7 +22,7 @@ if (cluster.isMaster) {
 	const _forkWorker = _ => {
 		const worker = cluster.fork();
 		worker.on("message", msg => {
-			if (msg.type == "cluster.count") 
+			if (msg.type == CLUSTER_COUNT) 
 				worker.send({count: Object.keys(cluster.workers).length, id: msg.id});
 			else for (const worker_id in cluster.workers) cluster.workers[worker_id].send(msg)
 		});
