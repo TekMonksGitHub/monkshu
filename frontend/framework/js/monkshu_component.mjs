@@ -141,7 +141,7 @@ function register(name, htmlTemplate, module) {
 
         async render(initialRender=this.__org_monkshu_hasBeenRendered?false:true) {
             // check security policy
-            if (this.hasAttribute("roles") && !securityguard.isAllowed(name) && !securityguard.isAllowed(name+this.id)) return;
+            if (this.hasAttribute("roles") && (!securityguard.isAllowed(name)) && (!securityguard.isAllowed(name+this.id))) return;
 
             if (module.elementPrerender) await module.elementPrerender(this, initialRender);
 

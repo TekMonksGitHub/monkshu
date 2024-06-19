@@ -1,0 +1,6 @@
+{
+    "fetch_options": {
+        "cache": "default",
+        "mode": "cors"
+    }
+}

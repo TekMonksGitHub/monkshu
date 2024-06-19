@@ -3,6 +3,7 @@
  * License: See enclosed LICENSE file.
  */
 
+import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 
 let _PERMISSIONS_MAP = session.get("_com_monkshu_securityguard_permissions_map") || {};
@@ -40,7 +41,11 @@ function addPermission(resource, role) {
 }
 
 function _doesResourceMatchPermissionPath(resource, permissionpath) {
-    if (!permissionpath.includes("*")) return resource == permissionpath;   // only exact match unless * wildcard is present in the permission
+    if (!permissionpath.includes("*")) {
+        if (resource == permissionpath) return true;    // definitely match else try router for LB URLs
+        else return router.doURLsMatch(permissionpath, resource);   
+    }
+    
     const _shellToJSRegexp =  shellRegex => shellRegex.replace(/[.+^${}()/|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.');
     const jsRegExp = _shellToJSRegexp(permissionpath), regExpObj = new RegExp(jsRegExp);  
     return resource.match(regExpObj) ? true : false;

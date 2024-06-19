@@ -111,14 +111,21 @@ $$.copyTextToClipboard = text => {
 }
 
 $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
-    const response = await fetch(url, {method: "GET", mode:corsMode||"cors", cache: "default", 
-        headers: {'Content-Type': contentType||'text/plain'}});
-    if (!response.ok) throw new Error(`Issue in fetch for URL ${url}, status returned is ${response.status} ${response.statusText}`);
-    else return response;
+    const urlToFetch = window.monkshu_env.frameworklibs.router ? 
+        window.monkshu_env.frameworklibs.router.getBalancedURL(url) : url;
+    try {
+        const resolvedCORSMode = corsMode||"cors";
+        const response = await fetch(urlToFetch, {method: "GET", mode:resolvedCORSMode, cache: "default", 
+            headers: {'Content-Type': contentType||'text/plain'}});
+        if (!response.ok) throw new Error(`Issue in fetch for URL ${url}, status returned is ${response.status} ${response.statusText}`);
+        else return response;
+    } catch (err) {
+        throw err;
+    }
 }
+    
 
 $$.boot = async (appPath, confPath) => {
-    $$.LOG = (await import("/framework/js/log.mjs")).LOG;
     const {bootstrap} = await import("/framework/js/bootstrap.mjs");
     bootstrap(appPath, confPath);
 }

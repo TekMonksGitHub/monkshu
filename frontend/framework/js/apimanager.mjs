@@ -13,6 +13,7 @@
  * Currently supports JWT tokens (or wild JWT type session tokens).
  */
 
+import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 import * as pako from "/framework/3p/pako.esm.min.mjs";
 
@@ -40,12 +41,12 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
         sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false) {
 
     let url; if (typeof urlOrOptions === "object") {
-        url = urlOrOptions.url; type = urlOrOptions.type; req = urlOrOptions.req; sendToken =urlOrOptions.sendToken||false; 
+        url = router.getBalancedURL(urlOrOptions.url); type = urlOrOptions.type; req = urlOrOptions.req; sendToken =urlOrOptions.sendToken||false; 
         extractToken = urlOrOptions.extractToken||false; canUseCache = urlOrOptions.canUseCache||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; sendErrResp = urlOrOptions.sendErrResp||false; 
         timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; headers = urlOrOptions.headers||{}; 
         provideHeaders = urlOrOptions.provideHeaders||false;
-    } else url = urlOrOptions;
+    } else url = router.getBalancedURL(urlOrOptions);
 
     const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
     if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
@@ -88,11 +89,11 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
         timeout=DEFAULT_TIMEOUT, headers={}) {
 
     let url; if (typeof urlOrOptions === "object") {
-        url = urlOrOptions.url; filename = urlOrOptions.filename; type = urlOrOptions.type; req = urlOrOptions.req; 
+        url = router.getBalancedURL(urlOrOptions.url); filename = urlOrOptions.filename; type = urlOrOptions.type; req = urlOrOptions.req; 
         sendToken = urlOrOptions.sendToken||false; extractToken = urlOrOptions.extractToken||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; 
         headers = urlOrOptions.headers||{};
-    } else url = urlOrOptions;
+    } else url = router.getBalancedURL(urlOrOptions);
 
     const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP, timeout, headers);
 
