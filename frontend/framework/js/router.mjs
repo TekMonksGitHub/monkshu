@@ -13,10 +13,11 @@ const PAGE_TRANSIENT_DATA = "org_monkshu__router__page_transient_data",
 	ROUTER_HISTORY_KEY = "__org_monkshu_router_history", HASH_PARAM=".";
 
 const loadbalancers = []; let conf;
+const DEFAULT_CONF = {"fetch_options": {"cache": "default", "mode": "cors"}};
 
 /** Inits the router, called by bootstrap */
 const init = async _ => {
-	conf = await $$.requireJSON("/framework/conf/router.json");
+	conf = (await $$.requireJSON($$.MONKSHU_CONSTANTS.CONFIG_MAIN)).router||DEFAULT_CONF;
 	window.monkshu_env.router = {pageload_funcs: [], urlRewriters: [], pagedata_funcs: []};
 }
 

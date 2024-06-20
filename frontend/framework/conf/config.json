@@ -1,0 +1,13 @@
+{
+    "frameworklibs": [
+        "apimanager", "blackboard", "bootstrap", "constants", "i18n", "log", "monkshu_component", "pwasupport",
+        "router", "securityguard", "session", "util", "loadbalancer"
+    ],
+    
+    "router": {
+        "fetch_options": {
+            "cache": "default",
+            "mode": "cors"
+        }
+    }
+}
