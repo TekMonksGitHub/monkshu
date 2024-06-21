@@ -340,16 +340,17 @@ function getBalancedURL(url) {
 
 /**
  * Checks if the given URLs match, taking into account LB policies.
- * @param {string} url1 First URL
+ * @param {string} url1OrRE First URL
  * @param {string} url2 Second URL
+ * @param {boolean} url1IsARegularExpression The first URL is a regular expression
  * @returns true if they match, else not
  */
-function doURLsMatch(url1, url2) {
-	try {new URL(url1), new URL(url2)} catch (err) {return false;}	// bad URL/s
-
+function doURLsMatch(url1OrRE, url2, url1IsARegularExpression) {	
+	const _doesThisURLMatchURL1 = (url1RE, url2, useREs) => useREs ? url2.match(new RegExp(url1RE)) : url1RE == url2;
+	if (!loadbalancers.length) return _doesThisURLMatchURL1(url1OrRE, url2, url1IsARegularExpression);
 	for (const lb of loadbalancers) {
-		const matchingURL = lb.getMatchingURLFrom([url1], url2);
-		if (matchingURL) return true;
+		const allPossibleLBURLs = lb.getAllBalancedCombinationURLs(url1OrRE);
+		for (const possibleMatch of allPossibleLBURLs) if (_doesThisURLMatchURL1(possibleMatch, url2, url1IsARegularExpression)) return true;
 	}
 	return false;
 }

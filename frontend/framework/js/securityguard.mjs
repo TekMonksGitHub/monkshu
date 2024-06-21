@@ -41,14 +41,12 @@ function addPermission(resource, role) {
 }
 
 function _doesResourceMatchPermissionPath(resource, permissionpath) {
-    if (!permissionpath.includes("*")) {
-        if (resource == permissionpath) return true;    // definitely match else try router for LB URLs
-        else return router.doURLsMatch(permissionpath, resource);   
-    }
+    if (resource == permissionpath) return true;    // definitely match else try router for LB URLs
+    else if (router.doURLsMatch(permissionpath, resource)) return true;
     
-    const _shellToJSRegexp =  shellRegex => shellRegex.replace(/[.+^${}()/|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.');
-    const jsRegExp = _shellToJSRegexp(permissionpath), regExpObj = new RegExp(jsRegExp);  
-    return resource.match(regExpObj) ? true : false;
+    // now check via the RE route
+    const regExpObj = new RegExp(permissionpath);  
+    return resource.match(regExpObj) ? true : router.doURLsMatch(permissionpath, resource, true);
 }
 
 export const securityguard = {isAllowed, setAppInterceptor, getAppInterceptor, setPermissionsMap, getPermissionsMap, 

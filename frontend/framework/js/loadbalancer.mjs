@@ -41,6 +41,18 @@ function createLoadbalancer(lbconf) {
                 const testURL = _getReplacedURL(hostThis, parsedURL);
                 if (testURL == urlToMatch) return urlThis;
             }
+        },
+
+        getAllBalancedCombinationURLs: function(urlIn) {
+            const balancedCombinations = [];
+            for (const hostThis of this.BACKENDCONF.endpoints) {
+                const urlHostMatchingRE = new RegExp("([A-Za-z0-9]+://)([A-Za-z0-9.]+)([:0-9]+)?(.*)");
+                const parsedURLPieces = urlIn.match(urlHostMatchingRE);
+                if (!parsedURLPieces) continue; // skip bad URLs
+                const replacedURL = [parsedURLPieces[1], hostThis, ...parsedURLPieces.slice(3)].join("");
+                balancedCombinations.push(replacedURL);
+            }
+            return balancedCombinations;
         }
     }
 }
