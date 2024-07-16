@@ -110,6 +110,9 @@ Logger.prototype.writeFile = function(level, s, sync) {
 		this._oldStderrWrite.call(process.stderr, msg);
 	}
 	
+	if (log_conf.console_everything && (!s.startsWith('[stdout]')) && (!s.startsWith('[stderr]')) && 
+		(!s.startsWith('[console]'))) this.console(JSON.stringify(msg.trim())+"\n");
+
 	if (sync === undefined) {
 		if (log_conf.sync_log) this.filewriter.queuedWrite(msg, err => {if (err) _errorHandler(err)});
 		else this.filewriter.writeFile(msg, err => {if (err) _errorHandler(err)});
@@ -122,6 +125,8 @@ Logger.prototype.writeFile = function(level, s, sync) {
 Logger.prototype.flush = function(callback) {
 	const timer = setInterval(_=>{if (!this.filewriter.areTherePendingWrites()) {clearInterval(timer); callback();}}, 100);
 }
+
+Logger.prototype.flushSync = function() {this.filewriter.flushSync();}
 
 function _getCaller() {
 	const e = new Error(); let callingFileLine;

@@ -96,11 +96,12 @@ async function main(argv) {
 		console.error(`Usage: ${__filename} [app tests folder path] [...other params]`);
 		exit(1);
 	}
-    setupServerEnvironmentForTesting();    // init the server environment only
+    setupServerEnvironmentForTesting();    	// init the server environment only
 
-    await runTestsAsync(argv); // run the tests
+    await runTestsAsync(argv); 				// run the tests
+	LOG.flushSync();    					// ensure all logs are written out before exit
 
-    shouldExit = true; // exit
+    shouldExit = true; 						// exit
 }
 
 const exit = _ => process.exit(0);

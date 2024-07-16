@@ -19,7 +19,7 @@ const pathmod = require("path");
 const fspromises = require("fs").promises;
 const conf = require(`${CONSTANTS.CONFDIR}/memfs.json`);
 
-const FSCACHE = {}; let memused = 0;
+const FSCACHE = {}, PENDING_PROMISES=[]; let memused = 0;
 
 exports.readFile = async (path, options) => {
     path = pathmod.resolve(path);
@@ -40,7 +40,7 @@ exports.writeFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
         FSCACHE[path] = {data, accesstime: Date.now(), stats: await fspromises.stat(path)};
-        fspromises.writeFile(path, data, options);  // no need for await as file is cached and read will be via the cache
+        _addPendingPromises(fspromises.writeFile(path, data, options));  // no need for await as file is cached and read will be via the cache
     } else await fspromises.writeFile(path, data, options);
 }
 
@@ -50,13 +50,13 @@ exports.appendFile = async (path, data, options) => {
         FSCACHE[path] = {data: typeof data === "string" ? FSCACHE[path].data + data :
             Buffer.concat([Buffer.from(FSCACHE[path].data), Buffer.from(data)]), accesstime: Date.now(), 
             stats: await fspromises.stat(path)};
-        fspromises.appendFile(path, data, options);  // no need for await as file is cached and read will be via the cache
+        _addPendingPromises(fspromises.appendFile(path, data, options));  // no need for await as file is cached and read will be via the cache
     } else await fspromises.appendFile(path, data, options);
 }
 
 exports.unlink = async path => {
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) fspromises.unlink(path); else await fspromises.unlink(path);
+    if (FSCACHE[path]) _addPendingPromises(fspromises.unlink(path)); else await fspromises.unlink(path);
     delete FSCACHE[path];
 }
 
@@ -75,8 +75,18 @@ exports.access = (path, mode) => fspromises.access(path, mode);
 
 exports.rm = async (path, options) => {
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) fspromises.rm(path, options); else await fspromises.rm(path, options);
+    if (FSCACHE[path]) _addPendingPromises(fspromises.rm(path, options)); else await fspromises.rm(path, options);
     delete FSCACHE[path];
+}
+
+exports.flush = _ => Promise.all(PENDING_PROMISES);
+
+function _addPendingPromises(promise) {
+    const pushedPromise = (async function(){
+        await promise; 
+        PENDING_PROMISES.splice(PENDING_PROMISES.indexOf(pushedPromise), 1);
+    })();
+    PENDING_PROMISES.push(pushedPromise);
 }
 
 function _allocateMemory(size) {

@@ -104,7 +104,8 @@ function _processSetMessage(obj)  {
 }
 
 function _getClusterCount(timeout) {
-    return new Promise(resolve => {
+    if (!process.send) return Promise.resolve(0);
+    else return new Promise(resolve => {
         let resolved = false; const requestID = _createRequestID(), msgListener = function (msg) {
             if (msg.id == requestID) {
                 resolved = true; resolve(msg.count); process.removeListener("message", msgListener); }

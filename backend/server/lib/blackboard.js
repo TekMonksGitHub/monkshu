@@ -11,10 +11,12 @@ const fs = require("fs");
 const mustache = require("mustache");
 const API_BB_PATH = "/__org_monkshu__blackboard";
 const rest = require(`${CONSTANTS.LIBDIR}/rest.js`);
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 let conf = _expandConf(require(CONSTANTS.BLACKBOARDCONF));
 const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
 
-const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf";
+const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf",
+    BLACKBOARD_REQUESTREPLY_TOPIC = "__org_monkshu_blackboard_requestreply_topic";
 
 function init() {
     global.BLACKBOARD = this;
@@ -60,6 +62,29 @@ async function publish(topic, payload) {
     }
 }
 
+function getDistribuedClusterSize() {return conf.replicas.length;}
+
+function getReply(topic, payload, timeout, replyReceiver) {
+    if (!replyReceiver) return new Promise(resolve => getReply(...arguments, resolve));
+
+    const id = utils.generateUUID();
+    let repliesReceived = 0, replied = false, replies = [];
+    const timeoutID = setTimeout(_=>{ if (!replied) {replied = true; replies.incomplete = true; replyReceiver(replies);}}, timeout);
+    subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
+        if (replied) return; // no longer an active request, timed out
+        if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies
+        replies.push(msg.reply); repliesReceived++; if (repliesReceived < conf.replicas.length) return;  // still waiting
+        clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
+        replyReceiver(replies); replied = true;
+    });
+    const finalPayload = {id, payload, topic, type: "request"}; 
+    publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload);
+}
+
+function sendReply(topic, blackboardcontrol, payload) {
+    publish(BLACKBOARD_REQUESTREPLY_TOPIC, {id: blackboardcontrol, topic, reply: payload, type: "reply"});
+}
+
 async function isEntireReplicaClusterOnline() {
     for (const replica of conf.replicas) {
         const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
@@ -82,7 +107,11 @@ function unsubscribe(topic, callback) {
 }
 
 function _broadcast(msg) {
-    const topic = msg.topic;
+    // handle specially formatted request-reply messages here
+    if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.type == "request") msg = {
+        topic: msg.payload.topic, payload: {...msg.payload.payload, blackboardcontrol: msg.payload.id}};
+    
+    const topic = msg.topic; 
     if (topics[topic]) for (const subscriber of topics[topic]) {
         const {callback, options} = subscriber;
         if (!options) {callback(msg.payload); continue;}  // no options means receive all the time
@@ -97,5 +126,5 @@ function _expandConf(conf) {
     return retConf;
 }
 
-module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, 
-    LOCAL_ONLY: "localonly", EXTERNAL_ONLY: "externalonly"};
+module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
+    sendReply, getDistribuedClusterSize, LOCAL_ONLY: "localonly", EXTERNAL_ONLY: "externalonly"};

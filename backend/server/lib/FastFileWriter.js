@@ -53,6 +53,13 @@ class FastFileWriter {
     }
 
     areTherePendingWrites() {return this.pendingWrites||this.writeQueue.length;}
+
+    flushSync() {   // sync flush to log
+        const savedWriteQueue = this.writeQueue, env = this._env; this.writeQueue = [];
+        if (!env.fd) env.fd = fs.openSync(this.path, this.overwrite?"w":"a");
+        for (const writeObject of savedWriteQueue) fs.writeFileSync(this._env.fd, writeObject.data, this.encoding);
+        fs.closeSync(env.fd); delete env.fd;
+    }
     
     // callback(err)
     writeFile(data, callback) {
