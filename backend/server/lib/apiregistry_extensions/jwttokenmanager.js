@@ -21,19 +21,18 @@ const TOKENMANCONF = require(`${CONSTANTS.CONFDIR}/apitoken.json`);
 const API_TOKEN_MEM_KEY = "__org_monkshu_jwttokens_key";
 const BASE_64_HEADER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
 const DEFAULT_TOKEN_EXPIRY = 600000, DEFAULT_GC_INTERVAL = 1800000;
-let conf, alreadyInit = false, TOKEN_MEMORY;
+let alreadyInit = false, TOKEN_MEMORY;
 
 function initSync() {
     if (alreadyInit) return; else alreadyInit = true;
 
     if (TOKENMANCONF.useGlobalMemory) TOKEN_MEMORY = _ => DISTRIBUTED_MEMORY; else TOKEN_MEMORY = _ => CLUSTER_MEMORY;
 
-    try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
-    conf.expiryInterval = conf.expiryInterval || DEFAULT_TOKEN_EXPIRY; 
-    conf.tokenGCInterval = conf.tokenGCInterval || DEFAULT_GC_INTERVAL;
+    TOKENMANCONF.expiryInterval = TOKENMANCONF?.expiryInterval || DEFAULT_TOKEN_EXPIRY; 
+    TOKENMANCONF.tokenGCInterval = TOKENMANCONF?.tokenGCInterval || DEFAULT_GC_INTERVAL;
 
-    setInterval(_cleanTokens, conf.tokenGCInterval);   
+    setInterval(_cleanTokens, TOKENMANCONF.tokenGCInterval);   
 }
 
 const checkHeaderToken = headers => checkSecurity({query:{needsToken: true}}, undefined, {}, headers, undefined, {});
@@ -110,7 +109,7 @@ const removeListener = listener => { if (_jwttokenListeners.indexOf(listener) !=
 
 function createSignedJWTToken(jwtproperties) {
     const timenow = Date.now(), timenowEPOCH = Math.round(timenow/1000), 
-        expiryInterval = parseInt(jwtproperties.expiryInterval || conf.expiryInterval), claims = {
+        expiryInterval = parseInt(jwtproperties.expiryInterval || TOKENMANCONF.expiryInterval), claims = {
             iss: TOKENMANCONF.iss||"Monkshu", 
             iat: timenowEPOCH, iatms: timenow, nbf: timenowEPOCH, exp: timenowEPOCH+expiryInterval, 
             jti: cryptmod.randomBytes(16).toString("hex"), expiryInterval, ...jwtproperties
