@@ -28,7 +28,7 @@ function initSync() {
 
     if (TOKENMANCONF.useGlobalMemory) TOKEN_MEMORY = _ => DISTRIBUTED_MEMORY; else TOKEN_MEMORY = _ => CLUSTER_MEMORY;
 
-    try {conf = require(TOKENMANCONF);} catch (err) {conf = {}}
+    try {conf = TOKENMANCONF;} catch (err) {conf = {}}
     // Default config if none was specified with 10 minute expiry and 30 min cleanups
     conf.expiryInterval = conf.expiryInterval || DEFAULT_TOKEN_EXPIRY; 
     conf.tokenGCInterval = conf.tokenGCInterval || DEFAULT_GC_INTERVAL;
