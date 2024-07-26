@@ -120,7 +120,7 @@ $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
         if (!response.ok) throw new Error(`Issue in fetch for URL ${url}, status returned is ${response.status} ${response.statusText}`);
         else return response;
     } catch (err) {
-        throw err;
+        throw new Error(`Issue in fetch for URL ${url}, the error is ${err.toString()}`);
     }
 }
     

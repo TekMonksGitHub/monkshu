@@ -78,6 +78,9 @@ async function bootstrap() {
 		throw err;	// stop the server as app init failed
 	}
 
+	/* Setup server ID stamp */
+	CONSTANTS.SERVER_ID = utils.generateUUID(false);
+
 	/* Log the start */
 	LOG.info("Server started.");
 	LOG.console("\nServer started.");

@@ -34,20 +34,21 @@ function init() {
 }
 
 async function doService(request) { 
-    if (request.type == BLACKBOARD_MSG) {   // received network message
+    if (request.type == BLACKBOARD_MSG) {   // received network message; if in a nodejs cluster, use cluster to broadcast, else broadcast here
         if (process.send) (process.send({type: BLACKBOARD_MSG, msg: request.msg}));
-        else _broadcast(request.msg);
+        else _broadcast(request.msg);   // no cluster so broadcast locally
         return CONSTANTS.TRUE_RESULT;
     } else return CONSTANTS.FALSE_RESULT;
 }
 
 async function publish(topic, payload) {
     const poster = conf.secure?rest.postHttps:rest.post;
-    const _createBroadcastMessage = _ => {return {topic, payload, processid: process.pid}};
+    const _createBroadcastMessage = _ => {return {topic, payload, serverid: CONSTANTS.SERVER_ID}};
 
     let failedReplicas = 0;
     for (const replica of conf.replicas) {
-        const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
+        const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
+        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
         try {
             await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:_createBroadcastMessage()}, (err,result) => {
                 if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
@@ -87,7 +88,8 @@ function sendReply(topic, blackboardcontrol, payload) {
 
 async function isEntireReplicaClusterOnline() {
     for (const replica of conf.replicas) {
-        const host = replica.substring(0, replica.lastIndexOf(":")); const port = replica.substring(replica.lastIndexOf(":")+1);
+        const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
+        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
         const check = await netcheck.checkConnect(host, port); if (!check.result) return false;
     }
     return true;
@@ -115,8 +117,8 @@ function _broadcast(msg) {
     if (topics[topic]) for (const subscriber of topics[topic]) {
         const {callback, options} = subscriber;
         if (!options) {callback(msg.payload); continue;}  // no options means receive all the time
-        if (options[module.exports.LOCAL_ONLY]) {if (msg.processid == process.pid) callback(msg.payload); continue;}
-        if (options[module.exports.EXTERNAL_ONLY]) {if (msg.processid != process.pid) callback(msg.payload); continue;}
+        if (options[module.exports.LOCAL_ONLY]) {if (msg.serverid == CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
+        if (options[module.exports.EXTERNAL_ONLY]) {if (msg.serverid != CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
         callback(msg.payload); // no valid option - so send it out still
     }
 }

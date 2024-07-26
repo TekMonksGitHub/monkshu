@@ -1,4 +1,4 @@
 {
-    "replicas": [],
+    "replicas": ["testhost1.app", "testhost2.app", "testhost3.app"],
     "secure": true
 }
