@@ -7,6 +7,8 @@
 const fs = require("fs");
 const path = require("path");
 const SERVER_ROOT = path.resolve(`${__dirname}/../`);
+const TESTING_TIMEOUT_INTERVAL = require(`${__dirname}/testing.json`).maxtestinginterval;
+
 
 async function runTestsAsync(argv) {
 	const testCasesDir = path.resolve(argv[0]);
@@ -96,15 +98,28 @@ async function main(argv) {
 		console.error(`Usage: ${__filename} [app tests folder path] [...other params]`);
 		exit(1);
 	}
-    setupServerEnvironmentForTesting();    	// init the server environment only
 
-    await runTestsAsync(argv); 				// run the tests
-	LOG.flushSync();    					// ensure all logs are written out before exit
+	try {
+        setupServerEnvironmentForTesting(); // Init the server environment only
+        if (TESTING_TIMEOUT_INTERVAL && TESTING_TIMEOUT_INTERVAL > 0) {
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout: The test cases are taking too long to complete')), TESTING_TIMEOUT_INTERVAL)
+            );
+            await Promise.race([runTestsAsync(argv), timeoutPromise]); // Force timeout error if the tests take too long
+        } else {
+            await runTestsAsync(argv); // Run tests without timeout
+        }
+    } catch (err) {
+        LOG.error(`Failed to initialize the server environment or run the test cases: ${err}.${err.stack ? "\n" + err.stack : ""}`);
+        exit(1);
+    }
 
-    shouldExit = true; 						// exit
+	LOG.flushSync();  // Ensure all logs are written out before exit
+	shouldExit = true; // exit
+
 }
 
-const exit = _ => process.exit(0);
+const exit = (code = 0) => process.exit(code);
 
 let shouldExit = false;
 if (require.main === module) {main(process.argv.slice(2)); setInterval(_=>{if (shouldExit) exit();}, 100 );}
