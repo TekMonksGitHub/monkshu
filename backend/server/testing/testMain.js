@@ -7,8 +7,8 @@
 const fs = require("fs");
 const path = require("path");
 const SERVER_ROOT = path.resolve(`${__dirname}/../`);
+const utils = require(`${SERVER_ROOT}/lib/utils.js`);
 const TESTING_TIMEOUT_INTERVAL = require(`${__dirname}/testing.json`).maxtestinginterval;
-
 
 async function runTestsAsync(argv) {
 	const testCasesDir = path.resolve(argv[0]);
@@ -33,7 +33,7 @@ async function runTestsAsync(argv) {
 	}
 }
 
-function setupServerEnvironmentForTesting() {
+async function setupServerEnvironmentForTesting() {
     global.CONSTANTS = require(SERVER_ROOT + "/lib/constants.js");
     const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
     
@@ -68,29 +68,33 @@ function setupServerEnvironmentForTesting() {
 	require(CONSTANTS.LIBDIR+"/app.js").initSync();
 
 	/* Init the API registry */
-	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
 	LOG.info("Initializing the API registry.");
+	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
 	apireg.initSync();
 
 	/* Init the built in blackboard server */
 	LOG.info("Initializing the distributed blackboard.");
-	require(CONSTANTS.LIBDIR+"/blackboard.js").init();
+	blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
+	blackboard.init();
 
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
-	require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
+	await require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
 	
-	/* Try to init the apps themselves */
+	/* Init the apps themselves */
 	LOG.info("Initializing the apps.");
 	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync()} catch (err) {
-		LOG.console(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack+"\n":""}`);
 		LOG.error(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack:""}`);
-		throw err;	// stop the test environment as app init failed
+		throw err;	// stop the server as app init failed
 	}
 
+	/* Setup server ID stamp */
+	CONSTANTS.SERVER_ID = utils.generateUUID(false);
+	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
+
 	/* Log the start */
-	LOG.info("Server testing environment initialized.");
-	LOG.console("\nServer testing environment initialized.\n");
+	LOG.info("Server started.");
+	LOG.console("\nServer started.");
 }
 
 async function main(argv) {
@@ -100,7 +104,7 @@ async function main(argv) {
 	}
 
 	try {
-        setupServerEnvironmentForTesting(); // Init the server environment only
+        await setupServerEnvironmentForTesting(); // Init the server environment only
         if (TESTING_TIMEOUT_INTERVAL && TESTING_TIMEOUT_INTERVAL > 0) {
             const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Timeout: The test cases are taking too long to complete')), TESTING_TIMEOUT_INTERVAL)
