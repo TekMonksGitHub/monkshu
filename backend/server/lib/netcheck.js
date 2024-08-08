@@ -30,13 +30,16 @@ const addNetEventListener = listener => netEventListeners.push(listener);
  *         The result is true on success, false otherwise. 
  *         The error is set if the result is false.
  */
-function checkConnect(host, port) {
+function checkConnect(host, port, timeout) {
     return new Promise(resolve => {
+        let resolved = false; const resolvePromise = value => {if (!resolved) {resolved = true; resolve(value);}};
+
+        if (timeout) setTimeout(_=>resolvePromise({result: false, error: `Connection establish timed out after ${timeout} ms`}), timeout);
         const testsocket = net.createConnection(port, host, _ => {
-            testsocket.end(); resolve({result: true});
+            testsocket.end(); resolvePromise({result: true}); 
         });
         testsocket.on("error", err => {
-            testsocket.end(); resolve({result: false, error: err});
+            testsocket.end(); resolvePromise({result: false, error: err});
         })
     });
 } 

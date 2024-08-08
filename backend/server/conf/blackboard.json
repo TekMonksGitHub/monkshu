@@ -1,4 +1,5 @@
 {
     "replicas": ["testhost1.app", "testhost2.app", "testhost3.app"],
-    "secure": true
+    "secure": true,
+    "quick_connect_timeout_ms": 50
 }

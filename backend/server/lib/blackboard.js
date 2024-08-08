@@ -34,7 +34,7 @@ function init() {
     process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
     process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
     if (!conf.replicas) conf.replicas = []; // init to empty list if not provided
-    utils.setIntervalImmediately(async _ => _currentClusterSizeOnline = await _updateCurrentClusterSizeOnline(), 100);
+    utils.setIntervalImmediately(async _ => _currentClusterSizeOnline = await _getCurrentClusterSizeOnline(), 100);
 }
 
 /** called by internal blackboard, not a public API */
@@ -71,12 +71,21 @@ async function publish(topic, payload, options) {
     }
 
     let failedReplicas = 0;
+    const shouldPostToThisReplica = async (host, port) => {
+        if (isEntireReplicaClusterOnline()) return true;
+        const canConnectToThisReplica = await _quickConnectCheck(host, port); return canConnectToThisReplica;
+    }
     for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
         const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
         try {
-            if ((!isEntireReplicaClusterOnline) && (!await _quickConnectCheck(host, port))) continue; // don't waste time publishing to nodes not reachable
-            if (options[blackboard.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
+            if (options?.[module.exports.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
+            
+            if (!(await shouldPostToThisReplica(host, port))) {  // don't waste time publishing to nodes not reachable
+                LOG.error(`Blackboard can't reach replica ${replica}, due to connection error. The message topic is ${topic}.`); 
+                failedReplicas++; continue; 
+            }
+            
             await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:_createBroadcastMessage()}, (err,result) => {
                 if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
             });
@@ -165,7 +174,7 @@ function unsubscribe(topic, callback) {
     if (indexFound != -1) topicSubscribersArray.splice(indexFound, 1);
 }
 
-async function _updateCurrentClusterSizeOnline() {
+async function _getCurrentClusterSizeOnline() {
     let size = 0; for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
         const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
@@ -174,7 +183,11 @@ async function _updateCurrentClusterSizeOnline() {
     return size;
 }
 
-const _quickConnectCheck = async (host, port) => await netcheck.checkConnect(host, port);
+const _quickConnectCheck = async (host, port) => {
+    const resultObject = await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms);
+    if (!resultObject.result) LOG.error(`Quick connect check to ${host}:${port} failed due to error: ${resultObject.error}`);
+    return resultObject.result;
+}
 
 function _broadcast(msg) {
     // handle specially formatted request-reply messages here
