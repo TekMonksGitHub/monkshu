@@ -19,7 +19,7 @@ const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf",
     BLACKBOARD_REQUESTREPLY_TOPIC = "__org_monkshu_blackboard_requestreply_topic";
 
-let _currentClusterSizeOnline;
+let _currentClusterSizeOnline=0, _replicasOffline=[], _replicasOnline = [];
 
 function init() {
     global.BLACKBOARD = this;
@@ -34,7 +34,7 @@ function init() {
     process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
     process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
     if (!conf.replicas) conf.replicas = []; // init to empty list if not provided
-    utils.setIntervalImmediately(async _ => _currentClusterSizeOnline = await _getCurrentClusterSizeOnline(), 100);
+    utils.setIntervalImmediately(_setCurrentClusterSizeOnline, conf.cluster_check_interval_ms);
 }
 
 /** called by internal blackboard, not a public API */
@@ -71,17 +71,13 @@ async function publish(topic, payload, options) {
     }
 
     let failedReplicas = 0;
-    const shouldPostToThisReplica = async (host, port) => {
-        if (isEntireReplicaClusterOnline()) return true;
-        const canConnectToThisReplica = await _quickConnectCheck(host, port); return canConnectToThisReplica;
-    }
     for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
         const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
         try {
             if (options?.[module.exports.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
             
-            if (!(await shouldPostToThisReplica(host, port))) {  // don't waste time publishing to nodes not reachable
+            if (!(await isReplicaOnline(host, port))) {  // don't waste time publishing to nodes not reachable
                 LOG.error(`Blackboard can't reach replica ${replica}, due to connection error. The message topic is ${topic}.`); 
                 failedReplicas++; continue; 
             }
@@ -144,6 +140,14 @@ function isEntireReplicaClusterOnline() {
     return _currentClusterSizeOnline == conf.replicas.length;
 }
 
+/** @return {boolean} true if the replica is online, else false */
+async function isReplicaOnline(host, port) {
+    if (isEntireReplicaClusterOnline()) return true;    // entire cluster is online
+    if (_replicasOnline.includes(host+":"+port)) return true; // definitely online
+    if (_replicasOffline.includes(host+":"+port)) return false; // definitely offline
+    return (await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms)).result;  // we are in the middle of updating cluster status, so it is unreliable, perform a full check ourselves
+}
+
 /** @return {number} The size of the cluster currently online */
 function getCurrentClusterSizeOnline() { return _currentClusterSizeOnline; }
 
@@ -174,19 +178,15 @@ function unsubscribe(topic, callback) {
     if (indexFound != -1) topicSubscribersArray.splice(indexFound, 1);
 }
 
-async function _getCurrentClusterSizeOnline() {
+async function _setCurrentClusterSizeOnline() {
+    _replicasOffline = []; _replicasOnline = [];
     let size = 0; for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
         const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
-        const check = await netcheck.checkConnect(host, port); if (check.result) size++;
+        const check = await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms); 
+        if (check.result) {size++; _replicasOnline.push(host+":"+port);} else _replicasOffline.push(host+":"+port);
     }
-    return size;
-}
-
-const _quickConnectCheck = async (host, port) => {
-    const resultObject = await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms);
-    if (!resultObject.result) LOG.error(`Quick connect check to ${host}:${port} failed due to error: ${resultObject.error}`);
-    return resultObject.result;
+    _currentClusterSizeOnline = size;
 }
 
 function _broadcast(msg) {
