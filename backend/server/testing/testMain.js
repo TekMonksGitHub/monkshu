@@ -42,7 +42,7 @@ async function setupServerEnvironmentForTesting() {
 
 	/* Init the logs */
 	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.testlogfile}`);
 	LOG.overrideConsole();
 
 	/* Warn if in debug mode */
