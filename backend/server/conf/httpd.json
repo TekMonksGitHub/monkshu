@@ -10,10 +10,10 @@
     },
     "host": "{{{hostname}}}",
     "port": 9090,
-    "ssl": false,
+    "ssl": true,
     "forceHTTP1": false,
-    "sslKeyFile":"/path/to/certificate/key.pem",
-    "sslCertFile":"/path/to/certificate/cert.pem",
+    "sslKeyFile": "/Users/rvkapoor/Documents/Programs/source/etc/dnsip_privkey.pem",
+    "sslCertFile": "/Users/rvkapoor/Documents/Programs/source/etc/dnsip_fullchain.pem",
     "ipblacklistRefresh": 5000,
     "ipwhitelistRefresh": 5000
 }

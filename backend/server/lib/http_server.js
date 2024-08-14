@@ -4,18 +4,20 @@
  * License: See enclosed LICENSE file.
  */
 const fs = require("fs");
+const path = require("path");
 const http = require("http");
 const https = require("https");
 const http2 = require("http2");
 const mustache = require("mustache");
+const app = require (CONSTANTS.LIBDIR+"/app.js");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
-const conf = JSON.parse(mustache.render(fs.readFileSync(`${CONSTANTS.HTTPDCONF}`, "utf8"), {hostname: CONSTANTS.HOSTNAME}));
-let ipblacklist = [], ipwhitelist = [];
+let ipblacklist = [], ipwhitelist = [], conf;
 
 function initSync() {
 	/* create HTTP/S server */
+	_initConfSync();
 	let host = conf.host || "::"; 
 	utils.watchFile(CONSTANTS.IPBLACKLIST, data=>ipblacklist=JSON.parse(data), conf.ipblacklistRefresh||10000); 
 	utils.watchFile(CONSTANTS.IPWHITELIST, data=>ipwhitelist=JSON.parse(data), conf.ipwhitelistRefresh||10000); 
@@ -26,6 +28,9 @@ function initSync() {
 			res.socket.destroy(); res.end(); return; }	
 		if (!ipwhitelist.length && _isIPInList(req, ipblacklist)) { LOG.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); // blacklisted, won't honor
 			res.socket.destroy(); res.end(); return; }	
+		const incomingURL = new URL(_normalizeURL(req.url), `${req.protocol||req.socket.encrypted?"https":"http"}://${utils.getServerHost(req)}`);
+		if (conf.virtualhosts && (!conf.virtualhosts.includes(incomingURL.host))) { LOG.error(`Blocking request as URL ${incomingURL} is not in the configured virtual hosts table.`); // bad request
+			res.socket.destroy(); res.end(); return; }	
 
 		if (req.method.toLowerCase() == "options") {
 			res.writeHead(200, conf.headers);
@@ -35,7 +40,7 @@ function initSync() {
 			const remoteHost = utils.getClientIP(req), remotePort = utils.getClientPort(req);
 			const servObject = {req, res, env:{remoteHost, remotePort, remoteAgent: req.headers["user-agent"]}, 
 				server: module.exports, compressionFormat: req.headers["content-encoding"]?.toLowerCase().includes("gzip") ? CONSTANTS.GZIP : undefined}; 
-			for (const header of Object.keys(req.headers)) {
+			for (const header of Object.keys(req.headers)) {	// lower case the incoming headers
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;
 			}
@@ -129,6 +134,31 @@ function _shouldWeGZIP(servObject, dontGZIP) {
 	if (dontGZIP) return false;
 	const acceptEncoding = _cloneLowerCase(servObject.req.headers)["accept-encoding"] || "identity";
 	return conf.enableGZIPEncoding && acceptEncoding.toLowerCase().includes("gzip");
+}
+
+function _initConfSync() {
+	conf = JSON.parse(mustache.render(fs.readFileSync(`${CONSTANTS.HTTPDCONF}`, "utf8"), {hostname: CONSTANTS.HOSTNAME}));
+	const httpd_conf_expands = ["appname", "serverroot", "hostname"];
+
+	// merge app conf files into main http server, for app specific configuration directives 
+	const appRoots = app.getApps(); for (const appObject of appRoots) {
+		const [appname, appRoot] = Object.entries(appObject)[0]; if (fs.existsSync(`${appRoot}/conf/httpd.json`)) {
+			const appHostname = fs.existsSync(`${appRoot}/conf/hostname.json`) ? require(`${appRoot}/conf/hostname.json`) : CONSTANTS.HOSTNAME;
+			let appHTTPDConf = fs.readFileSync(`${appRoot}/conf/httpd.json`, "utf8");
+			const replacers = {hostname: appHostname, serverroot: CONSTANTS.ROOTDIR, appname};
+			for (const escapedValue of httpd_conf_expands) appHTTPDConf = appHTTPDConf.replaceAll(`{{{${escapedValue}}}}`,
+				replacers[escapedValue]).replaceAll(`{{${escapedValue}}}`,replacers[escapedValue]);
+			appHTTPDConf = JSON.parse(appHTTPDConf);
+			
+			for (const confKey of Object.keys(appHTTPDConf)) {
+				const value = appHTTPDConf[confKey];
+				if (!conf[confKey]) {conf[confKey] = value; continue;}	// not set, then just set it
+				if (Array.isArray(value)) conf[confKey] = utils.union(value, conf[confKey]);	// merge arrays
+				else if (typeof value === "object" && value !== null) conf[confKey] = {...conf[confKey], ...value};	// merge objects, app overrides
+				else conf[confKey] = value;	// override value
+			}
+		}
+	}
 }
 
 const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(obj)) clone[key.toLocaleLowerCase()] = obj[key]; return clone;}
