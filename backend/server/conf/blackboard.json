@@ -2,5 +2,6 @@
     "replicas": ["testhost1.app", "testhost2.app", "testhost3.app"],
     "secure": true,
     "cluster_check_interval_ms": 100,
-    "quick_connect_timeout_ms": 50
+    "quick_connect_timeout_ms": 50,
+    "local_cluster_timeout_ms": 100
 }

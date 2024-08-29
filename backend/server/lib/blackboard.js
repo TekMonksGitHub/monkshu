@@ -15,6 +15,7 @@ const rest = require(`${CONSTANTS.LIBDIR}/rest.js`);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 let conf = _expandConf(require(CONSTANTS.BLACKBOARDCONF));
 const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
+const clustermemory = require(`${CONSTANTS.LIBDIR}/clustermemory.js`);
 
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf",
     BLACKBOARD_REQUESTREPLY_TOPIC = "__org_monkshu_blackboard_requestreply_topic";
@@ -31,8 +32,10 @@ function init() {
         // serialize to survive restarts
         fs.writeFile(CONSTANTS.BLACKBOARDCONF, JSON.stringify(confNew));    // serialize
     });
-    process.on("message", msg => {if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
-    process.on("message", msg => {if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
+    process.on("message", msg => {
+        if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
+    process.on("message", msg => {
+        if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
     if (!conf.replicas) conf.replicas = []; // init to empty list if not provided
     utils.setIntervalImmediately(_setCurrentClusterSizeOnline, conf.cluster_check_interval_ms);
 }
@@ -73,7 +76,7 @@ async function publish(topic, payload, options) {
     let failedReplicas = 0;
     for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
-        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
+        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_HTTPD_PORT;
         try {
             if (options?.[module.exports.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
             
@@ -88,9 +91,9 @@ async function publish(topic, payload, options) {
         } catch (err) { LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}. The message topic is ${topic}.`); failedReplicas++; }
     }
 
-    // if onlylocal is set or network is down or if all replicas are misconfigured, then at least broadcast to the local nodes
-    // so that applications relying on the blackboard keep running. 
-    if ((!conf.replicas.length) || (failedReplicas == conf.replicas.length)) {   
+    // if the network is down or if all replicas are misconfigured, then at least broadcast to the local nodes
+    // so that applications relying on the blackboard keep running, as long as the external only is not set.
+    if ((!options?.[module.exports.EXTERNAL_ONLY]) && ((!conf.replicas.length) || (failedReplicas == conf.replicas.length))) {   
         LOG.error(`Failed to reach all replicas. Assuming network isolated topology. Broadcasting the message locally. The message topic is ${topic}.`);
         if (process.send) process.send({type: BLACKBOARD_MSG, msg:_createBroadcastMessage()});   // broadcast to the local cluster if no replicas working
         else _broadcast(_createBroadcastMessage());  // if no local cluster then just give up and send to the local applications
@@ -105,34 +108,41 @@ function getDistribuedClusterSize() {return conf.replicas.length;}
  * @param {string} topic The topic
  * @param {object} payload The message to send for whom the reply is needed
  * @param {number} timeout The timeout, after which give up
+ * @param {object} options Same as publish options
  * @param {function} replyReceiver The function to receove the reply, unless await is called
  * @returns The replies received as an [array of reply objects]
  */
-function getReply(topic, payload, timeout, replyReceiver) {
+async function getReply(topic, payload, timeout, options, replyReceiver) {
     if (!replyReceiver) return new Promise(resolve => getReply(...arguments, resolve));
 
     const id = utils.generateUUID();
     let repliesReceived = 0, replied = false, replies = [];
     const timeoutID = setTimeout(_=>{ if (!replied) {replied = true; replies.incomplete = true; replyReceiver(replies);}}, timeout);
+    const repliedExpected = options[module.exports.LOCAL_ONLY] ? 1 : options[module.exports.LOCAL_CLUSTER_ONLY] ? 
+        await ((async _=> {
+            const count = await clustermemory.getClusterCount(conf.local_cluster_timeout_ms); 
+            if ((!count) || count == 0) return 1; else return count
+        })()) : conf.replicas.length;
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
         if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies
-        replies.push(msg.reply); repliesReceived++; if (repliesReceived < conf.replicas.length) return;  // still waiting
+        replies.push(msg.reply); repliesReceived++; if (repliesReceived < repliedExpected) return;  // still waiting
         clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
         replyReceiver(replies); replied = true;
     });
     const finalPayload = {id, payload, topic, type: "request"}; 
-    publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload);
+    publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload, options);
 }
 
 /**
  * Sends reply for the given topic
  * @param {string} topic The topic
  * @param {object} blackboardcontrol The blackboard control object which was passed along with the original message
- * @param {message} payload The reply message 
+ * @param {object} payload The reply message 
+ * @param {object} options Same as publish options
  */
-function sendReply(topic, blackboardcontrol, payload) {
-    publish(BLACKBOARD_REQUESTREPLY_TOPIC, {id: blackboardcontrol, topic, reply: payload, type: "reply"});
+function sendReply(topic, blackboardcontrol, payload, options) {
+    publish(BLACKBOARD_REQUESTREPLY_TOPIC, {id: blackboardcontrol, topic, reply: payload, type: "reply"}, options);
 }
 
 /** @return {boolean} true if the entire cluster is online, else false */
@@ -182,7 +192,7 @@ async function _setCurrentClusterSizeOnline() {
     _replicasOffline = []; _replicasOnline = [];
     let size = 0; for (const replica of conf.replicas) {
         const host = replica.lastIndexOf(":") != -1 ? replica.substring(0, replica.lastIndexOf(":")) : replica; 
-        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_PORT;
+        const port = replica.lastIndexOf(":") != -1 ? replica.substring(replica.lastIndexOf(":")+1) : CONSTANTS.DEFAULT_HTTPD_PORT;
         const check = await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms); 
         if (check.result) {size++; _replicasOnline.push(host+":"+port);} else _replicasOffline.push(host+":"+port);
     }
@@ -191,7 +201,7 @@ async function _setCurrentClusterSizeOnline() {
 
 function _broadcast(msg) {
     // handle specially formatted request-reply messages here
-    if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.type == "request") msg = {
+    if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.payload.type == "request") msg = {
         topic: msg.payload.topic, payload: {...msg.payload.payload, blackboardcontrol: msg.payload.id}};
     
     const topic = msg.topic; 

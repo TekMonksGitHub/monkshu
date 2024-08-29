@@ -4,25 +4,27 @@
  * License: See enclosed LICENSE file.
  */
 const fs = require("fs");
-const path = require("path");
 const http = require("http");
 const https = require("https");
 const http2 = require("http2");
 const mustache = require("mustache");
+const blackboard = require("./blackboard");
 const app = require (CONSTANTS.LIBDIR+"/app.js");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
+const netcheck = require (CONSTANTS.LIBDIR+"/netcheck.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
-let ipblacklist = [], ipwhitelist = [], conf;
+let ipblacklist = [], ipwhitelist = [], conf, thisServersPort;
 
-function initSync() {
+async function initAsync() {
 	/* create HTTP/S server */
 	_initConfSync();
 	let host = conf.host || "::"; 
 	utils.watchFile(CONSTANTS.IPBLACKLIST, data=>ipblacklist=JSON.parse(data), conf.ipblacklistRefresh||10000); 
 	utils.watchFile(CONSTANTS.IPWHITELIST, data=>ipwhitelist=JSON.parse(data), conf.ipwhitelistRefresh||10000); 
 
-	LOG.info(`Attaching socket listener on ${host}:${conf.port}`);
+	const portToListenOn = await _resolveListeningPort(); thisServersPort = portToListenOn;
+	LOG.info(`Attaching socket listener on ${host}:${portToListenOn}`);
 	const listener = (req, res) => {
 		if (ipwhitelist.length && !_isIPInList(req, ipwhitelist)) { LOG.error(`Blocking IP, not whitelisted ${utils.getClientIP(req)}`); // whitelist in operation, won't honor
 			res.socket.destroy(); res.end(); return; }	
@@ -52,10 +54,10 @@ function initSync() {
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
 	const server = options && (!conf.forceHTTP1) ? http2.createSecureServer({...options, allowHTTP1: true}, listener) : options ? https.createServer(options, listener) : http.createServer(listener); // create server for http2 or http1 based on configurations
 	server.timeout = conf.timeout;
-	server.listen(conf.port, host);
+	server.listen(portToListenOn, host);
 
-	LOG.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${conf.port}`);
-	LOG.console(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${conf.port}`);
+	LOG.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${portToListenOn}`);
+	LOG.console(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${portToListenOn}`);
 }
 
 function onData(_data, _servObject) { }
@@ -123,6 +125,33 @@ const inflateServObject = servObject => {
 	return {req: servObject.req, res: servObject.res, env: servObject.env, server: module.exports, compressionFormat: servObject.compressionFormat};
 }
 
+async function _resolveListeningPort() {
+	blackboard.subscribe("__org_monkshu_httpd_server_portcheck", message => {
+		blackboard.sendReply("__org_monkshu_httpd_server_portcheck", message.blackboardcontrol, {
+			server_ts: CONSTANTS.SERVER_START_TIME, server_id: CONSTANTS.SERVER_ID});
+	});
+	const _getListenablePort = async _ => {
+		const bboptions = {}; bboptions[blackboard.LOCAL_CLUSTER_ONLY] = true;
+		const serverReplies = await blackboard.getReply("__org_monkshu_httpd_server_portcheck", {}, 5000, bboptions);
+		serverReplies.push({server_ts: CONSTANTS.SERVER_START_TIME, server_id: CONSTANTS.SERVER_ID});
+		serverReplies.sort((a, b) => {
+			if (a.server_ts < b.server_ts) return -1;
+			if (a.server_ts == b.server_ts) {	// started at the same time, so sort on IDs
+				if (a.server_id < b.server_id) return -1;
+				else return 1;
+			}
+			return 1;
+		});
+		let listenableIndex = -1; for (const [i, serverReply] of serverReplies.entries()) 
+			if (serverReply.server_id == CONSTANTS.SERVER_ID) {listenableIndex = i; break};
+		return listenableIndex != -1 ? conf.ports[listenableIndex] : null;	// voting algorithm failed
+	}
+
+	if ((!conf.ports) && conf.port) return conf.port;
+	const freePort = await _getListenablePort();
+	return freePort||CONSTANTS.DEFAULT_HTTPD_PORT;
+}
+
 function _isIPInList(req, listHolder) {
 	let clientIP = utils.getClientIP(req); const ipAnalysis = utils.analyzeIPAddr(clientIP);
 	if (ipAnalysis.ipv6) clientIP = utils.expandIPv6Address(clientIP); else clientIP = ipAnalysis.ip;
@@ -165,6 +194,6 @@ const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(ob
 const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
-module.exports = {initSync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
+module.exports = {initAsync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
 	statusInternalError, statusTimeOut, statusOK, write, end, blacklistIP, whitelistIP, getSerializableServObject,
 	inflateServObject}

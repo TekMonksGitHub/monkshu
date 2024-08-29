@@ -23,6 +23,11 @@ async function bootstrap() {
 	/* Init - Server bootup */
 	console.log("Starting...");
 
+	/* Setup server ID stamp, IP etc */
+	CONSTANTS.SERVER_ID = utils.generateUUID(false);
+	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
+	CONSTANTS.SERVER_START_TIME = Date.now();
+
 	/* Init the logs */
 	console.log("Initializing the logs.");
 	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
@@ -61,7 +66,7 @@ async function bootstrap() {
 	blackboard.init();
 
 	/* Run the transport */
-	_initAndRunTransportLoop();
+	await _initAndRunTransportLoop();
 
 	/* Init the global memory */
 	LOG.info("Initializing the global memory.");
@@ -78,19 +83,16 @@ async function bootstrap() {
 		throw err;	// stop the server as app init failed
 	}
 
-	/* Setup server ID stamp */
-	CONSTANTS.SERVER_ID = utils.generateUUID(false);
-	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
-
 	/* Log the start */
 	LOG.info("Server started.");
 	LOG.console("\nServer started.");
 }
 
-function _initAndRunTransportLoop() {
+async function _initAndRunTransportLoop() {
 	/* Init the transport */
 	_server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
-	_server.initSync(); module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
+	if (_server.initAsync) await _server.initAsync(); else if (server.initSync) server.initSync(); 
+	module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
