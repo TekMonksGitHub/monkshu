@@ -6,6 +6,11 @@
 
 window.$$ = {_slowNetwork: false};
 
+$$.getRootAppName = _ => {
+    const path = new URL(window.location.href).pathname, splits = path.split("/");
+    return splits.at(2);
+}
+
 $$.ready = callback => {
     // in case the document is already rendered
     if (document.readyState!='loading') callback();

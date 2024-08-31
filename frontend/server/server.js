@@ -17,7 +17,7 @@ const fspromises = fs.promises;
 const mustache = require("mustache");
 const args = require(`${__dirname}/lib/processargs.js`);
 
-const HTTPD_CONF_EXPANDS = ["appname", "serverroot", "hostname"];
+const HTTPD_CONF_EXPANDS = ["appname", "serverroot", "hostname", "app"];
 
 let access, error, utils;
 
@@ -74,7 +74,7 @@ function _initConfSync() {
 				const appHostname = fs.existsSync(`${__dirname}/../apps/${app}/conf/hostname.json`) ?
 					require(`${__dirname}/../apps/${app}/conf/hostname.json`) : hostname;
 				let appHTTPDConf = fs.readFileSync(`${__dirname}/../apps/${app}/conf/httpd.json`, "utf8");
-				const replacers = {hostname: appHostname, serverroot: conf.serverroot, appname: app};
+				const replacers = {hostname: appHostname, serverroot: conf.serverroot, appname: app, app};
 				for (const escapedValue of HTTPD_CONF_EXPANDS) appHTTPDConf = appHTTPDConf.replaceAll(`{{{${escapedValue}}}}`,
 					replacers[escapedValue]).replaceAll(`{{${escapedValue}}}`,replacers[escapedValue]);
 				appHTTPDConf = JSON.parse(appHTTPDConf);
