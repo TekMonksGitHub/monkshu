@@ -1,8 +1,9 @@
-/* 
- * (C) 2015, 2016, 2017, 2018, 2019, 2020. TekMonks. All rights reserved.
- * License: MIT - see enclosed LICENSE file.
+/** 
+ * (C) 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024. 
+ * TekMonks. All rights reserved.
+ * License: See the enclosed LICENSE file.
  * 
- * Handles apps.
+ * Handles the backend apps.
  */
 
 const fs = require("fs");
