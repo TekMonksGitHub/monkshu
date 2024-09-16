@@ -3,7 +3,9 @@
 GOTO :CMDSCRIPT
 ::CMDLITERAL
 
-/sbin/ifconfig  | grep -i mask | grep -v "127.0.0" | head -1 | awk '{$1=$1;print}' | cut -d" " -f2 | awk '{$1=$1;print}'
+IPADDRESS=`/sbin/ifconfig  | grep -i mask | grep -v "127.0.0" | head -1 | awk '{$1=$1;print}' | cut -d" " -f2 | awk '{$1=$1;print}'`
+if [ -z $IPADDRESS ]; then IPADDRESS=127.0.0.1; fi
+echo $IPADDRESS
 exit 0
 
 :CMDSCRIPT

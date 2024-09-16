@@ -10,8 +10,8 @@ const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
 const BUILD_CONF = require(`${MONKSHU_PATH}/build/build.json`);
 const BACKEND_HTTPD_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/httpd.json`);
 const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
-const LOCAL_IP = require(`${MONKSHU_PATH}/backend/server/lib/utils.js`).getLocalIPs(true)[0];
 const BLACKBOARD_CONF_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/blackboard.json`);
+const LOCAL_IP = require(`${MONKSHU_PATH}/backend/server/lib/utils.js`).getLocalIPs(true)[0]||"127.0.0.1";
 const DEFAULT_APP_NAME = _resolveDefaultAppNameSync();
  
 // build
