@@ -45,8 +45,9 @@ function _doesResourceMatchPermissionPath(resource, permissionpath) {
     else if (router.doURLsMatch(permissionpath, resource)) return true;
     
     // now check via the RE route
-    const regExpObj = new RegExp(permissionpath);  
-    return resource.match(regExpObj) ? true : router.doURLsMatch(permissionpath, resource, true);
+    const regExpObj = new RegExp(permissionpath), regexpMatch = resource.match(regExpObj) ? true : false, 
+        routerMatch = regexpMatch ? true : router.doURLsMatch(permissionpath, resource, true);
+    return regexpMatch || routerMatch;
 }
 
 export const securityguard = {isAllowed, setAppInterceptor, getAppInterceptor, setPermissionsMap, getPermissionsMap, 
