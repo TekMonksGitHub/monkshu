@@ -8,8 +8,6 @@ const fspromises = require("fs").promises;
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const {os_cmd} = require(`${CONSTANTS.EXTDIR}/os_cmd.js`);
 const BUILD_CONF = require(`${MONKSHU_PATH}/build/build.json`);
-const BACKEND_HTTPD_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/httpd.json`);
-const BACKEND_HOST_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/hostname.json`);
 const BLACKBOARD_CONF_FILE = path.resolve(`${MONKSHU_PATH}/backend/server/conf/blackboard.json`);
 const LOCAL_IP = require(`${MONKSHU_PATH}/backend/server/lib/utils.js`).getLocalIPs(true)[0]||"127.0.0.1";
 const DEFAULT_APP_NAME = _resolveDefaultAppNameSync();
@@ -30,9 +28,10 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         CONSTANTS.LOGINFO("Setting hostnames");
         CONSTANTS.LOGINFO(`Resolved app name as ${appname||DEFAULT_APP_NAME}`);
         const frontend_host_file = path.resolve(`${MONKSHU_PATH}/frontend/apps/${appname||DEFAULT_APP_NAME}/conf/hostname.json`);
+        const backend_host_file = path.resolve(`${MONKSHU_PATH}/backend/apps/${appname||DEFAULT_APP_NAME}/conf/hostname.json`);
         
-        CONSTANTS.LOGINFO("Writing hostname to "+BACKEND_HOST_FILE);
-        await _makePathWritable(BACKEND_HOST_FILE); await fspromises.writeFile(BACKEND_HOST_FILE, `"${LOCAL_IP}"`);
+        CONSTANTS.LOGINFO("Writing hostname to "+backend_host_file);
+        await _makePathWritable(backend_host_file); await fspromises.writeFile(backend_host_file, `"${LOCAL_IP}"`);
         CONSTANTS.LOGINFO("Writing hostname to "+frontend_host_file);
         await _makePathWritable(frontend_host_file); await fspromises.writeFile(frontend_host_file, `"${LOCAL_IP}"`);
         
@@ -40,8 +39,9 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         const blackboard_conf = (await fspromises.readFile(BLACKBOARD_CONF_FILE, "utf8")).replace(/\"secure\"\s*:\s*false/, `"secure": true`);
         await _makePathWritable(BLACKBOARD_CONF_FILE); await fspromises.writeFile(BLACKBOARD_CONF_FILE, blackboard_conf);
         
-        CONSTANTS.LOGINFO("Adding SSL certificate paths to "+BACKEND_HTTPD_FILE);
-        await _makePathWritable(BACKEND_HTTPD_FILE); await _modifyHTTPDConf(BACKEND_HTTPD_FILE, etcdir, false);
+        const backend_httpd_file = path.resolve(`${MONKSHU_PATH}/backend/apps/${appname||DEFAULT_APP_NAME}/conf/httpd.json`);
+        CONSTANTS.LOGINFO("Adding SSL certificate paths to "+backend_httpd_file);
+        await _makePathWritable(backend_httpd_file); await _modifyHTTPDConf(backend_httpd_file, etcdir, false);
         const frontend_httpd_file = path.resolve(`${MONKSHU_PATH}/frontend/apps/${appname||DEFAULT_APP_NAME}/conf/httpd.json`);
         CONSTANTS.LOGINFO("Adding SSL certificate paths to "+frontend_httpd_file);
         await _makePathWritable(frontend_httpd_file); await _modifyHTTPDConf(frontend_httpd_file, etcdir, true);
