@@ -142,13 +142,14 @@ async function doService(data, servObject, headers, url) {
 	
 	const urlParams = new URL(url).searchParams, headersPlusURLParams = {...headers};
 	for (const urlParam of urlParams) if (urlParam[0] == SERVER_ID_HEADER) headersPlusURLParams[urlParam[0]] = urlParam[1];
+	if (headersPlusURLParams[SERVER_ID_HEADER]) LOG.info(`Sticky server ID header found. Redirect: ${SERVER_STAMP} -> ${headersPlusURLParams[SERVER_ID_HEADER]}`);
 	if (headersPlusURLParams[SERVER_ID_HEADER] && (headersPlusURLParams[SERVER_ID_HEADER] != SERVER_STAMP)) {
 		const ipcServerReply = await _getResponseViaInternalIPC(data, servObject, headersPlusURLParams, url);
 		return ipcServerReply;
 	}
 	
 	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
-	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
+	const api = APIREGISTRY.getAPI(url), apiconf = APIREGISTRY.getAPIConf(url);
 	LOG.info("Looked up service, calling: " + api);
 	
 	if (api) {
@@ -162,8 +163,8 @@ async function doService(data, servObject, headers, url) {
 			LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); return ({code: reason.code||401, respObj: {result: false, error: "Security check failed."}, reqObj: jsonObj}); }
 
 		try { 
-			const apiModule = apiConf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(api) :
-				utils.requireWithDebug(api, conf.debug_mode), apiconf = APIREGISTRY.getAPIConf(url);
+			const apiModule = apiconf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(api) :
+				utils.requireWithDebug(api, conf.debug_mode);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 		} catch (error) {
