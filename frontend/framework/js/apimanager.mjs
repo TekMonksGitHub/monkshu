@@ -32,25 +32,28 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000
  * @param {boolean} sendErrResp Optional: true or false - if true then on error javascript error object will be returned, else return null.
  * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
  * @param {object} headers Optional: The custom headers to send
- * @param {booleab} provideHeaders Optional: Response should return response headers as an object 
+ * @param {boolean} provideHeaders Optional: Response should return response headers as an object 
+ * @param {number} retries Optional: Number of retries in case of error, default is 0
  * 
  * @return {Object} If provideHeaders is true then {response, headers} where response is the Javascript result object 
  *                  or null on error. If it is false then just response, which is the Javascript result object or null.
  */
 async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, 
-        sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false) {
+        sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false, retries=0, _retryNumber=0) {
 
     let url; if (typeof urlOrOptions === "object") {
         url = router.getBalancedURL(urlOrOptions.url); type = urlOrOptions.type; req = urlOrOptions.req; sendToken =urlOrOptions.sendToken||false; 
         extractToken = urlOrOptions.extractToken||false; canUseCache = urlOrOptions.canUseCache||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; sendErrResp = urlOrOptions.sendErrResp||false; 
         timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; headers = urlOrOptions.headers||{}; 
-        provideHeaders = urlOrOptions.provideHeaders||false;
+        provideHeaders = urlOrOptions.provideHeaders||false; retries = urlOrOptions.retries||0;
     } else url = router.getBalancedURL(urlOrOptions);
 
-    const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
-    if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
-
+    if (canUseCache) {
+        const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
+        if (storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
+    }
+    
     try {
         const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP, timeout, headers), 
             response = await fetch(urlToCall, fetchInit);
@@ -61,12 +64,25 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;   
         } else {
             LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+
+            if (retries && _retryNumber < retries) {
+                LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+                return await rest(urlOrOptions, type, req, sendToken, extractToken, 
+                    canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
+            }
+            
             const errResp = {respErr: {status: response.status, statusText: response.statusText}};
             return sendErrResp ? (provideHeaders?{response: errResp, headers: _getFetchResponseHeadersAsObject(response)}:errResp) : null; // sending error response
         }
     } catch (err) {
         LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
-        return null;
+        if (retries && _retryNumber < retries) {
+            LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+            return await rest(urlOrOptions, type, req, sendToken, extractToken, 
+                canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
+        }
+        const errResp = {respErr: {status: 400, statusText: err.toString()}};   // client error, default to 400 code
+        return sendErrResp ? errResp : null;
     }
 }
 
@@ -82,17 +98,18 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
  * @param {boolean} dontGZIP Optional: true or false - if true then the POST data will be sent uncompressed, else it will be sent as GZIPed.
  * @param {number} timeout Optional: Timeout in millioseconds for the API call. Default is 300 seconds or 300000 milliseconds.
  * @param {object} headers Optional: The custom headers to send
+ * @param {number} retries Optional: Number of retries in case of error, default is 0
  * 
  * @return {Object} Downloads the BLOB
  */
 async function blob(urlOrOptions, filename, type, req, sendToken=false, extractToken=false, dontGZIP=false, 
-        timeout=DEFAULT_TIMEOUT, headers={}) {
+        timeout=DEFAULT_TIMEOUT, headers={}, retries=0, _retryNumber=0) {
 
     let url; if (typeof urlOrOptions === "object") {
         url = router.getBalancedURL(urlOrOptions.url); filename = urlOrOptions.filename; type = urlOrOptions.type; req = urlOrOptions.req; 
         sendToken = urlOrOptions.sendToken||false; extractToken = urlOrOptions.extractToken||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; 
-        headers = urlOrOptions.headers||{};
+        headers = urlOrOptions.headers||{}; retries = urlOrOptions.retries||0;
     } else url = router.getBalancedURL(urlOrOptions);
 
     const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "*/*", dontGZIP, timeout, headers);
@@ -108,10 +125,20 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
             return true;
         } else {
             LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+            if (retries && _retryNumber < retries) {
+                LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+                return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, 
+                    headers, retries, _retryNumber+1);
+            }
             return false;
         }
     } catch (err) {
         LOG.error(`Error in blob'ing ${url} for request ${JSON.stringify(req)} of type ${type} and filename ${filename} due to ${err}`);
+        if (retries && _retryNumber < retries) {
+            LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+            return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, headers, 
+                retries, _retryNumber+1);
+        }
         return false;
     }
 }
