@@ -6,6 +6,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const archiver = require('archiver');
 const http2 = require("http2");
 const crypto = require("crypto");
 const mkdirAsync = require("util").promisify(fs.mkdir);
@@ -567,9 +568,50 @@ function objectMemSize(object) {
     return object.toString().length*2;
 }
 
+/**
+ * Zips the contents of a folder into a .zip file.
+ * 
+ * @param {string} sourceFolderPath - The path of the folder to zip.
+ * @param {string} zipFilePath - The path where the zip file should be saved.
+ * @returns {Promise<void>} - Resolves when the folder is successfully zipped.
+ * @throws {Error} - Throws an error if zipping fails.
+ */
+
+async function zipFolder(sourceFolderPath, zipFilePath) {
+    return new Promise((resolve, reject) => {
+        const output = fs.createWriteStream(zipFilePath);
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        output.on('close', () => {
+            LOG.info(`Successfully zipped folder: ${sourceFolderPath} to ${zipFilePath} (${archive.pointer()} total bytes)`);
+            resolve();
+        });
+
+        output.on('error', (err) => {
+            LOG.error(`Error with zip output stream: ${err.message}`);
+            reject(err);
+        });
+
+        archive.on('error', (err) => {
+            LOG.error(`Error while zipping folder: ${err.message}`);
+            reject(err);
+        });
+
+        archive.pipe(output);
+        archive.directory(sourceFolderPath, false);
+
+        archive.finalize().catch(err => {
+            LOG.error(`Error finalizing the zip operation: ${err.message}`);
+            reject(err);
+        });
+    });
+}
+
+
+
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings,
-    isObject, hashObject, stringToBase64, base64ToString, objectMemSize };
+    isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder };
