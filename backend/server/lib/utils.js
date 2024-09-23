@@ -578,32 +578,19 @@ function objectMemSize(object) {
  */
 
 async function zipFolder(sourceFolderPath, zipFilePath) {
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    archive.directory(sourceFolderPath, false);
+
     return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(zipFilePath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.on('error', reject);
 
-        output.on('close', () => {
-            LOG.info(`Successfully zipped folder: ${sourceFolderPath} to ${zipFilePath} (${archive.pointer()} total bytes)`);
-            resolve();
-        });
+        const outputStream = fs.createWriteStream(zipFilePath)
+            .on('error', reject)
+            .on('close', resolve);
 
-        output.on('error', (err) => {
-            LOG.error(`Error with zip output stream: ${err.message}`);
-            reject(err);
-        });
-
-        archive.on('error', (err) => {
-            LOG.error(`Error while zipping folder: ${err.message}`);
-            reject(err);
-        });
-
-        archive.pipe(output);
-        archive.directory(sourceFolderPath, false);
-
-        archive.finalize().catch(err => {
-            LOG.error(`Error finalizing the zip operation: ${err.message}`);
-            reject(err);
-        });
+        archive.pipe(outputStream);
+        archive.finalize();
     });
 }
 
