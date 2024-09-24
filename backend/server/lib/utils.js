@@ -583,10 +583,16 @@ async function zipFolder(sourceFolderPath, zipFilePath) {
     archive.directory(sourceFolderPath, false);
 
     return new Promise((resolve, reject) => {
-        archive.on('error', reject);
+        archive.on('error', (err) => {
+            LOG.error(`Error while zipping folder: ${err.message}`);
+            reject(err); 
+        });
 
         const outputStream = fs.createWriteStream(zipFilePath)
-            .on('error', reject)
+            .on('error', (err) => {
+                LOG.error(`Error while writing zip file: ${err.message}`);
+                reject(err); 
+            })
             .on('close', resolve);
 
         archive.pipe(outputStream);
