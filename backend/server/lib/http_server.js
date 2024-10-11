@@ -11,10 +11,9 @@ const mustache = require("mustache");
 const blackboard = require("./blackboard");
 const app = require (CONSTANTS.LIBDIR+"/app.js");
 const utils = require(CONSTANTS.LIBDIR + "/utils.js");
-const netcheck = require (CONSTANTS.LIBDIR+"/netcheck.js");
 const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
-let ipblacklist = [], ipwhitelist = [], conf, thisServersPort;
+let ipblacklist = [], ipwhitelist = [], conf;
 
 async function initAsync() {
 	/* create HTTP/S server */
@@ -23,7 +22,7 @@ async function initAsync() {
 	utils.watchFile(CONSTANTS.IPBLACKLIST, data=>ipblacklist=JSON.parse(data), conf.ipblacklistRefresh||10000); 
 	utils.watchFile(CONSTANTS.IPWHITELIST, data=>ipwhitelist=JSON.parse(data), conf.ipwhitelistRefresh||10000); 
 
-	const portToListenOn = await _resolveListeningPort(); thisServersPort = portToListenOn;
+	const portToListenOn = await _resolveListeningPort(); 
 	LOG.info(`Attaching socket listener on ${host}:${portToListenOn}`);
 	const listener = (req, res) => {
 		if (ipwhitelist.length && !_isIPInList(req, ipwhitelist)) { LOG.error(`Blocking IP, not whitelisted ${utils.getClientIP(req)}`); // whitelist in operation, won't honor
