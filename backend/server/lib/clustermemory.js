@@ -110,8 +110,15 @@ function _getClusterCount(timeout) {
             if (msg.id == requestID) {
                 resolved = true; resolve(msg.count); process.removeListener("message", msgListener); }
         }
-        process.on("message", msgListener); process.send({type: CLUSTER_COUNT, id: requestID});
-        setTimeout(_=>{if (!resolved) {process.removeListener("message", msgListener); resolve(null)}}, timeout);
+        const _sendCountMessageRetryOnError = _ => {    // retry on error, as sometimes process.send takes a bit to work on new server processes
+            try {process.send({type: CLUSTER_COUNT, id: requestID});} catch (err) {
+                setTimeout(_=> {try {process.send({type: CLUSTER_COUNT, id: requestID})} catch (err) {
+                    process.removeListener("message", msgListener); resolved = true; resolve(null);
+                }}, 100);
+            }
+        }
+        process.on("message", msgListener); _sendCountMessageRetryOnError();
+        setTimeout(_=>{if (!resolved) {process.removeListener("message", msgListener); resolved = true; resolve(null);}}, timeout);
     });
 }
 
