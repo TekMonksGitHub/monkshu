@@ -371,8 +371,9 @@ function _isEncodedURL(url) {
 
 function _getMatchingLBURL(urlsToMatchFrom, candidateURL) {
 	const normalizedCandidateURL = util.baseURL(candidateURL);
-	if (!loadbalancers.length) for (const testURL of urlsToMatchFrom) if (testURL == normalizedCandidateURL) return testURL;
-	else for (const lb of loadbalancers) {
+	if (!loadbalancers.length) {
+		for (const testURL of urlsToMatchFrom) {if (testURL == normalizedCandidateURL) return testURL;} 
+	} else for (const lb of loadbalancers) {
 		const matchingURL = lb.getMatchingURLFrom(urlsToMatchFrom, normalizedCandidateURL);
 		if (matchingURL) return matchingURL;
 	}

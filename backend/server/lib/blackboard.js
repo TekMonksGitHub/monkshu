@@ -118,7 +118,7 @@ async function getReply(topic, payload, timeout, options, replyReceiver) {
     const id = utils.generateUUID();
     let repliesReceived = 0, replied = false, replies = [];
     const timeoutID = setTimeout(_=>{ if (!replied) {replied = true; replies.incomplete = true; replyReceiver(replies);}}, timeout);
-    const repliedExpected = options[module.exports.LOCAL_ONLY] ? 1 : options[module.exports.LOCAL_CLUSTER_ONLY] ? 
+    const repliedExpected = options?.[module.exports.LOCAL_ONLY] ? 1 : options?.[module.exports.LOCAL_CLUSTER_ONLY] ? 
         await ((async _=> {
             const count = await clustermemory.getClusterCount(conf.local_cluster_timeout_ms); 
             if ((!count) || count == 0) return 1; else return count
@@ -222,4 +222,4 @@ function _expandConf(conf) {
 
 module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
     sendReply, getDistribuedClusterSize, getCurrentClusterSizeOnline, LOCAL_ONLY: "localonly", 
-    LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly"};
+    LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", CONF_UPDATE_MSG};

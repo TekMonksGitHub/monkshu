@@ -2,5 +2,5 @@
     "logfile": "server.log.ndjson",
     "accesslog": "server.log.ndjson",
     "testlogfile": "server.testlog.ndjson",
-    "debug_mode": true
+    "debug_mode": false
 }

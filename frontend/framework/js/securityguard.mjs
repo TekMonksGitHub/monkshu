@@ -45,7 +45,7 @@ function _doesResourceMatchPermissionPath(resource, permissionpath) {
     else if (router.doURLsMatch(permissionpath, resource)) return true;
     
     // now check via the RE route if it contains an RE - to indicate that it must have a * or +
-    if (resource.indexOf("+") == -1 && resource.indexOf("*") == -1) return false;
+    if (permissionpath.indexOf("+") == -1 && permissionpath.indexOf("*") == -1) return false;
     const regExpObj = new RegExp(permissionpath), regexpMatch = resource.match(regExpObj) ? true : false, 
         routerMatch = regexpMatch ? true : router.doURLsMatch(permissionpath, resource, true);
     return regexpMatch || routerMatch;
