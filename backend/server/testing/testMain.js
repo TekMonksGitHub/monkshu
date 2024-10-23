@@ -1,13 +1,11 @@
 /**
- * Runs embedded app's test cases.
+ * Runs given test cases.
  * 
  * (C) 2023 Tekmonks. All rights reserved.
  */
 
 const fs = require("fs");
 const path = require("path");
-const SERVER_ROOT = path.resolve(`${__dirname}/../`);
-const utils = require(`${SERVER_ROOT}/lib/utils.js`);
 const TESTING_TIMEOUT_INTERVAL = require(`${__dirname}/testing.json`).maxtestinginterval;
 
 async function runTestsAsync(argv) {
@@ -33,78 +31,24 @@ async function runTestsAsync(argv) {
 	}
 }
 
-async function setupServerEnvironmentForTesting() {
-    global.CONSTANTS = require(SERVER_ROOT + "/lib/constants.js");
-    const conf = require(`${CONSTANTS.CONFDIR}/server.json`);
-    
-	/* Init - Server bootup */
-	console.log("Starting...");
-
-	/* Init the logs */
-	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.testlogfile}`);
-	LOG.overrideConsole();
-
-	/* Warn if in debug mode */
-	if (conf.debug_mode) {
-		LOG.warn("**** Server is in debug mode, expect severe performance degradation.");
-		LOG.console("**** Server is in debug mode, expect severe performance degradation.\n");
-	}
-
-	/* Init the cluster memory */
-	LOG.info("Initializing the cluster memory.");
-	require(CONSTANTS.LIBDIR+"/clustermemory.js").init();
-	
-	/* Start the network check service */
-	LOG.info("Initializing the network checker.")
-	require(CONSTANTS.LIBDIR+"/netcheck.js").init();
-
-	/* Start the queue executor */
-	LOG.info("Initializing the queue executor.");
-	require(CONSTANTS.LIBDIR+"/queueExecutor.js").init();
-
-	/* Init the list of apps */
-	LOG.info("Initializing the apps list.");
-	require(CONSTANTS.LIBDIR+"/app.js").initSync();
-
-	/* Init the API registry */
-	LOG.info("Initializing the API registry.");
-	const apireg = require(CONSTANTS.LIBDIR+"/apiregistry.js");
-	apireg.initSync();
-
-	/* Init the built in blackboard server */
-	LOG.info("Initializing the distributed blackboard.");
-	blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
-	blackboard.init();
-
-	/* Init the global memory */
-	LOG.info("Initializing the global memory.");
-	await require(CONSTANTS.LIBDIR+"/globalmemory.js").init();
-	
-	/* Init the apps themselves */
-	LOG.info("Initializing the apps.");
-	try {require(CONSTANTS.LIBDIR+"/app.js").initAppsSync()} catch (err) {
-		LOG.error(`Error initializing the apps ${err}.${err.stack?"\n"+err.stack:""}`);
-		throw err;	// stop the server as app init failed
-	}
-
-	/* Setup server ID stamp */
-	CONSTANTS.SERVER_ID = utils.generateUUID(false);
-	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
-
-	/* Log the start */
-	LOG.info("Server started.");
-	LOG.console("\nServer started.");
-}
-
 async function main(argv) {
+	process.env.___TESTING_ = true;
+	const server = require(`${__dirname}/../server.js`);
+	
 	if (!argv[0]) {
-		console.error(`Usage: ${__filename} [app tests folder path] [...other params]`);
+		console.error(`Usage: ${path.basename(__filename)} [app tests folder path] [...other params]`);
 		exit(1);
 	}
 
+	const _doExit = givenExitCode => {
+		LOG.flushSync();  // Ensure all logs are written out before exit
+		shouldExit = true; // exit
+		if (givenExitCode) exitCode = givenExitCode;
+	}
+
 	try {
-        await setupServerEnvironmentForTesting(); // Init the server environment only
+        await server.bootstrap(); // Init the server environment only
+		LOG.console("\n\n************** Testing starts ***********\n\n");	// bifurcate the logging boundaries
         if (TESTING_TIMEOUT_INTERVAL && TESTING_TIMEOUT_INTERVAL > 0) {
             const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Timeout: The test cases are taking too long to complete')), TESTING_TIMEOUT_INTERVAL)
@@ -115,15 +59,13 @@ async function main(argv) {
         }
     } catch (err) {
         LOG.error(`Failed to initialize the server environment or run the test cases: ${err}.${err.stack ? "\n" + err.stack : ""}`);
-        exit(1);
+		_doExit(1);
     }
 
-	LOG.flushSync();  // Ensure all logs are written out before exit
-	shouldExit = true; // exit
-
+	_doExit(0);
 }
 
-const exit = (code = 0) => process.exit(code);
+const exit = code => process.exit(code);
 
-let shouldExit = false;
-if (require.main === module) {main(process.argv.slice(2)); setInterval(_=>{if (shouldExit) exit();}, 100 );}
+let shouldExit = false, exitCode = 0;
+if (require.main === module) {main(process.argv.slice(2)); setInterval(_=>{if (shouldExit) exit(exitCode);}, 100 );}

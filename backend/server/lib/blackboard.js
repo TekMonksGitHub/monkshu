@@ -100,8 +100,11 @@ async function publish(topic, payload, options) {
     }
 }
 
-/** @return The cluster size, as configured */
+/** @return The distribued cluster size, as configured */
 function getDistribuedClusterSize() {return conf.replicas.length;}
+
+/** @return The local cluster size, as configured */
+async function getLocalClusterSize() {return await clustermemory.getClusterCount(conf.local_cluster_timeout_ms);}
 
 /**
  * Gets a reply for the given topic and message. 
@@ -125,12 +128,12 @@ async function getReply(topic, payload, timeout, options, replyReceiver) {
         })()) : conf.replicas.length;
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
-        if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies
+        if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies - this also ensures topics match etc
         replies.push(msg.reply); repliesReceived++; if (repliesReceived < repliedExpected) return;  // still waiting
         clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
         replyReceiver(replies); replied = true;
     });
-    const finalPayload = {id, payload, topic, type: "request"}; 
+    const finalPayload = {id, payload, topic, type: "request", options}; 
     publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload, options);
 }
 
@@ -139,10 +142,9 @@ async function getReply(topic, payload, timeout, options, replyReceiver) {
  * @param {string} topic The topic
  * @param {object} blackboardcontrol The blackboard control object which was passed along with the original message
  * @param {object} payload The reply message 
- * @param {object} options Same as publish options
  */
-function sendReply(topic, blackboardcontrol, payload, options) {
-    publish(BLACKBOARD_REQUESTREPLY_TOPIC, {id: blackboardcontrol, topic, reply: payload, type: "reply"}, options);
+function sendReply(topic, blackboardcontrol, payload) {
+    publish(BLACKBOARD_REQUESTREPLY_TOPIC, {id: blackboardcontrol.id, topic, reply: payload, type: "reply"}, blackboardcontrol.options);
 }
 
 /** @return {boolean} true if the entire cluster is online, else false */
@@ -202,7 +204,8 @@ async function _setCurrentClusterSizeOnline() {
 function _broadcast(msg) {
     // handle specially formatted request-reply messages here
     if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.payload.type == "request") msg = {
-        topic: msg.payload.topic, payload: {...msg.payload.payload, blackboardcontrol: msg.payload.id}};
+        topic: msg.payload.topic, payload: {...msg.payload.payload, blackboardcontrol: {
+            id: msg.payload.id, options: msg.payload.options} } };
     
     const topic = msg.topic; 
     if (topics[topic]) for (const subscriber of topics[topic]) {
@@ -221,5 +224,5 @@ function _expandConf(conf) {
 }
 
 module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
-    sendReply, getDistribuedClusterSize, getCurrentClusterSizeOnline, LOCAL_ONLY: "localonly", 
-    LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", CONF_UPDATE_MSG};
+    sendReply, getDistribuedClusterSize, getCurrentClusterSizeOnline, getLocalClusterSize, 
+    LOCAL_ONLY: "localonly", LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", CONF_UPDATE_MSG};

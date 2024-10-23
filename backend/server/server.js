@@ -17,7 +17,7 @@ let _server;	// holds the transport
 let blackboard; // for server IPC
 
 // support starting in stand-alone config
-if (require("cluster").isMaster == true) bootstrap();	
+if (require("cluster").isMaster == true && (!process.env.___TESTING_)) bootstrap();	
 
 async function bootstrap() {
 	/* Init - Server bootup */
@@ -64,6 +64,11 @@ async function bootstrap() {
 	LOG.info("Initializing the distributed blackboard.");
 	blackboard = require(CONSTANTS.LIBDIR+"/blackboard.js");
 	blackboard.init();
+
+	/* Init the distributed job handler */
+	LOG.info("Initializing the distributed job handler.");
+	distributedjobhandler = require(CONSTANTS.LIBDIR+"/distributedjobhandler.js");
+	distributedjobhandler.init();
 
 	/* Run the transport */
 	await _initAndRunTransportLoop();
