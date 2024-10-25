@@ -23,8 +23,7 @@ exports.init = function() {
     }
 
     const _handleJobResultMessage = msg => {
-        const {jobstamp, blackboardcontrol} = msg;
-        const [jobid, _ts, _random] = jobstamp.split('+');
+        const {jobid, blackboardcontrol} = msg;
         if (!JOBS[jobid]) JOBS[jobid] = {};
 
         if (JOBS[jobid].result) blackboard.sendReply(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, blackboardcontrol, 
@@ -39,17 +38,17 @@ exports.init = function() {
 
     const bboptions2 = {}; bboptions2[blackboard.LOCAL_CLUSTER_ONLY] = true;
     blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, _handleJobVotingMessage, bboptions2);
-    blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, _handleJobResultMessage, bboptions1);
+    blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, _handleJobResultMessage, bboptions2);
 }
 
-exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUSTER) {
+exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUSTER, result_timeout=conf.result_timeout) {
     const bboptions = {};
     if (options == exports.LOCAL_CLUSTER) bboptions[blackboard.LOCAL_CLUSTER_ONLY] = true;
     else bboptions[blackboard.LOCAL_CLUSTER_ONLY] = true;   // default
 
     const _returnPolledValue = async _ => {
         const returnValues = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, {jobid}, 
-            conf.vote_timeout, bboptions);
+            result_timeout, bboptions);
         let polledValue;
         for (const returnValue of returnValues) if (returnValues != null) {polledValue = returnValue; break;}
         JOBS[jobid] = {result: polledValue?.result};
@@ -62,7 +61,7 @@ exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUS
     } else {
         const tsOurs = Date.now(), randomOurs = Math.random(), 
             jobstampOurs = `${jobid}+${tsOurs}+${randomOurs}`;
-        if (!JOBS[jobid]?.jobstamp)JOBS[jobid] ? JOBS[jobid].jobstamp = jobstampOurs : 
+        if (!JOBS[jobid]?.jobstamp) JOBS[jobid] ? JOBS[jobid].jobstamp = jobstampOurs : 
             JOBS[jobid] = {jobstamp: jobstampOurs}; // setup the job in the cache
         const replies = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, {jobstamp: jobstampOurs}, 
             conf.vote_timeout, bboptions);  // get a vote on who will execute it
@@ -84,10 +83,10 @@ exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUS
             if (!JOBS[jobid].jobstamp) JOBS[jobid].jobstamp = jobstampOurs; // stamp this job if not done so far
             JOBS[jobid].result = await functionToRun();     // calculate the result
             if (JOBS[jobid].sendresult) blackboard.sendReply( // if this is set then others want this result as well
-                blackboard.sendReply(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, JOBS[jobid].blackboardcontrol, 
-                    {jobstamp: JOBS[jobid].jobstamp, result: JOBS[jobid].result}));
+                DISTRIBUTED_JOB_HANDLER_MSG_RESULT, JOBS[jobid].blackboardcontrol, 
+                    {jobstamp: JOBS[jobid].jobstamp, result: JOBS[jobid].result});
             delete JOBS[jobid].processing; delete JOBS[jobid].sendresult; return JOBS[jobid].result;
-        } else return _returnPolledValue(); // voting says someone else will calculate, to return polled value
+        } else return _returnPolledValue(); // voting says someone else will calculate, so return polled value
     }
 }
 

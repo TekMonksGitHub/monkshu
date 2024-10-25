@@ -1,3 +1,4 @@
 {
-    "vote_timeout": 30000
+    "vote_timeout": 30000,
+    "result_timeout": 30000
 }

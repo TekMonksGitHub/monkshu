@@ -13,7 +13,7 @@ exports.runTestsAsync = async function(argv) {
     }
     if (!argv[1]) LOG.console("Using defaults, as no arguments were provided.\n"); 
     const jobfunction = _ => {
-        const message = argv[1]?`[PID: ${process.pid}]${argv[1]}`:`Hello from process ID ${process.pid}`;
+        const message = argv[1]?`[PID: ${process.pid}] ${argv[1]}`:`Hello from process ID ${process.pid}`;
         LOG.console(message);
         return message;
     }
