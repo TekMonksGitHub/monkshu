@@ -117,7 +117,7 @@ const _handleJobResultMessage = msg => {
     if (JOBS[jobid].result) blackboard.sendReply(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, blackboardcontrol, 
         {jobstamp: JOBS[jobid].jobstamp, result: JOBS[jobid].result});  // we have this job and its result
     else {  // we may be the ones calculating it, if we won the vote, so send it once ready
-        JOBS[jobid].sendresult = true, 
-        JOBS[jobid].blackboardcontrols = (JOBS[jobid].blackboardcontrols||[]).push(blackboardcontrol)
+        JOBS[jobid].sendresult = true; if (!JOBS[jobid].blackboardcontrols) JOBS[jobid].blackboardcontrols = [];
+        JOBS[jobid].blackboardcontrols.push(blackboardcontrol);
     }
 }
