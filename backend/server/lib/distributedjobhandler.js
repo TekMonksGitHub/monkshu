@@ -10,7 +10,7 @@ const blackboard = require(`${CONSTANTS.LIBDIR}/blackboard.js`);
 const conf = require(`${CONSTANTS.CONFDIR}/distributedjobhandler.json`); 
 
 const DISTRIBUTED_JOB_HANDLER_MSG_VOTE = "distribuedjobmsg_vote", 
-    DISTRIBUTED_JOB_HANDLER_MSG_RESULT = "distribuedjobmsg_result";
+    DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT = "distribuedjobmsg_get_result";
 
 const JOBS = {}, JOB_FUNCTIONS = {}; 
 
@@ -19,7 +19,7 @@ exports.init = function() {
     // support all forms of messaging - local clusters (vertical) and distributed clusters (horizontal)
     // publishing later will decide who responds and thus, will control the cluster messaging widths
     blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, _handleJobVotingMessage);
-    blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, _handleJobResultMessage);
+    blackboard.subscribe(DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT, _handleGetJobResultMessage);
 }
 
 /**
@@ -49,17 +49,20 @@ exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUS
     else bboptions = undefined;   // default is across all local and distribued nodes
     if (await _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions)) {
         LOG.info(`Jobid ${jobid}, won the vote, running locally.`);
-        return await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
+        const result = await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
+        LOG.info(`Jobid ${jobid}, returning the results via local run, due to winning the vote.`); return result;
     }
     else try {
         LOG.info(`Jobid ${jobid}, lost the vote, returning via cluster result polling.`);
-        return await _returnPolledValue(jobid, bboptions, result_timeout); // voting says someone else will calculate, so return polled value
+        const result = await _returnPolledValue(jobid, bboptions, result_timeout); // voting says someone else will calculate, so return polled value
+        LOG.info(`Jobid ${jobid}, returning the results via successful polling.`); return result;
     } catch (error) {   // polling failed
         LOG.error(`Jobid ${jobid} result polling error: ${error}, running locally and returning`);
-        if (runLocallyOnErrors) return await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
-    } finally {
-        LOG.info(`Jobid ${jobid}, returning the results.`);
-    }
+        if (runLocallyOnErrors) {
+            const result = await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
+            LOG.info(`Jobid ${jobid}, returning the results via local run, due to polling error.`); return result;
+        }
+    } 
 }
 
 /**
@@ -82,11 +85,14 @@ exports.LOCAL_CLUSTER = 1;
 exports.DISTRIBUED_CLUSTER = 2;
 
 function _initJobCacheWithThisJob(jobid) {
+    if (JOBS[jobid] && JOBS[jobid].jobstamp) return;;   // already initialized
+
     const jobsignature = jobid.indexOf(".") != -1 ? jobid.split(".")[0] : undefined;
     const voteTSGenerator = JOB_FUNCTIONS[jobsignature]?.voteTSGenerator || Date.now,
         randomTSGenerator = JOB_FUNCTIONS[jobsignature]?.randomTSGenerator || Math.random;
     if (!JOBS[jobid]) JOBS[jobid] = {};   // add cache entry for this job if needed
     if (!JOBS[jobid].jobstamp) JOBS[jobid].jobstamp = `${jobid}+${voteTSGenerator()}+${randomTSGenerator()}`;    // stamp
+    LOG.info(`Distributed job handler initialized job ${jobid} with stamp ${JOBS[jobid].jobstamp}`);
 }
 
 async function _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions) {
@@ -94,36 +100,38 @@ async function _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions) {
         conf.vote_timeout, bboptions);  // get a vote on who will execute it
 
     const [_jobid, tsOurs, randomOurs] = JOBS[jobid].jobstamp.split('+');
-    let lowestTSReply = -1, lowestRandomReply = -1; for (const reply of replies) {  // find the lowest timestamp and randoms
+    let lowestTSReply = -1, lowestTSsRandomReply = -1; for (const reply of replies) {  // find the lowest timestamp and randoms
         const [jobidReply, tsReply_raw, randomReply_raw] = reply.jobstamp.split("+");
         const tsReply = parseInt(tsReply_raw), randomReply = parseFloat(randomReply_raw);
         if (jobidReply != jobid) continue;  // bad reply
-        if (lowestTSReply == -1) lowestTSReply = tsReply;
-        else if (tsReply < lowestTSReply) lowestTSReply = tsReply;
-        if (lowestRandomReply == -1) lowestRandomReply = randomReply;
-        else if (randomReply < lowestRandomReply) lowestRandomReply = randomReply;
+
+        if ((lowestTSReply == -1) || (tsReply < lowestTSReply)) {
+            lowestTSReply = tsReply;
+            lowestTSsRandomReply = randomReply;   
+        }
     }
 
-    if ((lowestTSReply > tsOurs) || (lowestTSReply == tsOurs && lowestRandomReply >= randomOurs) || 
+    LOG.info(`Our TS = ${tsOurs}, lowest TS = ${lowestTSReply}, our random = ${randomOurs} and lowest TS' random ${lowestTSsRandomReply}`);
+    if ((lowestTSReply > tsOurs) || (lowestTSReply == tsOurs && lowestTSsRandomReply >= randomOurs) || 
         (lowestTSReply == -1)) return true; else return false;
 }
 
 async function _runJobLocallyAndBroadcastTheResult(jobid, functionToRun) {
     JOBS[jobid].result = await functionToRun();     // calculate the result
-    if (JOBS[jobid].sendresult) {   // send results if others are waiting for us to calculate them
+    if (JOBS[jobid].broadcastresult) {   // broadcast the results if others are waiting for us to calculate them
         for (const blackboardcontrol of JOBS[jobid].blackboardcontrols) {
             blackboard.sendReply( // if this is set then others want this result as well
-                DISTRIBUTED_JOB_HANDLER_MSG_RESULT, blackboardcontrol, 
+                DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT, blackboardcontrol, 
                     {jobstamp: JOBS[jobid].jobstamp, result: JOBS[jobid].result});
         }
-        delete JOBS[jobid].sendresult; delete JOBS[jobid].blackboardcontrols;   // we sent all the results
+        delete JOBS[jobid].broadcastresult; delete JOBS[jobid].blackboardcontrols;   // we sent all the results
     }
     return JOBS[jobid].result;
 }
 
 async function _returnPolledValue(jobid, bboptions, timeout) {
     LOG.info(`Distribued job manager starting polling for results for jobid ${jobid} with timeout of ${timeout} ms.`);
-    const returnValues = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, {jobid}, 
+    const returnValues = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT, {jobid}, 
         timeout, bboptions);
 
     let polledValue;
@@ -140,14 +148,14 @@ const _handleJobVotingMessage = msg => {
     blackboard.sendReply(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, blackboardcontrol, {jobstamp: JOBS[jobid].jobstamp});
 }
 
-const _handleJobResultMessage = msg => {
+const _handleGetJobResultMessage = msg => {
     const {jobid, blackboardcontrol} = msg;
     _initJobCacheWithThisJob(jobid);        // we can get send result message before local code calls us to even execute the job
 
     if (JOBS[jobid].result) blackboard.sendReply(DISTRIBUTED_JOB_HANDLER_MSG_VOTE, blackboardcontrol, 
         {jobstamp: JOBS[jobid].jobstamp, result: JOBS[jobid].result});  // we have this job and its result
     else {  // we may be the ones calculating it, if we won the vote, so send it once ready
-        JOBS[jobid].sendresult = true; if (!JOBS[jobid].blackboardcontrols) JOBS[jobid].blackboardcontrols = [];
+        JOBS[jobid].broadcastresult = true; if (!JOBS[jobid].blackboardcontrols) JOBS[jobid].blackboardcontrols = [];
         JOBS[jobid].blackboardcontrols.push(blackboardcontrol);
     }
 }
