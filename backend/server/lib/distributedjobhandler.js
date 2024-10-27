@@ -12,7 +12,7 @@ const conf = require(`${CONSTANTS.CONFDIR}/distributedjobhandler.json`);
 const DISTRIBUTED_JOB_HANDLER_MSG_VOTE = "distribuedjobmsg_vote", 
     DISTRIBUTED_JOB_HANDLER_MSG_RESULT = "distribuedjobmsg_result";
 
-const JOBS = {}; 
+const JOBS = {}, JOB_FUNCTIONS = {}; 
 
 /** Inits the module, called by the server runtime. */
 exports.init = function() {
@@ -37,20 +37,44 @@ exports.init = function() {
 exports.runJob = async function(jobid, functionToRun, options=exports.LOCAL_CLUSTER, 
         runLocallyOnErrors=false, result_timeout=conf.result_timeout) {
 
-    if (JOBS[jobid]?.result) return JOBS[jobid].result; // if we have the result already, send it back
+    LOG.info(`Distribued job manager received a request to run ${functionToRun.name} as jobid ${jobid}.`);
+    if (JOBS[jobid]?.result) {
+        LOG.info(`Jobid ${jobid}, cached results found, returning.`);
+        return JOBS[jobid].result; // if we have the result already, send it back
+    }
     _initJobCacheWithThisJob(jobid);
 
     const bboptions = {};
     if (options == exports.LOCAL_CLUSTER) bboptions[blackboard.LOCAL_CLUSTER_ONLY] = true;
     else bboptions = undefined;   // default is across all local and distribued nodes
-    if (await _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions)) 
+    if (await _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions)) {
+        LOG.info(`Jobid ${jobid}, won the vote, running locally.`);
         return await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
+    }
     else try {
+        LOG.info(`Jobid ${jobid}, lost the vote, returning via cluster result polling.`);
         return await _returnPolledValue(jobid, bboptions, result_timeout); // voting says someone else will calculate, so return polled value
     } catch (error) {   // polling failed
+        LOG.error(`Jobid ${jobid} result polling error: ${error}, running locally and returning`);
         if (runLocallyOnErrors) return await _runJobLocallyAndBroadcastTheResult(jobid, functionToRun);
+    } finally {
+        LOG.info(`Jobid ${jobid}, returning the results.`);
     }
 }
+
+/**
+ * Registers job functions - this should be {voteTSGenerator: ... , randomTSGenerator: ...}. These are then
+ * used in voting algorithms. They can override time based voting, eg use CPU based voting etc.
+ * @param {any} jobsignature The jobsignature, later job ID should use jobsignature.unique_real_job_id if this is registered
+ * @param {object} functions The functions for generating timestamp and random stamps for job voting, see format above
+ */
+exports.registerJobFunctions = function(jobsignature, functions) {JOB_FUNCTIONS[jobsignature] = functions;}
+
+/**
+ * Unregisters previously registered job functions
+ * @param {any} jobsignature The jobsignature
+ */
+exports.unregisterJobFunctions = function(jobsignature) {delete JOB_FUNCTIONS[jobsignature];}
 
 /** Value for indicating the jobs should run on the local vertical cluster */
 exports.LOCAL_CLUSTER = 1;
@@ -58,8 +82,11 @@ exports.LOCAL_CLUSTER = 1;
 exports.DISTRIBUED_CLUSTER = 2;
 
 function _initJobCacheWithThisJob(jobid) {
+    const jobsignature = jobid.indexOf(".") != -1 ? jobid.split(".")[0] : undefined;
+    const voteTSGenerator = JOB_FUNCTIONS[jobsignature]?.voteTSGenerator || Date.now,
+        randomTSGenerator = JOB_FUNCTIONS[jobsignature]?.randomTSGenerator || Math.random;
     if (!JOBS[jobid]) JOBS[jobid] = {};   // add cache entry for this job if needed
-    if (!JOBS[jobid].jobstamp) JOBS[jobid].jobstamp = `${jobid}+${Date.now()}+${Math.random()}`;    // stamp
+    if (!JOBS[jobid].jobstamp) JOBS[jobid].jobstamp = `${jobid}+${voteTSGenerator()}+${randomTSGenerator()}`;    // stamp
 }
 
 async function _voteAndDecideIfWeHaveToRunTheJob(jobid, bboptions) {
@@ -95,11 +122,14 @@ async function _runJobLocallyAndBroadcastTheResult(jobid, functionToRun) {
 }
 
 async function _returnPolledValue(jobid, bboptions, timeout) {
+    LOG.info(`Distribued job manager starting polling for results for jobid ${jobid} with timeout of ${timeout} ms.`);
     const returnValues = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_RESULT, {jobid}, 
         timeout, bboptions);
+
     let polledValue;
     for (const returnValue of returnValues) if (returnValues != null) {polledValue = returnValue; break;}   // the first non-null reply is treated as authoritative
-    if (!polledValue) throw "Polled results failed";
+    
+    if (!polledValue) throw `Polling for results failed for jobid ${jobid}`;
     else {JOBS[jobid].result = polledValue.result; return JOBS[jobid].result;}
 }
 
