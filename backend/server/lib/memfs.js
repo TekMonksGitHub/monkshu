@@ -19,17 +19,17 @@ const pathmod = require("path");
 const fspromises = require("fs").promises;
 const conf = require(`${CONSTANTS.CONFDIR}/memfs.json`);
 
-const FSCACHE = {}, PENDING_PROMISES=[]; let memused = 0;
+const FSCACHE = {}, PENDING_PROMISES=[]; let memused = 0, flush_resolver, flush_promise;
 
 exports.readFile = async (path, options) => {
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) {
+    if (FSCACHE[path] && (!FSCACHE[path].deleted)) {
         FSCACHE[path].accesstime = Date.now();  // update last access, eg for LRU preservation
         return FSCACHE[path].data;
     }
 
     const data = await fspromises.readFile(path, options), stats = await fspromises.stat(path)
-    if ((!options.memfs_dontcache) && _allocateMemory(stats.size)) { // cache if possible, unless explicitly disabled
+    if ((!options?.memfs_dontcache) && _allocateMemory(stats.size)) { // cache if possible, unless explicitly disabled
         FSCACHE[path] = {data, accesstime: Date.now(), stats};
         LOG.info(`Memfs cached file ${path} using ${data.length} bytes of memory, total cache size is ${memused} bytes.`);
         return FSCACHE[path].data;
@@ -39,54 +39,79 @@ exports.readFile = async (path, options) => {
 exports.writeFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
+        delete FSCACHE[path].deleted;   // file is no longer deleted
         FSCACHE[path] = {data, accesstime: Date.now(), stats: await fspromises.stat(path)};
-        _addPendingPromises(fspromises.writeFile(path, data, options));  // no need for await as file is cached and read will be via the cache
-    } else await fspromises.writeFile(path, data, options);
+        _addPendingPromises(_=>fspromises.writeFile(path, data, options));  // no need for await as file is cached and read will be via the cache
+    } else await fspromises.writeFile(path, data, options); // we don't cache on writes, unless already cached
 }
 
 exports.appendFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
+        delete FSCACHE[path].deleted;   // file is no longer deleted
         FSCACHE[path] = {data: typeof data === "string" ? FSCACHE[path].data + data :
             Buffer.concat([Buffer.from(FSCACHE[path].data), Buffer.from(data)]), accesstime: Date.now(), 
             stats: await fspromises.stat(path)};
-        _addPendingPromises(fspromises.appendFile(path, data, options));  // no need for await as file is cached and read will be via the cache
-    } else await fspromises.appendFile(path, data, options);
+        _addPendingPromises(_=>fspromises.appendFile(path, data, options));  // no need for await as file is cached and read will be via the cache
+    } else await fspromises.appendFile(path, data, options);    // we don't cache on writes, unless already cached
 }
 
 exports.unlink = async path => {
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) _addPendingPromises(fspromises.unlink(path)); else await fspromises.unlink(path);
-    delete FSCACHE[path];
+    _addPendingPromises(async _ => {
+        await fspromises.unlink(path); if (FSCACHE[path]?.deleted) delete FSCACHE[path];});
+    _setPathDeleted(path);  // will ensure read doesn't read it, even if the disk has this
 }
 
 exports.unlinkIfExists = async path => {
-    const safe_unlink = async path => {try{await fspromises.unlink(path)} catch(err){if (err.code != "ENOENT") throw err;}}
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) safe_unlink(path); else await safe_unlink(path);
-    delete FSCACHE[path];
+    const safe_unlink = async path => {
+        try{await fspromises.unlink(path); if (FSCACHE[path]?.deleted) delete FSCACHE[path]; } 
+        catch(err) {if (err.code != "ENOENT") throw err;}
+    }
+    _addPendingPromises(_=>safe_unlink(path));
+    _setPathDeleted(path);  // will ensure read doesn't read it, even if the disk has this
 }
 
-exports.readdir = (path, options) => fspromises.readdir(path, options);
+exports.readdir = async (path, options) => (await fspromises.readdir(path, options)).filter(  // filter out deleted files (they may still be on the disk)
+    entry => FSCACHE[pathmod.resolve(path+"/"+(entry.name||entry.toString()))]?.deleted != true);   // entry.name||entry.toString() takes care of string names, dirent object and buffer objects
 
-exports.mkdir = (path, options) => fspromises.mkdir(path, options);
+exports.mkdir = (path, options) => fspromises.mkdir(path, options); // can't cache this easily, anyways it doesn't take long
 
-exports.access = (path, mode) => fspromises.access(path, mode);
+exports.rmdir = (path, options) => fspromises.rmdir(path, options);  // can't cache this easily, anyways it doesn't take long
+
+exports.access = async (path, mode) => {
+    if (FSCACHE[pathmod.resolve(path)]?.deleted) return false;  // deleted in memory, no need to check the disk
+    if (FSCACHE[pathmod.resolve(path)]) return true;   // have it locally and it is not deleted
+    else return await fspromises.access(path, mode);    // go to the disk
+}
 
 exports.rm = async (path, options) => {
     path = pathmod.resolve(path);
-    if (FSCACHE[path]) _addPendingPromises(fspromises.rm(path, options)); else await fspromises.rm(path, options);
-    delete FSCACHE[path];
+    _addPendingPromises(async _ => {
+        await fspromises.rm(path, options); 
+        if (options?.recursive) for (const pathToTest of Object.keys(FSCACHE)) 
+            if (pathToTest.startsWith(path)) delete FSCACHE[pathToTest];    // remove nested entries as parent dir went away
+        if (FSCACHE[path]?.deleted) delete FSCACHE[path];
+    }); 
+    if (options?.recursive) for (const pathToTest of Object.keys(FSCACHE)) 
+        if (pathToTest.startsWith(path)) _setPathDeleted(pathToTest);    // remove nested entries as parent dir went away
+    _setPathDeleted(path);  // will ensure read doesn't read it, even if the disk has this
 }
 
-exports.flush = _ => Promise.all(PENDING_PROMISES);
+exports.flush = _ => {
+    if (!flush_promise) flush_promise = new Promise(resolve=>flush_resolver=resolve);
+    return flush_promise;
+}
 
-function _addPendingPromises(promise) {
-    const pushedPromise = (async function(){
-        await promise; 
-        PENDING_PROMISES.splice(PENDING_PROMISES.indexOf(pushedPromise), 1);
-    })();
-    PENDING_PROMISES.push(pushedPromise);
+function _addPendingPromises(async_function) {
+    const wrapper = async _ => {
+        await async_function(); 
+        if (PENDING_PROMISES.length) (PENDING_PROMISES.pop())();    // runs the wrapper
+        else if (flush_resolver) {flush_resolver(); flush_resolver = undefined; flush_promise = undefined;}  // tell flush all work is done for now
+    };
+    PENDING_PROMISES.unshift(wrapper);
+    if (PENDING_PROMISES.length == 1) (PENDING_PROMISES.pop())();   // start the loop if needed
 }
 
 function _allocateMemory(size) {
@@ -115,4 +140,9 @@ function _freeMemoryLRU(sizeToFree) {
     }
     memused -= freed;
     LOG.info(`Memfs freed memory ${freed} bytes.`);
+}
+
+function _setPathDeleted(path) {
+    if (!FSCACHE[path]) return;
+    FSCACHE[path].deleted = true;
 }
