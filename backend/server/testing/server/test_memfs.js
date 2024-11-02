@@ -63,7 +63,7 @@ exports.runTestsAsync = async function(argv) {
 }
 
 async function _testRecursiveDelete(workingDir) {
-    LOG.console("Recursive deletion test begins.\n")
+    LOG.console("\nRecursive deletion test begins.\n")
     const dirToMake1 = `${workingDir}/recursive`, dirToMake2 = `${dirToMake1}/nested`;
     await _performOp("mkdir", dirToMake1, {recursive: true});
     await _performOp("writeFile", `${dirToMake1}/1.txt`, "Test file 1");
@@ -71,9 +71,19 @@ async function _testRecursiveDelete(workingDir) {
     await _performOp("mkdir", dirToMake2);
     await _performOp("writeFile", `${dirToMake2}/1.txt`, "Nested file 1");
     await _performOp("writeFile", `${dirToMake2}/2.txt`, "Nested file 2");
-    await LOG.console((await _performOp("readFile", `${dirToMake1}/1.txt`))||`Error reading: ${dirToMake1}/1.txt`+"\n");
-    await LOG.console((await _performOp("readFile", `${dirToMake2}/2.txt`))||`Error reading: ${dirToMake2}/2.txt`+"\n");
+    await _readAndPrintFile(`${dirToMake1}/1.txt`);
+    await _readAndPrintFile(`${dirToMake2}/2.txt`);
+
+    LOG.console("\nTesting cache hits, read ops below must respond from the cache.\n")
+    await _readAndPrintFile(`${dirToMake1}/1.txt`);
+    await _readAndPrintFile(`${dirToMake2}/2.txt`);
+
     await _performOp("rm", dirToMake1, {recursive: true, force: true});
+}
+
+async function _readAndPrintFile(path) {
+    const contents = (await _performOp("readFile", path)).toString('utf8');
+    await LOG.console((contents||`Error reading: ${path}`)+"\n");
 }
 
 async function _performOp() {
@@ -82,8 +92,10 @@ async function _performOp() {
     try {
         const result = await memfs[opName](...opArgs);
         LOG.console(`Result of op ${opName} on file path ${opArgs[0]} is ${result?result.toString("utf8"):"undefined"}\n`);
+        return result;
     } catch (err) {
          LOG.console(`Result of op ${opName} on file path ${opArgs[0]} is an error ${err}\n`);
+         return null;
     }
 }
 

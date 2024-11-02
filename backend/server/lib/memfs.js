@@ -25,9 +25,11 @@ exports.readFile = async (path, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path] && (!FSCACHE[path].deleted)) {
         FSCACHE[path].accesstime = Date.now();  // update last access, eg for LRU preservation
+        LOG.info(`memfs cache hit ${path}`);
         return FSCACHE[path].data;
     }
 
+    LOG.info(`memfs cache miss ${path}`);
     const data = await fspromises.readFile(path, options), stats = await fspromises.stat(path)
     if ((!options?.memfs_dontcache) && _allocateMemory(stats.size)) { // cache if possible, unless explicitly disabled
         FSCACHE[path] = {data, accesstime: Date.now(), stats};
