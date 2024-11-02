@@ -58,6 +58,8 @@ exports.appendFile = async (path, data, options) => {
     } else await fspromises.appendFile(path, data, options);    // we don't cache on writes, unless already cached
 }
 
+exports.stat = async path => FSCACHE[path]?.stats || await fspromises.stat(path);   // if cached, we have the stats
+
 exports.unlink = async path => {
     path = pathmod.resolve(path);
     _addPendingPromises(async _ => {

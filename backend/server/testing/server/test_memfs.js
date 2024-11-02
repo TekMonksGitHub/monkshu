@@ -6,7 +6,7 @@
 const memfs = require(`${CONSTANTS.LIBDIR}/memfs.js`);
 
 const memfsOps = ["readFile", "writeFile", "appendFile", "unlink", "unlinkIfExists", "readdir", "mkdir", 
-    "rmdir", "access", "rm", "flush"];
+    "rmdir", "access", "rm", "flush", "stat"];
 const writtenFiles = [], writtenDirs = [];
 
 exports.runTestsAsync = async function(argv) {
@@ -32,7 +32,7 @@ exports.runTestsAsync = async function(argv) {
             writtenFiles.push(randomFileName);
             await _performOp(opToDo, randomFileName, _generateRandomText(minLength, maxLength), "utf8");
         } else if (opToDo == "readFile" || opToDo == "unlink" || opToDo == "unlinkIfExists" || opToDo == "access" || 
-                opToDo == "rm") {
+                opToDo == "rm" || opToDo == "stat") {
 
             if (!writtenFiles.length) {LOG.console(`Skipping op ${opToDo} as no file exists.\n`); continue;};
             const fileName = _getRandomForArray(writtenFiles);
@@ -91,7 +91,9 @@ async function _performOp() {
     LOG.console(`Performing memfs op ${opName} with file path ${opArgs[0]}\n`);
     try {
         const result = await memfs[opName](...opArgs);
-        LOG.console(`Result of op ${opName} on file path ${opArgs[0]} is ${result?result.toString("utf8"):"undefined"}\n`);
+        LOG.console(`Result of op ${opName} on file path ${opArgs[0]} is ${result ? 
+            (typeof result == "string" || Buffer.isBuffer(result)?result.toString("utf8"):JSON.stringify(result)) :
+            "undefined"}\n`);
         return result;
     } catch (err) {
          LOG.console(`Result of op ${opName} on file path ${opArgs[0]} is an error ${err}\n`);
