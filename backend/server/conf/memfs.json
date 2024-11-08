@@ -1,4 +1,6 @@
 {
     "memsize": "1073741824",
-    "algo": "LRU"
+    "algo": "LRU",
+    "nativefs_js": "require('fs').promises",
+    "debug_all_ops": true
 }

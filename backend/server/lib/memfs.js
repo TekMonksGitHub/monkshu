@@ -49,7 +49,7 @@ exports.writeFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
         delete FSCACHE[path].deleted;   // file is no longer deleted
-        FSCACHE[path] = {data, accesstime: Date.now(), stats: await _runNativeFSFunction("stat", [path])};
+        FSCACHE[path].data = data; FSCACHE[path].accesstime = Date.now(); FSCACHE[path].stats.size = Buffer.from(data).length;  // update data, last access and sizes
         _addPendingPromises(_=>_runNativeFSFunction("writeFile", [path, data, options]));  // no need for await as file is cached and read will be via the cache
     } else await _runNativeFSFunction("writeFile",[path, data, options]); // we don't cache on writes, unless already cached
 }
@@ -57,10 +57,11 @@ exports.writeFile = async (path, data, options) => {
 exports.appendFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
-        delete FSCACHE[path].deleted;   // file is no longer deleted
-        FSCACHE[path] = {data: typeof data === "string" ? FSCACHE[path].data + data :
-            Buffer.concat([Buffer.from(FSCACHE[path].data), Buffer.from(data)]), accesstime: Date.now(), 
-            stats: await _runNativeFSFunction("stat",[path])};
+        if (FSCACHE[path].deleted) return exports.writeFile(path, data, options);   // it was deleted so append is a write
+        FSCACHE[path].data = typeof data === "string" ? FSCACHE[path].data + data :
+            Buffer.concat([Buffer.from(FSCACHE[path].data), Buffer.from(data)]);    // add data
+        FSCACHE[path].accesstime = Date.now();                                      // update last access timestamp
+        FSCACHE[path].stats.size += Buffer.from(data).length                        // update size
         _addPendingPromises(_=>_runNativeFSFunction("appendFile", [path, data, options]));  // no need for await as file is cached and read will be via the cache
     } else try{
         await _runNativeFSFunction("appendFile",[path, data, options]);    // we don't cache on writes, unless already cached
@@ -79,7 +80,7 @@ exports.unlink = async path => {
 exports.unlinkIfExists = async path => {
     path = pathmod.resolve(path);
     const safe_unlink = async path => {
-        try{await _runNativeFSFunction("unlink",[path]); if (FSCACHE[path]?.deleted) delete FSCACHE[path]; } 
+        try{await _runNativeFSFunction("unlink",[path],true); if (FSCACHE[path]?.deleted) delete FSCACHE[path]; } 
         catch(err) {if (err.code != "ENOENT") throw err;}
     }
     _addPendingPromises(_=>safe_unlink(path));
@@ -117,8 +118,12 @@ exports.flush = _ => {
     return flush_promise;
 }
 
-async function _runNativeFSFunction(functionName, params) {
-    try {return await NATIVE_FS[functionName](...params)} catch (err) {
+async function _runNativeFSFunction(functionName, params, noerrorOnException) {
+    try {
+        if (conf.debug_all_ops) LOG.info(`memfs running ${functionName} with params ${JSON.stringify(params)}`);
+        return await NATIVE_FS[functionName](...params);
+    } catch (err) {
+        if (noerrorOnException) return; // this means that an exception is expected and ok
         LOG.error(`memfs ${functionName} error in the native FS: ${err}`);
         throw err;
     }

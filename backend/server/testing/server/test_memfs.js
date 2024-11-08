@@ -54,6 +54,8 @@ exports.runTestsAsync = async function(argv) {
 
     await _testRecursiveDelete(workingDir);
 
+    await _testReadDeleteAppendSquence(workingDir);
+
     await memfs.flush();  // finally flush
 
     LOG.console(`\n\nEnd\nFiles that should exist: ${writtenFiles}\n`);
@@ -79,6 +81,22 @@ async function _testRecursiveDelete(workingDir) {
     await _readAndPrintFile(`${dirToMake2}/2.txt`);
 
     await _performOp("rm", dirToMake1, {recursive: true, force: true});
+}
+
+async function _testReadDeleteAppendSquence(workingDir) {
+    LOG.console("\nRead delete append sequence test begins.\n")
+    const dirToMake = `${workingDir}/readdeleteappendseq`;
+    await _performOp("mkdir", dirToMake, {recursive: true});
+    await _performOp("writeFile", `${dirToMake}/1.txt`, "Test file 1");
+    await _readAndPrintFile(`${dirToMake}/1.txt`);
+    await _performOp("rm", `${dirToMake}/1.txt`);
+    await _performOp("appendFile", `${dirToMake}/1.txt`, "\nAdded more text to file 1.");
+
+    LOG.console("\nTesting cache hits, read ops below must respond from the cache.\n")
+    await _readAndPrintFile(`${dirToMake}/1.txt`);
+
+    LOG.console(`\nCleaning up ${dirToMake}.\n`);
+    await _performOp("rm", dirToMake, {recursive: true, force: true});
 }
 
 async function _readAndPrintFile(path) {
