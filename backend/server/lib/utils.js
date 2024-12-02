@@ -443,8 +443,23 @@ function generateUUID(useDashes=true) { // Public Domain/MIT: from https://stack
  *          given code when called.
  */
 function createAsyncFunction(code) {
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-    const newFunction = context => new AsyncFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
+    const asyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const newFunction = context => new asyncFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
+    return newFunction;
+}
+
+/**
+ * Creates a function which executes the given code synchronously.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const myfunction = util.createSyncFunction(code);
+ * await myfunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Sync function which executes the given code when called.
+ */
+function createSyncFunction(code) {
+    const retFunction = Object.getPrototypeOf(function(){}).constructor;
+    const newFunction = context => new retFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
     return newFunction;
 }
 
@@ -606,5 +621,5 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
-    createAsyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, convertToUnixPathEndings,
-    isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder };
+    createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
+    convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder };
