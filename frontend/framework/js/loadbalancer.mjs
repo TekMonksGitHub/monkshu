@@ -27,15 +27,16 @@ function createLoadbalancer(lbconf) {
         },
         
         resolveURL: function(url) {
-            if (!this.BACKENDCONF.endpoints) return url;
+            if ((!this.BACKENDCONF.endpoints) || (this.BACKENDCONF.endpoints.length == 0)) return url;  // no enpoints to balance
             const originalURL = new URL(url);
             const returnedHostIndex = this._nextEndpoint || Math.floor(this.BACKENDCONF.endpoints.length*Math.random());
-            this._nextEndpoint = returnedHostIndex + 1 === this.BACKENDCONF.endpoints.length ? 0 : returnedHostIndex + 1;
+            this._nextEndpoint = returnedHostIndex + 1 >= this.BACKENDCONF.endpoints.length ? 0 : returnedHostIndex + 1;
             const returnedHost = this.BACKENDCONF.endpoints[returnedHostIndex], newURL = _getReplacedURL(returnedHost, originalURL);
             return newURL;
         },
 
         getMatchingURLFrom: function(urls, urlToMatch) {
+            if (this.BACKENDCONF.endpoints.length == 0) if (urls.includes(urlToMatch)) return urlToMatch;
             for (const urlThis of urls) for (const hostThis of this.BACKENDCONF.endpoints) {
                 let parsedURL; try {parsedURL = new URL(urlThis)} catch (err) {continue;}   // skip bad URLs
                 const testURL = _getReplacedURL(hostThis, parsedURL);
@@ -45,6 +46,7 @@ function createLoadbalancer(lbconf) {
 
         getAllBalancedCombinationURLs: function(urlIn) {
             const balancedCombinations = [];
+            if (this.BACKENDCONF.endpoints.length == 0) return [urlIn];
             for (const hostThis of this.BACKENDCONF.endpoints) {
                 const urlHostMatchingRE = new RegExp("([A-Za-z0-9]+://)([A-Za-z0-9.]+)([:0-9]+)?(.*)");
                 const parsedURLPieces = urlIn.match(urlHostMatchingRE);
