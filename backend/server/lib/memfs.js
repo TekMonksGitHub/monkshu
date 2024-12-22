@@ -63,9 +63,7 @@ exports.appendFile = async (path, data, options) => {
         FSCACHE[path].accesstime = Date.now();                                      // update last access timestamp
         FSCACHE[path].stats.size += Buffer.from(data).length                        // update size
         _addPendingPromises(_=>_runNativeFSFunction("appendFile", [path, data, options]));  // no need for await as file is cached and read will be via the cache
-    } else try{
-        await _runNativeFSFunction("appendFile",[path, data, options]);    // we don't cache on writes, unless already cached
-    } catch (err) {_handleError(err, "appendFile")}
+    } else await _runNativeFSFunction("appendFile",[path, data, options]);    // we don't cache on writes, unless already cached
 }
 
 exports.stat = async path => FSCACHE[path]?.stats || await _runNativeFSFunction("stat",[path]);   // if cached, we have the stats
@@ -103,7 +101,7 @@ exports.access = async (path, mode) => {
 exports.rm = async (path, options) => {
     path = pathmod.resolve(path);
     _addPendingPromises(async _ => {
-        await _runNativeFSFunction("rm",[path, options]); 
+        await _runNativeFSFunction("rm",[path, options]);
         if (options?.recursive) for (const pathToTest of Object.keys(FSCACHE)) 
             if (pathToTest.startsWith(path)) delete FSCACHE[pathToTest];    // remove nested entries as parent dir went away
         if (FSCACHE[path]?.deleted) delete FSCACHE[path];
@@ -131,7 +129,7 @@ async function _runNativeFSFunction(functionName, params, noerrorOnException) {
 
 function _addPendingPromises(async_function) {
     const wrapper = async _ => {
-        await async_function(); 
+        try {await async_function()} catch (err) {LOG.error(`Error in pending function ${async_function}. The error is ${err}.`)}
         if (PENDING_PROMISES.length) (PENDING_PROMISES.pop())();    // runs the wrapper
         else if (flush_resolver) {flush_resolver(); flush_resolver = undefined; flush_promise = undefined;}  // tell flush all work is done for now
     };
