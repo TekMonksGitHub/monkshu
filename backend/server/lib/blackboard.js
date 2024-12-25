@@ -20,7 +20,7 @@ const clustermemory = require(`${CONSTANTS.LIBDIR}/clustermemory.js`);
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf",
     BLACKBOARD_REQUESTREPLY_TOPIC = "__org_monkshu_blackboard_requestreply_topic";
 
-let _currentClusterSizeOnline=0, _replicasOffline=[], _replicasOnline = [];
+let _currentDistributedClusterSizeOnline=0, _currentLocalClusterSizeOnline=1, _replicasOffline=[], _replicasOnline = [];
 
 function init() {
     global.BLACKBOARD = this;
@@ -111,7 +111,8 @@ async function getLocalClusterSize() {return await clustermemory.getClusterCount
  * @param {string} topic The topic
  * @param {object} payload The message to send for whom the reply is needed
  * @param {number} timeout The timeout, after which give up
- * @param {object} options Same as publish options
+ * @param {object} options Same as publish options plus if exports.FIRST_REPLY_ONLY is set 
+ *                         then only first reply received is waited for, and sent back
  * @param {function} replyReceiver The function to receove the reply, unless await is called
  * @returns The replies received as an [array of reply objects]
  */
@@ -120,18 +121,19 @@ async function getReply(topic, payload, timeout, options, replyReceiver) {
 
     const id = utils.generateUUID();
     let repliesReceived = 0, replied = false, replies = [];
-    const timeoutID = setTimeout(_=>{ if (!replied) {replied = true; replies.incomplete = true; replyReceiver(replies);}}, timeout);
-    const repliedExpected = options?.[module.exports.LOCAL_ONLY] ? 1 : options?.[module.exports.LOCAL_CLUSTER_ONLY] ? 
-        await ((async _=> {
-            const count = await clustermemory.getClusterCount(conf.local_cluster_timeout_ms); 
-            if ((!count) || count == 0) return 1; else return count
-        })()) : conf.replicas.length;
+    const timeoutID = setTimeout(_=>{ if (!replied) {
+        replied = true; replies.incomplete = true; replyReceiver(replies);
+        LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}. Sending incomplete reply.`);
+    }}, timeout);
+    const repliedExpected = options?.[module.exports.LOCAL_ONLY] ? 1 : options?.[module.exports.FIRST_REPLY_ONLY] ? 1 :
+        options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : conf.replicas.length;
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
         if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies - this also ensures topics match etc
         replies.push(msg.reply); repliesReceived++; if (repliesReceived < repliedExpected) return;  // still waiting
         clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
         replyReceiver(replies); replied = true;
+        LOG.info(`Blackboard getReply sent successful reply for topic -> ${topic} with options ${JSON.stringify(options)}.`);
     });
     const finalPayload = {id, payload, topic, type: "request", options}; 
     publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload, options);
@@ -149,7 +151,7 @@ function sendReply(topic, blackboardcontrol, payload) {
 
 /** @return {boolean} true if the entire cluster is online, else false */
 function isEntireReplicaClusterOnline() {
-    return _currentClusterSizeOnline == conf.replicas.length;
+    return _currentDistributedClusterSizeOnline == conf.replicas.length;
 }
 
 /** @return {boolean} true if the replica is online, else false */
@@ -161,7 +163,7 @@ async function isReplicaOnline(host, port) {
 }
 
 /** @return {number} The size of the cluster currently online */
-function getCurrentClusterSizeOnline() { return _currentClusterSizeOnline; }
+function getCurrentDistributedClusterSizeOnline() { return _currentDistributedClusterSizeOnline; }
 
 /**
  * Subscribes to the given topic
@@ -198,7 +200,8 @@ async function _setCurrentClusterSizeOnline() {
         const check = await netcheck.checkConnect(host, port, conf.quick_connect_timeout_ms); 
         if (check.result) {size++; _replicasOnline.push(host+":"+port);} else _replicasOffline.push(host+":"+port);
     }
-    _currentClusterSizeOnline = size;
+    _currentDistributedClusterSizeOnline = size;
+    _currentLocalClusterSizeOnline = (await getLocalClusterSize()) || 1;
 }
 
 function _broadcast(msg) {
@@ -224,5 +227,6 @@ function _expandConf(conf) {
 }
 
 module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
-    sendReply, getDistribuedClusterSize, getCurrentClusterSizeOnline, getLocalClusterSize, 
-    LOCAL_ONLY: "localonly", LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", CONF_UPDATE_MSG};
+    sendReply, getDistribuedClusterSize, getCurrentDistributedClusterSizeOnline, getLocalClusterSize, 
+    LOCAL_ONLY: "localonly", LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", 
+    FIRST_REPLY_ONLY: "firstreplyonly", CONF_UPDATE_MSG};

@@ -9,8 +9,8 @@
 const blackboard = require(`${CONSTANTS.LIBDIR}/blackboard.js`);
 const conf = require(`${CONSTANTS.CONFDIR}/distributedjobhandler.json`); 
 
-const DISTRIBUTED_JOB_HANDLER_MSG_VOTE = "distribuedjobmsg_vote", 
-    DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT = "distribuedjobmsg_get_result";
+const DISTRIBUTED_JOB_HANDLER_MSG_VOTE = "distriburedjobmsg_vote", 
+    DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT = "distributedjobmsg_get_result";
 
 const JOBS = {}, JOB_FUNCTIONS = {}; 
 
@@ -24,7 +24,7 @@ exports.init = function() {
 
 /**
  * Runs the given job and returns the result, either locally or via local cluster members or via
- * distributed cluster members.
+ * distributed cluster members. The jobid must be unique for every job. 
  * @param {any} jobid Job ID, can be string, number etc. Should be unique.
  * @param {function} functionToRun Function object to run to calculate the result. The result must be serializable.
  * @param {number} options Optional: Whether to run on local cluster or distributed across nodes. 
@@ -131,8 +131,9 @@ async function _runJobLocallyAndBroadcastTheResult(jobid, functionToRun) {
 
 async function _returnPolledValue(jobid, bboptions, timeout) {
     LOG.info(`Distribued job manager starting polling for results for jobid ${jobid} with timeout of ${timeout} ms.`);
+    const bboptionsFirstReply = {...bboptions}; bboptionsFirstReply[blackboard.FIRST_REPLY_ONLY] = true;
     const returnValues = await blackboard.getReply(DISTRIBUTED_JOB_HANDLER_MSG_GET_RESULT, {jobid}, 
-        timeout, bboptions);
+        timeout, bboptionsFirstReply);
 
     let polledValue;
     for (const returnValue of returnValues) if (returnValues != null) {polledValue = returnValue; break;}   // the first non-null reply is treated as authoritative
