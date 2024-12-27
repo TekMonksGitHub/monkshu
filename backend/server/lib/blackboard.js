@@ -85,8 +85,8 @@ async function publish(topic, payload, options) {
                 failedReplicas++; continue; 
             }
             
-            await poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:_createBroadcastMessage()}, (err,result) => {
-                if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`);
+            poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:_createBroadcastMessage()}, (err,result) => {
+                if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`); 
             });
         } catch (err) { LOG.error(`Blackboard can't reach replica ${replica}, error is ${err}. The message topic is ${topic}.`); failedReplicas++; }
     }
@@ -110,13 +110,13 @@ async function getLocalClusterSize() {return await clustermemory.getClusterCount
  * Gets a reply for the given topic and message. 
  * @param {string} topic The topic
  * @param {object} payload The message to send for whom the reply is needed
- * @param {number} timeout The timeout, after which give up
+ * @param {number} timeout The timeout, after which to give up. Default is 1000 ms.
  * @param {object} options Same as publish options plus if exports.FIRST_REPLY_ONLY is set 
  *                         then only first reply received is waited for, and sent back
  * @param {function} replyReceiver The function to receove the reply, unless await is called
  * @returns The replies received as an [array of reply objects]
  */
-async function getReply(topic, payload, timeout, options, replyReceiver) {
+async function getReply(topic, payload, timeout=conf.send_reply_timeout, options, replyReceiver) {
     if (!replyReceiver) return new Promise(resolve => getReply(...arguments, resolve));
 
     const id = utils.generateUUID();
@@ -126,7 +126,7 @@ async function getReply(topic, payload, timeout, options, replyReceiver) {
         LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}. Sending incomplete reply.`);
     }}, timeout);
     const repliedExpected = options?.[module.exports.LOCAL_ONLY] ? 1 : options?.[module.exports.FIRST_REPLY_ONLY] ? 1 :
-        options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : conf.replicas.length;
+        options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : _currentDistributedClusterSizeOnline;
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
         if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies - this also ensures topics match etc
