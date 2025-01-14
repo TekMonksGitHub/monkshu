@@ -108,10 +108,10 @@ $$.getOS = _ => {
 $$.setSlowNetwork = slowNetworkFlag => window.$$["_slowNetwork"] = slowNetworkFlag?true:false;
 $$.isSlowNetwork = _ => window.$$["_slowNetwork"];
 
-$$.copyTextToClipboard = text => {
-    if (navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+$$.copyTextToClipboard = (text, mime) => {
+    if (((!mime) || (mime.toLowerCase() == "text/plain")) && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
     
-    const type = "text/plain", blob = new Blob([text], { type }), data = [new ClipboardItem({ [type]: blob })];
+    const type = mime||"text/plain", blob = new Blob([text], { type }), data = [new ClipboardItem({ [type]: blob })];
     return navigator.clipboard.write(data);
 }
 

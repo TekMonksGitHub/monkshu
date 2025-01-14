@@ -118,8 +118,9 @@ async function _initAndRunTransportLoop() {
 			respHeaders[SERVER_ID_HEADER] = SERVER_STAMP;
 
 			try {
+				const responseToSend = APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject);
 				_server.statusOK(respHeaders, servObject);
-				await _server.write(APIREGISTRY.encodeResponse(url, respObj, headers, respHeaders, servObject), servObject);
+				await _server.write(responseToSend, servObject);
 				_server.end(servObject);
 			} catch (err) {send500(err)}
 		} else if (code == 404) {

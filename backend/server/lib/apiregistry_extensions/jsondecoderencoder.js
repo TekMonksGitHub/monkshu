@@ -15,7 +15,7 @@ function decodeIncomingData(apiregentry, _url, data, headers, _servObject) {
     catch (err) {LOG.error(`JSON parsing error: ${err}.`); LOG.error(`Incoming JSON was: ${data}`); throw err;}
 }
 
-function encodeResponse(apiregentry, _url, respObj, reqHeaders, respHeaders, _servObject) {
+function encodeResponse(apiregentry, _url, respObj={}, reqHeaders, respHeaders, _servObject) {
     if (!acceptsJSON(apiregentry, reqHeaders)) return respObj;   // can't handle
 
     if (!utils.getObjectKeyValueCaseInsensitive(respHeaders,"Content-Type").toLowerCase().trim().startsWith("application/json")) return respObj;   // can't handle

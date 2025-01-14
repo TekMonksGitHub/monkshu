@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const os = require("os");
+const dns = require("dns");
 const path = require("path");
 const archiver = require('archiver');
 const http2 = require("http2");
@@ -615,11 +616,15 @@ async function zipFolder(sourceFolderPath, zipFilePath) {
     });
 }
 
-
+function dnsResolve(domain) {
+    return new Promise((resolve, reject) => 
+        dns.lookup(domain, {all: true}, (err, records) => {
+            if (err) reject(err); else resolve(records);}));
+}
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
-    convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder };
+    convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, dnsResolve };

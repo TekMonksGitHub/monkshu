@@ -8,7 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const querystring = require("querystring");
-const app = require(`${CONSTANTS.LIBDIR}/app.js`);
+const appmod = require(`${CONSTANTS.LIBDIR}/app.js`);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const API_REG_DISTM_KEY = "__org_monkshu_apiregistry_key";
 let decoders, encoders, headermanagers, securitycheckers;
@@ -25,7 +25,7 @@ function initSync(notVerbose) {
 	const headermanagersPathAndRoots = [{path: CONSTANTS.API_MANAGER_HEADERMANAGERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
 	const securitycheckersPathAndRoots = [{path: CONSTANTS.API_MANAGER_SECURITYCHECKERS_CONF_CORE_SERVER, root: CONSTANTS.ROOTDIR}];
 
-	const apps = app.getApps();
+	const apps = appmod.getApps();
 	const _toPOSIXPath = pathin => pathin.split(path.sep).join(path.posix.sep)
 
 	for (const appObj of apps) {
@@ -135,19 +135,21 @@ function listAPIs() {
 	return [...Object.keys(apireg)];	// clone for security
 }
 
-async function addAPI(path, apiregentry, app) {
-	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), apps = app.getApps(), approot = apps[app];
+async function addAPI(path, apiregentry, app, inmem) {
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), approot = appmod.getAppPath(app);
 	apireg[path] = approot?`${approot}/${apiregentry}`:apiregentry;
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
-	const regFile = approot?`${approot}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
-	const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
-	regFileObj[path] = apiregentry; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
+	if (!inmem) {	// serialize to the registry file
+		const regFile = approot?`${approot}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;
+		const regFileObj = JSON.parse(await fs.promises.readFile(regFile));
+		regFileObj[path] = apiregentry; await fs.promises.writeFile(regFile, JSON.stringify(regFileObj, null, 4));
+	}
 }
 
 const editAPI = addAPI;
 
 async function deleteAPI(path, app) {
-	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), apps = app.getApps(), approot = apps[app]
+	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY), approot = appmod.getAppPath(app);
 	if (apireg[path]) delete apireg[path];
 	CLUSTER_MEMORY.set(API_REG_DISTM_KEY, apireg);
 	const regFile = approot?`${approot}/conf/apiregistry.json`:CONSTANTS.API_REGISTRY;

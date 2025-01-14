@@ -24,7 +24,7 @@ function initGlobalLoggerSync(logName) {
 }
 
 function doService(jsonReq, servObject, _headers, _url, apiconf) {
-	if ((!jsonReq) || (!jsonReq.level) || (!jsonReq.message)) {LOG.error(`Bad incoming remote log request ${JSON.stringify(jsonReq)}`); return;}
+	if ((!jsonReq) || (!jsonReq.level) || (!jsonReq.message)) {LOG.error(`Bad incoming remote log request ${JSON.stringify(jsonReq)}`); return CONSTANTS.FALSE_RESULT;}
 	
 	let logger; if (!apiconf.logpath) { LOG.error("Bad remote log config, need logpath, redirecting logs to main server log."); logger = LOG; } 
 	else {

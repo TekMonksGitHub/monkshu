@@ -29,5 +29,9 @@ function initAppsSync() {
 }
 
 const getApps = _ => appRoots;
+const getAppPath = app => {
+    for (const appEntry of appRoots) if (appEntry[app]) return appEntry[app];
+    return undefined;
+}
 
-module.exports = {initSync, getApps, initAppsSync}
+module.exports = {initSync, getApps, getAppPath, initAppsSync}

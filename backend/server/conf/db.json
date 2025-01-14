@@ -1,0 +1,9 @@
+{
+    "sqlite_db": {
+        "api_path": "/__org_monkshu__db_sqlite", 
+        "api_entry": "/lib/dbdrivers/sqlite_db.js?keys=89jfkl09urjq9udj39f8ndeku397rdj",
+        "api_default_port": 9090,
+        "api_key": "89jfkl09urjq9udj39f8ndeku397rdj",
+        "secure": true
+    }
+}
