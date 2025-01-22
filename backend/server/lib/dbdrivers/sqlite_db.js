@@ -26,7 +26,9 @@ let dbInstance = [], dbRunAsync = [], dbAllAsync = [];
  * @return true on success, and false on error
  */
 exports.runCmd = async (cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
-    if (_isNetworkPath(dbConnectInfo)) return await _networkCall("runCmd", [cmd, params], dbConnectInfo, dbCreationSQLs);
+    if (_isNetworkPath(dbConnectInfo)) try {
+        return await _networkCall("runCmd", [cmd, params], dbConnectInfo, dbCreationSQLs); 
+    } catch (err) {LOG.error(`DB network error running, ${cmd}, with params ${params}, error: ${err}`); return false;}
 
     dbConnectInfo = path.resolve(dbConnectInfo);
     if (!(await _initDB(dbConnectInfo, dbCreationSQLs))) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: DB Init Error`) ; return false;}
@@ -44,7 +46,9 @@ exports.runCmd = async (cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
  * @return rows array on success, and false on error. The returned array contains row data as JSON objects.
  */
 exports.getQuery = async(cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
-    if (_isNetworkPath(dbConnectInfo)) return await _networkCall("getQuery", [cmd, params], dbConnectInfo, dbCreationSQLs);
+    if (_isNetworkPath(dbConnectInfo)) try {
+        return await _networkCall("getQuery", [cmd, params], dbConnectInfo, dbCreationSQLs); 
+    } catch (err) { LOG.error(`DB network error running, ${cmd}, with params ${params}, error: ${err}`); return false; }
 
     dbConnectInfo = path.resolve(dbConnectInfo);
     if (!(await _initDB(dbConnectInfo, dbCreationSQLs))) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: DB Init Error`) ; return false;}
@@ -73,7 +77,9 @@ exports.init = async (dbConnectInfo, dbCreationSQLs) => {
  * @returns true on success, and false on error
  */
 exports.runTransaction = async (cmdObjs, dbConnectInfo, dbCreationSQLs) => {
-    if (_isNetworkPath(dbConnectInfo)) return await _networkCall("runTransaction", [cmdObjs], dbConnectInfo, dbCreationSQLs);
+    if (_isNetworkPath(dbConnectInfo)) try {
+        return await _networkCall("runTransaction", [cmdObjs], dbConnectInfo, dbCreationSQLs); 
+    } catch (err) { LOG.error(`DB network error running, transaction ${cmdObjs}, error: ${err}`); return false; }
 
     const cmdsToRun = [{cmd: "BEGIN TRANSACTION", params: []}, ...cmdObjs, {cmd: "COMMIT", params: []}];
     for (const cmdObj of cmdsToRun) if (!(await exports.runCmd(cmdObj.cmd, cmdObj.params, dbConnectInfo, dbCreationSQLs)))
@@ -94,7 +100,10 @@ exports.doService = async jsonReq => {
     try {
         const dbresult = await module.exports[jsonReq.method](...function_arguments);
         return {dbresult, result: true};
-    } catch (err) {return CONSTANTS.FALSE_RESULT;}
+    } catch (err) {
+        LOG.error(`Database error in servicing network call ${jsonReq}. The error is ${err}`); 
+        return CONSTANTS.FALSE_RESULT;
+    }
 }
 
 async function _listenDB(dbConnectInfo) {
