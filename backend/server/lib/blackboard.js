@@ -16,6 +16,7 @@ const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 let conf = _expandConf(require(CONSTANTS.BLACKBOARDCONF));
 const netcheck = require(`${CONSTANTS.LIBDIR}/netcheck.js`);
 const clustermemory = require(`${CONSTANTS.LIBDIR}/clustermemory.js`);
+const timed_expiry_cache = require(`${CONSTANTS.LIBDIR}/timedcache.js`).newcache(conf.fastcache_timeout);
 
 const BLACKBOARD_MSG = "__org_monkshu_blackboard_msg", CONF_UPDATE_MSG = "__org_monkshu_blackboard_msg_conf",
     BLACKBOARD_REQUESTREPLY_TOPIC = "__org_monkshu_blackboard_requestreply_topic";
@@ -42,8 +43,8 @@ function init() {
 
 /** called by internal blackboard, not a public API */
 async function doService(request) { 
-    if (request.type == BLACKBOARD_MSG) {   // received network message; if in a nodejs cluster, use cluster to broadcast, else broadcast here
-        if (process.send && (!request.msg.options?.nolocal)) process.send({type: BLACKBOARD_MSG, msg: request.msg});
+    if (request.type == BLACKBOARD_MSG) {   
+        if (process.send) process.send({type: BLACKBOARD_MSG, msg: request.msg});   // received network message; if in a nodejs cluster, use cluster to broadcast, else broadcast here
         else _broadcast(request.msg);   // no cluster so broadcast locally
         return CONSTANTS.TRUE_RESULT;
     } else return CONSTANTS.FALSE_RESULT;
@@ -58,12 +59,14 @@ async function doService(request) {
  *                              blackboard.EXTERNAL_ONLY: if true, don't broadcast to the local vertical cluster or process
  *                              blackboard.LOCAL_ONLY: if true, broadcast only to the current process
  *                              blackboard.LOCAL_CLUSTER_ONLY: if true, broadcast only to the current vertical cluster
+ *                              blackbaord.NOT_LOCAL_ONLY: if true, broadcast to everyone except local current process
  *                           }
  */
 async function publish(topic, payload, options) {
     const poster = conf.secure?rest.postHttps:rest.post;
     const _createBroadcastMessage = _ => { return {
-        topic, payload, serverid: CONSTANTS.SERVER_ID, serverip: CONSTANTS.SERVER_IP, options} };
+        topic, payload, serverid: CONSTANTS.SERVER_ID, serverip: CONSTANTS.SERVER_IP, 
+        messageid: utils.generateUUID(false), options} };
 
     if (options?.[module.exports.LOCAL_ONLY]) {_broadcast(_createBroadcastMessage()); return;}   // only send to the current process
 
@@ -93,7 +96,9 @@ async function publish(topic, payload, options) {
 
     // if the network is down or if all replicas are misconfigured, then at least broadcast to the local nodes
     // so that applications relying on the blackboard keep running, as long as the external only is not set.
-    if ((!options?.[module.exports.EXTERNAL_ONLY]) && ((!conf.replicas.length) || (failedReplicas == conf.replicas.length))) {   
+    if ((!options?.[module.exports.EXTERNAL_ONLY]) && ((!conf.replicas.length) || 
+            (failedReplicas == conf.replicas.length))) {  
+
         LOG.error(`Failed to reach all replicas. Assuming network isolated topology. Broadcasting the message locally. The message topic is ${topic}.`);
         if (process.send) process.send({type: BLACKBOARD_MSG, msg:_createBroadcastMessage()});   // broadcast to the local cluster if no replicas working
         else _broadcast(_createBroadcastMessage());  // if no local cluster then just give up and send to the local applications
@@ -114,9 +119,10 @@ async function getLocalClusterSize() {return await clustermemory.getClusterCount
  * @param {object} options Same as publish options plus if exports.FIRST_REPLY_ONLY is set 
  *                         then only first reply received is waited for, and sent back
  * @param {function} replyReceiver The function to receove the reply, unless await is called
+ * @param {number} repliesExpected The number of expected replies, if not provided it is auto-calculated
  * @returns The replies received as an [array of reply objects]
  */
-async function getReply(topic, payload, timeout=conf.send_reply_timeout, options, replyReceiver) {
+async function getReply(topic, payload, timeout=conf.send_reply_timeout, options, replyReceiver, repliesExpected) {
     if (!replyReceiver) return new Promise(resolve => getReply(...arguments, resolve));
 
     const id = utils.generateUUID();
@@ -125,8 +131,12 @@ async function getReply(topic, payload, timeout=conf.send_reply_timeout, options
         replied = true; replies.incomplete = true; replyReceiver(replies);
         LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}. Sending incomplete reply.`);
     }}, timeout);
-    const repliedExpected = options?.[module.exports.LOCAL_ONLY] ? 1 : options?.[module.exports.FIRST_REPLY_ONLY] ? 1 :
-        options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : _currentDistributedClusterSizeOnline;
+    if (!repliesExpected) repliedExpected = options?.[module.exports.FIRST_REPLY_ONLY] ? 1 : 
+        options?.[module.exports.LOCAL_ONLY] ? 1 :
+        options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : 
+        options?.[module.exports.NOT_LOCAL_ONLY] ? 
+            _currentDistributedClusterSizeOnline + _currentLocalClusterSizeOnline - 1 : 
+        _currentDistributedClusterSizeOnline;
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
         if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies - this also ensures topics match etc
@@ -134,7 +144,7 @@ async function getReply(topic, payload, timeout=conf.send_reply_timeout, options
         clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
         replyReceiver(replies); replied = true;
         LOG.info(`Blackboard getReply sent successful reply for topic -> ${topic} with options ${JSON.stringify(options)}.`);
-    });
+    }, options);
     const finalPayload = {id, payload, topic, type: "request", options}; 
     publish(BLACKBOARD_REQUESTREPLY_TOPIC, finalPayload, options);
 }
@@ -206,9 +216,15 @@ async function _setCurrentClusterSizeOnline() {
 
 function _broadcast(msg) {
     // handle specially formatted request-reply messages here
-    if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.payload.type == "request") msg = {
-        topic: msg.payload.topic, payload: {...msg.payload.payload, blackboardcontrol: {
-            id: msg.payload.id, options: msg.payload.options} } };
+    if (msg.topic == BLACKBOARD_REQUESTREPLY_TOPIC && msg.payload.type == "request") {  // unmarshall request-reply messages
+        msg.topic = msg.payload.topic; msg.payload = {...msg.payload.payload, 
+            blackboardcontrol: {id: msg.payload.id, options: msg.payload.options} }
+    }
+
+    if (timed_expiry_cache.get("_blackboard"+msg.messageid)) {    // deliver only once
+        LOG.warn(`Skipping rebroadcast of message with ID: ${msg.messageid} for topic ${msg.topic} topic -> ${topic}.`)
+        return;
+    } else timed_expiry_cache.set("_blackboard"+msg.messageid, "sent");
     
     const topic = msg.topic; 
     if (topics[topic]) for (const subscriber of topics[topic]) {
@@ -216,6 +232,7 @@ function _broadcast(msg) {
         if (!options) {callback(msg.payload); continue;}  // no options means receive all the time
         if (options[module.exports.LOCAL_ONLY]) {if (msg.serverid == CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
         if (options[module.exports.LOCAL_CLUSTER_ONLY]) {if (utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); continue;}
+        if (options[module.exports.NOT_LOCAL_ONLY]) {if (msg.serverid != CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
         if (options[module.exports.EXTERNAL_ONLY]) {if (!utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); continue;}
         callback(msg.payload); // no valid option - so send it out to everyone
     }
@@ -229,4 +246,4 @@ function _expandConf(conf) {
 module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
     sendReply, getDistribuedClusterSize, getCurrentDistributedClusterSizeOnline, getLocalClusterSize, 
     LOCAL_ONLY: "localonly", LOCAL_CLUSTER_ONLY: "localclusteronly", EXTERNAL_ONLY: "externalonly", 
-    FIRST_REPLY_ONLY: "firstreplyonly", CONF_UPDATE_MSG};
+    NOT_LOCAL_ONLY: "notlocalonly", FIRST_REPLY_ONLY: "firstreplyonly", CONF_UPDATE_MSG};

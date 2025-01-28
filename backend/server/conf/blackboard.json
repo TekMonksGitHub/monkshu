@@ -4,5 +4,6 @@
     "cluster_check_interval_ms": 100,
     "quick_connect_timeout_ms": 50,
     "local_cluster_timeout_ms": 100,
-    "send_reply_timeout": 1000
+    "send_reply_timeout": 1000,
+    "fastcache_timeout": 10000
 }
