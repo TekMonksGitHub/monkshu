@@ -9,5 +9,6 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 pushd .
 cd "$DIR"
+export NODE_TLS_REJECT_UNAUTHORIZED=0
 node "$DIR/cluster.js" $*
 popd
