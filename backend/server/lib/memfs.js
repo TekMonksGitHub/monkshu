@@ -49,7 +49,7 @@ exports.writeFile = async (path, data, options) => {
     path = pathmod.resolve(path);
     if (FSCACHE[path]) {
         delete FSCACHE[path].deleted;   // file is no longer deleted
-        FSCACHE[path].data = data; FSCACHE[path].accesstime = Date.now(); FSCACHE[path].stats.size = Buffer.from(data).length;  // update data, last access and sizes
+        FSCACHE[path].data = data; FSCACHE[path].accesstime = Date.now(); FSCACHE[path].stats.size = Buffer.byteLength(data);  // update data, last access and sizes
         _addPendingPromises(_=>_runNativeFSFunction("writeFile", [path, data, options]));  // no need for await as file is cached and read will be via the cache
     } else await _runNativeFSFunction("writeFile",[path, data, options]); // we don't cache on writes, unless already cached
 }
@@ -61,7 +61,7 @@ exports.appendFile = async (path, data, options) => {
         FSCACHE[path].data = typeof data === "string" ? FSCACHE[path].data + data :
             Buffer.concat([Buffer.from(FSCACHE[path].data), Buffer.from(data)]);    // add data
         FSCACHE[path].accesstime = Date.now();                                      // update last access timestamp
-        FSCACHE[path].stats.size += Buffer.from(data).length                        // update size
+        FSCACHE[path].stats.size += Buffer.byteLength(data);                        // update size
         _addPendingPromises(_=>_runNativeFSFunction("appendFile", [path, data, options]));  // no need for await as file is cached and read will be via the cache
     } else await _runNativeFSFunction("appendFile",[path, data, options]);    // we don't cache on writes, unless already cached
 }
