@@ -95,6 +95,8 @@ exports.runTransaction = async (cmdObjs, dbConnectInfo, dbCreationSQLs) => {
 exports.doService = async jsonReq => {
     const _validateRequest = jsonReq => jsonReq && jsonReq.method && jsonReq.params && jsonReq.path && jsonReq.dbCreationSQLs;
     if (!_validateRequest(jsonReq)) {LOG.error("SQLite DB API validation failure."); return CONSTANTS.FALSE_RESULT;}
+
+    if (CONSTANTS.SERVER_CONF.debug_mode) {LOG.info(`SQLite service incoming request -> ${JSON.stringify(jsonReq)}`)}
     
     const function_arguments = [...(jsonReq.params||[]), jsonReq.path, jsonReq.dbCreationSQLs];
     try {

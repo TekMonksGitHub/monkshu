@@ -27,14 +27,15 @@ async function bootstrap() {
 	CONSTANTS.SERVER_ID = utils.generateUUID(false);
 	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
 	CONSTANTS.SERVER_START_TIME = Date.now();
+	CONSTANTS.SERVER_CONF = conf;
 
 	/* Init the logs */
 	console.log("Initializing the logs.");
-	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${conf.logfile}`);
+	require(CONSTANTS.LIBDIR+"/log.js").initGlobalLoggerSync(`${CONSTANTS.LOGDIR}/${CONSTANTS.SERVER_CONF.logfile}`);
 	LOG.overrideConsole();
 
 	/* Warn if in debug mode */
-	if (conf.debug_mode) {
+	if (CONSTANTS.SERVER_CONF.debug_mode) {
 		LOG.warn("**** Server is in debug mode, expect severe performance degradation.");
 		LOG.console("**** Server is in debug mode, expect severe performance degradation.\n");
 	}
@@ -154,7 +155,7 @@ async function doService(data, servObject, headers, url) {
 		return ipcServerReply;
 	}
 	
-	if (conf.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
+	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
 	const api = APIREGISTRY.getAPI(url), apiconf = APIREGISTRY.getAPIConf(url);
 	LOG.info("Looked up service, calling: " + api);
 	
@@ -170,7 +171,7 @@ async function doService(data, servObject, headers, url) {
 
 		try { 
 			const apiModule = apiconf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(api) :
-				utils.requireWithDebug(api, conf.debug_mode);
+				utils.requireWithDebug(api, CONSTANTS.SERVER_CONF.debug_mode);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 		} catch (error) {
