@@ -112,6 +112,7 @@ exports.rm = async (path, options) => {
 }
 
 exports.flush = _ => {
+    if (!PENDING_PROMISES.length) return;   // nothing to flush
     if (!flush_promise) flush_promise = new Promise(resolve=>flush_resolver=resolve);
     return flush_promise;
 }

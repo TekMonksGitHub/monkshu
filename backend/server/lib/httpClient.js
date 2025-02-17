@@ -30,6 +30,8 @@ const utils = require(CONSTANTS.LIBDIR + "/utils.js");
 const crypt = require(CONSTANTS.LIBDIR + "/crypt.js");
 const gunzipAsync = require("util").promisify(zlib.gunzip);
 
+const MONKSHU_AGENT = `Monkshu httpc/${CONSTANTS.BUILD_NUMBER}`;
+
 let undiciMod;  // holds the undici module if it is available
 
 function post(host, port, path, headers, req, sslObj, callback) {
@@ -146,6 +148,7 @@ function _addHeaders(headers, body) {
     if (body) headers["content-length"] = Buffer.byteLength(body, "utf8");
     headers["accept"] = utils.getObjectKeyValueCaseInsensitive(headers, "accept") || "*/*";
     headers["accept-encoding"] = "gzip,identity";   // we will accept gzip
+    if (!headers["user-agent"]) headers["user-agent"] = MONKSHU_AGENT;
     return headers;
 }
 
