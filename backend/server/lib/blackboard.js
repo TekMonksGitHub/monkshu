@@ -36,7 +36,11 @@ function init() {
     process.on("message", msg => {
         if (msg.type == CONF_UPDATE_MSG) conf = _expandConf(msg.conf)});
     process.on("message", msg => {
-        if (msg.type == BLACKBOARD_MSG) _broadcast(msg.msg)});
+        if (msg.type == BLACKBOARD_MSG) {
+            _log_verbose(`Blackboard at PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} received message with ID ${msg.msg.messageid} via network internal cluster IPC.`);
+            _broadcast(msg.msg);
+        }
+    });
     if (!conf.replicas) conf.replicas = []; // init to empty list if not provided
     utils.setIntervalImmediately(_setCurrentClusterSizeOnline, conf.cluster_check_interval_ms);
 }
@@ -44,6 +48,7 @@ function init() {
 /** called by internal blackboard, not a public API */
 async function doService(request) { 
     if (request.type == BLACKBOARD_MSG) {   
+        _log_verbose(`Blackboard at PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} received message with ID ${request.msg.messageid} via network API.`);
         if (process.send) process.send({type: BLACKBOARD_MSG, msg: request.msg});   // received network message; if in a nodejs cluster, use cluster to broadcast, else broadcast here
         else _broadcast(request.msg);   // no cluster so broadcast locally
         return CONSTANTS.TRUE_RESULT;
@@ -84,10 +89,11 @@ async function publish(topic, payload, options) {
             if (options?.[module.exports.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
             
             if (!(await isReplicaOnline(host, port))) {  // don't waste time publishing to nodes not reachable
-                LOG.error(`Blackboard can't reach replica ${replica}, due to connection error. The message topic is ${topic}.`); 
+                LOG.error(`Blackboard with PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} can't reach replica ${replica}, due to connection error. Dropping messgae with topic ${topic}.`); 
                 failedReplicas++; continue; 
             }
             
+            _log_verbose(`Blackboard with PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} sending message for topic ${topic} via network to ${replica}.`);
             poster(host, port, API_BB_PATH, {}, {type:BLACKBOARD_MSG, msg:_createBroadcastMessage()}, (err,result) => {
                 if (err || !result.result) LOG.error(`Blackboard replication failed for replica: ${replica}`); 
             });
@@ -129,7 +135,7 @@ async function getReply(topic, payload, timeout=conf.send_reply_timeout, options
     let repliesReceived = 0, replied = false, replies = [];
     const timeoutID = setTimeout(_=>{ if (!replied) {
         replied = true; replies.incomplete = true; replyReceiver(replies);
-        LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}. Sending incomplete reply.`);
+        LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}, expected = ${repliedExpected}, received = ${repliesReceived}. Sending incomplete reply.`);
     }}, timeout);
     if (!repliesExpected) repliedExpected = options?.[module.exports.FIRST_REPLY_ONLY] ? 1 : 
         options?.[module.exports.LOCAL_ONLY] ? 1 :
@@ -221,6 +227,7 @@ function _broadcast(msg) {
             blackboardcontrol: {id: msg.payload.id, options: msg.payload.options} }
     }
 
+    _log_verbose(`Blackboard with PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} received message for broadcast with message ID ${msg.messageid} for topic ${msg.topic}`);
     if (timed_expiry_cache.get("_blackboard"+msg.messageid)) {    // deliver only once
         LOG.warn(`Skipping rebroadcast of message with ID: ${msg.messageid} for topic ${msg.topic} topic -> ${topic}.`)
         return;
@@ -230,10 +237,26 @@ function _broadcast(msg) {
     if (topics[topic]) for (const subscriber of topics[topic]) {
         const {callback, options} = subscriber;
         if (!options) {callback(msg.payload); continue;}  // no options means receive all the time
-        if (options[module.exports.LOCAL_ONLY]) {if (msg.serverid == CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
-        if (options[module.exports.LOCAL_CLUSTER_ONLY]) {if (utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); continue;}
-        if (options[module.exports.NOT_LOCAL_ONLY]) {if (msg.serverid != CONSTANTS.SERVER_ID) callback(msg.payload); continue;}
-        if (options[module.exports.EXTERNAL_ONLY]) {if (!utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); continue;}
+        if (options[module.exports.LOCAL_ONLY]) {
+            if (msg.serverid == CONSTANTS.SERVER_ID) callback(msg.payload); 
+            else LOG.info(`Blackboard dropped message with ID ${msg.messageid} for topic ${msg.topic} with LOCAL_ONLY option due to ${msg.serverid} != ${CONSTANTS.SERVER_ID}.`);
+            continue;
+        }
+        if (options[module.exports.LOCAL_CLUSTER_ONLY]) {
+            if (utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); 
+            else LOG.info(`Blackboard dropped message with ID ${msg.messageid} for topic ${msg.topic} with LOCAL_CLUSTER_ONLY option due to ${msg.serverop} not in local IPs.`);
+            continue;
+        }
+        if (options[module.exports.NOT_LOCAL_ONLY]) {
+            if (msg.serverid != CONSTANTS.SERVER_ID) callback(msg.payload); 
+            else LOG.info(`Blackboard dropped message with ID ${msg.messageid} for topic ${msg.topic} with NOT_LOCAL_ONLY option due to ${msg.serverid} == ${CONSTANTS.SERVER_ID}`);
+            continue;
+        }
+        if (options[module.exports.EXTERNAL_ONLY]) {
+            if (!utils.getLocalIPs().includes(msg.serverip)) callback(msg.payload); 
+            else LOG.info(`Blackboard dropped message with ID ${msg.messageid} for topic ${msg.topic} with EXTERNAL_ONLY option due to ${msg.serverip} being in local IPs.`);
+            continue;
+        }
         callback(msg.payload); // no valid option - so send it out to everyone
     }
 }
@@ -242,6 +265,8 @@ function _expandConf(conf) {
     const retConf = JSON.parse(mustache.render(JSON.stringify(conf), {hostname: CONSTANTS.HOSTNAME}));
     return retConf;
 }
+
+_log_verbose = s => {if (conf.verbose_logging) LOG.info(s);}
 
 module.exports = {init, doService, publish, subscribe, unsubscribe, isEntireReplicaClusterOnline, getReply, 
     sendReply, getDistribuedClusterSize, getCurrentDistributedClusterSizeOnline, getLocalClusterSize, 
