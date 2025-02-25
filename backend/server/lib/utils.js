@@ -7,6 +7,7 @@ const fs = require("fs");
 const os = require("os");
 const dns = require("dns");
 const path = require("path");
+const zlib = require("zlib");  
 const archiver = require('archiver');
 const http2 = require("http2");
 const crypto = require("crypto");
@@ -616,6 +617,26 @@ async function zipFolder(sourceFolderPath, zipFilePath) {
     });
 }
 
+/**
+ * Gzips the contents of a file into a gzip file.
+ * @param {string} sourceFilePath - The path of the folder to zip.
+ * @param {string} zipFilePath - The path where the zip file should be saved.
+ * @returns {Promise<void>} - Resolves when the file is successfully zipped.
+ * @throws {Error} - Throws an error if zipping fails.
+ */
+
+async function gzipFile(sourceFilePath, zipFilePath) {
+    return new Promise((resolve, reject) => {
+        const inp = fs.createReadStream(sourceFilePath);  
+        const out = fs.createWriteStream(zipFilePath);  
+        const gzip = zlib.createGzip();
+        out.on("close", _=>resolve());
+        out.on("error", err=>reject(err));
+        inp.on("error", err=>reject(err));
+        inp.pipe(gzip).pipe(out);
+    });
+}
+
 function dnsResolve(domain) {
     return new Promise((resolve, reject) => 
         dns.lookup(domain, {all: true}, (err, records) => {
@@ -627,4 +648,5 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
-    convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, dnsResolve };
+    convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
+    gzipFile, dnsResolve };
