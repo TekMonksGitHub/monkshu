@@ -94,7 +94,8 @@ const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))
 
 /**
  * Uploads a single file.
- * @param accept Optional: The MIME type to accept. Default is "*".
+ * @param accept Optional: The MIME types to accept. Default is "*\/*". Can be multiple with commas as below
+ *                         Example .doc,.docx,application/msword
  * @param type Optional: Can be "text" or "binary". Default is "text".
  * @returns A promise which resolves to {name - filename, data - string or ArrayBuffer} or rejects with error
  */
@@ -254,6 +255,22 @@ function base64ToString(base64) {
     return new TextDecoder().decode(bytes);
 }
 
+/** 
+ * Converts ArrayBuffer or Uint8Array to Base 64
+ * @param {ArrayBuffer|Uint8Array} buffer The buffer to encode to Base64
+ * from: https://stackoverflow.com/questions/12710001/how-to-convert-uint8-array-to-base64-encoded-string
+ */
+async function bufferToBase64(buffer) {
+    // use a FileReader to generate a base64 data URI:
+    const base64url = await new Promise(r => {
+        const reader = new FileReader()
+        reader.onload = () => r(reader.result)
+        reader.readAsDataURL(new Blob([buffer]))
+    });
+    // remove the `data:...;base64,` part from the start
+    return base64url.slice(base64url.indexOf(',') + 1);
+}
+
 /**
  * Encodes HTML entities in the given text.
  * @param {string} text The text to encode
@@ -308,4 +325,4 @@ function _getObjectPathSplits(path) {
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
     removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
-    encodeHTMLEntities, htmlToDOMNodes, getObjProperty};
+    encodeHTMLEntities, htmlToDOMNodes, getObjProperty, bufferToBase64};
