@@ -99,10 +99,10 @@ const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))
  * @param type Optional: Can be "text" or "binary". Default is "text".
  * @returns A promise which resolves to {name - filename, data - string or ArrayBuffer} or rejects with error
  */
-function uploadAFile(accept="*/*", type="text") {
+function uploadAFile(accept="*/*", type="text", maxsize, max_size_error) {
     const uploadFiles = _ => new Promise(resolve => {
         const uploader = document.createElement("input"); uploader.setAttribute("type","file"); 
-        uploader.style.display = "none"; uploader.setAttribute("accept", accept);
+        uploader.style.display = "none"; uploader.setAttribute("accept", accept); 
         
         document.body.appendChild(uploader); uploader.onchange = _ => {resolve(uploader.files); document.body.removeChild(uploader); }; 
         uploader.click();
@@ -110,6 +110,7 @@ function uploadAFile(accept="*/*", type="text") {
 
     return new Promise(async (resolve, reject) => {
         const file = (await uploadFiles())[0]; if (!file) {reject("User cancelled upload"); return;}
+        if (maxsize && (file.size > maxsize)) {alert(max_size_error); return;}
         try {resolve(await getFileData(file, type));} catch (err) {reject(err);} 
     });
 }
@@ -123,7 +124,7 @@ function uploadAFile(accept="*/*", type="text") {
 function getFileData(file, type="text") {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = event => resolve({name: file.name, data: event.target.result});
+        reader.onload = event => resolve({name: file.name, type: file.type, size: file.size, data: event.target.result});
         reader.onerror = _event => reject(reader.error);
         if (type.toLowerCase() == "text") reader.readAsText(file); else reader.readAsArrayBuffer(file);
     });
