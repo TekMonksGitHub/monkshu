@@ -89,7 +89,7 @@ async function publish(topic, payload, options) {
             if (options?.[module.exports.EXTERNAL_ONLY] && utils.getLocalIPs().includes(host)) continue;    // only need to send to external cluster members
             
             if (!(await isReplicaOnline(host, port))) {  // don't waste time publishing to nodes not reachable
-                LOG.error(`Blackboard with PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} can't reach replica ${replica}, due to connection error. Dropping messgae with topic ${topic}.`); 
+                LOG.error(`Blackboard with PID ${process.pid} and server ID ${CONSTANTS.SERVER_ID} can't reach replica ${replica}, due to connection error. Dropping messgae with topic ${topic} for this replica.`); 
                 failedReplicas++; continue; 
             }
             
