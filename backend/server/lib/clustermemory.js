@@ -158,4 +158,5 @@ function _getPolledReplyForKey(key, polltimeout, sendtype, responsetype) {
 
 const _createRequestID = _ => `${Date.now()}-${Math.round(Math.random()*1000)}`;
 
-module.exports = {init, set, get, listen, getClusterCount: _getClusterCount};
+module.exports = {init, set, get, listen, getDynamicClusterCount: _getClusterCount, 
+    configured_cluster_count: clusterconf.workers};

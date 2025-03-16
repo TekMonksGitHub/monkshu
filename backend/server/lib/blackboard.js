@@ -115,7 +115,7 @@ async function publish(topic, payload, options) {
 function getDistribuedClusterSize() {return conf.replicas.length;}
 
 /** @return The local cluster size, as configured */
-async function getLocalClusterSize() {return await clustermemory.getClusterCount(conf.local_cluster_timeout_ms);}
+async function getLocalClusterSize() {return await clustermemory.getDynamicClusterCount(conf.local_cluster_timeout_ms);}
 
 /**
  * Gets a reply for the given topic and message. 
