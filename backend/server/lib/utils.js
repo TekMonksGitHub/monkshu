@@ -8,9 +8,10 @@ const os = require("os");
 const dns = require("dns");
 const path = require("path");
 const zlib = require("zlib");  
-const archiver = require('archiver');
 const http2 = require("http2");
 const crypto = require("crypto");
+const archiver = require("archiver");
+const spawn = require("child_process").spawn;
 const mkdirAsync = require("util").promisify(fs.mkdir);
 const lstatAsync = require("util").promisify(fs.lstat);
 const readdirAsync = require("util").promisify(fs.readdir);
@@ -642,6 +643,34 @@ function dnsResolve(domain) {
         dns.lookup(domain, {all: true}, (err, records) => {
             if (err) reject(err); else resolve(records);}));
 }
+
+/**
+ * Executes the given command
+ * @param {string} command The command to execute
+ * @param {Array} args The arguments to the command
+ * @return {Object} The format is {"result": true | false, "msg": "Text output message"}
+ */
+exports.exec = (command, args) => {
+    const quoter = process.platform=="win32"?'"':"'";
+    const re = /^["'].*["']$/, escapedCommand = command.match(re)?command:`${quoter}${command}${quoter}`;
+    const escapedArgs = []; for (const arg of args) escapedArgs.push(arg.match(re)?arg:`${quoter}${arg}${quoter}`);
+
+    return new Promise(resolve => {
+        const shellProcess = spawn(escapedCommand, escapedArgs, {shell: true});
+        LOG.debug(`Process started ${shellProcess.pid} command: ${escapedCommand} ${escapedArgs.join(" ")}`);
+
+        let out = "", error = "";
+
+        shellProcess.stdout.on("data", data => {out += String.fromCharCode.apply(null, data);
+            LOG.debug(`PID ${shellProcess.pid}, stdout: ${String.fromCharCode.apply(null, data)}`);});
+        shellProcess.stderr.on("data", data => {error += String.fromCharCode.apply(null, data);
+            LOG.debug(`PID ${shellProcess.pid}, stderr: ${String.fromCharCode.apply(null, data)}`);});
+
+        shellProcess.on("exit", exitCode => {resolve({"result":exitCode==0?true:false, stdout: out, stderr: error});
+            LOG.debug(`PID ${shellProcess.pid}, finished with exit code ${exitCode}`);});
+    });
+}
+
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
