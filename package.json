@@ -27,7 +27,6 @@
     "clean-css": "latest",
     "html-minifier": "latest",
     "mustache": "latest",
-    "natural": "^6.5.0",
     "nodemailer": "latest",
     "sqlite3": "latest",
     "terser": "latest",
