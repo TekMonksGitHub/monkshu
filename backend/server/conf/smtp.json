@@ -4,5 +4,8 @@
     "secure":   true,
     "user":     "noreply@tekmonks.com",
     "password": "<add encrypted password here - using lib/crypt.js>",
-    "from":     "noreply@tekmonks.com"
+    "from":     "noreply@tekmonks.com",
+    "domain":   "teleworkr.com",
+    "apikey":   "<add encrypted apikey here - using lib/crypt.js>",
+    "useMailGunApi": false
 }

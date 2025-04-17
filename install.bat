@@ -12,6 +12,7 @@ call npm install uglify-js
 call npm install html-minifier
 call npm install clean-css
 call npm install nodemailer
+call npm install nodemailer-mailgun-transport
 
 npm install --save-dev electron
 popd

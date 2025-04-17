@@ -7,6 +7,7 @@
  * See enclosed LICENSE file.
  */
 const nodemailer = require("nodemailer");
+const mailgunTransport = require('nodemailer-mailgun-transport');
 const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
 const SERVER_CONF = require(`${CONSTANTS.CONFDIR}/smtp.json`);
 
@@ -24,10 +25,10 @@ const SERVER_CONF = require(`${CONSTANTS.CONFDIR}/smtp.json`);
  */
 module.exports.email = async function(to, title, email_html, email_text, conf, auth) {
     if (!conf) conf = SERVER_CONF;
-    if (!auth) auth = {user: SERVER_CONF.user, pass: crypt.decrypt(SERVER_CONF.password)};
+    if (!auth) auth = conf.useMailGunApi ? {auth: { api_key: crypt.decrypt(SERVER_CONF.apikey), domain: SERVER_CONF.domain }} : {user: SERVER_CONF.user, pass: crypt.decrypt(SERVER_CONF.password)};
 
     const smtpConfig = {pool: true, host: conf.server, port: conf.port, secure: conf.secure, auth},
-        transporter = nodemailer.createTransport(smtpConfig);
+        transporter = conf.useMailGunApi ? nodemailer.createTransport(mailgunTransport(auth)) : nodemailer.createTransport(smtpConfig);
 
     try {
         const result = await transporter.sendMail({"from": conf.from, "to": to, "subject": title, "text": email_text, "html": email_html});
