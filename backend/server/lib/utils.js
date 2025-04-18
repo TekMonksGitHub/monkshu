@@ -654,6 +654,7 @@ function dnsResolve(domain) {
  * @return {Object} The format is {"result": true | false, "msg": "Text output message"}
  */
 function exec(command, args, escapeArgs=true, inShell=true, quoterCharacter) {
+    if (typeof args === "string") args = [args];    // args should be an array, fix it
     const quoter = quoterCharacter || (process.platform=="win32"?'"':"'");
     const re = /^["'].*["']$/, escapedCommand = command.match(re)?command:`${quoter}${command}${quoter}`;
     const escapedArgs = []; for (const arg of args) escapedArgs.push(arg.match(re)?arg:`${quoter}${arg}${quoter}`);
