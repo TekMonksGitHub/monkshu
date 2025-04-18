@@ -648,26 +648,34 @@ function dnsResolve(domain) {
  * Executes the given command
  * @param {string} command The command to execute
  * @param {Array} args The arguments to the command
+ * @param {escapeArgs} boolean If true args are escaped
+ * @param {inshell} boolean If true, shell option is used
+ * @param {quoterCharacter} string The character forced to quote the params
  * @return {Object} The format is {"result": true | false, "msg": "Text output message"}
  */
-exports.exec = (command, args) => {
-    const quoter = process.platform=="win32"?'"':"'";
+function exec(command, args, escapeArgs=true, inShell=true, quoterCharacter) {
+    const quoter = quoterCharacter || (process.platform=="win32"?'"':"'");
     const re = /^["'].*["']$/, escapedCommand = command.match(re)?command:`${quoter}${command}${quoter}`;
     const escapedArgs = []; for (const arg of args) escapedArgs.push(arg.match(re)?arg:`${quoter}${arg}${quoter}`);
 
     return new Promise(resolve => {
-        const shellProcess = spawn(escapedCommand, escapedArgs, {shell: true});
-        LOG.debug(`Process started ${shellProcess.pid} command: ${escapedCommand} ${escapedArgs.join(" ")}`);
+        try {
+            const shellProcess = spawn(escapedCommand, escapeArgs?escapedArgs:args, {shell: inShell});
+            LOG.debug(`Process started ${shellProcess.pid} command: ${escapedCommand} ${escapedArgs.join(" ")}`);
 
-        let out = "", error = "";
+            let out = "", error = "";
 
-        shellProcess.stdout.on("data", data => {out += String.fromCharCode.apply(null, data);
-            LOG.debug(`PID ${shellProcess.pid}, stdout: ${String.fromCharCode.apply(null, data)}`);});
-        shellProcess.stderr.on("data", data => {error += String.fromCharCode.apply(null, data);
-            LOG.debug(`PID ${shellProcess.pid}, stderr: ${String.fromCharCode.apply(null, data)}`);});
+            shellProcess.stdout.on("data", data => {out += String.fromCharCode.apply(null, data);
+                LOG.debug(`PID ${shellProcess.pid}, stdout: ${String.fromCharCode.apply(null, data)}`);});
+            shellProcess.stderr.on("data", data => {error += String.fromCharCode.apply(null, data);
+                LOG.debug(`PID ${shellProcess.pid}, stderr: ${String.fromCharCode.apply(null, data)}`);});
 
-        shellProcess.on("exit", exitCode => {resolve({"result":exitCode==0?true:false, stdout: out, stderr: error});
-            LOG.debug(`PID ${shellProcess.pid}, finished with exit code ${exitCode}`);});
+            shellProcess.on("exit", exitCode => {resolve({"result":exitCode==0?true:false, stdout: out, stderr: error});
+                LOG.debug(`PID ${shellProcess.pid}, finished with exit code ${exitCode}`);});
+        } catch (err) {
+            LOG.error(`PID ${shellProcess.pid}, Spawn Exception: ${err.toString()}`);
+            resolve({"result":false, exception: err});
+        }
     });
 }
 
@@ -678,4 +686,4 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
     convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
-    gzipFile, dnsResolve };
+    gzipFile, dnsResolve, exec };
