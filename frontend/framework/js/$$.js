@@ -111,7 +111,11 @@ $$.isSlowNetwork = _ => window.$$["_slowNetwork"];
 $$.copyTextToClipboard = (text, mime) => {
     if (((!mime) || (mime.toLowerCase() == "text/plain")) && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
     
-    const type = mime||"text/plain", blob = new Blob([text], { type }), data = [new ClipboardItem({ [type]: blob })];
+    const type = mime||"text/plain", blob = new Blob([text], { type });
+    let blobText; if (type != "text/plan") blobText = new Blob([text.toString()], {type: "text/plain"});
+    const clipboardItem = (blobText !== undefined) ? new ClipboardItem({ [blob.type]: blob, [blobText.type]: blobText}) : 
+        new ClipboardItem({ [blob.type]: blob });
+    const data = [clipboardItem];
     return navigator.clipboard.write(data);
 }
 

@@ -648,12 +648,13 @@ function dnsResolve(domain) {
  * Executes the given command
  * @param {string} command The command to execute
  * @param {Array} args The arguments to the command
+ * @param {string} encoding The output encoding expected
  * @param {escapeArgs} boolean If true args are escaped
  * @param {inshell} boolean If true, shell option is used
  * @param {quoterCharacter} string The character forced to quote the params
  * @return {Object} The format is {"result": true | false, "msg": "Text output message"}
  */
-function exec(command, args, escapeArgs=true, inShell=true, quoterCharacter) {
+function exec(command, args, encoding, escapeArgs=true, inShell=true, quoterCharacter) {
     if (typeof args === "string") args = [args];    // args should be an array, fix it
     const quoter = quoterCharacter || (process.platform=="win32"?'"':"'");
     const re = /^["'].*["']$/, escapedCommand = command.match(re)?command:`${quoter}${command}${quoter}`;
@@ -662,14 +663,15 @@ function exec(command, args, escapeArgs=true, inShell=true, quoterCharacter) {
     return new Promise(resolve => {
         try {
             const shellProcess = spawn(escapedCommand, escapeArgs?escapedArgs:args, {shell: inShell});
+            if (encoding) {shellProcess.stdout.setEncoding(encoding); shellProcess.stderr.setEncoding(encoding);}
             LOG.debug(`Process started ${shellProcess.pid} command: ${escapedCommand} ${escapedArgs.join(" ")}`);
 
             let out = "", error = "";
 
-            shellProcess.stdout.on("data", data => {out += String.fromCharCode.apply(null, data);
-                LOG.debug(`PID ${shellProcess.pid}, stdout: ${String.fromCharCode.apply(null, data)}`);});
-            shellProcess.stderr.on("data", data => {error += String.fromCharCode.apply(null, data);
-                LOG.debug(`PID ${shellProcess.pid}, stderr: ${String.fromCharCode.apply(null, data)}`);});
+            shellProcess.stdout.on("data", data => {out += encoding?data:String.fromCharCode.apply(null, data);
+                LOG.debug(`PID ${shellProcess.pid}, stdout: ${encoding?data:String.fromCharCode.apply(null, data)}`);});
+            shellProcess.stderr.on("data", data => {error += encoding?data:String.fromCharCode.apply(null, data);
+                LOG.debug(`PID ${shellProcess.pid}, stderr: ${encoding?data:String.fromCharCode.apply(null, data)}`);});
 
             shellProcess.on("exit", exitCode => {resolve({"result":exitCode==0?true:false, stdout: out, stderr: error});
                 LOG.debug(`PID ${shellProcess.pid}, finished with exit code ${exitCode}`);});
