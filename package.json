@@ -30,10 +30,12 @@
     "nodemailer": "latest",
     "sqlite3": "latest",
     "terser": "latest",
-    "uglify-js": "latest"
+    "uglify-js": "latest",
+    "webpack": "latest"
   },
   "devDependencies": {
     "electron": "latest",
-    "electron-builder": "latest"
+    "electron-builder": "latest",
+    "webpack-cli": "^6.0.1"
   }
 }
