@@ -90,7 +90,14 @@ function downloadFile(contents, type, filename) {
  * @param meta The meta object of the module
  * @returns URL path to the module as a string
  */
-const getModulePath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
+const getModulePath = meta => getModulePathFromURL(meta.url);
+
+/**
+ * Returns the URL path to the ES6 module (parent path) given its meta.url property
+ * @param url The URL of the module
+ * @returns URL path to the module as a string
+ */
+const getModulePathFromURL = url => url.substring(0,url.lastIndexOf("/"));
 
 /**
  * Uploads a single file.
@@ -326,4 +333,4 @@ function _getObjectPathSplits(path) {
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
     downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
     removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
-    encodeHTMLEntities, htmlToDOMNodes, getObjProperty, bufferToBase64};
+    encodeHTMLEntities, htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL};
