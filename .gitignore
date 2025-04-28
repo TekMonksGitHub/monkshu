@@ -17,3 +17,5 @@ backend/server/java/org/*
 backend/server/conf/hostname.json
 backend/server/conf/constants.json
 frontend/webpack/*
+frontend/index.mjs
+frontend/index.js
