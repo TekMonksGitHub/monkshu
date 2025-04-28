@@ -4,9 +4,10 @@
  * License: See enclosed LICENSE file.
  */
 import {util} from "./util.mjs";
+import {constants} from "./constants.mjs";
 import {blackboard} from "/framework/js/blackboard.mjs";
 
-const FRAMEWORK_FILELIST = `/framework/${$$.MONKSHU_CONSTANTS.CACHELIST_SUFFIX}`, 
+const FRAMEWORK_FILELIST = `/framework/${constants.CACHELIST_SUFFIX}`, 
     DEFAULT_VERSION_CHECK_FREQUENCY = 300000, CACHE_WORKER_URL = util.resolveURL("/framework/js/cacheworker.mjs"),
     VERSION_SWITCH_IN_PROGRESS = {}, PAGE_RELOAD_ON_UPGRADE_INTERVAL = 500;
     

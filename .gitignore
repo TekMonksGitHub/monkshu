@@ -16,3 +16,4 @@ desktop/package.json
 backend/server/java/org/*
 backend/server/conf/hostname.json
 backend/server/conf/constants.json
+frontend/webpack/*
