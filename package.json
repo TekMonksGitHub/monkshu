@@ -28,14 +28,14 @@
     "html-minifier": "latest",
     "mustache": "latest",
     "nodemailer": "latest",
+    "nodemailer-mailgun": "latest",
     "sqlite3": "latest",
     "terser": "latest",
     "uglify-js": "latest",
-    "webpack": "latest"
+    "wordcut": "latest"
   },
   "devDependencies": {
     "electron": "latest",
-    "electron-builder": "latest",
-    "webpack-cli": "^6.0.1"
+    "electron-builder": "latest"
   }
 }

@@ -29,6 +29,8 @@
     "framework/js/securityguard.mjs",
     "framework/js/session.mjs",
     "framework/js/util.mjs",
+    "framework/js/webbundlesupport.mjs",
+    "framework/js/webbundleworker.mjs",
     "framework/js/xhr.mjs",
     "index.html"
 ]

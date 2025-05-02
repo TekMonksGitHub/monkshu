@@ -133,7 +133,7 @@ $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     }
 }
 
-$$.boot = async (appPath, confPath) => {
+$$.boot = async (appPath=new URL("./", window.location), confPath=new URL("./conf", window.location)) => {
     const {bootstrapMonkshu} = await import("/framework/js/bootstrap.mjs");
     bootstrapMonkshu();
     const {bootstrapApp} = await import("/framework/js/bootstrap.mjs");

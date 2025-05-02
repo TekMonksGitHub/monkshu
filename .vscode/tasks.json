@@ -38,12 +38,26 @@
             }
         },
         {
+            "label": "Build Webbundle",
+            "type": "shell",
+            "linux": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/webbundle.xf.js'"},
+            "osx": {"command": "'${workspaceFolder}/../xforge/xforge' -c -f '${workspaceFolder}/build/webbundle.xf.js'"},
+            "windows": {
+                "command": "cmd.exe",
+                "args": ["/c", "'\\\"${workspaceFolder}\\..\\xforge\\xforge.bat\\\" -c -f \\\"${workspaceFolder}\\build\\webbundle.xf.js\\\"'"]
+            }
+        },
+        {
             "label": "Delete Electron Cache",
             "dependsOn": ["Real Delete Electron Cache", "Build Cachelists"]
         },
         {
             "label": "Delete Chrome Profile",
             "dependsOn": ["Real Delete Chrome Profile", "Build Cachelists"]
+        },
+        {
+            "label": "Generate SSL Config and Build Webbundle",
+            "dependsOn": ["Generate SSL Config", "Build Webbundle"]
         }
     ],
     "inputs": [

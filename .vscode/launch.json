@@ -123,13 +123,13 @@
             "name": "Launch All - Backend, HTTPD and Frontend - SSL Support",
             "configurations": ["Launch Backend", "Launch HTTPD", "Launch Frontend SSL"],
             "stopAll": true,
-            "preLaunchTask": "Generate SSL Config"
+            "preLaunchTask": "Generate SSL Config and Build Webbundle"
         },
         {
             "name": "Launch All - Backend, HTTPD and Frontend - SSL Support with Cluster",
             "configurations": ["Launch Backend Cluster", "Launch HTTPD Cluster", "Launch Frontend SSL"],
             "stopAll": true,
-            "preLaunchTask": "Generate SSL Config"
+            "preLaunchTask": "Generate SSL Config and Build Webbundle"
         }
     ],
     "inputs": [
