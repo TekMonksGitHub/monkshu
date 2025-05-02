@@ -8,9 +8,7 @@
  */
 
 const SPECIAL_KEYS = [];
-const appname = new URL(location).searchParams.get("app");
 const webbundle_url = new URL(location).searchParams.get("bundle");
-
 
 let webbundle_response, webbundle_json={}, webbundle_loading_error;
 
@@ -66,22 +64,28 @@ function _enableCacheWorker() {
  * @param {string} url The bundle URL
  */
 async function _loadbundle(url) {
-    _refreshOrLoadCachedWebBundleResponse();
-    if (!webbundle_response) return;    // we can't load the bundle from the server
-
-    let loaded_webbundle_json;
-    try { loaded_webbundle_json = await webbundle_response.json(); } catch (err) {
-        console.error(`Bad web bundle JSON - ${err.toString()}`);
+    console.log(`Web bundle service worker loading new bundle from ${url}`);
+    const response = await _errorHandeledFetch(url); 
+    if (!response.ok) {
+        console.error(`Can't load bundle ${url} response not ok, response status is ${response.status}, ${response.statusText}.`);
         webbundle_loading_error = true;
-        return;
     }
-    for (const [urlKey, responseObject] of Object.entries(loaded_webbundle_json)) {
-        if (SPECIAL_KEYS.includes(urlKey)) continue;
-        const resolvedURLPath = new URL(urlKey, webbundle_url).pathname.replaceAll(/\/+/g, "/");
-        webbundle_json[resolvedURLPath] = responseObject; // normalize URLs for searching later
+    else {
+        webbundle_response = response.clone();
+        let loaded_webbundle_json;
+        try { loaded_webbundle_json = await response.json(); } catch (err) {
+            console.error(`Bad web bundle JSON - ${err.toString()}`);
+            webbundle_loading_error = true;
+            return;
+        }
+        for (const [urlKey, responseObject] of Object.entries(loaded_webbundle_json)) {
+            if (SPECIAL_KEYS.includes(urlKey)) continue;
+            const resolvedURLPath = new URL(urlKey, webbundle_url).pathname.replaceAll(/\/+/g, "/");
+            webbundle_json[resolvedURLPath] = responseObject; // normalize URLs for searching later
+        }
+        webbundle_loading_error = false;
+        console.log(`Web bundle service worker bundle loaded ${url}`); 
     }
-    webbundle_loading_error = false;
-    console.log(`Web bundle service worker bundle loaded ${url}`); 
 }
 
 /**
@@ -92,35 +96,5 @@ async function _loadbundle(url) {
 async function _errorHandeledFetch(request){
     try { return await fetch(request); } catch (err) {
         return new Response("", { "status" : 500 , "statusText" : `Fetch error: ${err.toString()}` });
-    }
-}
-
-/**
- * Refreshes and loads the web bundle response via cache or 
- * loads the web bundle response object from the server and 
- * caches it. Uses ETags to figure out what to do for refreshes.
- * 
- * @returns In case of errors webbundle_response will not be set (will be null)
- */
-async function _refreshOrLoadCachedWebBundleResponse() {
-    const cache = await caches.open(appname);
-    webbundle_response = cache.match(url);
-
-    if (webbundle_response) {   // refresh the webbundle if needed using ETag
-        const testResponse = _errorHandeledFetch(url, {method: "GET", headers: {
-            "If-None-Match": webbundle_response.headers.etag, "Accept": webbundle_response.headers["content-type"]||"application/json"}});
-        if ((testResponse.status != 304) && testResponse.ok) {
-            webbundle_response = testResponse.clone(); cache.put(url, testResponse);
-            console.log(`Web bundle service worker refreshed the web bundle from the server.`);
-        } else console.log(`Web bundle service worker loaded web bundle from cache.`);
-    } else {
-        console.log(`Web bundle service worker loading new bundle from ${url} due to cache miss for app ${appname}.`);
-        const response = await _errorHandeledFetch(url); 
-        if (!response.ok) {
-            console.error(`Can't load bundle ${url} response not ok, response status is ${response.status}, ${response.statusText}.`);
-            webbundle_loading_error = true;
-            return;
-        }
-        webbundle_response = response.clone(); cache.put(url, response);
     }
 }

@@ -25,7 +25,7 @@ exports.processRequest = async (req, res, dataSender, errorSender, _codeSender, 
     access.info(`Proxying ${req.url} via ${proxiedURL}`);
 
     let result={}; try{result = await httpClient[method](host, port, path, headers, data);} catch (err) {result.error=err; result.status=500;}
-    if (!result.error) dataSender(res, result.status, result.resHeaders, result.data); else errorSender(req, res, result.status, result.error);
+    if (!result.error) dataSender(req, res, result.resHeaders, null, result.data, false, result.status); else errorSender(req, res, result.status, result.error);
     return true;
 }
 

@@ -14,6 +14,7 @@ const http = require("http");
 const https = require("https");
 const http2 = require("http2");
 const fspromises = fs.promises;
+const stream = require("stream");
 const mustache = require("mustache");
 const args = require(`${__dirname}/lib/processargs.js`);
 
@@ -123,7 +124,7 @@ async function _handleRequest(req, res) {
 		{_sendError(req, res, 404, "Path Not Found."); return;}
 		
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} GET: ${req.url}`);
-	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, _sendCode, access, error)) {
+	for (const extension of extensions) if (await extension.processRequest(req, res, _sendData, _sendError, _sendCode, access, error, _genEtag)) {
 		access.info(`Request ${req.url} handled by extension ${extension.name}`);
 		return; // extension handled it
 	}
@@ -148,6 +149,7 @@ function _getServerHeaders(headers, stats) {
 	if (stats) {
 		headers["Last-Modified"] = stats.mtime.toGMTString();
 		headers["ETag"] = _genEtag(stats);
+		headers["X-Last-Modified-Epoch"] = Math.floor(Date.now() / 1000);
 	}
 
 	const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
@@ -158,22 +160,13 @@ const _genEtag = stats => `${stats.ino}-${stats.mtimeMs}-${stats.size}`;
 
 async function _sendFile(fileRequested, req, res, stats) {
 	try {		
-		access.info(`Sending: ${fileRequested}`);
-		const mime = conf.mimeTypes[path.extname(fileRequested)];
-		const rawStream = fs.createReadStream(fileRequested, {"flags":"r","autoClose":true});
+		access.info(`Sending from disk: ${fileRequested}`);
+		let mime = conf.mimeTypes[path.extname(fileRequested)]; if (mime && (!Array.isArray(mime))) mime = [mime];
 		const acceptEncodingHeader = req.headers["accept-encoding"] || "";
-
-		if (conf.enableGZIPEncoding && acceptEncodingHeader.includes("gzip") && mime && ((!Array.isArray(mime)) || Array.isArray(mime) && mime[1]) ) {
-			res.writeHead(200, _getServerHeaders({ "Content-Type": Array.isArray(mime)?mime[0]:mime, "Content-Encoding": "gzip" }, stats));
-			rawStream.pipe(zlib.createGzip()).pipe(res)
-			.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
-			.on("end", _ => res.end());
-		} else {
-			res.writeHead(200, mime ? _getServerHeaders({"Content-Type":Array.isArray(mime)?mime[0]:mime}, stats) : _getServerHeaders({}, stats));
-			rawStream.on("data", chunk => res.write(chunk, "binary"))
-				.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
-				.on("end", _ => res.end());
-		}
+		const canGZIPThisMime = acceptEncodingHeader && acceptEncodingHeader.includes("gzip") && mime && (mime[1] != false);
+		const rawStream = fs.createReadStream(fileRequested, {"flags":"r","autoClose":true});
+		const headers = {}; if (mime) headers["Content-Type"] = mime[0];
+		_sendData(req, res, headers, stats, rawStream, canGZIPThisMime)
 	} catch (err) {
 		if (err && err.code === "ENOENT") _sendError(req, res, 404, "Path Not Found.");
 		else _sendError(req, res, 500, err);
@@ -189,17 +182,21 @@ function _sendError(req, res, code, message) {
 	res.end();
 }
 
-function _sendCode(req, res, code, message) {
+function _sendCode(req, res, code, message, stats) {
 	access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} Code: ${code} URL: ${req.url} Message: ${_getStringOrObjectJSON(message)}`);
-	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}));
+	res.writeHead(code, _getServerHeaders({"Content-Type": "text/plain"}, stats));
 	res.write(`${code} ${message}\n`);
 	res.end();
 }
 
-function _sendData(res, code, headers, data) {
-	res.writeHead(code||200, _getServerHeaders(headers));
-	if (data) res.write(data);
-	res.end();
+function _sendData(req, res, headers, stats, dataOrStream, gzip, code=200) {
+	res.writeHead(code, _getServerHeaders({ "Content-Encoding": gzip?"gzip":"identity", ...headers }, stats));
+	const rawStream = dataOrStream ? Buffer.isBuffer(dataOrStream) ? stream.Readable.from(dataOrStream) : dataOrStream : undefined;
+	
+	if (rawStream) (gzip?rawStream.pipe(zlib.createGzip()).pipe(res):rawStream.pipe(res))
+		.on("error", err => _sendError(req, res, 500, `500: Error: ${err}`))
+		.on("end", _ => res.end());
+	else res.end();
 }
 
 function _isSubdirectory(to, from) {

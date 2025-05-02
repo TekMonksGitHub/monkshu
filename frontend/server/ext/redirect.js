@@ -16,7 +16,7 @@ exports.processRequest = async (req, res, dataSender, _errorSender, _codeSender,
 
 	access.info(`Redirecting, ${code}, ${req.url} to ${redirectedURL.href}`);
 	
-	dataSender(res, code, {"Location": redirectedURL.href}, null); return true;
+	dataSender(req, res, {"Location": redirectedURL.href}, null, null, null, 302); return true;
 }
 
 function _getRedirectedURL(url) {

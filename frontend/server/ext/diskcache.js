@@ -47,13 +47,13 @@ exports.processRequest = async (req, res, dataSender, _errorSender, codeSender, 
 
     if (cache[fileRequested] && cache[fileRequested].data && fileRequested != SIZE_KEY) {
         const eTagMatches = utils.etagsMatch(req.headers["if-none-match"], cache[fileRequested].etag);
-        if (eTagMatches) codeSender(req, res, 304, "No change."); else dataSender(res, 200, {
+        if (eTagMatches) codeSender(req, res, 304, "No change."); else dataSender(req, res, {
             "Content-Type": cache[fileRequested].mime, 
             "Content-Length": cache[fileRequested].size,
             "Last-Modified": cache[fileRequested].modified,
 		    "ETag": cache[fileRequested].etag,
             "Content-Encoding": cache[fileRequested].encoding,
-        }, cache[fileRequested].data);
+        }, undefined, cache[fileRequested].data, false);
         return true;
     } else return false;    // cache miss or non-cacheable asset
 }
