@@ -8,8 +8,10 @@
  */
 
 const SPECIAL_KEYS = [];
-const appname = new URL(location).searchParams.get("app");
-const webbundle_url = new URL(location).searchParams.get("bundle");
+const urlLocation = new URL(location);
+const appname = urlLocation.searchParams.get("app");
+const webbundle_url = urlLocation.searchParams.get("bundle");
+const stale_check_function = urlLocation.searchParams.get("stalecheck");
 
 let webbundle_json={}, webbundle_loading_error;
 
@@ -100,7 +102,10 @@ async function _refreshOrLoadCachedWebBundleResponse(bundleurl) {
     if (webbundle_response_internal) {   // check if we need to refresh the webbundle
         const testResponse = await _errorHandeledFetch(new Request(bundleurl, {method: "HEAD"}));
         const responseLastModified = _getHeaders(testResponse)["x-last-modified-epoch"], cachedLastModified = _getHeaders(webbundle_response_internal)["x-last-modified-epoch"];
-        const needToRefresh = testResponse.ok && (responseLastModified != cachedLastModified);
+        const staleCheckFunction =  stale_check_function ? _createSyncFunction(stale_check_function) : undefined;
+        const needToRefresh = testResponse.ok ? (staleCheckFunction ? 
+            staleCheckFunction({server_last_modified: responseLastModified, cached_last_modified: cachedLastModified}) : 
+            responseLastModified != cachedLastModified) : false;
         if (!needToRefresh) {console.log(`Web bundle service worker loaded web bundle from cache.`); return webbundle_response_internal;}
         else console.log(`Web bundle refresh needed due to modified TS = ${responseLastModified} and cached TS = ${cachedLastModified}.`);
     } else console.log(`Web bundle not in cache, loading new.`);
@@ -127,8 +132,28 @@ async function _errorHandeledFetch(request){
     }
 }
 
+/**
+ * Returns headers from the response as a simple object with keys lowered cased.
+ * @param {Object} response The HTTP response object
+ * @returns The headers from the response as a simple object with keys lowered cased.
+ */
 function _getHeaders(response) {
     if ((!response) || (!response.headers)) return {};
     const allHeaders = {...response.headers}; for (const [key, value] of response.headers) allHeaders[key.toLowerCase()] = value;
     return allHeaders;
+}
+
+/**
+ * Creates a function which executes the given code synchronously.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const myfunction = util.createSyncFunction(code);
+ * await myfunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Sync function which executes the given code when called.
+ */
+function _createSyncFunction(code) {
+    const retFunction = Object.getPrototypeOf(function(){}).constructor;
+    const newFunction = context => new retFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
+    return newFunction;
 }

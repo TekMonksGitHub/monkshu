@@ -242,6 +242,21 @@ const createAsyncFunction = code => {
 }
 
 /**
+ * Creates a function which executes the given code synchronously.
+ * To call the function call the created function with the 
+ * context. For example, 
+ * const myfunction = util.createSyncFunction(code);
+ * await myfunction({key: value, key2: value2})
+ * @param {string} code The code to execute
+ * @returns Sync function which executes the given code when called.
+ */
+function createSyncFunction(code) {
+    const retFunction = Object.getPrototypeOf(function(){}).constructor;
+    const newFunction = context => new retFunction(Object.keys(context||{}).join(","), code)(...Object.values(context||{}));
+    return newFunction;
+}
+
+/**
  * Converts unicode string to Base64.
  * @param {string} text The unicode string to convert to Base64.
  * @returns Base64 of the string
@@ -330,7 +345,8 @@ function _getObjectPathSplits(path) {
     return final;
 }
 
-export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, getModulePath,
-    downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, getChildByID, getChildrenByTagName,
-    removeAllChildElements, setIntervalImmediately, generateUUID, createAsyncFunction, stringToBase64, base64ToString,
-    encodeHTMLEntities, htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL};
+export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, 
+    getModulePath, downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, 
+    getChildByID, getChildrenByTagName, removeAllChildElements, setIntervalImmediately, generateUUID, 
+    createAsyncFunction, createSyncFunction, stringToBase64, base64ToString, encodeHTMLEntities, 
+    htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL};

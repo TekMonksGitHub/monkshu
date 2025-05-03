@@ -19,11 +19,14 @@
  * Adds webbundle support by registering service worker and caching files.
  * @param bundleurl The web bundle URL, default is /apps/<appname>/webbundle/webbundle.txt
  * @param appname The web bundle app name, default is detected from the incoming URL
- * @param timeout The time to wait for the worker to install and become active, else assume failure
+ * @param webbundleStaleCheck Optional: A function which can check if web bundle is stale. It is passed contextual
+ *                              params server_last_modified and cached_last_modified which are epochs of bundle's 
+ *                              last modification dates for server and cached (cached_last_modified could be null).
+ * @param timeout Optional: The time to wait for the worker to install and become active, else assume failure
  * @returns The registered service worker on success, and false on failure
  */
 async function addWebbundleSupport(bundleurl=new URL("./webbundle/webbundle.json", window.location.href).href,
-        appname=new URL(window.location.href).pathname.split("/")[2],
+        appname=new URL(window.location.href).pathname.split("/")[2], webbundleStaleCheck,
         timeout) {
     if (!("serviceWorker" in navigator)) { console.error("Service workers not supported in the browser"); return false; }
 
@@ -35,8 +38,9 @@ async function addWebbundleSupport(bundleurl=new URL("./webbundle/webbundle.json
         const timedOutInstall = (!timeout) ? undefined : setTimeout(_=>{
             alreadySentFalse = true; resolve(false); console.error("Webbundle registration timedout."); }, timeout);
         const encodedWebbundleURL = encodeURIComponent(bundleurl), encodedAppname = encodeURIComponent(appname);
+        const encodedWebbundleStaleCheck = webbundleStaleCheck ? encodeURIComponent(webbundleStaleCheck) : undefined;
         const webbundlworkerurl = new URL("./webbundleworker.mjs", import.meta.url), 
-            webbundlworkerurlwithparams =`${webbundlworkerurl.href}?bundle=${encodedWebbundleURL}&app=${encodedAppname}`;
+            webbundlworkerurlwithparams =`${webbundlworkerurl.href}?bundle=${encodedWebbundleURL}&app=${encodedAppname}${encodedWebbundleStaleCheck?`&stalecheck=${encodedWebbundleStaleCheck}`:""}`;
         await navigator.serviceWorker.register(webbundlworkerurlwithparams, {type: "module", scope: "/"});
         const registration = await navigator.serviceWorker.ready; 
 
