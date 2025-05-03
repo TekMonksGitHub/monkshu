@@ -1,6 +1,11 @@
 /**
  * Web bundle support for Monkshu. These classes are loaded before
- * the frontend framework, so they have no dependencies.
+ * the frontend framework, so they have no dependencies. 
+ * 
+ * IMPORTANT NOTE: The last modified time stamp MUST be the same across 
+ * all the horizontal clusters of the HTTP server files if clustering is used. 
+ * This is VERY important else web bundle caching WILL FAIL. Shared NFS for 
+ * web files will achieve this. So will transferring the files via TAR etc.
  * 
  * (C) 2024 TekMonks. All rights reserved.
  * License: See the enclosed LICENSE file.
