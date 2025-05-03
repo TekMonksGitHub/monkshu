@@ -7,21 +7,25 @@ const terser = require("terser");
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const DEFAULT_APP_NAME = _resolveDefaultAppNameSync();
 
-const DEFAULT_WEBUNDLE_FILE_PATTERNS = ["**/*.mjs", "**/*.js", "**/*.html", "**/*.css", "**/*.json", "**/*.svg"];
+const DEFAULT_WEBUNDLE_FILE_PATTERNS = ["**/*.mjs", "**/*.js", "**/*.html", "**/*.css", "**/*.json"];
 const MINIMIZABLE_FILE_EXTENSIONS = [".js", ".mjs"];
-const MIMES = {".html": "text/html", ".css": "text/css", ".js": "text/javascript", 
+const DEFAULT_MIMES = {".html": "text/html", ".css": "text/css", ".js": "text/javascript", 
     ".mjs": "text/javascript", ".json": "application/json", ".svg":"image/svg+xml", "*": "text/plain"};
 const MIN_EXTENSIONS = [".min"];
+
+let buildconf = {}; 
  
 // build
 exports.make = async function(appname, webbundlepath, filePatterns) {
     try {
         if ((!appname) || appname.toLowerCase() == "use_default_app") appname = DEFAULT_APP_NAME;
         if (!webbundlepath) webbundlepath = `${MONKSHU_PATH}/frontend/apps/${appname}/webbundle/webbundle.json`;
+        const test = path.resolve(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);
+        try {buildconf = require(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);} catch (err) {};
         const webbundleRoot = path.dirname(webbundlepath); await _makePathWritable(webbundleRoot);
         await CONSTANTS.SHELL.rm("-rf", webbundleRoot); // clean the webbundle directory
         const webbundleURL = "/"+path.relative(`${MONKSHU_PATH}/frontend`, webbundleRoot);
-        if (!filePatterns) filePatterns = DEFAULT_WEBUNDLE_FILE_PATTERNS;
+        if (!filePatterns) filePatterns = buildconf.WEBUNDLE_FILE_PATTERNS||DEFAULT_WEBUNDLE_FILE_PATTERNS;
 
         const allFilesToBundle = []; for (const filePattern of filePatterns) {
             try {
@@ -56,8 +60,8 @@ async function _bundleFile(filepath, webbundleRoot, webbundleURL) {
         extension = path.extname(filepath).toLowerCase(),
         isMinimizedAlready = _isMimimizedAlready(filepath);
     
-    let minified = {};
-    if (MINIMIZABLE_FILE_EXTENSIONS.includes(extension) && (!isMinimizedAlready)) {
+    let minified = {}; const MINIMIZABLE_FILE_EXTENSIONS_FINAL = buildconf.MINIMIZABLE_FILE_EXTENSIONS || MINIMIZABLE_FILE_EXTENSIONS;
+    if (MINIMIZABLE_FILE_EXTENSIONS_FINAL.includes(extension) && (!isMinimizedAlready)) {
         try {
             minified = await terser.minify(bodyRaw, {mangle: false, sourceMap: {url: mapURL}});
             await _makePathWritable(mapPath); fs.writeFileSync(mapPath, minified.map);
@@ -67,11 +71,12 @@ async function _bundleFile(filepath, webbundleRoot, webbundleURL) {
         }
     } else minified = {code: bodyRaw};
 
+    const MIMES_FINAL = buildconf.MIMES || DEFAULT_MIMES;
     const bundledObject = {body: minified.code, statusText: "ok: webbundle", headers: {
         "server": "Monkshu HTTPD (unix)",
-        "content-type": MIMES[extension] || MIMES["*"],
+        "content-type": MIMES_FINAL[extension] || MIMES_FINAL["*"],
         "content-length": Buffer.from(minified.code, "utf8").length,
-        "content-type": MIMES[extension],
+        "content-type": MIMES_FINAL[extension],
         "x-frame-options": "deny",
 		"x-content-type-options": "nosniff"
     }};
