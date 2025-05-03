@@ -149,7 +149,7 @@ function _getServerHeaders(headers, stats) {
 	if (stats) {
 		headers["Last-Modified"] = stats.mtime.toGMTString();
 		headers["ETag"] = _genEtag(stats);
-		headers["X-Last-Modified-Epoch"] = Math.floor(Date.now() / 1000);
+		headers["X-Last-Modified-Epoch"] = Math.floor(stats.mtimeMs/1000);
 	}
 
 	const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};

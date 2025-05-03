@@ -27,7 +27,7 @@ async function addWebbundleSupport(bundleurl=new URL("./webbundle/webbundle.json
             alreadySentFalse = true; resolve(false); console.error("Webbundle registration timedout."); }, timeout);
         const encodedWebbundleURL = encodeURIComponent(bundleurl), encodedAppname = encodeURIComponent(appname);
         const webbundlworkerurl = new URL("./webbundleworker.mjs", import.meta.url), 
-            webbundlworkerurlwithparams =`${webbundlworkerurl.href}?bundle=${encodedWebbundleURL}&app=${encodedAppname}&rand=${Math.random()}`;
+            webbundlworkerurlwithparams =`${webbundlworkerurl.href}?bundle=${encodedWebbundleURL}&app=${encodedAppname}`;
         await navigator.serviceWorker.register(webbundlworkerurlwithparams, {type: "module", scope: "/"});
         const registration = await navigator.serviceWorker.ready; 
 
