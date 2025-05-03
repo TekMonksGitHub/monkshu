@@ -12,11 +12,12 @@ const utils = require(conf.libdir+"/utils.js");
 
 exports.name = "httpverbs";
 exports.processRequest = async (req, res, dataSender, errorSender, codeSender, access, error, etagGenerator) => {
-    if (req.method.trim().toLowerCase() == "head") return processHeadVerb(req, res, dataSender, errorSender, codeSender, access, error, etagGenerator);
+    if ((req.method.trim().toLowerCase() == "head") || (req.method.trim().toLowerCase() == "options")) 
+        return processHeadOrOptionsVerb(req, res, dataSender, errorSender, codeSender, access, error, etagGenerator);
     else return false;
 }
 
-async function processHeadVerb(req, res, dataSender, errorSender, codeSender, _access, _error, etagGenerator) {
+async function processHeadOrOptionsVerb(req, res, dataSender, errorSender, codeSender, _access, _error, etagGenerator) {
     const pathname = new URL(req.url, `http://${utils.getServerHost(req)}/`).pathname;
     const fileRequested = path.resolve(`${conf.webroot}/${pathname}`);
     try {
