@@ -174,8 +174,10 @@ function _initConfSync() {
 			const appHostname = fs.existsSync(`${appRoot}/conf/hostname.json`) ? require(`${appRoot}/conf/hostname.json`) : CONSTANTS.HOSTNAME;
 			let appHTTPDConf = fs.readFileSync(`${appRoot}/conf/httpd.json`, "utf8");
 			const replacers = {hostname: appHostname, serverroot: CONSTANTS.ROOTDIR, appname};
-			for (const escapedValue of httpd_conf_expands) appHTTPDConf = appHTTPDConf.replaceAll(`{{{${escapedValue}}}}`,
-				replacers[escapedValue]).replaceAll(`{{${escapedValue}}}`,replacers[escapedValue]);
+			for (const escapedValue of httpd_conf_expands) 
+				appHTTPDConf = appHTTPDConf.replaceAll(`{{{${escapedValue}}}}`,
+					replacers[escapedValue]).replaceAll(`{{${escapedValue}}}`, replacers[escapedValue]);
+			if (replacers.hostname) conf.host = replacers.hostname;	// inherit it back to original conf as well
 			appHTTPDConf = JSON.parse(appHTTPDConf);
 			
 			for (const confKey of Object.keys(appHTTPDConf)) {
