@@ -5,7 +5,11 @@
  * IMPORTANT NOTE: The last modified time stamp MUST be the same across 
  * all the horizontal clusters of the HTTP server files if clustering is used. 
  * This is VERY important else web bundle caching WILL FAIL. Shared NFS for 
- * web files will achieve this. So will transferring the files via TAR etc.
+ * web files will achieve this. So will transferring the files via TAR etc. Also
+ * the caching uses a special HTTP header x-last-modified-epoch which is Monkshu
+ * HTTPD specific. So using another HTTPD will break the caching possibly. If using
+ * Cloudflare etc check the headers via HEAD command first to ensure x-last-modified-epoch
+ * is present.
  * 
  * (C) 2024 TekMonks. All rights reserved.
  * License: See the enclosed LICENSE file.
