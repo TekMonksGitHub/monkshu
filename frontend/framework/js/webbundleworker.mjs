@@ -95,7 +95,7 @@ async function _loadbundle(url) {
  */
 async function _refreshOrLoadCachedWebBundleResponse(bundleurl) {
     const cache = await caches.open(appname);
-    const webbundle_response_internal = (await cache.match(bundleurl))?.clone(); 
+    let webbundle_response_internal = (await cache.match(bundleurl))?.clone(); 
 
     if (webbundle_response_internal) {   // check if we need to refresh the webbundle
         const testResponse = await _errorHandeledFetch(new Request(bundleurl, {method: "HEAD"}));
