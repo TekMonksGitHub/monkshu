@@ -25,7 +25,7 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         CONSTANTS.LOGINFO("Generating SSL certificates."); etcdir = path.resolve(etcdir); open_ssl_conf = path.resolve(open_ssl_conf);
         if (!await CONSTANTS.SHELL.test("-e", etcdir)) await CONSTANTS.SHELL.mkdir("-p", etcdir);  // create the cert directory if it doesn't exist
         await os_cmd(`openssl req${BUILD_CONF.OPENSSLCONF && os.platform=="darwin"?` -config ${BUILD_CONF.OPENSSLCONF}`:""} -newkey rsa:2048 -nodes -keyout "${etcdir}/dnsip_privkey.pem" -x509 -days 365 -subj "/CN=*/C=US/L=San Fransisco/OU=Test/O=Test" -out "${etcdir}/dnsip_fullchain.pem"`, 
-            false, {OPENSSL_CONF: open_ssl_conf});
+            false, os.platform=="darwin"?{OPENSSL_CONF: open_ssl_conf}:undefined);
 
         CONSTANTS.LOGINFO("Setting hostnames");
         CONSTANTS.LOGINFO(`Resolved app name as ${appname||DEFAULT_APP_NAME}`);
