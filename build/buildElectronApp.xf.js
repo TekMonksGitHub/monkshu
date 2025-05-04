@@ -37,7 +37,7 @@ exports.make = async function(output_dir, monkshuAppName) {
 
         CONSTANTS.LOGSUCCESS();
     } catch (err) {
-        CONSTANTS.LOGHELP("Build command format: xforge -c -f buildApp.xf.js -o monkshu_app_name [-o output_dir]")
+        CONSTANTS.LOGHELP("Build command format: xforge -c -f buildElectronApp.xf.js -o monkshu_app_name [-o output_dir]")
         return CONSTANTS.HANDLE_BUILD_ERROR(err);
     }
 }

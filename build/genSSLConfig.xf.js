@@ -18,6 +18,8 @@ exports.make = async function(etcdir, open_ssl_conf, appname) {
         if ((!etcdir) || (!open_ssl_conf)) throw "Bad incoming arguments."; // check usage
         if (appname.toLowerCase() == "use_default_app") appname = null;
 
+        if (!fs.existsSync(etcdir)) fs.mkdirSync(etcdir, {recursive: true}); 
+
         CONSTANTS.LOGINFO(`Detected IP as ${LOCAL_IP}.`);
 
         CONSTANTS.LOGINFO("Generating SSL certificates."); etcdir = path.resolve(etcdir); open_ssl_conf = path.resolve(open_ssl_conf);
