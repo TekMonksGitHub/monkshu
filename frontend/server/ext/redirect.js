@@ -8,10 +8,15 @@
 const mustache = require("mustache");
 const utils = require(`${conf.libdir}/utils.js`);
 
+exports.NO_REDIRECT_HEADER = "__org_monkshu_no_redirect";
+
 exports.name = "redirect";
 exports.processRequest = async (req, res, dataSender, _errorSender, _codeSender, access, _error) => {
+    if (req.headers[exports.NO_REDIRECT_HEADER]?.toLowerCase() == "true") return false; 
+
 	const protocol = req.connection.encrypted ? "https" : "http";
-    const {redirectedURL, code} = _getRedirectedURL(new URL(req.url, `${protocol}://${utils.getServerHost(req)}/`)); 
+    
+    const {redirectedURL, code} = exports.getRedirectedURL(new URL(req.url, `${protocol}://${utils.getServerHost(req)}/`)); 
 	if (!redirectedURL) return false;
 
 	access.info(`Redirecting, ${code}, ${req.url} to ${redirectedURL.href}`);
@@ -19,11 +24,11 @@ exports.processRequest = async (req, res, dataSender, _errorSender, _codeSender,
 	dataSender(req, res, {"Location": redirectedURL.href}, null, null, null, code); return true;
 }
 
-function _getRedirectedURL(url) {
+exports.getRedirectedURL = function(url, redirectRules=conf.redirects) {
     const nullReturn = {redirectedURL:null, code:null};
-    if (!conf.redirects) return nullReturn; // no redirects configured
+    if (!redirectRules) return nullReturn; // no redirects configured
 
-    for (const redirect of conf.redirects) {
+    for (const redirect of redirectRules) {
         const match = url.href.match(new RegExp(Object.keys(redirect)[0])); 
         if (match) {
             const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];

@@ -65,6 +65,7 @@ function _initConfSync() {
 	conf.confdir = path.resolve(`${__dirname}/${conf.confdir}`);
 	conf.accesslog = path.resolve(`${__dirname}/${conf.accesslog}`);
 	conf.errorlog = path.resolve(`${__dirname}/${conf.errorlog}`);
+	conf.extdir = path.resolve(`${__dirname}/${conf.extdir}`);
 	conf.serverroot = path.resolve(`${__dirname}/../../`);
 	utils = require(conf.libdir+"/utils.js");
 
