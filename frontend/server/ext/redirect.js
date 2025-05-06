@@ -27,8 +27,11 @@ function _getRedirectedURL(url) {
         const match = url.href.match(new RegExp(Object.keys(redirect)[0])); 
         if (match) {
             const data = {}; for (let i = 1; i < match.length; i++) data[`$${i}`] = match[i];
-            data.base64 = _ => (text, render) => btoa(render(text));  // add base64 encoding function, useful for Monkshu framework
-            return {redirectedURL: new URL(mustache.render(redirect[Object.keys(redirect)[0]], data)), code: 302}
+            data.replacehost = _ => (text, render) => {const oldURL = new URL(render(text)); oldURL.host = new URL(url).host; return oldURL.href;}
+            data.monkshubase64decode = _ => (text, render) => atob(decodeURIComponent((render(text))));  // add base64 decoding function, useful for Monkshu framework
+            data.monkshubase64encode = _ => (text, render) => encodeURIComponent(btoa((render(text))));  // add base64 encoding function, useful for Monkshu framework
+            const redirectedURL = new URL(mustache.render(Object.values(redirect)[0], data));
+            return {redirectedURL, code: 302}
         }
     }
     return nullReturn;    // nothing matched
