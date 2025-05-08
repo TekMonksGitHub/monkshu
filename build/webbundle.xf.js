@@ -20,8 +20,11 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
     try {
         if ((!appname) || appname.toLowerCase() == "use_default_app") appname = DEFAULT_APP_NAME;
         if (!webbundlepath) webbundlepath = `${MONKSHU_PATH}/frontend/apps/${appname}/webbundle/webbundle.json`;
-        const test = path.resolve(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);
-        try {buildconf = require(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);} catch (err) {};
+        const bundlepath = path.resolve(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);
+        try {buildconf = require(bundlepath);} catch (err) {
+            if ((err.code != "ENOENT") && (err.code != 'MODULE_NOT_FOUND')) {
+                CONSTANTS.HANDLE_BUILD_ERROR(`Bad web bundle at ${bundlepath}. Error ${err}`); return; }
+        };
         const webbundleRoot = path.dirname(webbundlepath); await _makePathWritable(webbundleRoot);
         await CONSTANTS.SHELL.rm("-rf", webbundleRoot); // clean the webbundle directory
         const webbundleURL = "/"+path.relative(`${MONKSHU_PATH}/frontend`, webbundleRoot);
@@ -29,10 +32,10 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
 
         const allFilesToBundle = []; for (const filePattern of filePatterns) {
             try {
-                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls(`${MONKSHU_PATH}/frontend/framework/${filePattern}`)));
+                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls('-d', `${MONKSHU_PATH}/frontend/framework/${filePattern}`)));
             } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/framework/${filePattern}`)}
             try {
-                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls(`${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)));;
+                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls('-d', `${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)));;
             } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)}
         }
 
@@ -53,6 +56,8 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
 }
 
 async function _bundleFile(filepath, webbundleRoot, webbundleURL) {
+    if (!fs.statSync(filepath).isFile()) {CONSTANTS.LOGWARN(`${filepath} is not a file. Skipping from the bundle.`); return;}
+
     const bodyRaw = fs.readFileSync(filepath, "utf8"),
         mapRootRelative = filepath.substring(`${MONKSHU_PATH}/frontend`.length)+".map",
         mapPath = path.resolve(`${webbundleRoot}/${mapRootRelative}`),
@@ -71,7 +76,7 @@ async function _bundleFile(filepath, webbundleRoot, webbundleURL) {
         }
     } else minified = {code: bodyRaw};
 
-    const MIMES_FINAL = buildconf.MIMES || DEFAULT_MIMES;
+    const MIMES_FINAL = {...(buildconf.MIMES || DEFAULT_MIMES), ...(buildconf.ADDITIONAL_MIMES||{})};
     const bundledObject = {body: minified.code, statusText: "ok: webbundle", headers: {
         "server": "Monkshu HTTPD (unix)",
         "content-type": MIMES_FINAL[extension] || MIMES_FINAL["*"],
