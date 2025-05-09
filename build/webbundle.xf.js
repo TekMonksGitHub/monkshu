@@ -6,6 +6,7 @@ const path = require("path");
 const terser = require("terser");
 const MONKSHU_PATH = path.resolve(`${__dirname}/../`);
 const DEFAULT_APP_NAME = _resolveDefaultAppNameSync();
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 
 const DEFAULT_WEBUNDLE_FILE_PATTERNS = ["**/*.mjs", "**/*.js", "**/*.html", "**/*.css", "**/*.json"];
 const MINIMIZABLE_FILE_EXTENSIONS = [".js", ".mjs"];
@@ -32,10 +33,12 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
 
         const allFilesToBundle = []; for (const filePattern of filePatterns) {
             try {
-                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls('-d', `${MONKSHU_PATH}/frontend/framework/${filePattern}`)));
+                const filesFound = utils.findAllFilesSync(`${MONKSHU_PATH}/frontend/framework`, filePattern);
+                allFilesToBundle.push(...filesFound);
             } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/framework/${filePattern}`)}
             try {
-                allFilesToBundle.push(...(await CONSTANTS.SHELL.ls('-d', `${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)));;
+                const filesFound = utils.findAllFilesSync(`${MONKSHU_PATH}/frontend/apps/${appname}`, filePattern);
+                allFilesToBundle.push(...filesFound);
             } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)}
         }
 
