@@ -12,15 +12,16 @@ const crypt = require(CONSTANTS.CRYPTCONF);
  * @param {string} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
  * @param {Buffer} ivIn The initialization vector to use, optional. Funtion can pick random one if not provided.
  * @param {boolean} asBinary The result is returned as a Buffer not string
+ * @param {string} crypt_algo The encryption algorightm eg. "aes-256-ctr"
  * @returns The encrypted text as HEX string in UTF8 encoding or Buffer object if asBinary is true
  */
-function encrypt(textOrBuffer, key = crypt.key, ivIn, asBinary) {
+function encrypt(textOrBuffer, key = crypt.key, ivIn, asBinary, crypt_algo) {
 	const iv = ivIn||asBinary?cryptmod.randomBytes(16):Buffer.from(cryptmod.randomBytes(16)).toString("hex").slice(0, 16);
 	const password_hash = cryptmod.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
-	const cipher = cryptmod.createCipheriv(crypt.crypt_algo||"aes-256-ctr", password_hash, iv);
+	const cipher = cryptmod.createCipheriv(crypt_algo||crypt.crypt_algo||"aes-256-ctr", password_hash, iv);
 	const textToEncrypt = ((typeof textOrBuffer !== "string") && (!Buffer.isBuffer(textOrBuffer))) ? textOrBuffer.toString() : textOrBuffer;
 	let crypted = cipher.update(textToEncrypt, Buffer.isBuffer(textOrBuffer)?undefined:"utf8", asBinary?undefined:"hex");
-	crypted += cipher.final(asBinary?undefined:"hex");
+	crypted = asBinary?Buffer.concat([crypted, cipher.final()]):crypted+cipher.final("hex");
 	return ivIn ? crypted : (asBinary ? Buffer.concat([crypted, iv]) : crypted+iv);
 }
 
@@ -30,13 +31,14 @@ function encrypt(textOrBuffer, key = crypt.key, ivIn, asBinary) {
  * @param {string} key The encryption key to use, the key in conf/crypt.json is used if this is skipped
  * @param {Buffer} ivIn The initialization vector to use, optional. Funtion can read the random one if used while encrypting.
  * @param {boolean} asBinary The result is returned as a Buffer not string
+ * @param {string} crypt_algo The encryption algorightm eg. "aes-256-ctr"
  * @returns The decrypted text as string in UTF8 encoding or Buffer object if asBinary is true
  */
-function decrypt(textOrBuffer, key = crypt.key, ivIn, asBinary) {
+function decrypt(textOrBuffer, key = crypt.key, ivIn, asBinary, crypt_algo) {
 	const iv = ivIn||textOrBuffer.slice(textOrBuffer.length - 16, textOrBuffer.length);
 	textOrBuffer = ivIn ? textOrBuffer : textOrBuffer[Buffer.isBuffer(textOrBuffer)?"slice":"substring"](0, textOrBuffer.length - 16);
 	const password_hash = cryptmod.createHash("md5").update(key, "utf-8").digest("hex").toUpperCase();
-	const decipher = cryptmod.createDecipheriv(crypt.crypt_algo||"aes-256-ctr", password_hash, iv);
+	const decipher = cryptmod.createDecipheriv(crypt_algo||crypt.crypt_algo||"aes-256-ctr", password_hash, iv);
 	const textToDecrypt = ((typeof textOrBuffer !== "string") && (!Buffer.isBuffer(textOrBuffer))) ? textOrBuffer.toString() : textOrBuffer;
 	let decrypted = decipher.update(textToDecrypt, Buffer.isBuffer(textOrBuffer)?undefined:"hex", asBinary?undefined:"utf8");
 	decrypted += decipher.final(asBinary?undefined:"utf8");
