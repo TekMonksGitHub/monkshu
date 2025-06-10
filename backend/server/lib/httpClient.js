@@ -17,7 +17,7 @@ let CONSTANTS, LOG;
 if (INDEPENDENT_EXECUTION) {
     CONSTANTS = {LIBDIR: __dirname};
     LOG = {info: s => console.info(s), error: s => console.error(s), warn: s => console.warn(s)};
-} else {CONSTANTS = global.CONSTANTS; LOG = global.LOG;}
+} else {CONSTANTS = global.CONSTANTS; LOG = global.LOG||console;}
 
 const PROC_MEMORY = {};
 const http = require("http");
