@@ -13,11 +13,8 @@
  */
 
 const INDEPENDENT_EXECUTION = global.CONSTANTS?.MONKSHU_BACKEND != true;    // support independent execution
-let CONSTANTS, LOG;
-if (INDEPENDENT_EXECUTION) {
-    CONSTANTS = {LIBDIR: __dirname};
-    LOG = {info: s => console.info(s), error: s => console.error(s), warn: s => console.warn(s)};
-} else {CONSTANTS = global.CONSTANTS; LOG = global.LOG||console;}
+const CONSTANTS = INDEPENDENT_EXECUTION ? {LIBDIR: __dirname} : global.CONSTANTS;
+const LOG = global.LOG||console;
 
 const PROC_MEMORY = {};
 const http = require("http");
@@ -103,8 +100,17 @@ async function fetch(url, options={}, redirected=false) {    // somewhat fetch c
     if (!options.method) options.method = "get"; if (options.enforce_mime) headers.enforce_mime = true;
 
     if (options.undici && (!_haveUndiciModule())) LOG.warn(`HTTP client told to use Undici in fetch for URL ${url}. But Undici NPM is not installed. Falling back to the native HTTP clients.`);
-    const { error, data, status, resHeaders } = undici ? await _undiciRequest(url, options) : 
+    const httpCall = async _ => undici ? await _undiciRequest(url, options) : 
         await module.exports[method](urlObj.hostname, port, totalPath, headers, body, sslOptions);
+    const { error, data, status, resHeaders } = options.timeout ? await new Promise(async resolve => {
+        let isResolved = false;
+        const timeoutPointer = setTimeout(_=>{
+                isResolved = true;
+                resolve({error: `Timeout after ${options.timeout} milliseconds.`, status: 408});
+            }, options.timeout);
+        const result = await httpCall();
+        if (!isResolved) {clearTimeout(timeoutPointer); resolve(result);}
+    }) : await httpCall();
 
     if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
             ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
@@ -211,7 +217,7 @@ function _doCall(reqStr, options, secure, sslObj) {
             if (reqStr) req.write(reqStr);
             req.end();
         } else {
-            LOG.info(`httpClient connecting to URL ${options.host}:${options.port}/${options.path} via HTTP1.`);
+            LOG.info(`httpClient connecting to URL ${secure?"https://":"http://"+`${options.host}:${options.port}${options.path.startsWith("/")?"":"/"}${options.path}`} via HTTP1.`);
 
             if (sslObj && typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
