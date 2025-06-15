@@ -33,11 +33,14 @@ function printHelp(propMap, errorKeys, outputcollector, argv=process.argv) {
 
     const consoleOut = outputcollector || (errorKeys ? console.error : console.log);
     if (propMap.__description) consoleOut(propMap.__description);
-    let usage = `Usage: ${argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
+    let usage = `Usage\n${argv[1]} `; for (const [key, value] of Object.entries(propMap)) 
         if (key.startsWith("__")) continue; else usage += `[-${key}${value.long?`, --${value.long}`:""}] `;
-    consoleOut(usage);
-    for (const [key, value] of Object.entries(propMap)) if (((errorKeys && errorKeys.includes(key)) || (!errorKeys)) && 
-        value.help) consoleOut(`    -${key}${value.long?`, --${value.long}`:""}: ${value.help}`);
+    consoleOut(usage); 
+    let longestKeyLength = 0; for (const value of Object.values(propMap)) if (value.long?.length||0>longestKeyLength) longestKeyLength = value.long.length;
+    const _getSpacesToAlign = str => ''.padStart(longestKeyLength+4-(str.length||0), ' ');
+    for (const [key, value] of Object.entries(propMap)) 
+        if (value.help) consoleOut(`\t-${key}${value.long?`, --${value.long}`:""}${_getSpacesToAlign(value.long)}${value.help}`);
+    if (propMap.__extra_help) consoleOut(propMap.__extra_help);
 }
 
 /**
@@ -59,10 +62,13 @@ function getArgs(propMap, argv=process.argv, outputcollector) {
     }
 
     const errorKeys = [];
-    if (propMap) for (const key of Object.keys(propMap)) if (propMap[key].required && args[_getArgsKey(key)] && 
-        (!args[_getArgsKey(key)].length)) errorKeys.push(key);
+    if (propMap) for (const key of Object.keys(propMap)) {
+        if (propMap[key].required && (!args[_getArgsKey(key)])) errorKeys.push(key);    // required keys must be present
+        else if (propMap[key] && (args[_getArgsKey(key)]) &&                            // key param lengths must be honored
+            (args[_getArgsKey(key)].length < (propMap[key].minlength||0))) errorKeys.push(key);
+    }
 
-    if (errorKeys.length) { printHelp(propMap, errorKeys, outputcollector, argv); return null;} else return args;
+    if (errorKeys.length) { printHelp(propMap, errorKeys, outputcollector, argv); return null; } else return args;
 }
 
 module.exports = {getArgs, printHelp, helpInformation};
