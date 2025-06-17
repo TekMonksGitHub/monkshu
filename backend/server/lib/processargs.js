@@ -46,18 +46,25 @@ function printHelp(propMap, errorKeys, outputcollector, argv=process.argv) {
 /**
  * @param {Object} propMap The map of properties to expect, named and required.
  * @param {Array} argv Optional: The arguments to parse. Uses process.argv by default.
+ * @param {Function} outputcollector Optional: The output collector, if givem the function is called with UTF-8 output strings.
+ * @param {boolean} strict If true then keys must be in arg map for them to be treated as options. Default: false
  * @returns The process args as a key-value pair object. All values are arrays.
  */
-function getArgs(propMap, argv=process.argv, outputcollector) {
+function getArgs(propMap, argv=process.argv, outputcollector, strict=false) {
     const args = {};
 
-    const _getArgsKey = argOption => 
-        propMap && propMap[argOption] ? propMap[argOption].long||propMap[argOption] : argOption;
+    const _getArgsKey = argOption => {
+        for (const [k,v] of Object.entries(propMap)) if ((k == argOption) || (v.long == argOption)) return v.long;
+        strict ? null : argOption;
+    }
 
     const argvSliced = argv.slice(2);
     let currKey; for (const arg of argvSliced) {
-        if (arg.startsWith("-")||(process.platform=="win32" && arg.startsWith("/"))||(arg.startsWith("--"))) {
-            currKey = _getArgsKey(arg.substring(arg.startsWith("--")?2:1)); args[currKey] = args[currKey]||[];
+        const argName = arg.substring(arg.startsWith("--")?2:1);
+        const isArg = arg.startsWith("-")||(process.platform=="win32" && arg.startsWith("/"))||(arg.startsWith("--"));
+        const isArgInPropMap = _getArgsKey(argName) != null;
+        if (isArg && ((!strict) || isArgInPropMap)) {
+            currKey = _getArgsKey(argName); args[currKey] = args[currKey]||[];
         } else if (currKey) args[currKey].push(arg);
     }
 
