@@ -102,15 +102,15 @@ async function fetch(url, options={}, redirected=false) {    // somewhat fetch c
     if (options.undici && (!_haveUndiciModule())) LOG.warn(`HTTP client told to use Undici in fetch for URL ${url}. But Undici NPM is not installed. Falling back to the native HTTP clients.`);
     const httpCall = async _ => undici ? await _undiciRequest(url, options) : 
         await module.exports[method](urlObj.hostname, port, totalPath, headers, body, sslOptions);
-    const { error, data, status, resHeaders } = options.timeout ? await new Promise(async resolve => {
+    const { error, data, status, resHeaders } = options.timeout ? await (new Promise(async resolve => {
         let isResolved = false;
         const timeoutPointer = setTimeout(_=>{
                 isResolved = true;
                 resolve({error: `Timeout after ${options.timeout} milliseconds.`, status: 408});
             }, options.timeout);
-        const result = await httpCall();
+        let result = {ok: false, status: 500}; try { result = await httpCall(); } catch (err) {}
         if (!isResolved) {clearTimeout(timeoutPointer); resolve(result);}
-    }) : await httpCall();
+    })) : await httpCall();
 
     if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
             ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
