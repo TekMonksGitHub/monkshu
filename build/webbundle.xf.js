@@ -20,7 +20,10 @@ let buildconf = {};
 exports.make = async function(appname, webbundlepath, filePatterns) {
     try {
         if ((!appname) || appname.toLowerCase() == "use_default_app") appname = DEFAULT_APP_NAME;
-        if (!webbundlepath) webbundlepath = `${MONKSHU_PATH}/frontend/apps/${appname}/webbundle/webbundle.json`;
+        const appBasePath = path.join(MONKSHU_PATH, "frontend", "apps", appname);
+        const appSrcPath  = fs.existsSync(path.join(appBasePath, "loginappframework"))
+        ? path.join(appBasePath, "loginappframework") : appBasePath;
+        if (!webbundlepath) webbundlepath = path.join(appSrcPath, "webbundle", "webbundle.json");
         const bundlepath = path.resolve(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);
         try {buildconf = require(bundlepath);} catch (err) {
             if ((err.code != "ENOENT") && (err.code != 'MODULE_NOT_FOUND')) {
@@ -37,9 +40,9 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
                 allFilesToBundle.push(...filesFound);
             } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/framework/${filePattern}`)}
             try {
-                const filesFound = utils.findAllFilesSync(`${MONKSHU_PATH}/frontend/apps/${appname}`, filePattern);
+                const filesFound = utils.findAllFilesSync(appSrcPath, filePattern);
                 allFilesToBundle.push(...filesFound);
-            } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${MONKSHU_PATH}/frontend/apps/${appname}/${filePattern}`)}
+                } catch (err) { CONSTANTS.LOGWARN(`No matching files found for ${appSrcPath}/${filePattern}`) }
         }
 
         CONSTANTS.LOGINFO(`Bundling files: ${allFilesToBundle}`);
