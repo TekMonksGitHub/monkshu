@@ -21,6 +21,7 @@ exports.make = async function(appname, webbundlepath, filePatterns) {
     try {
         if ((!appname) || appname.toLowerCase() == "use_default_app") appname = DEFAULT_APP_NAME;
         if (!webbundlepath) webbundlepath = `${MONKSHU_PATH}/frontend/apps/${appname}/webbundle/webbundle.json`;
+        else webbundlepath = webbundlepath + "/webbundle/webbundle.json";
         const bundlepath = path.resolve(`${path.dirname(webbundlepath)}/../webbundle.conf.json`);
         try {buildconf = require(bundlepath);} catch (err) {
             if ((err.code != "ENOENT") && (err.code != 'MODULE_NOT_FOUND')) {
