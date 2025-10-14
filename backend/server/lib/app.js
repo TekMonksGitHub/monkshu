@@ -7,6 +7,8 @@
  */
 
 const fs = require("fs");
+const path = require("path");
+
 const appRoots = [];
 
 function initSync() {
@@ -22,11 +24,11 @@ function initSync() {
 
 function initAppsSync(preInit=false) {
     for (const appEntry of appRoots) {
-        const app = Object.keys(appEntry)[0];
+        const app = Object.keys(appEntry)[0], app_path = path.resolve(Object.values(appEntry)[0]);
         if (fs.existsSync(`${appEntry[app]}/lib/app.js`)) {
             LOG.info(`${preInit?"Preinitializing":"Initializing"} app: ${app}`);
             const appThis = require(`${appEntry[app]}/lib/app.js`); 
-            if (preInit?appThis.preinitSync:appThis.initSync) preInit?appThis.preinitSync(app):appThis.initSync(app); 
+            if (preInit?appThis.preinitSync:appThis.initSync) preInit?appThis.preinitSync(app, app_path):appThis.initSync(app, app_path); 
         }
     }
 }
