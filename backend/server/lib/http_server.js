@@ -45,9 +45,12 @@ async function initAsync() {
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;
 			}
-			req.on("data", data => module.exports.onData(data, servObject)); 
-			req.on("end", _ => module.exports.onReqEnd(new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, servObject)); 
-            req.on("error", error => module.exports.onReqError(new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href, req.headers, error, servObject));
+			const normURL = new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href;
+			module.exports.onConnect(normURL, req.headers, servObject); 
+			req.on("data", data => {if (!servObject.error_state) module.exports.onData(normURL, data, servObject);});
+			req.on("end", _ => {if (!servObject.error_state) module.exports.onReqEnd(normURL, req.headers, servObject);});
+			req.on("close", _ => {if (!servObject.error_state) module.exports.onConnectionClose(normURL, req.headers, servObject);});
+            req.on("error", error => module.exports.onReqError(normURL, req.headers, error, servObject));
 		}
 	};
 	const options = conf.ssl ? {key: fs.readFileSync(conf.sslKeyFile), cert: fs.readFileSync(conf.sslCertFile)} : null;
@@ -59,9 +62,11 @@ async function initAsync() {
 	LOG.console(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${host}:${portToListenOn}`);
 }
 
+function onConnect(_url, _headers, servObject) { end(servObject); }
 function onData(_data, _servObject) { }
-function onReqError(_url, _headers, error, servObject) { statusInternalError(servObject, error); end(servObject); }
+function onReqError(_url, _headers, error, servObject) { servObject.error_state = true; statusInternalError(servObject, error); end(servObject); }
 function onReqEnd(_url, _headers, servObject) { statusNotFound(servObject); end(servObject); }
+function onConnectionClose(_url, _headers, _servObject) { close(servObject); }
 
 function statusNotFound(servObject, _error) {
 	servObject.res.writeHead(404, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
@@ -92,18 +97,28 @@ function statusOK(headers, servObject, dontGZIP) {
 	const confHeaders = _cloneLowerCase(conf.headers);
 	const headersIn = _cloneLowerCase(headers);
 
-	const respHeaders = {...headersIn, ...confHeaders, "content-encoding":_shouldWeGZIP(servObject, dontGZIP)?"gzip":"identity"};
+	const respHeaders = {...confHeaders, "content-encoding":_shouldWeGZIP(servObject, dontGZIP)?"gzip":"identity", ...headersIn};
 	servObject.res.writeHead(200, _squishHeaders(respHeaders));
 }
 
 async function write(data, servObject, encoding, dontGZIP) {
 	if (typeof data != "string" && !Buffer.isBuffer(data) && data !== "") throw ("Can't write data, not serializable.");
 	if (_shouldWeGZIP(servObject, dontGZIP)) data = await gzipAsync(data);
-	servObject.res.write(data, encoding?encoding:"utf-8");
+	servObject.res.write(data, encoding||"utf-8");
 }
 
 function end(servObject) {
+	servObject.error_state = true;	// anything else at this point will be an error
 	servObject.res.end();
+}
+
+function close(servObject) {
+	servObject.error_state = true;	// anything else at this point will be an error
+}
+
+function destroy(servObject) {
+	servObject.error_state = true;	// anything else at this point will be an error
+	servObject.res.socket.destroy(); servObject.res.end();
 }
 
 const blacklistIP = async (ip, op) => addIPToIPList(CONSTANTS.IPBLACKLIST, ipblacklist, ip, op);
@@ -195,6 +210,6 @@ const _cloneLowerCase = obj => {let clone = {}; for (const key of Object.keys(ob
 const _normalizeURL = url => url.replace(/\\/g, "/").replace(/\/+/g, "/");
 const _squishHeaders = headers => {const squished = {}; for ([key,value] of Object.entries(headers)) squished[key.toLowerCase()] = value; return squished};
 
-module.exports = {initAsync, onData, onReqEnd, onReqError, statusNotFound, statusUnauthorized, statusThrottled, 
-	statusInternalError, statusTimeOut, statusOK, write, end, blacklistIP, whitelistIP, getSerializableServObject,
-	inflateServObject}
+module.exports = {initAsync, onConnect, onData, onReqEnd, onConnectionClose, onReqError, statusNotFound, 
+	statusUnauthorized, statusThrottled, statusInternalError, statusTimeOut, statusOK, write, end, destroy, 
+	blacklistIP, whitelistIP, getSerializableServObject, inflateServObject}

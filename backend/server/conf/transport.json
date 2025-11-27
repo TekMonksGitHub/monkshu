@@ -1,3 +1,4 @@
 {
-"servertype" : "http_server"
+"servertype" : "http_server",
+"drop_insecure_immediately": true
 }

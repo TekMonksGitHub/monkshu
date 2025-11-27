@@ -94,7 +94,7 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	let encoded = respObj;
-	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, endPoint, encoded, reqHeaders, respHeaders, servObject);
+	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, url, encoded, reqHeaders, respHeaders, servObject);
 
 	return encoded;
 }
@@ -109,7 +109,7 @@ async function checkSecurity(url, req, headers, servObject, reason) {
 	if (apiregentry.query.customSecurity) for (const securityCheckerCustom of utils.escapedSplit(apiregentry.query.customSecurity, ","))
 		allSecurityCheckers.push(global.APIREGISTRY.ENV.CUSTOM_SECURITY_CHECKERS[securityCheckerCustom]);
 	for (const securitycheckerThis of allSecurityCheckers) if (securitycheckerThis && 
-			(!(await securitycheckerThis.checkSecurity(apiregentry, endPoint, req, headers, servObject, reason)))) { 
+			(!(await securitycheckerThis.checkSecurity(apiregentry, url, req, headers, servObject, reason)))) { 
 		reason.reason += ` ---- Failed on: ${securitycheckerThis.__org_monkshu_apiregistry_conf_modulename}`; 
 		return false; 
 	}
@@ -127,7 +127,7 @@ function injectResponseHeaders(url, response, requestHeaders, responseHeaders, s
 	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
 
 	for (const headermanagerThis of headermanagers) 
-		headermanagerThis.injectResponseHeaders(apiregentry, endPoint, response, requestHeaders, responseHeaders, servObject, reqObj);
+		headermanagerThis.injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, reqObj);
 }
 
 function listAPIs() {

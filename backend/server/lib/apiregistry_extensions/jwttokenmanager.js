@@ -37,10 +37,13 @@ function initSync() {
 
 const checkHeaderToken = headers => checkSecurity({query:{needsToken: true}}, undefined, {}, headers, undefined, {});
 
-async function checkSecurity(apiregentry, _url, req, headers, _servObject, reason) {
+async function checkSecurity(apiregentry, url, req, headers, _servObject, reason) {
     if ((!apiregentry.query.needsToken) || (apiregentry.query.needsToken.toLowerCase() == "false")) return true;	// no token needed
 
-    const incomingToken = headers["authorization"];
+    const urlSearchParams = new URL(url).searchParams;
+    const incomingToken = apiregentry.query.get?.toLowerCase()=="true"?
+        (urlSearchParams.get("authorization") || urlSearchParams.get("Authorization") || headers["authorization"]) : 
+        headers["authorization"];
     const token_splits = incomingToken?incomingToken.split(/[ \t]+/):[];
     if (token_splits.length == 2 && token_splits[0].trim().toLowerCase() == "bearer") return await checkToken(token_splits[1], reason, apiregentry.query.needsToken, apiregentry.query.checkClaims, req);
     else {reason.reason = `JWT malformatted. Got token ${incomingToken}`; reason.code = 403; return false;}	// missing or badly formatted token

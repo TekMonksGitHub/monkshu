@@ -13,6 +13,7 @@ const gunzipAsync = require("util").promisify(require("zlib").gunzip);
 
 const SERVER_STAMP = utils.generateUUID(false), SERVER_IPC_TOPIC_REQUEST = "_____org_monkshu_server_ipc__request",
 	SERVER_IPC_TOPIC_RESPONSE = "_____org_monkshu_server_ipc__response", SERVER_ID_HEADER = "x_monkshu_serverid";
+const SSE_TIMEOUTS = {}, DEFAULT_SSE_INTERVAL = 10000;
 let _server;	// holds the transport 
 let blackboard; // for server IPC
 
@@ -96,19 +97,35 @@ async function bootstrap() {
 
 async function _initAndRunTransportLoop() {
 	/* Init the transport */
-	_server = require(CONSTANTS.LIBDIR+"/"+require(CONSTANTS.TRANSPORT).servertype+".js");
+	const transportConf = require(CONSTANTS.TRANSPORT);
+	_server = require(CONSTANTS.LIBDIR+"/"+transportConf.servertype+".js");
 	if (_server.initAsync) await _server.initAsync(); else if (server.initSync) server.initSync(); 
 	module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
 	
 	/* Server loop */
 	/* send request to the service mentioned in url*/
-	_server.onData = (chunk, servObject) => servObject.env.data = servObject.env.data ? (Buffer.isBuffer(servObject.env.data) ?
-		Buffer.concat([servObject.env.data, chunk]) : servObject.env.data + chunk) : chunk;
+	_server.onConnect = async (url, headers, servObject) => {
+		if (APIREGISTRY.getAPI(url) && transportConf.drop_insecure_immediately && 
+				(APIREGISTRY.getAPIConf(url).checksec_immediate?.toLowerCase() != "false")) {	// check security early
+			
+			const jsonObjForSecurityCheck = APIREGISTRY.decodeIncomingData(url, "{}", headers, servObject);
+			let reason = {}; if (!(await APIREGISTRY.checkSecurity(url, jsonObjForSecurityCheck, headers, servObject, reason))) {
+				LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); 
+				_server.destroy(servObject);
+				return;
+			}
+		}
+		doSSEIfSSEEndpoint(servObject, headers, url);	// SSE support
+	}
+	_server.onConnectionClose = (url, headers, servObject) => stopSSEIfSSEEndpoint(servObject, headers, url);
+	_server.onData = (url, chunk, servObject) => isAPI(url) ? (servObject.env.data = servObject.env.data ? (Buffer.isBuffer(servObject.env.data) ?
+		Buffer.concat([servObject.env.data, chunk]) : servObject.env.data + chunk) : chunk) : {/*not API do nothing*/};
 	_server.onReqEnd = async (url, headers, servObject) => {
 		const send500 = error => {
 			LOG.info(`Sending Internal Error for: ${url}, due to ${error}${error.stack?"\n"+error.stack:""}`);
 			_server.statusInternalError(servObject, error); _server.end(servObject);
 		}
+		if (!isAPI(url)) return;	// skip sending responses for SSE for example
 		
 		if (servObject.compressionFormat == CONSTANTS.GZIP && servObject.env.data && Buffer.isBuffer(servObject.env.data)) try {
 			servObject.env.data = await gunzipAsync(servObject.env.data); } catch (err) {send500(err); return;}
@@ -179,6 +196,51 @@ async function doService(data, servObject, headers, url) {
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}, reqObj: jsonObj}); 
 		}
 	} else return ({code: 404, respObj: {result: false, error: "API Not Found"}});
+}
+
+async function doSSEIfSSEEndpoint(servObject, headers, url) {	// polling interval is config.sseint or url?sseint=interval or default is 10 seconds
+	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
+	const sseAPI = APIREGISTRY.getAPI(url), sseAPIConf = APIREGISTRY.getAPIConf(url), urlParams = new URL(url).searchParams;
+	if (sseAPI && (sseAPIConf.sse?.toString().toLowerCase() == "true")) {	// this URL is an SSE endpoint
+		LOG.info("Looked up SSE service, checking security for: " + sseAPI);
+		const jsonObjFromURLParams = APIREGISTRY.decodeIncomingData(url, "{}", headers, servObject);
+		let reason = {}; if (!(await APIREGISTRY.checkSecurity(url, jsonObjFromURLParams, headers, servObject, reason))) {
+			LOG.error(`SSE security check failed for ${url}, reason: ${reason.reason}`);  return false;}
+
+		try { 
+			LOG.info("SSE setting up polling for: " + sseAPI);
+			const sseAPIModule = sseAPIConf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(sseAPI) :
+				utils.requireWithDebug(sseAPI, CONSTANTS.SERVER_CONF.debug_mode);
+			_server.statusOK({"content-type": "text/event-stream", "cache-control": "no-cache", "connection": "keep-alive", "content-encoding": "none"}, servObject);
+			const sseEventSender = (jsonObj={}) => {
+				const event = jsonObj.event||"monkshu_sse", id = jsonObj.id||Date.now();
+				const dataObj = jsonObj.event && jsonObj.id && jsonObj.data ? jsonObj.data : jsonObj;
+				_server.write(`event: ${event}\nid: ${id}\ndata: ${JSON.stringify(dataObj)}\n\n`, servObject, "utf-8", true);
+			}
+			const requestID = `${servObject.env.remoteHost}:${servObject.env.remotePort}`;
+			const sseinterval = sseAPIConf.sseint||urlParams.get("sseint")||DEFAULT_SSE_INTERVAL;
+			SSE_TIMEOUTS[requestID] = utils.setIntervalImmediately(_=>sseAPIModule.doSSE(jsonObjFromURLParams, sseEventSender, servObject, headers, url, sseAPIConf), sseinterval);
+		} catch (error) {
+			LOG.error(`SSE error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`);
+		} 
+	} // not ours 
+}
+
+function stopSSEIfSSEEndpoint(servObject, _headers, url) {	// stop SSE poll calls if the endpoint is an SSE endpoint
+	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
+	const sseAPI = APIREGISTRY.getAPI(url), sseAPIConf = APIREGISTRY.getAPIConf(url);
+	if (sseAPI && (sseAPIConf.sse?.toString().toLowerCase() == "true")) {
+		const requestID = `${servObject.env.remoteHost}:${servObject.env.remotePort}`;
+		clearInterval(SSE_TIMEOUTS[requestID]); 
+		delete SSE_TIMEOUTS[requestID];
+		return true;
+	} else return false;	// this is not an SSE endpoint
+}
+
+const isAPI = url => {
+	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
+	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
+	return (api && (apiConf.sse?.toString().toLowerCase() != "true"));	// API found and it is not an SSE event endpoint
 }
 
 function _getResponseViaInternalIPC(data, servObject, headers, url) {

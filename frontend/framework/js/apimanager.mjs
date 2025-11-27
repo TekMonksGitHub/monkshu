@@ -144,6 +144,31 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
 }
 
 /**
+ * Subscribes to SSE events. Will automatically send keys and JWT tokens (if selected) as URL params.
+ * @param {string|object} urlOrOptions The URL to call or an options object which contains all the parameters
+ * @param {object} params Additional URL params (like request object for JSON APIs). Only used to establish the connection.
+ * @param {object|boolean} sendToken Optional: {type: "access" or other types}, if set to true then access is assumed
+ * @returns {object} The associated EventSource object
+ */
+function subscribeSSEEvents(urlOrOptions, params={}, sendToken=false) {
+    let rewrittenURL; if (typeof urlOrOptions === "object") {
+        rewrittenURL = router.getBalancedURL(urlOrOptions.url); params = urlOrOptions.params||{}; 
+        sendToken = urlOrOptions.sendToken||false; 
+    } else rewrittenURL = router.getBalancedURL(urlOrOptions);
+
+    const urlSSE = new URL(rewrittenURL); 
+    for (const [key, value] of Object.entries(params)) urlSSE.searchParams.append(key, value);
+    const apiKey = getAPIKeyFor(rewrittenURL), storage = _getAPIManagerStorage();
+    if (apiKey) urlSSE.searchParams.append(storage.keyHeader, apiKey);
+    if (sendToken) {
+        const token = getJWTToken(rewrittenURL, sendToken==true?"access":sendToken)||"undefined";
+        urlSSE.searchParams.append("Authorization", `Bearer ${token}`);
+    }
+
+    return new EventSource(urlSSE.href);
+}
+
+/**
  * Register keys to send for various APIs.
  * @param {object} apikeys Of format {"url":"key"} or {"*":"key"}. * matches all URLs.
  * @param {string} apiKeyHeaderName The name of the HTTP header to use to send the key. 
@@ -254,4 +279,4 @@ function _modifyAPIManagerStorage(key, value) {
     storage[key] = value;
 }
 
-export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor, subscribeSSEEvents};
