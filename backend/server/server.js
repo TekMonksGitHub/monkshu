@@ -218,7 +218,7 @@ async function doSSEIfSSEEndpoint(servObject, headers, url) {	// polling interva
 				_server.write(`event: ${event}\nid: ${id}\ndata: ${JSON.stringify(dataObj)}\n\n`, servObject, "utf-8", true);
 			}
 			const requestID = `${servObject.env.remoteHost}:${servObject.env.remotePort}`;
-			const sseinterval = sseAPIConf.sseint||urlParams.get("sseint")||DEFAULT_SSE_INTERVAL;
+			const sseinterval = parseInt(sseAPIConf.sseint||urlParams.get("sseint")||DEFAULT_SSE_INTERVAL);
 			if (sseinterval > 0) SSE_TIMEOUTS[requestID] = utils.setIntervalImmediately(_=>sseAPIModule.doSSE(jsonObjFromURLParams, sseEventSender, servObject, headers, url, sseAPIConf), sseinterval);
 			else sseAPIModule.doSSE(jsonObjFromURLParams, sseEventSender, servObject, headers, url, sseAPIConf);	// SSE endpoint will decide its own frequency etc
 		} catch (error) {
