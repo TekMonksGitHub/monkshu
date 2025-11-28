@@ -221,19 +221,26 @@ async function doSSEIfSSEEndpoint(servObject, headers, url) {	// polling interva
 			const sseinterval = parseInt(sseAPIConf.sseint||urlParams.get("sseint")||DEFAULT_SSE_INTERVAL);
 			if (sseinterval > 0) SSE_TIMEOUTS[requestID] = utils.setIntervalImmediately(_=>sseAPIModule.doSSE(jsonObjFromURLParams, sseEventSender, servObject, headers, url, sseAPIConf), sseinterval);
 			else sseAPIModule.doSSE(jsonObjFromURLParams, sseEventSender, servObject, headers, url, sseAPIConf);	// SSE endpoint will decide its own frequency etc
+			LOG.info(`Started SSE endpoint: ${sseAPI}`);
 		} catch (error) {
-			LOG.error(`SSE error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`);
+			LOG.error(`SSE ${sseAPI} has error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`);
 		} 
 	} // not ours 
 }
 
-function stopSSEIfSSEEndpoint(servObject, _headers, url) {	// stop SSE poll calls if the endpoint is an SSE endpoint
+function stopSSEIfSSEEndpoint(servObject, headers, url) {	// stop SSE poll calls if the endpoint is an SSE endpoint
 	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
 	const sseAPI = APIREGISTRY.getAPI(url), sseAPIConf = APIREGISTRY.getAPIConf(url);
 	if (sseAPI && (sseAPIConf.sse?.toString().toLowerCase() == "true")) {
 		const requestID = `${servObject.env.remoteHost}:${servObject.env.remotePort}`;
-		clearInterval(SSE_TIMEOUTS[requestID]); 
-		delete SSE_TIMEOUTS[requestID];
+		if (SSE_TIMEOUTS[requestID]) {
+			clearInterval(SSE_TIMEOUTS[requestID]); 
+			delete SSE_TIMEOUTS[requestID];
+		} 
+		const sseAPIModule = sseAPIConf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(sseAPI) :
+			utils.requireWithDebug(sseAPI, CONSTANTS.SERVER_CONF.debug_mode);
+		if (sseAPIModule.endSSE) sseAPIModule.endSSE(servObject, headers, url, sseAPIConf);	// SSE can cleanup here if needed
+		LOG.info(`Stopped SSE endpoint: ${sseAPI}`);
 		return true;
 	} else return false;	// this is not an SSE endpoint
 }
