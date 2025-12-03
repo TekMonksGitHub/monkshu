@@ -682,6 +682,26 @@ function exec(command, args, encoding, escapeArgs=true, inShell=true, quoterChar
     });
 }
 
+/**
+ * Checks if the objects are deep equal.
+ * @param {object} objA Object A
+ * @param {object} objB Object B
+ * @returns true if they are equal else false
+ */
+function areObjectsEqual(objA, objB) {
+    if (objA === objB) return true; // Check for reference equality and primitive types
+
+    // Not objects or one is null
+    if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) return false; 
+
+    const keysA = Object.keys(objA), keysB = Object.keys(objB);
+    if (keysA.length !== keysB.length) return false; // Different number of properties
+
+    for (const key of keysA) if ( (!keysB.includes(key)) || (!areObjectsEqual(objA[key], objB[key])) ) 
+        return false; // Property missing or values don't match recursively
+
+    return true;
+}
 
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
@@ -689,4 +709,4 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
     convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
-    gzipFile, dnsResolve, exec };
+    gzipFile, dnsResolve, exec, areObjectsEqual };

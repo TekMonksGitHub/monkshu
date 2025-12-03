@@ -332,6 +332,27 @@ function htmlToDOMNodes(html) {
 }
 
 /**
+ * Checks if the objects are deep equal.
+ * @param {object} objA Object A
+ * @param {object} objB Object B
+ * @returns true if they are equal else false
+ */
+function areObjectsEqual(objA, objB) {
+    if (objA === objB) return true; // Check for reference equality and primitive types
+
+    // Not objects or one is null
+    if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) return false; 
+
+    const keysA = Object.keys(objA), keysB = Object.keys(objB);
+    if (keysA.length !== keysB.length) return false; // Different number of properties
+
+    for (const key of keysA) if ( (!keysB.includes(key)) || (!areObjectsEqual(objA[key], objB[key])) ) 
+        return false; // Property missing or values don't match recursively
+
+    return true;
+}
+
+/**
  * Returns object path splits as an array. Internal only.
  * @param {string} path The object path
  * @returns The object path splits as an array.
@@ -349,4 +370,4 @@ export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, pa
     getModulePath, downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, 
     getChildByID, getChildrenByTagName, removeAllChildElements, setIntervalImmediately, generateUUID, 
     createAsyncFunction, createSyncFunction, stringToBase64, base64ToString, encodeHTMLEntities, 
-    htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL};
+    htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL, areObjectsEqual};
