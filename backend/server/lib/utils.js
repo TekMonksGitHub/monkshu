@@ -26,19 +26,22 @@ let lastFileCheckTime = {};
  * @param {function} functionToCall The function to call (can be async) for each entry, receives
  *      from, to, relativePath (from the initial fromPath), and stats for the original file copied.
  * @param {boolean} isCalledFunctionAsync Whether the walk function we are calling is async
+ * @param {function} skipEntryChecker Checks whether to skip this entry
  */
-async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync, rootFrom) {
+async function copyFileOrFolder(from, to, functionToCall, isCalledFunctionAsync, skipEntryChecker, rootFrom) {
     if (!rootFrom) rootFrom = path.dirname(from); // entry call, so we are at the root of the tree
-
     const statsFrom = await lstatAsync(from);
+
+    if (skipEntryChecker && (!skipEntryChecker(from, to, path.relative(rootFrom, from), statsFrom))) return;
+
     if (statsFrom.isFile()) {
         if (!rootFrom) rootFrom = path.dirname(from);   // parent is the root directory
         await copyFileAsync(from, to);
     } else {
         if (!rootFrom) rootFrom = from; // this is the root directory
-        await mkdirAsync(to); 
+        try {await mkdirAsync(to);} catch (err) {if (err.code != "EEXIST") throw err;}  // ignore harmless mkdir errors
         for (const entry of await readdirAsync(from)) await copyFileOrFolder(path.join(from, entry), 
-            path.join(to, entry), functionToCall, isCalledFunctionAsync, rootFrom);
+            path.join(to, entry), functionToCall, isCalledFunctionAsync, skipEntryChecker, rootFrom);
     }
 
     if (functionToCall) {   // call function if provided for every entry
@@ -80,12 +83,18 @@ async function rmrf(path) {
         else {LOG.error(`Can't access path for rmrf ${path}, error is ${err}.`); return false;} // can't operate on this path.
     }
 
-	if ((await fspromises.stat(path)).isFile()) try{await fspromises.unlink(path); return true;} catch (err) {
-        if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; } }    // multiprocessing can cause ENOENT if another processes deleted it midway
+	try{
+        const stats = await fspromises.stat(path); 
+        if (stats.isFile()) {await fspromises.unlink(path); return true;}
+     } catch (err) {if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; } }    // multiprocessing can cause ENOENT if another processes deleted it midway
 
-	const entries = await fspromises.readdir(path);
+	let entries = []; try {entries = await fspromises.readdir(path);} catch (err) {if (err.code !== "ENOENT") {LOG.error(`Error reading entries for path ${path}, error is ${err}.`); return false;}}
 	for (const entry of entries) {
-		const pathThis = `${path}/${entry}`, stats = await fspromises.stat(pathThis);
+		const pathThis = `${path}/${entry}`; let stats; 
+        try { stats = await fspromises.stat(pathThis);} catch (err) {
+            if (err.code !== "ENOENT") {LOG.error(`Error reading ${pathThis}, error is ${err}.`); return false;}
+            else continue;  // this file is already gone
+        }
 		if (stats.isFile()) try {await fspromises.unlink(pathThis);} catch (err) {
             if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false;} }
 		else if (stats.isDirectory()) {
