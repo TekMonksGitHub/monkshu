@@ -32,6 +32,7 @@ exports.CLUSTERMEMCONF = confdir + "/cluster.json";
 exports.GLOBALMEMCONF = confdir + "/globalmemory.json";
 exports.NETCHECKCONF = confdir + "/netcheck.json";
 exports.OBJOBSERVERCONF = confdir + "/objectobserver.json";
+exports.FRONTENDDIR = rootdir + "/../../frontend";
 exports.RELEASEFILE = rootdir + "/../../RELEASE";
 exports.BUILD_NUMBER_FILE = rootdir + "/../../build_number";
 exports.RELEASE = require("fs").readFileSync(exports.RELEASEFILE, "utf8").trim();

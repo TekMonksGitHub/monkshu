@@ -229,8 +229,8 @@ function generateUUID(useDashes=true) { // Public Domain/MIT: from https://stack
  * Creates an async function which executes the given code.
  * To call the function call the created function with the 
  * context. For example, 
- * const asyncFunction = util.createAsyncFunction(code);
- * await asyncFunction({key: value, key2: value2})
+ *  const asyncFunction = util.createAsyncFunction(code);
+ *  await asyncFunction({key: value, key2: value2})
  * @param {string} code The code to execute
  * @returns Asynchronous function (or sync) which executes the
  *          given code when called.
@@ -245,8 +245,8 @@ const createAsyncFunction = code => {
  * Creates a function which executes the given code synchronously.
  * To call the function call the created function with the 
  * context. For example, 
- * const myfunction = util.createSyncFunction(code);
- * await myfunction({key: value, key2: value2})
+ *  const myfunction = util.createSyncFunction(code);
+ *  myfunction({key: value, key2: value2})
  * @param {string} code The code to execute
  * @returns Sync function which executes the given code when called.
  */
