@@ -112,9 +112,7 @@ async function fetch(url, options={}, redirected=false) {    // somewhat fetch c
         if (!isResolved) {clearTimeout(timeoutPointer); resolve(result);}
     })) : await httpCall();
 
-    if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308 && 
-            ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
-
+    if (_isRedirectStatus(status) && ((!options.redirect) || options.redirect.toLowerCase() == "follow")) {    // handle redirects
         if (resHeaders.location) return fetch(new URL(resHeaders.location, url).href, options, true);   
         else LOG.error(`URL ${url} sent a redirect with no location specified (location header not found).`);
     }
@@ -123,6 +121,8 @@ async function fetch(url, options={}, redirected=false) {    // somewhat fetch c
         text: encoding => data.toString(encoding||"utf8"), json: _ => JSON.parse(data), redirected, url}
     if (callback) callback(result); else return result;
 }
+
+const _isRedirectStatus = status => status == 301 || status == 302 || status == 303 || status == 307 || status == 308;
 
 const _haveUndiciModule = _ => { if (undiciMod) return true; try {undiciMod = require("undici"); return true;} catch (err) {return false;}}
 
@@ -135,7 +135,7 @@ async function _undiciRequest(url, options) {
     
     const status = res.statusCode, resHeaders = _squishHeaders({ ...res.headers });
     const statusOK = Math.trunc(status / 200) == 1 && status % 200 < 100;
-    if (!_checkRequestResponseContentTypesMatch(reqHeaders, resHeaders)) return({ 
+    if (!_checkRequestResponseContentTypesMatch(reqHeaders, resHeaders, status)) return({ 
         error: `Content type doesn't match acceptable content. Requested ${reqHeaders.accept} != resHeaders["content-type"].`, 
             data: null, status, resHeaders });
     const dataArrayBuffer = res.body ? await res.body.arrayBuffer() : [];
@@ -197,13 +197,15 @@ function _doCall(reqStr, options, secure, sslObj) {
                     caller.destroy();
                 }
 
-                if (!_checkRequestResponseContentTypesMatch(options.headers, headers)) {
-                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
-                    return;
-                }
+                
                 let status; try{status = parseInt(headers[http2.constants.HTTP2_HEADER_STATUS]||headers.status)} catch(err) {status=500}; 
                 const statusOK = (Math.trunc(status / 200) == 1) && (status % 200 < 100);
                 if (!statusOK) sendError({ message: `Bad status: ${status}`, status }); else _skipProtocolErrors = true;
+
+                if (!_checkRequestResponseContentTypesMatch(options.headers, headers, status)) {
+                    sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${headers["content-type"]}.`);
+                    return;
+                }
 
                 const encoding = utils.getObjectKeyValueCaseInsensitive(headers, "content-encoding") || "identity";
                 if (encoding.toLowerCase() == "gzip") { resPiped = zlib.createGunzip(); req.pipe(resPiped); } else resPiped = req;
@@ -221,7 +223,7 @@ function _doCall(reqStr, options, secure, sslObj) {
 
             if (sslObj && typeof sslObj == "object") try{await _addSecureOptions(options, sslObj)} catch (err) {reject(err); return;};
             const req = caller.request(options, res => {
-                if (!_checkRequestResponseContentTypesMatch(options.headers, res.headers)) {
+                if (!_checkRequestResponseContentTypesMatch(options.headers, res.headers, res.statusCode)) {
                     sendError(`Content type doesn't match acceptable content. Requested ${options.headers.accept} != ${res.headers["content-type"]}.`);
                     return;
                 }
@@ -248,8 +250,9 @@ function _doCall(reqStr, options, secure, sslObj) {
     });
 }
 
-function _checkRequestResponseContentTypesMatch(requestHeaders, responseHeaders) {
-    if ((!requestHeaders.enforce_mime)) return true;  // enforce only if asked to
+function _checkRequestResponseContentTypesMatch(requestHeaders, responseHeaders, status) {
+    // enforce only if asked to and mime of redirect doesn't matter
+    if ((!requestHeaders.enforce_mime) || _isRedirectStatus(status)) return true;  
     const headersReq = _squishHeaders(requestHeaders), headersRes = _squishHeaders(responseHeaders);
     if (!headersReq.accept) return true;    // nothing to check
     const headersAccept = headersReq.accept.split(",").map(value => value.trim()), 
