@@ -42,7 +42,7 @@ async function getI18NObject(language=getSessionLang(), refresh=false) {
 				const i18nBundle = await import(i18nThisAppPath), loadedBundle = i18nBundle.i18n, 
 					cachedObject = i18nCached[language].i18n;
 				i18nCached[language].i18n = {...cachedObject, ...loadedBundle};
-			} catch (err) {LOG.error(`Error importing i18n bundle for apppath ${appPath}. Error is ${err}.`);}
+			} catch (err) {$$.LOG.error(`Error importing i18n bundle for apppath ${appPath}. Error is ${err}.`);}
 		}
 		i18nCached.reload = false;
 		_setI18NSessionObject(i18nCached);

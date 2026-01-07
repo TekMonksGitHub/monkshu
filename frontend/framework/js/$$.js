@@ -133,7 +133,17 @@ $$.__fetchGETThrowErrorOnNotOK = async (url, contentType, corsMode) => {
     }
 }
 
-$$.boot = async (appPath=new URL("./", window.location), confPath=new URL("./conf", window.location)) => {
+$$.isDualBoot = _ => window._monkshu_booted_already;
+
+$$.boot = async (appPath=new URL("./", window.location), confPath=new URL("./conf", window.location), 
+        addwebbundle=false, preventDualBoot=false) => {
+
+    if (preventDualBoot && window._monkshu_booted_already) return; else window._monkshu_booted_already = true;
+
+    const {webbundlesupport} = await import("/framework/js/webbundlesupport.mjs"); 
+    if (addwebbundle && (!await webbundlesupport.addWebbundleSupport())) 
+        console.error("Webbundle loading failed or not available. Website performance will be slow.");
+    
     const {bootstrapMonkshu} = await import("/framework/js/bootstrap.mjs");
     await bootstrapMonkshu();
     const {bootstrapApp} = await import("/framework/js/bootstrap.mjs");

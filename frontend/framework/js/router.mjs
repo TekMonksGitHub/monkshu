@@ -41,10 +41,11 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  * Navigates to the given URL, this is different than loadPage which will
  * load it without changing Window location.
  * @param {string} url The URL to navigate to
+ * @param {boolean} dontEncode Do not encode the URL
  */
- function navigate(url) {
+ function navigate(url, dontEncode=false) {
 	let normalizedUrl = getBalancedURL(_getRewrittenURL(url));	// normalize
-	if (!_isEncodedURL(normalizedUrl.href)) normalizedUrl = new URL(encodeURL(url));
+	if (!_isEncodedURL(normalizedUrl.href) && (!dontEncode)) normalizedUrl = new URL(encodeURL(url));
 	window.location.assign(normalizedUrl.href);
 }
 
@@ -52,8 +53,10 @@ async function setAppAsPWA(timeout=10000, appName=getCurrentAppName(), manifestd
  * Loads the given page into the browser tab.
  * @param {string} url The URL to load - can be either in hashed form, or the actual page URL
  * @param {Object} dataModels Data models object
+ * @param {boolean} dontDecode Do not decode the URL
+ * @param {boolean} pushstate Push the state into the URL bar
  */
-async function loadPage(url, dataModels={}) {
+async function loadPage(url, dataModels={}, dontDecode=false, pushstate=true) {
 	url = getBalancedURL(_getRewrittenURL(url)); 
 
 	// in case of hard reloads etc we may have saved transient data
@@ -63,16 +66,21 @@ async function loadPage(url, dataModels={}) {
 	if (!session.get(ROUTER_HISTORY_KEY)) session.set(ROUTER_HISTORY_KEY, {});
 	const history = session.get(ROUTER_HISTORY_KEY); let hash;
 
-	if (!_isEncodedURL(url)) {
+	if (!dontDecode) {	// resolve URL and push into history state etc.
+		if (!_isEncodedURL(url)) {
 		hash = btoa(url); const currenturl = new URL(new URL(window.location.href).pathname, window.location.href); 
 		currenturl.searchParams.set(HASH_PARAM, hash);
-		window.history.pushState(null, null, currenturl.href);
+		if (pushstate) window.history.pushState(null, null, currenturl.href);
 		history[hash] = [url, dataModels];
+		} else {
+			if (pushstate) window.history.pushState(null, null, url);
+			hash = new URL(url).searchParams.get(HASH_PARAM);
+			url = new URL(atob(hash), window.location).href;
+			if (!history[hash]) history[hash] = [url, dataModels];
+		}
 	} else {
-		window.history.pushState(null, null, url);
-		hash = new URL(url).searchParams.get(HASH_PARAM);
-		url = new URL(atob(hash), window.location).href;
-		if (!history[hash]) history[hash] = [url, dataModels];
+		if (pushstate) window.history.pushState(null, null, url);
+		history[url] = [url, dataModels];
 	}
 
 	session.set(ROUTER_HISTORY_KEY, history);
@@ -188,11 +196,14 @@ async function runShadowJSScripts(sourceDocument, documentToRunScriptOn) {
 /**
  * Checks if we have navigated to this URL before
  * @param {string} url The URL in hash form
+ * @param {boolean} dontDecode Do not decode the URL
  * @returns {boolean} true if we have navigated to this page before, else false
  */
-function isInHistory(url) {
+function isInHistory(url, dontDecode=false) {
 	const history = session.get(ROUTER_HISTORY_KEY);
 	if (!history) return false;
+
+	if (dontDecode) {if (!history[url]) return false; else return true;}
 
 	const hash = new URL(url, window.location.href).searchParams.get(HASH_PARAM);
 	if (!hash) return false;	
