@@ -63,10 +63,10 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
             return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;   
         } else {
-            LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+            $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
 
             if (retries && _retryNumber < retries) {
-                LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+                $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
                 return await rest(urlOrOptions, type, req, sendToken, extractToken, 
                     canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
             }
@@ -75,9 +75,9 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             return sendErrResp ? (provideHeaders?{response: errResp, headers: _getFetchResponseHeadersAsObject(response)}:errResp) : null; // sending error response
         }
     } catch (err) {
-        LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
+        $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
         if (retries && _retryNumber < retries) {
-            LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+            $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
             return await rest(urlOrOptions, type, req, sendToken, extractToken, 
                 canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
         }
@@ -124,18 +124,18 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
             document.body.appendChild(link); link.click(); link.remove();  
             return true;
         } else {
-            LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
+            $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
             if (retries && _retryNumber < retries) {
-                LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+                $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
                 return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, 
                     headers, retries, _retryNumber+1);
             }
             return false;
         }
     } catch (err) {
-        LOG.error(`Error in blob'ing ${url} for request ${JSON.stringify(req)} of type ${type} and filename ${filename} due to ${err}`);
+        $$.LOG.error(`Error in blob'ing ${url} for request ${JSON.stringify(req)} of type ${type} and filename ${filename} due to ${err}`);
         if (retries && _retryNumber < retries) {
-            LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
+            $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
             return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, headers, 
                 retries, _retryNumber+1);
         }
