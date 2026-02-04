@@ -16,6 +16,7 @@ exports.CONFDIR = confdir;
 exports.HOSTNAME = require("fs").existsSync(`${confdir}/hostname.json`) ? require(`${confdir}/hostname.json`) : require("os").hostname();
 exports.APPROOTDIRS = [rootdir + "/../apps"];
 exports.LIBDIR = rootdir + "/lib";
+exports.APISDIR = rootdir + "/apis";
 exports.LOGDIR = rootdir + "/logs";
 exports.JAVADIR = rootdir + "/java";
 exports.GLOBALMEMLOGDIR = rootdir+"/logs";

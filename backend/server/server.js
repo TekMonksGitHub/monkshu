@@ -190,7 +190,13 @@ async function doService(data, servObject, headers, url) {
 			const apiModule = apiconf.reloadOnDebug?.trim().toLowerCase() == "false" ? require(api) :
 				utils.requireWithDebug(api, CONSTANTS.SERVER_CONF.debug_mode);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
-			else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
+			else {
+				if (apiconf.respondviasse?.trim().toLowerCase() == "true") {
+					const requestid = `${Date.now()}${Math.ceil(1000*Math.random())}`;
+					_runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf);
+					return ({code: 200, respObj: {requestid, ...CONSTANTS.TRUE_RESULT}, reqObj: jsonObj});
+				} else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
+			}
 		} catch (error) {
 			LOG.error(`API error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 			return ({code: error.status||500, respObj: {result: false, error: error.message||error}, reqObj: jsonObj}); 
@@ -216,6 +222,7 @@ async function doSSEIfSSEEndpoint(servObject, headers, url) {	// polling interva
 				const event = jsonObj.event||"monkshu_sse", id = jsonObj.id||Date.now();
 				const dataObj = jsonObj.event && jsonObj.id && jsonObj.data ? jsonObj.data : jsonObj;
 				_server.write(`event: ${event}\nid: ${id}\ndata: ${JSON.stringify(dataObj)}\n\n`, servObject, "utf-8", true);
+				LOG.info(`Sent SSE with ID: ${id} for ${url}`);
 			}
 			const requestID = `${servObject.env.remoteHost}:${servObject.env.remotePort}`;
 			const sseinterval = parseInt(sseAPIConf.sseint||urlParams.get("sseint")||DEFAULT_SSE_INTERVAL);
@@ -249,6 +256,17 @@ const isAPI = url => {
 	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
 	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
 	return (api && (apiConf.sse?.toString().toLowerCase() != "true"));	// API found and it is not an SSE event endpoint
+}
+
+async function _runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf) {
+	const clientMemory = CLUSTER_MEMORY.get(CONSTANTS.MEM_KEY+jsonObj.clientid, {});
+	try {
+		const respObj = await apiModule.doService(jsonObj, servObject, headers, url, apiconf);
+		clientMemory[requestid] = respObj;
+	} catch (error) {
+		LOG.error(`API error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`); 
+		clientMemory[requestid] = {result: false, error: error.message||error};
+	}
 }
 
 function _getResponseViaInternalIPC(data, servObject, headers, url) {

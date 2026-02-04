@@ -32,7 +32,9 @@ function initSync(notVerbose) {
 		const app = Object.keys(appObj)[0], appRoot = appObj[app];
 		if (fs.existsSync(`${appRoot}/conf/apiregistry.json`)) {
 			let regThisRaw = fs.readFileSync(`${appRoot}/conf/apiregistry.json`, "utf8").
-				replace(/{{app}}/g, app).replace(/{{server}}/g, _toPOSIXPath(CONSTANTS.ROOTDIR)).replace(/{{server_lib}}/g, _toPOSIXPath(CONSTANTS.LIBDIR));
+				replace(/{{app}}/g, app).replace(/{{server}}/g, _toPOSIXPath(CONSTANTS.ROOTDIR)).
+				replace(/{{server_lib}}/g, _toPOSIXPath(CONSTANTS.LIBDIR)).
+				replace(/{{server_apis}}/g, _toPOSIXPath(CONSTANTS.APISDIR));
 			if (!notVerbose) LOG.info(`Read App API registry for app ${app}: ${regThisRaw}`);
 			let regThis = JSON.parse(regThisRaw);
 			for (const key in regThis) regThis[key] = fs.existsSync(regThis[key].split("?")[0]) ? regThis[key] : (`${appRoot}/${regThis[key]}`);

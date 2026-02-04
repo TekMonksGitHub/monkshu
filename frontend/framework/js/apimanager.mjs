@@ -17,7 +17,8 @@ import {router} from "/framework/js/router.mjs";
 import {session} from "/framework/js/session.mjs";
 import * as pako from "/framework/3p/pako.esm.min.mjs";
 
-const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000;
+const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000, SSE_EVENT_SOURCES={}, 
+    SERVER_SSE_EVENTS_NAME = "_org_monkshu_api_sse_event_";
 
 /**
  * Makes a REST API call.
@@ -34,19 +35,23 @@ const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000
  * @param {object} headers Optional: The custom headers to send
  * @param {boolean} provideHeaders Optional: Response should return response headers as an object 
  * @param {number} retries Optional: Number of retries in case of error, default is 0
+ * @param {string} sseURL Optional: Get response via SSE not API call (for long running APIs). 
+ *                                  The SSE endpoint URL must be set to this. 
  * 
  * @return {Object} If provideHeaders is true then {response, headers} where response is the Javascript result object 
  *                  or null on error. If it is false then just response, which is the Javascript result object or null.
  */
 async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false, canUseCache=false, dontGZIP=false, 
-        sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false, retries=0, _retryNumber=0) {
+        sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false, retries=0, sseURL=false, 
+        _retryNumber=0) {
 
     let url; if (typeof urlOrOptions === "object") {
-        url = router.getBalancedURL(urlOrOptions.url); type = urlOrOptions.type; req = urlOrOptions.req; sendToken =urlOrOptions.sendToken||false; 
+        url = router.getBalancedURL(urlOrOptions.url); type = urlOrOptions.type; req = urlOrOptions.req; sendToken = urlOrOptions.sendToken||false; 
         extractToken = urlOrOptions.extractToken||false; canUseCache = urlOrOptions.canUseCache||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; sendErrResp = urlOrOptions.sendErrResp||false; 
         timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; headers = urlOrOptions.headers||{}; 
         provideHeaders = urlOrOptions.provideHeaders||false; retries = urlOrOptions.retries||0;
+        sseURL = urlOrOptions.sseURL;
     } else url = router.getBalancedURL(urlOrOptions);
 
     if (canUseCache) {
@@ -61,14 +66,16 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             const respObj = await response.json();
             if (extractToken) _extractTokens(response, respObj);
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
-            return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;   
+            if (!sseURL) return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;
+            else return new Promise(resolve => _waitForSSEResponse({url: sseURL, params: {}, sendtoken: sendToken}, 
+                respObj.requestid, resolve));
         } else {
             $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
 
             if (retries && _retryNumber < retries) {
                 $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
                 return await rest(urlOrOptions, type, req, sendToken, extractToken, 
-                    canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
+                    canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, sseResponse, _retryNumber+1);
             }
             
             const errResp = {respErr: {status: response.status, statusText: response.statusText}};
@@ -165,7 +172,24 @@ function subscribeSSEEvents(urlOrOptions, params={}, sendToken=false) {
         urlSSE.searchParams.append("Authorization", `Bearer ${token}`);
     }
 
-    return new EventSource(urlSSE.href);
+    const originalURL = new URL(urlOrOptions.url||urlOrOptions);
+    if (!SSE_EVENT_SOURCES[originalURL.href]) { // create listner only if really a new one is needed
+        const eventsource = new EventSource(urlSSE.href)
+        eventsource.onerror = _ => $$.LOG.error(`Error in EventSource with URL ${originalURL}`);
+        eventsource.onopen = _ => $$.LOG.debug(`EventSource source open ${originalURL}`);
+        SSE_EVENT_SOURCES[originalURL.href] = eventsource;
+    }
+    return SSE_EVENT_SOURCES[originalURL.href];
+}
+
+/**
+ * Unsubscribes to SSE events and closes the listener.
+ * @param {string} url The URL to close
+ */
+function unsubscribeSSEEvents(url) {
+    const originalURL = new URL(url);
+    if (!SSE_EVENT_SOURCES[originalURL.href]) return;
+    else {SSE_EVENT_SOURCES[originalURL.href].close(); delete SSE_EVENT_SOURCES[originalURL.href];}
 }
 
 /**
@@ -202,6 +226,25 @@ const addJWTToken = (url, headers, jsonResponseObj) => {
  * @returns The API key for the given URL if setup
  */
 const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
+
+function _waitForSSEResponse(sseURL, requestidToWatch, resolver) {
+    const sseURLReal = typeof sseURL == "string" ? sseURL : sseURL.url,
+        sseURLParams = typeof sseURL == "string" ? {} : sseURL.params,
+        sseURLSendToken = typeof sseURL == "string" ? false : sseURL.sendtoken;
+
+    const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
+
+    const listener = event => { // server API events
+        try {
+            const {requestid, response} = JSON.parse(event.data);
+            if (requestid == requestidToWatch) {
+                resolver(response); 
+                eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+            }
+        } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
+    }
+    eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
+}
 
 function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout, additional_headers) {
     type = type || "GET"; const urlHost = new URL(url).host; 
@@ -279,4 +322,4 @@ function _modifyAPIManagerStorage(key, value) {
     storage[key] = value;
 }
 
-export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor, subscribeSSEEvents};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor, subscribeSSEEvents, unsubscribeSSEEvents};
