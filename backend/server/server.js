@@ -261,7 +261,8 @@ const isAPI = url => {
 }
 
 async function _runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf) {
-	const clientMemory = CLUSTER_MEMORY.get(CONSTANTS.MEM_KEY+jsonObj.clientid, {});
+	const clientMemoryKey = CONSTANTS.MEM_KEY+jsonObj.clientid;
+	const clientMemory = CLUSTER_MEMORY.get(clientMemoryKey, {});
 	try {
 		const respObj = await apiModule.doService(jsonObj, servObject, headers, url, apiconf);
 		clientMemory[requestid] = respObj;
@@ -269,6 +270,7 @@ async function _runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject,
 		LOG.error(`API error: ${error.message || error}${error.stack?`, stack is: ${error.stack}`:""}`); 
 		clientMemory[requestid] = {result: false, error: error.message||error};
 	}
+	finally {await CLUSTER_MEMORY.set(clientMemoryKey, clientMemory, true);}
 }
 
 function _getResponseViaInternalIPC(data, servObject, headers, url) {
