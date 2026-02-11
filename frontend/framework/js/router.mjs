@@ -324,7 +324,7 @@ const getMustache = async _ => {
 }
 	
 /** Reloads the page */
-function reload() {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA));}
+function reload(dontDecode, pushstate) {loadPage(session.get($$.MONKSHU_CONSTANTS.PAGE_URL),session.get($$.MONKSHU_CONSTANTS.PAGE_DATA), dontDecode, pushstate);}
 
 /** Hard reloads the page */
 function hardreload() {
