@@ -52,14 +52,14 @@ async function checkSecurity(apiregentry, url, req, headers, _servObject, reason
 async function checkToken(token, reason={}, accessNeeded, checkClaims, req) {
     const activeTokens = await (TOKEN_MEMORY().get(API_TOKEN_MEM_KEY, {}, true)); // init the memory if needed and poll replicas
     const lastAccess = activeTokens[token]; // this automatically verifies token integrity too, and is a stronger check than rehashing and checking the hash signature
-    if (!lastAccess) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
+    if ((!TOKENMANCONF.disableLastAccessChecks) && (!lastAccess)) {reason.reason = "JWT Token Error, no last access found"; reason.code = 403; return false;}
 
     let claims; try{ claims = JSON.parse(Buffer.from(token.split(".")[1],"base64").toString("utf8")); } catch (err) {
         LOG.error(`Error parsing claims ${err}`); 
         {reason.reason = "JWT Token Error, claims are not parseable"; reason.code = 403; return false;}
     } 
 
-    if (Date.now() - lastAccess > claims.expiryInterval) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
+    if ((!TOKENMANCONF.disableLastAccessChecks) && (Date.now() - lastAccess > claims.expiryInterval)) {reason.reason = "JWT Token Error, expired"; reason.code = 403; return false;} 
 
     if (accessNeeded && accessNeeded.toLowerCase() != "true" && (!utils.escapedSplit(accessNeeded, ",").includes(claims.sub))) {
         reason.reason = `JWT Token Error, sub:claims doesn't match needed access level. Claims are ${JSON.stringify(claims)} and needed access is ${accessNeeded}.`; 
