@@ -232,17 +232,16 @@ function _waitForSSEResponse(sseURL, requestidToWatch, resolver) {
         sseURLParams = typeof sseURL == "string" ? {} : sseURL.params,
         sseURLSendToken = typeof sseURL == "string" ? false : sseURL.sendtoken;
 
-    const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
-
     const listener = event => { // server API events
-        try {
-            const {requestid, response} = JSON.parse(event.data);
-            if (requestid == requestidToWatch) {
-                resolver(response); 
-                eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
-            }
-        } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
-    }
+    try {
+        const {requestid, response} = JSON.parse(event.data);
+        if (requestid == requestidToWatch) {
+            resolver(response); 
+            eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+        }
+    } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
+}
+    const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
     eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
 }
 

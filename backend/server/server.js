@@ -194,6 +194,7 @@ async function doService(data, servObject, headers, url) {
 				if (apiconf.respondviasse?.trim().toLowerCase() == "true") {
 					const requestid = `${Date.now()}${Math.ceil(1000*Math.random())}`;
 					_runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf);
+					LOG.info(`Sending OK for SSE API immediately to ensure polling`);
 					return ({code: 200, respObj: {requestid, ...CONSTANTS.TRUE_RESULT}, reqObj: jsonObj});
 				} else return ({code: 200, respObj: await apiModule.doService(jsonObj, servObject, headers, url, apiconf), reqObj: jsonObj}); 
 			}
