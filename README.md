@@ -5,11 +5,11 @@ Monkshu - The Modern Enterprise Application Server - JAMStack Compliant
 =============================================================================================
 A complete Javascript based Enterprise Application Server for Mobile apps (iOS and Android), PWA applications, Responsive HTML 5 Web Apps, Electron based native desktop apps and JSON API services. Consists of web container (called frontend), JSON API container (called backend), and hybrid iOS and Android app frameworks. 
 
-Monkshu is 100% compliant with [JAMStack](https://jamstack.org) standards for modern web development. 
+Monkshu is 100% compliant with [JAMStack](https://en.wikipedia.org/wiki/JAMstack) standards for modern web development. 
 
 Fully independent - Monkshu is built ground up to not require any other dependencies other than base Node.js. Includes embedded HTTP servers as well.
 
-## Monkshu's JAMStack
+## Monkshu's Stack
 * Javascript - Monkshu frontend is simple ES6 JS modules  
 * Api - Monkshu Backend is a feature rich and easy to use API framework  
 * Markup - Monkshu uses WebComponents and Mustache templates for easy HTML Markup  
