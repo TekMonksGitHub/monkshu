@@ -379,6 +379,29 @@ function setObjProperty(object, path, value) {
 } 
 
 /**
+ * Sets nested object property with recursive merge for objects.
+ * If value is an object, performs deep merge instead of replacement.
+ * Arrays are replaced completely.
+ * @param {object} object The object to set the property on.
+ * @param {string} path The path for the property using dots . or indexes []
+ * @param {object|native} value The value to set it to
+ */
+function setObjPropertyRecursive(object, path, value) {
+    const existingValue = getObjProperty(object, path);
+
+    // If both are plain objects → merge recursively
+    if (isObject(existingValue) && isObject(value)) {
+        for (const [childKey, childValue] of Object.entries(value)) {
+            const childPath = path ? `${path}.${childKey}` : childKey;
+            setObjPropertyRecursive(object, childPath, childValue);
+        }
+    } else {
+        // Fallback to normal setter (replace behavior)
+        setObjProperty(object, path, value);
+    }
+}
+
+/**
  * Returns nested object property.
  * @param {object} object The object to set the property on.
  * @param {string} path The path for the property using dots . or indexes []
@@ -715,7 +738,7 @@ function areObjectsEqual(objA, objB) {
 module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTimeStamp, getUnixEpoch, 
     getObjectKeyValueCaseInsensitive, getObjectKeyNameCaseInsensitive, getTempFile, copyFileOrFolder, getClientIP, 
     getServerHost, getClientPort, getEmbeddedIPV4, setIntervalImmediately, expandIPv6Address, analyzeIPAddr, 
-    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, requireWithDebug, generateUUID, 
+    watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, setObjPropertyRecursive, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
     convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
     gzipFile, dnsResolve, exec, areObjectsEqual };
