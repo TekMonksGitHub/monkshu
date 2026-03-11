@@ -102,7 +102,7 @@ async function rmrf(path) {
         }
 	}
 	try {await fspromises.rmdir(path); return true;} catch (err) { 
-        if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${pathThis}, error is ${err}.`); return false; }}
+        if (err.code !== "ENOENT") {LOG.error(`Error deleting path ${path}, error is ${err}.`); return false; }}
 }
 
 /**
