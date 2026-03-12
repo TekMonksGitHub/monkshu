@@ -67,8 +67,8 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             if (extractToken) _extractTokens(response, respObj);
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
             if (!sseURL) return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;
-            else return new Promise(resolve => _waitForSSEResponse({url: sseURL, params: {}, sendtoken: sendToken}, 
-                respObj.requestid, resolve));
+            else return new Promise(resolve => _waitForSSEResponse({url: sseURL, params: {}, sendtoken: sendToken},
+                respObj.requestid, resolve, timeout));
         } else {
             $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
 
@@ -227,20 +227,33 @@ const addJWTToken = (url, headers, jsonResponseObj) => {
  */
 const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
 
-function _waitForSSEResponse(sseURL, requestidToWatch, resolver) {
+function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout) {
     const sseURLReal = typeof sseURL == "string" ? sseURL : sseURL.url,
         sseURLParams = typeof sseURL == "string" ? {} : sseURL.params,
         sseURLSendToken = typeof sseURL == "string" ? false : sseURL.sendtoken;
 
-    const listener = event => { // server API events
-    try {
-        const {requestid, response} = JSON.parse(event.data);
-        if (requestid == requestidToWatch) {
-            resolver(response); 
+    let resolved = false;
+    const startTime = Date.now();
+    const timeoutInterval = setInterval(() => {
+        if (resolved) { clearInterval(timeoutInterval); return; }
+        if (Date.now() - startTime >= timeout) {
+            clearInterval(timeoutInterval); resolved = true;
             eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+            $$.LOG.error(`SSE response timed out for request ${requestidToWatch}`);
+            resolver({respErr: {status: 504, statusText: "SSE response timeout"}});
         }
-    } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
-}
+    }, 1000);
+
+    const listener = event => { // server API events
+        try {
+            const {requestid, response} = JSON.parse(event.data);
+            if (requestid == requestidToWatch && !resolved) {
+                resolved = true; clearInterval(timeoutInterval);
+                resolver(response); 
+                eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+            }
+        } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
+    }
     const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
     eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
 }
