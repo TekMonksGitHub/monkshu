@@ -10,6 +10,10 @@
  * Frontend API managers are required just as much as backend
  * API managers (forward versus reverse proxy concept for APIs).
  * 
+ * SSE backend API endpoint is secured on request ID, so even if
+ * it is not using tokens, the request ID match ensures only the
+ * right browser can see the API responses.
+ * 
  * Currently supports JWT tokens (or wild JWT type session tokens).
  */
 

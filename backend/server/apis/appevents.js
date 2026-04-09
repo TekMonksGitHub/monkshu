@@ -1,6 +1,10 @@
 /**
  * Processes and informs about app events.
  * 
+ * SSE backend API endpoint is secured on clientid, so even if
+ * it is not using tokens, the request ID match ensures only the
+ * right browser can see the API responses.
+ * 
  * (C) 2026 Tekmonks Corp. All rights reserved.
  * License: See the enclosed LICENSE file.
  */
