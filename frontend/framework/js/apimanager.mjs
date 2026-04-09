@@ -237,7 +237,7 @@ function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout) {
     const timeoutInterval = setInterval(() => {
         if (resolved) { clearInterval(timeoutInterval); return; }
         if (Date.now() - startTime >= timeout) {
-            clearInterval(timeoutInterval); resolved = true;
+            resolved = true; clearInterval(timeoutInterval); 
             eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
             $$.LOG.error(`SSE response timed out for request ${requestidToWatch}`);
             resolver({respErr: {status: 504, statusText: "SSE response timeout"}});
@@ -249,8 +249,8 @@ function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout) {
             const {requestid, response} = JSON.parse(event.data);
             if (requestid == requestidToWatch && !resolved) {
                 resolved = true; clearInterval(timeoutInterval);
-                resolver(response); 
                 eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+                resolver(response); 
             }
         } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
     }
