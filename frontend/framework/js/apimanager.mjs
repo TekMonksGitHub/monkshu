@@ -22,7 +22,7 @@ import {session} from "/framework/js/session.mjs";
 import * as pako from "/framework/3p/pako.esm.min.mjs";
 
 const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000, SSE_EVENT_SOURCES={}, 
-    SERVER_SSE_EVENTS_NAME = "_org_monkshu_api_sse_event_";
+    SERVER_SSE_EVENTS_NAME = "_org_monkshu_api_sse_event_", SERVER_SSE_RESPONSE_FORCE_FLAG = "respondviasse";
 
 /**
  * Makes a REST API call.
@@ -64,8 +64,10 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
     }
     
     try {
-        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", dontGZIP, timeout, headers), 
-            response = await fetch(urlToCall, fetchInit);
+        if (sseURL) headers[SERVER_SSE_RESPONSE_FORCE_FLAG] = true; // this ensures server will use SSE for APIs which can work in both SSE and non-SSE modes
+        const {fetchInit, url: urlToCall} = _createFetchInit(url, type, req, sendToken, "application/json", 
+            dontGZIP, timeout, headers, sseURL);
+        const response = await fetch(urlToCall, fetchInit); // initial request (for non-sse this is final)
         if (response.ok) {
             const respObj = await response.json();
             if (extractToken) _extractTokens(response, respObj);

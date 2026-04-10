@@ -191,7 +191,7 @@ async function doService(data, servObject, headers, url) {
 				utils.requireWithDebug(api, CONSTANTS.SERVER_CONF.debug_mode);
 			if (apiModule.handleRawRequest) {await apiModule.handleRawRequest(jsonObj, servObject, headers, url, apiconf); return ({code: 999});}
 			else {
-				if (apiconf.respondviasse?.trim().toLowerCase() == "true") {
+				if (_checkIfResponseViaSSEAPIRequest(apiconf, headers, jsonObj)) {
 					const requestid = `${Date.now()}${Math.ceil(1000*Math.random())}`;
 					_runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf);
 					LOG.info(`Sending OK for SSE API immediately to ensure polling`);
@@ -259,6 +259,15 @@ const isAPI = url => {
 	if (CONSTANTS.SERVER_CONF.debug_mode) { LOG.warn("Server in debug mode, re-initializing the registry on every request"); APIREGISTRY.initSync(true); }
 	const api = APIREGISTRY.getAPI(url), apiConf = APIREGISTRY.getAPIConf(url);
 	return (api && (apiConf.sse?.toString().toLowerCase() != "true"));	// API found and it is not an SSE event endpoint
+}
+
+function _checkIfResponseViaSSEAPIRequest(apiconf, headers, jsonObj) {
+	if (apiconf.respondviasse?.trim().toLowerCase() == "true") return true;
+	if (apiconf.responseviasseifasked?.trim().toLowerCase() == "true" && 
+		headers["respondviasse"]?.trim().toLowerCase() == "true") return true;
+	if (apiconf.responseviasseifasked?.trim().toLowerCase() == "true" && 
+		jsonObj["respondviasse"]?.trim().toLowerCase() == "true") return true;
+	return false;
 }
 
 async function _runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf) {
