@@ -73,7 +73,7 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             if (extractToken) _extractTokens(response, respObj);
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
             if (!sseURL) return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;
-            else return new Promise(resolve => _waitForSSEResponse({url: sseURL, params: {}, sendtoken: sendToken},
+            else return new Promise(resolve => _waitForSSEResponse( typeof sseURL === "string" ? {url: sseURL, params: {}, sendtoken: sendToken} : {...sseURL, sendtoken: sendToken},
                 respObj.requestid, resolve, timeout));
         } else {
             $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
