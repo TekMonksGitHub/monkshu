@@ -271,7 +271,7 @@ function _checkIfResponseViaSSEAPIRequest(apiconf, headers, jsonObj) {
 }
 
 async function _runAPIAndSetSSEMemory(apiModule, requestid, jsonObj, servObject, headers, url, apiconf) {
-	const clientMemoryKey = CONSTANTS.MEM_KEY+jsonObj.clientid;
+	const clientMemoryKey = CONSTANTS.SSE_MEM_KEY+jsonObj.clientid;
 	const clientMemory = CLUSTER_MEMORY.get(clientMemoryKey, {});
 	try {
 		const respObj = await apiModule.doService(jsonObj, servObject, headers, url, apiconf);

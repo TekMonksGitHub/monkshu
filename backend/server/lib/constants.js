@@ -63,6 +63,9 @@ exports.API_MANAGER_ENCODERS_CONF_APPS = "conf/apiregistry.encoders.json";
 exports.API_MANAGER_SECURITYCHECKERS_CONF_APPS = "conf/apiregistry.securitycheckers.json";
 exports.API_MANAGER_HEADERMANAGERS_CONF_APPS = "conf/apiregistry.headermanagers.json";
 
+/* Monkshu's SSE Constants */
+exports.SSE_MEM_KEY = "__org_monkshu_sse_mem_key_";
+
 function overrideConstants() {
     const _isPath = key => { for (const ending of ["dir", "conf", "apiregistry"]) if (key.toLowerCase().endsWith(ending)) return true; return false;}
     const currentConstants = {...module.exports}; for (const [key, value] of Object.entries(currentConstants))

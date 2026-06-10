@@ -12,9 +12,9 @@
 const SERVER_API_SSE_EVENT = "_org_monkshu_api_sse_event_";
 
 exports.doSSE = async (jsonReq, sseEventSender) => {
-    const memory = CLUSTER_MEMORY.get(CONSTANTS.MEM_KEY+jsonReq.clientid, {});
+    const memory = CLUSTER_MEMORY.get(CONSTANTS.SSE_MEM_KEY+jsonReq.clientid, {});
     for (const [requestid, response] of Object.entries(memory)) {
-        delete memory[requestid]; await CLUSTER_MEMORY.set(CONSTANTS.MEM_KEY+jsonReq.clientid, memory, true);
+        delete memory[requestid]; await CLUSTER_MEMORY.set(CONSTANTS.SSE_MEM_KEY+jsonReq.clientid, memory, true);
         sseEventSender({event: SERVER_API_SSE_EVENT, id: Date.now(), data:{requestid, response}});
     }
 }
