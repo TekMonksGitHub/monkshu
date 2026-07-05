@@ -353,6 +353,13 @@ function areObjectsEqual(objA, objB) {
 }
 
 /**
+ * Unescapes the given escaped HTML
+ * @param {string} escapedHTML The escaped HTML
+ * @returns The given escaped HTML's corresponding unescaped HTML
+ */
+const unescapeHTML = escapedHTML => escapedHTML.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+
+/**
  * Returns object path splits as an array. Internal only.
  * @param {string} path The object path
  * @returns The object path splits as an array.
@@ -370,4 +377,4 @@ export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, pa
     getModulePath, downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, 
     getChildByID, getChildrenByTagName, removeAllChildElements, setIntervalImmediately, generateUUID, 
     createAsyncFunction, createSyncFunction, stringToBase64, base64ToString, encodeHTMLEntities, 
-    htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL, areObjectsEqual};
+    htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL, areObjectsEqual, unescapeHTML};
