@@ -164,11 +164,17 @@ function _doCall(reqStr, options, secure, sslObj) {
     return new Promise(async (resolve, reject) => {
         const caller = secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1) ? http2.connect(`https://${options.host}:${options.port||443}`) : 
             secure ? https : http; // use the right connection factory based on http2, http1/ssl or http1/http
-        let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false;
+        let resp, ignoreEvents = false, resPiped, _skipProtocolErrors = false, activeReq;
         if (sslObj && typeof sslObj == "object") try { await _addSecureOptions(options, sslObj) } catch (err) { reject(err); return; };
         const sendError = (error) => { 
             reject(error); ignoreEvents = true; 
         };
+        const signal = options.headers?.["_abort_signal"]; if (signal) delete options.headers["_abort_signal"];
+        if (signal?.aborted) return reject(new Error("AbortError"));
+        if (signal) signal.addEventListener("abort", () => {
+            sendError(new Error("AbortError"));
+            if (activeReq) activeReq.destroy();    // closes the connection; works for the HTTP/1 request and the HTTP/2 stream alike
+        });
         options.headers = _squishHeaders(options.headers);  // squish the headers - needed specially for HTTP/2 but good anyways
 
         if (secure && (!sslObj?._org_monkshu_httpclient_forceHTTP1)) { // for http2 case
@@ -183,8 +189,8 @@ function _doCall(reqStr, options, secure, sslObj) {
                 case "POST": return http2.constants.HTTP2_METHOD_POST;
                 default: return http2.constants.HTTP2_METHOD_GET;
             }})();
-            const req = caller.request(http2Headers); 
-            req.on("error", (error) => { 
+            const req = caller.request(http2Headers); activeReq = req;
+            req.on("error", (error) => {
                 if (_skipProtocolErrors && error.code == "ERR_HTTP2_STREAM_ERROR") return; else sendError(error) });
             req.on("response", headers => {
                 const _processEnd = _ => {
@@ -243,6 +249,7 @@ function _doCall(reqStr, options, secure, sslObj) {
                     else resolve({ error: null, data: resp, status, resHeaders });
                 });
             });
+            activeReq = req;
             req.on("error", error => reject(error));
             if (reqStr) req.write(reqStr);
             req.end();
