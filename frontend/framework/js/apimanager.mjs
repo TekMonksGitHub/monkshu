@@ -49,13 +49,13 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
         sendErrResp=false, timeout=DEFAULT_TIMEOUT, headers={}, provideHeaders=false, retries=0, sseURL=false, 
         _retryNumber=0) {
 
-    let url; if (typeof urlOrOptions === "object") {
+    let url, signal; if (typeof urlOrOptions === "object") {
         url = router.getBalancedURL(urlOrOptions.url); type = urlOrOptions.type; req = urlOrOptions.req; sendToken = urlOrOptions.sendToken||false; 
         extractToken = urlOrOptions.extractToken||false; canUseCache = urlOrOptions.canUseCache||false; 
         dontGZIP = urlOrOptions.dontGZIP||false; sendErrResp = urlOrOptions.sendErrResp||false; 
         timeout = urlOrOptions.timeout||DEFAULT_TIMEOUT; headers = urlOrOptions.headers||{}; 
         provideHeaders = urlOrOptions.provideHeaders||false; retries = urlOrOptions.retries||0;
-        sseURL = urlOrOptions.sseURL;
+        sseURL = urlOrOptions.sseURL; signal = urlOrOptions.signal;   // optional: AbortSignal to stop waiting for an SSE-backed response early
     } else url = router.getBalancedURL(urlOrOptions);
 
     if (canUseCache) {
@@ -74,7 +74,7 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
             if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
             if (!sseURL) return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;
             else return new Promise(resolve => _waitForSSEResponse( typeof sseURL === "string" ? {url: sseURL, params: {}, sendtoken: sendToken} : {...sseURL, sendtoken: sendToken},
-                respObj.requestid, resolve, timeout));
+                respObj.requestid, resolve, timeout, signal));
         } else {
             $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${response.status}: ${response.statusText}`);
 
@@ -233,18 +233,19 @@ const addJWTToken = (url, headers, jsonResponseObj) => {
  */
 const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
 
-function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout) {
+function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout, signal) {
     const sseURLReal = typeof sseURL == "string" ? sseURL : sseURL.url,
         sseURLParams = typeof sseURL == "string" ? {} : sseURL.params,
         sseURLSendToken = typeof sseURL == "string" ? false : sseURL.sendtoken;
 
     let resolved = false;
+    const stopWatchingSSE = () => { resolved = true; clearInterval(timeoutInterval); eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener); };
+
     const startTime = Date.now();
     const timeoutInterval = setInterval(() => {
         if (resolved) { clearInterval(timeoutInterval); return; }
         if (Date.now() - startTime >= timeout) {
-            resolved = true; clearInterval(timeoutInterval); 
-            eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
+            stopWatchingSSE();
             $$.LOG.error(`SSE response timed out for request ${requestidToWatch}`);
             resolver({respErr: {status: 504, statusText: "SSE response timeout"}});
         }
@@ -254,14 +255,19 @@ function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout) {
         try {
             const {requestid, response} = JSON.parse(event.data);
             if (requestid == requestidToWatch && !resolved) {
-                resolved = true; clearInterval(timeoutInterval);
-                eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener);
-                resolver(response); 
+                stopWatchingSSE();
+                resolver(response);
             }
         } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
     }
     const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
     eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
+
+    if (signal) signal.addEventListener("abort", () => {
+        if (resolved) return;
+        stopWatchingSSE();
+        resolver(null);
+    });
 }
 
 function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout, additional_headers) {
