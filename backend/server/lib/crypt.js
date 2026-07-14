@@ -4,7 +4,23 @@
 if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
 const cryptmod = require("crypto");
-const crypt = require(CONSTANTS.CRYPTCONF);
+const cryptConf = require(CONSTANTS.CRYPTCONF);
+
+/**
+ * Resolves env:VARIABLE_NAME values from the named environment variable (throws if unset), returns all other values as is.
+ * @param {string or object} val The configuration value to resolve
+ * @returns The resolved value from environment variable's set
+ */
+const _resolveConf = val => {
+	if(typeof val!=="string" || !val.startsWith("env:")) return val; 
+	const envValue = process.env[val.substring(4)]; 
+	if(!envValue) throw (`Environment variable ${val.substring(4)} not set or crypt conf is not configured properly`);
+	return envValue;
+}
+
+// Load Configuration in memory.
+const crypt = {};
+for(const key in cryptConf) crypt[key] = _resolveConf(cryptConf[key]);
 
 /**
  * Encrypts the given string or Buffer
@@ -69,7 +85,7 @@ function getDecipher(key = crypt.key, iv = Buffer.alloc(16, 0)) {
 	return decipher;
 }
 
-module.exports = { encrypt, decrypt, getCipher, getDecipher, main }
+module.exports = { encrypt, decrypt, getCipher, getDecipher, resolveConf: _resolveConf, main }
 
 if (require.main === module) main();
 function main() {
