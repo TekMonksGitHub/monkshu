@@ -4,7 +4,7 @@
 if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
 const cryptmod = require("crypto");
-const crypt = require(CONSTANTS.CRYPTCONF);
+const crypt = require(`${CONSTANTS.LIBDIR}/utils.js`).loadAndResolveConf(CONSTANTS.CRYPTCONF);
 
 /**
  * Encrypts the given string or Buffer
