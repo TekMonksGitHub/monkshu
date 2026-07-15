@@ -4,7 +4,12 @@
 if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
 
 const cryptmod = require("crypto");
-const crypt = require(CONSTANTS.CRYPTCONF);
+const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
+const cryptConf = require(CONSTANTS.CRYPTCONF);
+
+// Load Configuration in memory, resolving env:VARIABLE_NAME values from the environment.
+const crypt = {};
+for(const key in cryptConf) crypt[key] = utils.resolveConf(cryptConf[key]);
 
 /**
  * Encrypts the given string or Buffer

@@ -715,6 +715,18 @@ function exec(command, args, encoding, escapeArgs=true, inShell=true, quoterChar
 }
 
 /**
+ * Resolves env:VARIABLE_NAME values from the named environment variable (throws if unset), returns all other values as is.
+ * @param {string or object} val The configuration value to resolve
+ * @returns The resolved value from environment variable's set
+ */
+const resolveConf = val => {
+    if (typeof val !== "string" || !val.startsWith("env:")) return val;
+    const envValue = process.env[val.substring(4)];
+    if (!envValue) throw (`Environment variable ${val.substring(4)} not set or conf is not configured properly`);
+    return envValue;
+}
+
+/**
  * Checks if the objects are deep equal.
  * @param {object} objA Object A
  * @param {object} objB Object B
@@ -741,4 +753,4 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, setObjPropertyRecursive, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
     convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
-    gzipFile, dnsResolve, exec, areObjectsEqual };
+    gzipFile, dnsResolve, exec, areObjectsEqual, resolveConf };
