@@ -1,7 +1,7 @@
 /* 
  * (C) 2015 - 2018 TekMonks. All rights reserved.
  */
-if (!global.CONSTANTS) global.CONSTANTS = require(__dirname + "/constants.js");	// to support direct execution
+const CONSTANTS = global.CONSTANTS?.MONKSHU_BACKEND ? global.CONSTANTS : require(__dirname + "/constants.js");  // trust the global only if it is Monkshu's, else use ours
 
 const cryptmod = require("crypto");
 const crypt = require(`${CONSTANTS.LIBDIR}/utils.js`).loadAndResolveConf(CONSTANTS.CRYPTCONF);
