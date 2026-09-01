@@ -715,6 +715,27 @@ function exec(command, args, encoding, escapeArgs=true, inShell=true, quoterChar
 }
 
 /**
+ * Loads the given conf (JSON) file and returns it with all env:VARIABLE_NAME values resolved
+ * from the named environment variables (throws if one is unset), all other values are returned
+ * as is. Objects and arrays are resolved recursively.
+ * @param {string} path The path to the conf JSON file
+ * @returns The loaded configuration with all env values resolved
+ */
+function loadAndResolveConf(path) {
+    const _resolve = val => {
+        if (typeof val === "string" && val.startsWith("env:")) {
+            const envValue = process.env[val.substring(4)];
+            if (!envValue) throw (`Environment variable ${val.substring(4)} not set or conf is not configured properly`);
+            return envValue;
+        }
+        if (Array.isArray(val)) return val.map(_resolve);
+        if (isObject(val)) {const resolved = {}; for (const key in val) resolved[key] = _resolve(val[key]); return resolved;}
+        return val;
+    }
+    return _resolve(require(path));
+}
+
+/**
  * Checks if the objects are deep equal.
  * @param {object} objA Object A
  * @param {object} objB Object B
@@ -741,4 +762,4 @@ module.exports = { parseBoolean, getDateTime, queryToObject, escapedSplit, getTi
     watchFile, clone, walkFolder, rmrf, getObjProperty, setObjProperty, setObjPropertyRecursive, requireWithDebug, generateUUID, 
     createAsyncFunction, createSyncFunction, getLocalIPs, promiseExceptionToBoolean, createDirectory, exists, 
     convertToUnixPathEndings, isObject, hashObject, stringToBase64, base64ToString, objectMemSize, zipFolder, 
-    gzipFile, dnsResolve, exec, areObjectsEqual };
+    gzipFile, dnsResolve, exec, areObjectsEqual, loadAndResolveConf };
