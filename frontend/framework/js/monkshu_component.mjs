@@ -83,10 +83,10 @@ function register(name, htmlTemplate, module) {
         return allInstances;
     }
 
-    module.reload = async id => {
+    module.reload = async (id, disableDomDiff) => {
         module.clearMemory(id);  const host = module.getHostElementByID(id);
         if (module.elementConnected) await module.elementConnected(host); 
-        await host.render(false);
+        await host.render(false, disableDomDiff);
     }
 
     module.getComponentPath = meta => `${meta.url.substring(0,meta.url.lastIndexOf("/"))}`;
@@ -132,14 +132,20 @@ function register(name, htmlTemplate, module) {
     // register the web component
     if (!customElements.get(name)) customElements.define(name, class extends HTMLElement {
 
-        static async _diffApplyDom(oldDom, newDom) {
+        static async _diffApplyDom(oldDom, newDom, disableDomDiff) {
+            if (disableDomDiff) {
+                for (const attr of [...oldDom.attributes]) oldDom.removeAttributeNS(attr.namespaceURI, attr.localName);
+                for (const attr of newDom.attributes) oldDom.setAttributeNS(attr.namespaceURI, attr.name, attr.value);
+                oldDom.replaceChildren(...[...newDom.childNodes].map(node => node.cloneNode(true)));
+                return;
+            }
+
             await $$.require("/framework/3p/diffDOM.js");
             const dd = new diffDOM();
-            const diff = dd.diff(oldDom, newDom);
-            dd.apply(oldDom, diff);
+            dd.apply(oldDom, dd.diff(oldDom, newDom));
         }
 
-        async render(initialRender=this.__org_monkshu_hasBeenRendered?false:true) {
+        async render(initialRender=this.__org_monkshu_hasBeenRendered?false:true, disableDomDiff) {
             // check security policy
             if (this.hasAttribute("roles") && (!securityguard.isAllowed(name)) && (!securityguard.isAllowed(name+this.id))) return;
 
@@ -160,7 +166,7 @@ function register(name, htmlTemplate, module) {
                     if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=this.shadowRoot;}
                     else module.shadowRoot = this.shadowRoot;
                 }
-                else if (this.shadowRoot.firstChild) await this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot);
+                else if (this.shadowRoot.firstChild) await this.constructor._diffApplyDom(this.shadowRoot.firstChild, templateRoot, disableDomDiff);
             }
             else {  
                 if (initialRender) {
@@ -169,7 +175,7 @@ function register(name, htmlTemplate, module) {
                     templateRoot.getElementById = id => templateRoot.querySelector(`#${id}`);
                     if (this.id) {if (!module.shadowRoots) module.shadowRoots = {}; module.shadowRoots[this.id]=templateRoot;}
                     else module.shadowRoot = templateRoot;
-                } else if (this.firstChild) await this.constructor._diffApplyDom(this.firstChild, templateRoot);
+                } else if (this.firstChild) await this.constructor._diffApplyDom(this.firstChild, templateRoot, disableDomDiff);
             }
 
             this.__org_monkshu_hasBeenRendered = true;
