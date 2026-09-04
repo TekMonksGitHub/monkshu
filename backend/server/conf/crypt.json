@@ -1,4 +1,4 @@
 {
-    "key":"hbrpoig8f1cbfno6b9m80o2rak1vrjnvgf",
+    "key":"env:MONKSHU_CRYPT_KEY",
     "crypt_algo":"aes-256-ctr"
 }

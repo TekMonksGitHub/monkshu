@@ -3,5 +3,5 @@
     "tokenGCInterval": 1800000,
     "iss": "Monkshu",
     "useGlobalMemory": true,
-    "disableLastAccessChecks": false
+    "disableLastAccessChecks": "env:INSECURE_JWT"
 }

@@ -16,7 +16,7 @@ const _jwttokenListeners = [];
 const cryptmod = require("crypto");
 const mustache = require("mustache");
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
-const TOKENMANCONF = require(`${CONSTANTS.CONFDIR}/apitoken.json`);
+const TOKENMANCONF = utils.loadAndResolveConf(`${CONSTANTS.CONFDIR}/apitoken.json`);
 
 const API_TOKEN_MEM_KEY = "__org_monkshu_jwttokens_key";
 const BASE_64_HEADER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // {"alg":"HS256","typ":"JWT"} in Base 64 
@@ -26,6 +26,7 @@ let alreadyInit = false, TOKEN_MEMORY;
 function initSync() {
     if (alreadyInit) return; else alreadyInit = true;
 
+    TOKENMANCONF.disableLastAccessChecks = String(TOKENMANCONF.disableLastAccessChecks).toLowerCase() === "true";
     if (TOKENMANCONF.useGlobalMemory) TOKEN_MEMORY = _ => DISTRIBUTED_MEMORY; else TOKEN_MEMORY = _ => CLUSTER_MEMORY;
 
     // Default config if none was specified with 10 minute expiry and 30 min cleanups

@@ -18,11 +18,14 @@ let _server;	// holds the transport
 let blackboard; // for server IPC
 
 // support starting in stand-alone config
-if (require("cluster").isMaster == true && (!process.env.___TESTING_)) bootstrap();	
+if (require("cluster").isPrimary == true && (!process.env.___TESTING_)) bootstrap();	
 
 async function bootstrap() {
 	/* Init - Server bootup */
 	console.log("Starting...");
+
+	/* Load the environment first */
+	process.loadEnvFile(`${CONSTANTS.CONFDIR}/.env`);
 
 	/* Setup server ID stamp, IP etc */
 	CONSTANTS.SERVER_ID = utils.generateUUID(false);
