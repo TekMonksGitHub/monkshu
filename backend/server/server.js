@@ -25,7 +25,7 @@ async function bootstrap() {
 	console.log("Starting...");
 
 	/* Load the environment first */
-	process.loadEnvFile(`${CONSTANTS.CONFDIR}/.env`);
+	try {process.loadEnvFile(`${CONSTANTS.CONFDIR}/.env`);} catch (err) {}
 
 	/* Setup server ID stamp, IP etc */
 	CONSTANTS.SERVER_ID = utils.generateUUID(false);

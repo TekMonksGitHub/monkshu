@@ -55,7 +55,7 @@ function bootstrap() {
 function _initConfSync() {
 	const confdir = args.getArgs().c?.[0]||args.getArgs().conf?.[0]||`${__dirname}/conf`,
 		hostname = fs.existsSync(`${confdir}/hostname.json`) ? require(`${confdir}/hostname.json`) : require("os").hostname;
-	process.loadEnvFile(`${confdir}/.env`);
+	try {process.loadEnvFile(`${confdir}/.env`);} catch (err) {}
 	global.conf = require(`${confdir}/httpd.json`);
 	global.conf.host = mustache.render(global.conf.host, {hostname});	// override host as appropriate
 
