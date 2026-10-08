@@ -24,7 +24,7 @@ async function initAsync() {
 
 	const portToListenOn = await _resolveListeningPort(); 
 	LOG.info(`Attaching socket listener on ${host}:${portToListenOn}`);
-	const listener = (req, res) => {
+	const listener = async (req, res) => {
 		if (ipwhitelist.length && !_isIPInList(req, ipwhitelist)) { LOG.error(`Blocking IP, not whitelisted ${utils.getClientIP(req)}`); // whitelist in operation, won't honor
 			res.socket.destroy(); res.end(); return; }	
 		if (!ipwhitelist.length && _isIPInList(req, ipblacklist)) { LOG.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); // blacklisted, won't honor
@@ -46,7 +46,8 @@ async function initAsync() {
 				req.headers[header.toLowerCase()] = saved;
 			}
 			const normURL = new URL(_normalizeURL(req.url), `${req.protocol}://${utils.getServerHost(req)}`).href;
-			module.exports.onConnect(normURL, req.headers, servObject); 
+			await module.exports.onConnect(normURL, req.headers, servObject);	// await so it can't race doService's security check
+			if (servObject.error_state) return;	// already closed by onConnect
 			req.on("data", data => {if (!servObject.error_state) module.exports.onData(normURL, data, servObject);});
 			req.on("end", _ => {if (!servObject.error_state) module.exports.onReqEnd(normURL, req.headers, servObject);});
 			req.on("close", _ => {if (!servObject.error_state) module.exports.onConnectionClose(normURL, req.headers, servObject);});
