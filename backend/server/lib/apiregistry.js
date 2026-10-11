@@ -66,23 +66,40 @@ function initSync(notVerbose) {
 	global.APIREGISTRY = this;
 }
 
+/**
+ * Finds the registry entry for a URL: exact match, else longest registered ancestor path.
+ * @returns {string|undefined} the raw registry entry, or undefined if nothing matches
+ */
+function _findRegistryEntry(pathname, apireg, matchedRoute) {
+	let pathToTry = pathname;
+	while (pathToTry) {
+		if (apireg[pathToTry]) { if (matchedRoute) matchedRoute.route = pathToTry; return apireg[pathToTry]; }
+		const lastSlash = pathToTry.lastIndexOf("/");
+		pathToTry = lastSlash > 0 ? pathToTry.substring(0, lastSlash) : "";
+	}
+	return undefined;
+}
+
 function getAPI(url) {
 	const endPoint = new URL(url).pathname, apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	if (apireg[endPoint]) return path.resolve(_getAPIRegEntryAsURL(apireg[endPoint]).rawpathname);
+	const regEntry = _findRegistryEntry(endPoint, apireg);
+	if (regEntry) return path.resolve(_getAPIRegEntryAsURL(regEntry).rawpathname);
 	else return;
 }
 
 function getAPIConf(url) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	if (apireg[endPoint]) return _getAPIRegEntryAsURL(apireg[endPoint]).query;
+	const matchedRoute = {};
+	const regEntry = _findRegistryEntry(endPoint, apireg, matchedRoute);
+	if (regEntry) return {..._getAPIRegEntryAsURL(regEntry).query, route: matchedRoute.route};
 	else return null;
 }
 
 function decodeIncomingData(url, data, headers, servObject) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
+	let apiregentry = _findRegistryEntry(endPoint, apireg); if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apiregentry);
 
 	let decoded = data;
 	for (const decoderThis of decoders) decoded = decoderThis.decodeIncomingData(apiregentry, url, decoded, headers, servObject);
@@ -93,7 +110,7 @@ function decodeIncomingData(url, data, headers, servObject) {
 function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
+	let apiregentry = _findRegistryEntry(endPoint, apireg); if (!apiregentry) return false; apiregentry = _getAPIRegEntryAsURL(apiregentry);
 
 	let encoded = respObj;
 	for (const encoderThis of encoders) encoded = encoderThis.encodeResponse(apiregentry, url, encoded, reqHeaders, respHeaders, servObject);
@@ -104,8 +121,8 @@ function encodeResponse(url, respObj, reqHeaders, respHeaders, servObject) {
 async function checkSecurity(url, req, headers, servObject, reason) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
-	apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
+	let apiregentry = _findRegistryEntry(endPoint, apireg); if (!apiregentry) { reason = {reason:"API endpoint missing", code:403}; return false; }
+	apiregentry = _getAPIRegEntryAsURL(apiregentry);
 
 	const allSecurityCheckers = [...securitycheckers];
 	if (apiregentry.query.customSecurity) for (const securityCheckerCustom of utils.escapedSplit(apiregentry.query.customSecurity, ","))
@@ -126,7 +143,7 @@ const removeCustomSecurityChecker = name => delete global.APIREGISTRY.ENV.CUSTOM
 function injectResponseHeaders(url, response, requestHeaders, responseHeaders, servObject, reqObj) {
 	const endPoint = new URL(url).pathname;
 	const apireg = CLUSTER_MEMORY.get(API_REG_DISTM_KEY);
-	let apiregentry = apireg[endPoint]; if (!apiregentry) return; apiregentry = _getAPIRegEntryAsURL(apireg[endPoint]);
+	let apiregentry = _findRegistryEntry(endPoint, apireg); if (!apiregentry) return; apiregentry = _getAPIRegEntryAsURL(apiregentry);
 
 	for (const headermanagerThis of headermanagers) 
 		headermanagerThis.injectResponseHeaders(apiregentry, url, response, requestHeaders, responseHeaders, servObject, reqObj);
