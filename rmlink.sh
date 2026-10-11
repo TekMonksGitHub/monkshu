@@ -1,48 +1,38 @@
 #!/bin/bash
 
-CURPATH="$( cd "$( dirname "$0" )" && pwd )"
-
-pushd "$CURPATH/../" > /dev/null
+shopt -s nullglob 							# skip empty folders
+MONKSHU_DIR="$( cd "$( dirname "$0" )" && pwd )"
+pushd . > /dev/null
+cd "$MONKSHU_DIR/../"
 APP_DIR=$PWD
 popd > /dev/null
 
-if [ "$1" == "" ]; then
-    echo Usage: $0 [name of the application]
-    exit 1
-fi
-
 APP_NAME=$1
 
-for TYPE in backend frontend; do
-    SRC="$APP_DIR/$APP_NAME/$TYPE/apps"
+function removeAppLinkOfType {
+    local APP_TYPE="$1"
+    local TARGET_DIR="$MONKSHU_DIR/$APP_TYPE/apps"
+    if [[ ! -d "$TARGET_DIR" ]]; then return 0; fi
 
-    if [ -d "$SRC" ]; then
-        for APP in "$SRC"/*; do
-            [ -d "$APP" ] || continue
-            rm -f "$CURPATH/$TYPE/apps/$(basename "$APP")"
-        done
+    local DIRS=( "$APP_DIR/$APP_NAME/$APP_TYPE/apps"/*/ )
+    if [[ ${#DIRS[@]} -gt 0 ]]; then
+        local SRC_DIR="${DIRS[0]%/}"
+        local DETECTED_NAME=$(basename "$SRC_DIR")
+        if [[ -L "$TARGET_DIR/$DETECTED_NAME" ]]; then
+            rm "$TARGET_DIR/$DETECTED_NAME"
+            rmdir "$TARGET_DIR" 2>/dev/null
+            return 0
+        fi
     fi
-done
 
-SRC="$APP_DIR/$APP_NAME/desktop/app"
-if [ -d "$SRC" ]; then
-    for APP in "$SRC"/*; do
-        [ -d "$APP" ] || continue
-        rm -f "$CURPATH/desktop/app/$(basename "$APP")"
+    for APP_LINK in "$TARGET_DIR"/*; do     
+        if [[ -L "$APP_LINK" ]]; then rm "$APP_LINK"; fi    # only remove if it's a symbolic link
     done
-fi
+    rmdir "$TARGET_DIR" 2>/dev/null
+}
 
-# Remove empty directories if they exist
-for DIR in \
-    "$CURPATH/backend/apps" \
-    "$CURPATH/frontend/apps" \
-    "$CURPATH/desktop/app"
-do
-    if [ -d "$DIR" ] && [ -z "$(ls -A "$DIR" 2>/dev/null)" ]; then
-        rmdir "$DIR"
-    fi
-done
-
-echo Done.
+removeAppLinkOfType "backend" 
+removeAppLinkOfType "frontend"
+removeAppLinkOfType "desktop"
 
 echo Done.

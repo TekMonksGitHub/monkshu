@@ -1,39 +1,35 @@
 #!/bin/bash
 
-CURPATH="$( cd "$( dirname "$0" )" && pwd )"
-
-pushd "$CURPATH/../" > /dev/null
+shopt -s nullglob 							# skip empty folders
+MONKSHU_DIR="$( cd "$( dirname "$0" )" && pwd )"
+pushd . > /dev/null
+cd "$MONKSHU_DIR/../"
 APP_DIR=$PWD
 popd > /dev/null
 
 if [ "$1" == "" ]; then
-    echo Usage: $0 [name of the application]
-    exit 1
+	echo "Usage: $0 [name of the application]"
+	exit 1
 fi
-
 APP_NAME=$1
 
-for TYPE in backend frontend; do
-    SRC="$APP_DIR/$APP_NAME/$TYPE/apps"
+function createAppLinkOfType {
+	local APP_TYPE="$1"
+	local APPS_BASE="$APP_DIR/$APP_NAME/$APP_TYPE/apps"
+	local DEST_DIR="$MONKSHU_DIR/$APP_TYPE/apps"
 
-    if [ -d "$SRC" ]; then
-        mkdir -p "$CURPATH/$TYPE/apps"
+	local DIRS=( "$APPS_BASE"/*/ )					# Find all directories using * and a / in the end
+	if [[ ${#DIRS[@]} -eq 0 ]]; then return 0; fi	# Nothing found
 
-        for APP in "$SRC"/*; do
-            [ -d "$APP" ] || continue
-            ln -sfn "$APP" "$CURPATH/$TYPE/apps/$(basename "$APP")"
-        done
-    fi
-done
+	local SRC_DIR="${DIRS[0]%/}"					# Extract the clean source directory path 
+	local DETECTED_NAME=$(basename "$SRC_DIR")		# Just the name
 
-SRC="$APP_DIR/$APP_NAME/desktop/app"
-if [ -d "$SRC" ]; then
-    mkdir -p "$CURPATH/desktop/app"
+	mkdir -p "$DEST_DIR"					
+	ln -sf "$SRC_DIR" "$DEST_DIR/$DETECTED_NAME"
+}
 
-    for APP in "$SRC"/*; do
-        [ -d "$APP" ] || continue
-        ln -sfn "$APP" "$CURPATH/desktop/app/$(basename "$APP")"
-    done
-fi
+createAppLinkOfType "backend"
+createAppLinkOfType "frontend"
+createAppLinkOfType "desktop"
 
 echo Done.
