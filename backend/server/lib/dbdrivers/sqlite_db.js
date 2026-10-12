@@ -20,7 +20,7 @@ let dbInstance = [], dbRunAsync = [], dbAllAsync = [];
 /**
  * Runs the given SQL command e.g. insert, delete etc.
  * @param {string} cmd The command to run
- * @param {array} params The params for SQL
+ * @param {array||object} params The params for SQL
  * @param {string} dbConnectInfo DB connection info. For this driver it is the path to the DB file.
  * @param {array} dbCreationSQLs The DB creation SQLs as string array, else default is used from the constants
  * @return true on success, and false on error
@@ -32,7 +32,12 @@ exports.runCmd = async (cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
 
     dbConnectInfo = path.resolve(dbConnectInfo);
     if (!(await _initDB(dbConnectInfo, dbCreationSQLs))) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: DB Init Error`) ; return false;}
-    params = Array.isArray(params)?params:[params];
+    params = (Array.isArray(params) || typeof params === "object") && (params !==null) ? params : [params];
+    if (params && !Array.isArray(params) && typeof params === "object") {
+        const prefixed = {};
+        for (const [k, v] of Object.entries(params)) prefixed[/^[:@$]/.test(k) ? k : `:${k}`] = v;
+        params = prefixed;
+    }
     try {await dbRunAsync[dbConnectInfo](cmd, params); return true}
     catch (err) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: ${err}`); return false;}
 }
@@ -40,7 +45,7 @@ exports.runCmd = async (cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
 /**
  * Runs the given query e.g. select and returns the rows from the result.
  * @param {string} cmd The command to run
- * @param {array} params The params for SQL
+ * @param {array||object} params The params for SQL
  * @param {string} dbConnectInfo DB connection info. For this driver it is the path to the DB file.
  * @param {array} dbCreationSQLs The DB creation SQLs as string array
  * @return rows array on success, and false on error. The returned array contains row data as JSON objects.
@@ -52,7 +57,12 @@ exports.getQuery = async(cmd, params=[], dbConnectInfo, dbCreationSQLs) => {
 
     dbConnectInfo = path.resolve(dbConnectInfo);
     if (!(await _initDB(dbConnectInfo, dbCreationSQLs))) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: DB Init Error`) ; return false;}
-    params = Array.isArray(params)?params:[params];
+    params = (Array.isArray(params) || typeof params === "object") && (params !==null) ? params : [params];
+    if (params && !Array.isArray(params) && typeof params === "object") {
+        const prefixed = {};
+        for (const [k, v] of Object.entries(params)) prefixed[/^[:@$]/.test(k) ? k : `:${k}`] = v;
+        params = prefixed;
+    }
     try {const rows = await dbAllAsync[dbConnectInfo](cmd, params); return rows}
     catch (err) {LOG.error(`DB error running, ${cmd}, with params ${params}, error: ${err}`); return false;}
 }

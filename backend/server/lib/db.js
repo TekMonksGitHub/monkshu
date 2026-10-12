@@ -7,7 +7,7 @@
  * aysnc function init()
  * Initializes the database. Throws error if the initialization fails.
  * 
- * async function runCmd(cmd, params=[])
+ * async function runCmd(cmd, params=[]||{})
  * Runs the given SQL command e.g. insert, delete etc.
  * @param {string} cmd The command to run
  * @param {array} params The params for SQL
@@ -19,7 +19,7 @@
  * @param {array} cmdObjs Array of {cmd: "command_to_run", params: []} objects which will be run as a single transaction.
  * @return true on success, and false on error
  *
- * async function getQuery(cmd, params=[])
+ * async function getQuery(cmd, params=[]||{})
  * Runs the given query e.g. select and returns the rows from the result.
  * @param {string} cmd The command to run
  * @param {array} params The params for SQL
