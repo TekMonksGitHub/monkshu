@@ -23,6 +23,17 @@ const elementConnected = async element => {
 async function getHTML(pageFileURLOrPageSchema, cssHref, data) {
 	const pageFile = await router.expandPageData((pageFileURLOrPageSchema instanceof URL) ? 
 		await $$.requireText(pageFileURLOrPageSchema) : pageFileURLOrPageSchema, undefined, data);
+	let metadataArray = pageFile.match(/METADATA\s*\r?\n=+\r?\n(.+?)\r?\n=+[\r?\n]*/sm);
+	let metadata = (metadataArray && metadataArray.length > 1) ? metadataArray[1] : "";
+	const disableTimerange = /^\s*DISABLE_TIMERANGE\s*=\s*true\s*$/im.test(metadata);
+	const disablePlaypause = /^\s*DISABLE_PLAYPAUSE\s*=\s*true\s*$/im.test(metadata);
+	const disableThemeToggle = /^\s*DISABLE_THEME_TOGGLE\s*=\s*true\s*$/im.test(metadata);
+	const disableSettingsGear = /^\s*DISABLE_SETTINGS_GEAR\s*=\s*true\s*$/im.test(metadata);
+	document.getElementById("timerange-controls")?.toggleAttribute("hidden", disableTimerange);
+	document.getElementById("playpause")?.toggleAttribute("hidden", disablePlaypause);
+	document.getElementById("toggle-theme")?.toggleAttribute("hidden", disableThemeToggle);
+	document.getElementById("gear")?.toggleAttribute("hidden", disableSettingsGear);
+
 	const schemaArray = pageFile.match(/SCHEMA\s*\r?\n=+\r?\n(.+?)\r?\n=+[\r?\n]*/sm);
 	const schema = (schemaArray && schemaArray.length > 1) ? schemaArray[1] : "";
 
