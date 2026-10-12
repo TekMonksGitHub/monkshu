@@ -1,4 +1,3 @@
-:: AI generated to match BASH scripts
 @echo off
 setlocal enabledelayedexpansion
 
@@ -25,7 +24,7 @@ set "DEST_DIR=%CURPATH%\%APP_TYPE%\apps"
 
 if not exist "%SRC_BASE%\" exit /b 0
 
-:: Loop over BOTH files and folders inside the source folder
+:: Loops over EVERYTHING inside the source folder without stopping
 for %%i in ("%SRC_BASE%\*") do (
     set "SRC_TARGET=%%~fi"
     set "DETECTED_NAME=%%~nxi"
@@ -45,9 +44,6 @@ for %%i in ("%SRC_BASE%\*") do (
     ) else (
         mklink "%DEST_DIR%\!DETECTED_NAME!" "!SRC_TARGET!"
     )
-    
-    :: Process only the first item found to match the Bash array behaviour
-    exit /b 0
 )
 exit /b 0
 

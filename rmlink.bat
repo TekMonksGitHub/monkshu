@@ -1,4 +1,3 @@
-:: AI generated to match BASH scripts
 @echo off
 setlocal enabledelayedexpansion
 
@@ -27,21 +26,20 @@ if not exist "%TARGET_DIR%\" exit /b 0
 if not "%APP_NAME%"=="" (
     set "SRC_BASE=%APP_DIR%\%APP_NAME%\%APP_TYPE%\apps"
     
+    :: Loops and removes EVERYTHING matching this specific application's source list
     for %%i in ("!SRC_BASE!\*") do (
         set "DETECTED_NAME=%%~nxi"
         
         if exist "%TARGET_DIR%\!DETECTED_NAME!" (
-            :: Delete directory links via rmdir, file links via del
             if exist "%TARGET_DIR%\!DETECTED_NAME!\" (
                 rmdir "%TARGET_DIR%\!DETECTED_NAME!"
             ) else (
                 del /f /q "%TARGET_DIR%\!DETECTED_NAME!"
             )
-            
-            call :removeDirIfEmpty "%TARGET_DIR%"
-            exit /b 0
         )
     )
+    call :removeDirIfEmpty "%TARGET_DIR%"
+    exit /b 0
 )
 
 :: FALLBACK SWEEP: Clears all items in the target dir if no specific arg matches
