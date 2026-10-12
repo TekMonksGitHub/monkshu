@@ -18,14 +18,15 @@ function createAppLinkOfType {
 	local APPS_BASE="$APP_DIR/$APP_NAME/$APP_TYPE/apps"
 	local DEST_DIR="$MONKSHU_DIR/$APP_TYPE/apps"
 
-	local DIRS=( "$APPS_BASE"/*/ )					# Find all directories using * and a / in the end
-	if [[ ${#DIRS[@]} -eq 0 ]]; then return 0; fi	# Nothing found
+	local DIRS=( "$APPS_BASE"/* )								# Find all files & directories using * and a / in the end
+	if [[ ${#DIRS[@]} -eq 0 ]]; then return 0; fi				# Nothing found
 
-	local SRC_DIR="${DIRS[0]%/}"					# Extract the clean source directory path 
-	local DETECTED_NAME=$(basename "$SRC_DIR")		# Just the name
+	mkdir -p "$DEST_DIR"										# Create the destination link holder if it doesn't exist
 
-	mkdir -p "$DEST_DIR"					
-	ln -sf "$SRC_DIR" "$DEST_DIR/$DETECTED_NAME"
+	for SRC_DIR_ENTRY in "${DIRS[@]}"; do
+		local DETECTED_NAME=$(basename "$SRC_DIR_ENTRY")		# Just the name
+		ln -sf "$SRC_DIR_ENTRY" "$DEST_DIR/$DETECTED_NAME"
+	done
 }
 
 createAppLinkOfType "backend"

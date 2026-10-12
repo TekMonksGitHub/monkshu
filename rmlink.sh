@@ -14,20 +14,20 @@ function removeAppLinkOfType {
     local TARGET_DIR="$MONKSHU_DIR/$APP_TYPE/apps"
     if [[ ! -d "$TARGET_DIR" ]]; then return 0; fi
 
-    local DIRS=( "$APP_DIR/$APP_NAME/$APP_TYPE/apps"/*/ )
-    if [[ ${#DIRS[@]} -gt 0 ]]; then
-        local SRC_DIR="${DIRS[0]%/}"
-        local DETECTED_NAME=$(basename "$SRC_DIR")
-        if [[ -L "$TARGET_DIR/$DETECTED_NAME" ]]; then
-            rm "$TARGET_DIR/$DETECTED_NAME"
-            rmdir "$TARGET_DIR" 2>/dev/null
-            return 0
-        fi
+    if [[ -z "$APP_NAME" ]]; then
+        for APP_LINK in "$TARGET_DIR"/*; do     
+            if [[ -L "$APP_LINK" ]]; then rm "$APP_LINK"; fi    # only remove if it's a symbolic link
+        done
+        rmdir "$TARGET_DIR" 2>/dev/null
+        return 0
     fi
 
-    for APP_LINK in "$TARGET_DIR"/*; do     
-        if [[ -L "$APP_LINK" ]]; then rm "$APP_LINK"; fi    # only remove if it's a symbolic link
-    done
+    local DIRS=( "$APP_DIR/$APP_NAME/$APP_TYPE/apps"/* )        # find all files and directories inside 
+    if [[ ${#DIRS[@]} -eq 0 ]]; then return 0; fi				# Nothing found
+    for SRC_DIR_ENTRY in "${DIRS[@]}"; do
+		local DETECTED_NAME=$(basename "$SRC_DIR_ENTRY")		# Just the name
+		if [[ -L "$TARGET_DIR/$DETECTED_NAME" ]]; then rm "$TARGET_DIR/$DETECTED_NAME"; fi
+	done
     rmdir "$TARGET_DIR" 2>/dev/null
 }
 
