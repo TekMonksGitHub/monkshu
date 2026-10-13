@@ -23,6 +23,7 @@ import * as pako from "/framework/3p/pako.esm.min.mjs";
 
 const APIMANAGER_SESSIONKEY = "__org_monkshu_APIManager", DEFAULT_TIMEOUT=300000, SSE_EVENT_SOURCES={}, 
     SERVER_SSE_EVENTS_NAME = "_org_monkshu_api_sse_event_", SERVER_SSE_RESPONSE_FORCE_FLAG = "respondviasse";
+const NON_ACCESS_TOKEN_TYPES = ["refresh"];   // subjects that must never be used as the access token
 
 /**
  * Makes a REST API call.
@@ -58,10 +59,8 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
         sseURL = urlOrOptions.sseURL; signal = urlOrOptions.signal;   // optional: AbortSignal to stop waiting for an SSE-backed response early
     } else url = router.getBalancedURL(urlOrOptions);
 
-    if (canUseCache) {
-        const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+sendToken+extractToken;
-        if (storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
-    }
+    const storage = _getAPIManagerStorage(), apiResponseCacheKey = url.toString()+type+JSON.stringify(req)+JSON.stringify(sendToken)+extractToken;
+    if (canUseCache && storage.apiResponseCache[apiResponseCacheKey]) return storage.apiResponseCache[apiResponseCacheKey]; // send cached response if acceptable and available
     
     try {
         if (sseURL) headers[SERVER_SSE_RESPONSE_FORCE_FLAG] = true; // this ensures server will use SSE for APIs which can work in both SSE and non-SSE modes
@@ -71,7 +70,7 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
         if (response.ok) {
             const respObj = await response.json();
             if (extractToken) _extractTokens(response, respObj);
-            if (canUseCache) storage.apiResponseCache[apiResponseCacheKey] = respObj; // cache response if allowed
+            if (canUseCache) {const latestStorage = _getAPIManagerStorage(); latestStorage.apiResponseCache[apiResponseCacheKey] = respObj; _setAPIManagerStorage(latestStorage);} // cache response if allowed
             if (!sseURL) return provideHeaders?{response: respObj, headers: _getFetchResponseHeadersAsObject(response)}:respObj;
             else return new Promise(resolve => _waitForSSEResponse( typeof sseURL === "string" ? {url: sseURL, params: {}, sendtoken: sendToken} : {...sseURL, sendtoken: sendToken},
                 respObj.requestid, resolve, timeout, signal));
@@ -80,8 +79,8 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
 
             if (retries && _retryNumber < retries) {
                 $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
-                return await rest(urlOrOptions, type, req, sendToken, extractToken, 
-                    canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, sseResponse, _retryNumber+1);
+                return await rest(urlOrOptions, type, req, sendToken, extractToken, canUseCache, dontGZIP, 
+                    sendErrResp, timeout, headers, provideHeaders, retries, sseURL, (_retryNumber+1));
             }
             
             const errResp = {respErr: {status: response.status, statusText: response.statusText}};
@@ -91,8 +90,8 @@ async function rest(urlOrOptions, type, req, sendToken=false, extractToken=false
         $$.LOG.error(`Error in fetching ${url} for request ${JSON.stringify(req)} of type ${type} due to ${err}`);
         if (retries && _retryNumber < retries) {
             $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
-            return await rest(urlOrOptions, type, req, sendToken, extractToken, 
-                canUseCache, dontGZIP, sendErrResp, timeout, headers, provideHeaders, retries, _retryNumber+1);
+            return await rest(urlOrOptions, type, req, sendToken, extractToken, canUseCache, dontGZIP, 
+                sendErrResp, timeout, headers, provideHeaders, retries, sseURL, (_retryNumber+1));
         }
         const errResp = {respErr: {status: 400, statusText: err.toString()}};   // client error, default to 400 code
         return sendErrResp ? errResp : null;
@@ -141,7 +140,7 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
             if (retries && _retryNumber < retries) {
                 $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
                 return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, 
-                    headers, retries, _retryNumber+1);
+                    headers, retries, (_retryNumber+1));
             }
             return false;
         }
@@ -150,7 +149,7 @@ async function blob(urlOrOptions, filename, type, req, sendToken=false, extractT
         if (retries && _retryNumber < retries) {
             $$.LOG.info(`Retrying API at ${url}, retry number ${_retryNumber+1} of ${retries}.`); 
             return await blob(urlOrOptions, filename, type, req, sendToken, extractToken, dontGZIP, timeout, headers, 
-                retries, _retryNumber+1);
+                retries, (_retryNumber+1));
         }
         return false;
     }
@@ -174,11 +173,13 @@ function subscribeSSEEvents(urlOrOptions, params={}, sendToken=false) {
     const apiKey = getAPIKeyFor(rewrittenURL), storage = _getAPIManagerStorage();
     if (apiKey) urlSSE.searchParams.append(storage.keyHeader, apiKey);
     if (sendToken) {
-        const token = getJWTToken(rewrittenURL, sendToken==true?"access":sendToken)||"undefined";
-        urlSSE.searchParams.append("Authorization", `Bearer ${token}`);
+        const token = getJWTToken(rewrittenURL, sendToken.type||"access");
+        if (token) urlSSE.searchParams.append("Authorization", `Bearer ${token}`);
+        else $$.LOG.error(`No JWT token available for SSE URL ${rewrittenURL}`);
     }
 
-    const originalURL = new URL(urlOrOptions.url||urlOrOptions);
+    const originalURL = new URL(urlOrOptions.url||urlOrOptions), existing = SSE_EVENT_SOURCES[originalURL.href];
+    if (existing && existing.readyState === EventSource.CLOSED) delete SSE_EVENT_SOURCES[originalURL.href];
     if (!SSE_EVENT_SOURCES[originalURL.href]) { // create listner only if really a new one is needed
         const eventsource = new EventSource(urlSSE.href)
         eventsource.onerror = _ => $$.LOG.error(`Error in EventSource with URL ${originalURL}`);
@@ -197,6 +198,9 @@ function unsubscribeSSEEvents(url) {
     if (!SSE_EVENT_SOURCES[originalURL.href]) return;
     else {SSE_EVENT_SOURCES[originalURL.href].close(); delete SSE_EVENT_SOURCES[originalURL.href];}
 }
+
+/** Closes all active SSE event streams, useful on logout */
+function closeAllSSEEventStreams() { for (const url of Object.keys(SSE_EVENT_SOURCES)) unsubscribeSSEEvents(url); }
 
 /**
  * Register keys to send for various APIs.
@@ -231,15 +235,26 @@ const addJWTToken = (url, headers, jsonResponseObj) => {
  * @param {string} url The URL for which we need the key
  * @returns The API key for the given URL if setup
  */
-const getAPIKeyFor = url => { const storage = _getAPIManagerStorage(); return storage.keys[url] || storage.keys["*"]; }
+const getAPIKeyFor = url => { 
+    const urlObject = new URL(url), baseURL1 = urlObject.origin + urlObject.pathname;
+    const baseURL2 = baseURL1.endsWith("/") ? baseURL1.slice(0, -1) : baseURL1+"/";
+    const storage = _getAPIManagerStorage(); 
+    return storage.keys[baseURL1] || storage.keys[baseURL2] || storage.keys["*"]; 
+}
 
 function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout, signal) {
     const sseURLReal = typeof sseURL == "string" ? sseURL : sseURL.url,
         sseURLParams = typeof sseURL == "string" ? {} : sseURL.params,
         sseURLSendToken = typeof sseURL == "string" ? false : sseURL.sendtoken;
 
-    let resolved = false;
-    const stopWatchingSSE = () => { resolved = true; clearInterval(timeoutInterval); eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener); };
+    let resolved = false, eventSource;
+    const stopWatchingSSE = () => { 
+        resolved = true; clearInterval(timeoutInterval); 
+        if (eventSource) eventSource.removeEventListener(SERVER_SSE_EVENTS_NAME, listener); 
+        if (signal) signal.removeEventListener("abort", onAbort);
+    }
+    const finish = result => { if (resolved) return; resolved = true; stopWatchingSSE(); resolver(result); };
+    const onAbort = _ => finish(null);
 
     const startTime = Date.now();
     const timeoutInterval = setInterval(() => {
@@ -254,24 +269,21 @@ function _waitForSSEResponse(sseURL, requestidToWatch, resolver, timeout, signal
     const listener = event => { // server API events
         try {
             const {requestid, response} = JSON.parse(event.data);
-            if (requestid == requestidToWatch && !resolved) {
-                stopWatchingSSE();
-                resolver(response);
-            }
+            if (requestid == requestidToWatch && (!resolved)) finish(response);
         } catch (err) {$$.LOG.error(`Error parsing server event type ${event.type} from ${event.currentTarget.url}, skipping this SSE update.`);}
     }
-    const eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken);
-    eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
 
-    if (signal) signal.addEventListener("abort", () => {
-        if (resolved) return;
-        stopWatchingSSE();
-        resolver(null);
-    });
+    if (signal?.aborted) { finish(null); return; }
+    if (signal) signal.addEventListener("abort", onAbort);
+
+    try { eventSource = subscribeSSEEvents(sseURLReal, sseURLParams, sseURLSendToken); } 
+    catch (err) { $$.LOG.error(`SSE subscription to ${sseURLReal} failed due to ${err}`); }
+    if (!eventSource) { finish({respErr: {status: 500, statusText: "SSE endpoint not available as subscription failed"}}); return; }
+    eventSource.addEventListener(SERVER_SSE_EVENTS_NAME, listener);
 }
 
 function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostBody, timeout, additional_headers) {
-    type = type || "GET"; const urlHost = new URL(url).host; 
+    type = type || "GET"; const urlHost = new URL(url).host;
     const storage = _getAPIManagerStorage();
 
     let jsonReq;
@@ -283,8 +295,11 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
     const headers = {"Accept":acceptHeader||"application/json", 
         "Content-Encoding":(!dontGZIPPostBody)&&req?"gzip":"identity", ...additional_headers};
     if (type.toUpperCase() != "GET" && type.toUpperCase() != "DELETE") headers["Content-type"] = "application/json";
-    if (sendToken) headers.Authorization = `Bearer ${storage.tokenManager[`${urlHost}_${sendToken.type?sendToken.type:"access"}`]}`;
-    if (storage.keys[url] || storage.keys["*"]) headers[storage.keyHeader] = storage.keys[url] ? storage.keys[url] : storage.keys["*"];
+    if (sendToken) {
+        const token = storage.tokenManager[`${urlHost}_${sendToken.type||"access"}`];
+        if (token) headers.Authorization = `Bearer ${token}`; else $$.LOG.error(`No JWT token available for ${url}`);
+    }
+    if (getAPIKeyFor(url)) headers[storage.keyHeader] = getAPIKeyFor(url);
 
     const fetchInit = {method: type, credentials: "omit", headers, redirect: "follow", 
         referrerPolicy: "origin", timeout};
@@ -293,12 +308,12 @@ function _createFetchInit(url, type, req, sendToken, acceptHeader, dontGZIPPostB
 
 function _extractTokens(response, jsonResponseObj) {
     const urlHost = new URL(response.url).host, headersBack = _getFetchResponseHeadersAsObject(response); 
-    if (jsonResponseObj && jsonResponseObj.access_token && jsonResponseObj.token_type == "bearer") 
+    if (jsonResponseObj && jsonResponseObj.access_token && jsonResponseObj.token_type?.toLowerCase() == "bearer") 
         _extractAddToken(jsonResponseObj.access_token, urlHost);
-    else if (headersBack.access_token && headersBack.token_type == "bearer") 
+    else if (headersBack.access_token && headersBack.token_type?.toLowerCase() == "bearer") 
         _extractAddToken(headersBack.access_token, urlHost);
     else if (headersBack.authorization && headersBack.authorization.toLowerCase().startsWith("bearer "))
-        _extractAddToken(headersBack.headersBack.authorization.substring(7).trim(), urlHost);
+        _extractAddToken(headersBack.authorization.substring(7).trim(), urlHost);
 }
 
 function _getFetchResponseHeadersAsObject(response) {
@@ -311,7 +326,7 @@ function _getKeyValAsURLParam(key, val) {
     const encodeValue = val => (typeof val === 'string' || val instanceof String)?encodeURIComponent(val):encodeURIComponent(JSON.stringify(val));
 
     let retVal; 
-    if (Array.isArray(val)) for (const valThis of val) retVal = retVal ? `&${key}=${encodeValue(valThis)}`:`${key}=${encodeValue(valThis)}`;
+    if (Array.isArray(val)) for (const valThis of val) retVal = retVal ? `${retVal}&${key}=${encodeValue(valThis)}`:`${key}=${encodeValue(valThis)}`;
     else retVal = `${key}=${encodeValue(val)}`;
 
     return retVal;
@@ -320,15 +335,19 @@ function _getKeyValAsURLParam(key, val) {
 function _extractAddToken(token, host) {
     let sub = "access"; // default is an access token
 
-    const tokenSplits = token.split(".");   // try to parse as JWT to get the subject, if possible
+    // try to parse as JWT to get the subject, if possible, the replacement ensures any - and _ are converted as sometimes JWT carry them
+    const tokenSplits = token.replace(/-/g, "+").replace(/_/g, "/").split(".");   
     if (tokenSplits.length == 3) {  
         try {
-            const claims = JSON.parse(btoa(tokenSplits[1]));
+            const claims = JSON.parse(atob(tokenSplits[1]));
             if (claims.sub) sub = claims.sub;
         } catch (err) {}
     }
 
-    const storage = _getAPIManagerStorage(); storage.tokenManager[`${host}_${sub}`] = token; _setAPIManagerStorage(storage);
+    const storage = _getAPIManagerStorage(); 
+    storage.tokenManager[`${host}_${sub}`] = token; 
+    if (!NON_ACCESS_TOKEN_TYPES.includes(sub)) storage.tokenManager[`${host}_access`] = token;  // latest token is stored for wildcard access as well
+    _setAPIManagerStorage(storage);
 }
 
 function _getAPIManagerStorage() {
@@ -344,6 +363,8 @@ function _setAPIManagerStorage(storage) {
 function _modifyAPIManagerStorage(key, value) {
     const storage = _getAPIManagerStorage();
     storage[key] = value;
+    _setAPIManagerStorage(storage);
 }
 
-export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor, subscribeSSEEvents, unsubscribeSSEEvents};
+export const apimanager = {rest, blob, registerAPIKeys, getJWTToken, addJWTToken, getAPIKeyFor, 
+    subscribeSSEEvents, unsubscribeSSEEvents, closeAllSSEEventStreams};
