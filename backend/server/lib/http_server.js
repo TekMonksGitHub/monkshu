@@ -15,7 +15,7 @@ const gzipAsync = require("util").promisify(require("zlib").gzip);
 const HEADER_ERROR = {"content-type": "text/plain", "content-encoding":"identity"};
 let ipblacklist = [], ipwhitelist = [], conf;
 
-async function initAsync() {
+async function initAsync(monkshu_backend_server) {
 	/* create HTTP/S server */
 	_initConfSync();
 	let host = conf.host || "::"; 
@@ -40,7 +40,8 @@ async function initAsync() {
 			req.protocol = req.protocol || req.socket.encrypted?"https":"http";
 			const remoteHost = utils.getClientIP(req), remotePort = utils.getClientPort(req);
 			const servObject = {req, res, env:{remoteHost, remotePort, remoteAgent: req.headers["user-agent"]}, 
-				server: module.exports, compressionFormat: req.headers["content-encoding"]?.toLowerCase().includes("gzip") ? CONSTANTS.GZIP : undefined}; 
+				server: module.exports, compressionFormat: req.headers["content-encoding"]?.toLowerCase().includes("gzip") ? CONSTANTS.GZIP : undefined,
+				monkshu_backend_server}; 
 			for (const header of Object.keys(req.headers)) {	// lower case the incoming headers
 				const saved = req.headers[header]; delete req.headers[header]; 
 				req.headers[header.toLowerCase()] = saved;

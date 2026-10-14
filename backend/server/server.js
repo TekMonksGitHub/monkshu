@@ -102,7 +102,7 @@ async function _initAndRunTransportLoop() {
 	/* Init the transport */
 	const transportConf = require(CONSTANTS.TRANSPORT);
 	_server = require(CONSTANTS.LIBDIR+"/"+transportConf.servertype+".js");
-	if (_server.initAsync) await _server.initAsync(); else if (server.initSync) server.initSync(); 
+	if (_server.initAsync) await _server.initAsync(module.exports); else if (server.initSync) server.initSync(module.exports); 
 	module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
 	
 	/* Server loop */
@@ -112,7 +112,7 @@ async function _initAndRunTransportLoop() {
 				(APIREGISTRY.getAPIConf(url).checksec_immediate?.toLowerCase() != "false")) {	// check security early
 			
 			const jsonObjForSecurityCheck = APIREGISTRY.decodeIncomingData(url, "{}", headers, servObject);
-			let reason = {}; if (!(await APIREGISTRY.checkSecurity(url, jsonObjForSecurityCheck, headers, servObject, reason))) {
+			const reason = {_monkshu_early_check: true}; if (!(await APIREGISTRY.checkSecurity(url, jsonObjForSecurityCheck, headers, servObject, reason))) {
 				LOG.error(`API security check failed for ${url}, reason: ${reason.reason}`); 
 				_server.destroy(servObject);
 				return;
@@ -264,6 +264,8 @@ const isAPI = url => {
 	return (api && (apiConf.sse?.toString().toLowerCase() != "true"));	// API found and it is not an SSE event endpoint
 }
 
+const isThisAnEarlySecurityCheck = (_apiregentry, _url, _req, _headers, _servObject, reason) => reason._monkshu_early_check == true;
+
 function _checkIfResponseViaSSEAPIRequest(apiconf, headers, jsonObj) {
 	if (apiconf.respondviasse?.trim().toLowerCase() == "true") return true;
 	if (apiconf.responseviasseifasked?.trim().toLowerCase() == "true" && 
@@ -308,4 +310,4 @@ function _initInterServerIPC() {
 	}, bboptions);
 }
 
-module.exports = {bootstrap, doService};
+module.exports = {bootstrap, doService, isThisAnEarlySecurityCheck};
