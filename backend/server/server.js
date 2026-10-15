@@ -311,4 +311,4 @@ function _initInterServerIPC() {
 	}, bboptions);
 }
 
-module.exports = {bootstrap, doService, isThisAnEarlySecurityCheck};
+Object.assign(module.exports, {bootstrap, doService, isThisAnEarlySecurityCheck});
