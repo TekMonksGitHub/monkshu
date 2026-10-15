@@ -134,11 +134,13 @@ async function addIPToIPList(file, listHolder, ip, op) {
 }
 
 const getSerializableServObject = servObject => {
-	return {req: {headers: _cloneLowerCase(servObject.req.headers)}, res: {}, env: servObject.env, server: {}, compressionFormat: servObject.compressionFormat};
+	return {req: {headers: _cloneLowerCase(servObject.req.headers)}, res: {}, env: servObject.env, 
+		server: {}, compressionFormat: servObject.compressionFormat, monkshu_backend_server: {}};
 }
 
-const inflateServObject = servObject => {
-	return {req: servObject.req, res: servObject.res, env: servObject.env, server: module.exports, compressionFormat: servObject.compressionFormat};
+const inflateServObject = (servObject, monkshu_backend_server) => {
+	return {req: servObject.req, res: servObject.res, env: servObject.env, server: module.exports, 
+		compressionFormat: servObject.compressionFormat, monkshu_backend_server};
 }
 
 async function _resolveListeningPort() {

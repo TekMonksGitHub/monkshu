@@ -305,7 +305,8 @@ function _initInterServerIPC() {
 	const bboptions = {}; bboptions[blackboard.EXTERNAL_ONLY] = true;
 	blackboard.subscribe(SERVER_IPC_TOPIC_REQUEST, async request => {
 		if (request.stamp != SERVER_STAMP) return;	// not for us
-		const result = await doService(request.data, _server.inflateServObject(request.servObject), request.headers, request.url);
+		const result = await doService(request.data, _server.inflateServObject(request.servObject, module.exports), 
+			request.headers, request.url);
 		blackboard.publish(SERVER_IPC_TOPIC_RESPONSE, {...result, id: request.id, stamp: SERVER_STAMP}); 
 	}, bboptions);
 }
