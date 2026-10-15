@@ -102,7 +102,7 @@ async function _initAndRunTransportLoop() {
 	/* Init the transport */
 	const transportConf = require(CONSTANTS.TRANSPORT);
 	_server = require(CONSTANTS.LIBDIR+"/"+transportConf.servertype+".js");
-	if (_server.initAsync) await _server.initAsync(module.exports); else if (server.initSync) server.initSync(module.exports); 
+	if (_server.initAsync) await _server.initAsync(module.exports); else if (_server.initSync) _server.initSync(module.exports); 
 	module.exports.blacklistIP = _server.blacklistIP; module.exports.whitelistIP = _server.whitelistIP
 	
 	/* Server loop */

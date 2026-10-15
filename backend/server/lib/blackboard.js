@@ -135,9 +135,9 @@ async function getReply(topic, payload, timeout=conf.send_reply_timeout, options
     let repliesReceived = 0, replied = false, replies = [];
     const timeoutID = setTimeout(_=>{ if (!replied) {
         replied = true; replies.incomplete = true; replyReceiver(replies);
-        LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}, expected = ${repliedExpected}, received = ${repliesReceived}. Sending incomplete reply.`);
+        LOG.warn(`Blackboard getReply timed out for topic -> ${topic} with options ${JSON.stringify(options)}, expected = ${repliesExpected}, received = ${repliesReceived}. Sending incomplete reply.`);
     }}, timeout);
-    if (!repliesExpected) repliedExpected = options?.[module.exports.FIRST_REPLY_ONLY] ? 1 : 
+    if (!repliesExpected) repliesExpected = options?.[module.exports.FIRST_REPLY_ONLY] ? 1 : 
         options?.[module.exports.LOCAL_ONLY] ? 1 :
         options?.[module.exports.LOCAL_CLUSTER_ONLY] ? _currentLocalClusterSizeOnline : 
         options?.[module.exports.NOT_LOCAL_ONLY] ? 
@@ -146,7 +146,7 @@ async function getReply(topic, payload, timeout=conf.send_reply_timeout, options
     subscribe(BLACKBOARD_REQUESTREPLY_TOPIC, function(msg) {
         if (replied) return; // no longer an active request, timed out
         if ((msg.id != id) || (msg.type !== "reply")) return;   // not for us, as we handle only replies - this also ensures topics match etc
-        replies.push(msg.reply); repliesReceived++; if (repliesReceived < repliedExpected) return;  // still waiting
+        replies.push(msg.reply); repliesReceived++; if (repliesReceived < repliesExpected) return;  // still waiting
         clearTimeout(timeoutID); unsubscribe(BLACKBOARD_REQUESTREPLY_TOPIC, this);   // we are not waiting anymore
         replyReceiver(replies); replied = true;
         LOG.info(`Blackboard getReply sent successful reply for topic -> ${topic} with options ${JSON.stringify(options)}.`);
