@@ -9,8 +9,16 @@ import {monkshu_component} from "/framework/js/monkshu_component.mjs";
 
 const elementConnected = async element => {
 	const pagePath = element.getAttribute("file");
-	page_generator.setTemplateHTML(element, await getHTML(new URL(pagePath, window.location.href), 
-		element.getAttribute("css"), JSON.parse(util.safeURIDecode(element.getAttribute("pageData")||"{}"))));
+	const pageFile = await _getPageFile(new URL(pagePath, window.location.href),
+		JSON.parse(util.safeURIDecode(element.getAttribute("pageData")||"{}")));
+	element._pageGeneratorScript = _parseScript(pageFile);
+	if (element._pageGeneratorScript?.timing == "onload") await _runScript(element, element._pageGeneratorScript);
+	page_generator.setTemplateHTML(element, await _getHTML(pageFile, element.getAttribute("css")));
+}
+
+const elementRendered = async (element, initialRender) => {
+	if (initialRender && element._pageGeneratorScript?.timing == "postrender")
+		await _runScript(element, element._pageGeneratorScript);
 }
 
 /**
@@ -21,8 +29,10 @@ const elementConnected = async element => {
  * @returns The generated HTML
  */
 async function getHTML(pageFileURLOrPageSchema, cssHref, data) {
-	const pageFile = await router.expandPageData((pageFileURLOrPageSchema instanceof URL) ? 
-		await $$.requireText(pageFileURLOrPageSchema) : pageFileURLOrPageSchema, undefined, data);
+	return await _getHTML(await _getPageFile(pageFileURLOrPageSchema, data), cssHref);
+}
+
+async function _getHTML(pageFile, cssHref) {
 	const schemaArray = pageFile.match(/SCHEMA\s*\r?\n=+\r?\n(.+?)\r?\n=+[\r?\n]*/sm);
 	const schema = (schemaArray && schemaArray.length > 1) ? schemaArray[1] : "";
 
@@ -153,6 +163,37 @@ function _findObject(objectArray, colStart, colEnd, rowEnd, label) {
 	return null;
 }
 
+async function _getPageFile(pageFileURLOrPageSchema, data) {
+	return await router.expandPageData((pageFileURLOrPageSchema instanceof URL) ?
+		await $$.requireText(pageFileURLOrPageSchema) : pageFileURLOrPageSchema, undefined, data);
+}
+
+function _parseScript(pageFile) {
+	const scriptArray = pageFile.match(/SCRIPT\s*\r?\n=+\r?\n([\s\S]*?)\r?\n=+[\r?\n]*/m);
+	if (!scriptArray?.[1]) return null;
+
+	const lines = scriptArray[1].split(/\r?\n/);
+	const timingIndex = lines.findIndex(line => /^\s*Timing\s*=\s*/i.test(line));
+	const timing = timingIndex == -1 ? "onload" : lines[timingIndex].split("=").slice(1).join("=").trim().toLowerCase().replace(/\s+/g, "");
+	if (timingIndex != -1) lines.splice(timingIndex, 1);
+	if (timing != "onload" && timing != "postrender") {
+		console.error(`Unsupported page-generator SCRIPT timing: ${timing}`);
+		return null;
+	}
+
+	return {timing, code: lines.join("\n")};
+}
+
+async function _runScript(element, pageScript) {
+	if (!pageScript.code.trim()) return;
+	try {
+		const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
+		await new AsyncFunction("element", "shadowRoot", pageScript.code)(element, element.shadowRoot);
+	} catch (error) {
+		console.error("Unable to run page-generator SCRIPT.", error);
+	}
+}
+
 // convert this all into a WebComponent so we can use it
-export const page_generator = {trueWebComponentMode: true, elementConnected, getHTML}
+export const page_generator = {trueWebComponentMode: true, elementConnected, elementRendered, getHTML}
 monkshu_component.register("page-generator", null, page_generator);
