@@ -278,6 +278,21 @@ function base64ToString(base64) {
     return new TextDecoder().decode(bytes);
 }
 
+/**
+ * Converts a raw Base64 string or full Data URI to a Blob manually
+ * @param {string} base64String The Base64 string
+ * @param {string} [contentType=''] Optional explicit MIME type (e.g., 'image/png')
+ * @returns {Blob} The blob
+ */
+function base64ToBlob(base64String, contentType='') {           // AI code - Google gemini
+    const cleanBase64 = base64String.replace(/^data:.+;base64,/, '');   // 1. Clean the string if it contains a Data URI prefix
+    const byteCharacters = atob(cleanBase64);                   // 2. Decode the Base64 string into a raw binary string
+    const byteNumbers = new Array(byteCharacters.length);       // 3. Create an array of byte values
+    for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+    const byteArray = new Uint8Array(byteNumbers);              // 4. Convert the numbers into an architectural typed array
+    return new Blob([byteArray], {type: contentType});          // 5. Instatitate and return the Blob
+}
+
 /** 
  * Converts ArrayBuffer or Uint8Array to Base 64
  * @param {ArrayBuffer|Uint8Array} buffer The buffer to encode to Base64
@@ -376,5 +391,5 @@ function _getObjectPathSplits(path) {
 export const util = {getCSSRule, getFunctionFromString, replaceURLParamValue, parseBoolean, escapeHTML, 
     getModulePath, downloadFile, uploadAFile, getFileData, clone, resolveURL, baseURL, safeURIDecode, 
     getChildByID, getChildrenByTagName, removeAllChildElements, setIntervalImmediately, generateUUID, 
-    createAsyncFunction, createSyncFunction, stringToBase64, base64ToString, encodeHTMLEntities, 
+    createAsyncFunction, createSyncFunction, stringToBase64, base64ToString, base64ToBlob, encodeHTMLEntities, 
     htmlToDOMNodes, getObjProperty, bufferToBase64, getModulePathFromURL, areObjectsEqual, unescapeHTML};
