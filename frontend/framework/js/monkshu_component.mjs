@@ -199,12 +199,12 @@ function register(name, htmlTemplate, module) {
             this.render();  
         }
         
-        disconnectedCallback() {
-            if (this.id) delete module.elements[this.id];
-            else delete module.element;
+        async disconnectedCallback() {
+            if (module.elementDisconnected) await module.elementDisconnected(this); 
 
-            delete module.data;
-            delete module.datas;
+            module.clearMemory(this.id);
+            if (this.id) {delete module.elements[this.id]; if (module.datas) delete module.datas[this.id]; } 
+            else {delete module.element; delete module.data;}
         }
 
         async attributeChangedCallback(name, oldValue, newValue) {
