@@ -67,7 +67,7 @@ async function getHttps(host, port, path, headers, req, sslObj, callback) {
 
 async function deleteHttp(host, port, path, headers, _req, sslObj, callback) {
     try {
-        const result = await httpClient.deleteHttp(host, port, path, headers, _req, sslObj); 
+        const result = await httpClient.delete(host, port, path, headers, _req, sslObj); 
         if((!result.error) && result.data) result.data = JSON.parse(result.data); 
         if (callback) callback(null, result); else return result;
     } catch (err) { if (callback) callback(err); else throw err; }
