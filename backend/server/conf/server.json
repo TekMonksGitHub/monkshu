@@ -3,5 +3,6 @@
     "accesslog": "server.log.ndjson",
     "testlogfile": "server.testlog.ndjson",
     "sse_keepalive": 10000,
+    "connect_attempt_timeout": 1000,
     "debug_mode": false
 }
