@@ -32,6 +32,7 @@ async function bootstrap() {
 	CONSTANTS.SERVER_IP = utils.getLocalIPs()[0];
 	CONSTANTS.SERVER_START_TIME = Date.now();
 	CONSTANTS.SERVER_CONF = conf;
+	if (conf.connect_attempt_timeout) require("net").setDefaultAutoSelectFamilyAttemptTimeout(conf.connect_attempt_timeout);
 
 	/* Init the logs */
 	console.log("Initializing the logs.");
