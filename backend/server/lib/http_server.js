@@ -51,7 +51,7 @@ async function initAsync(monkshu_backend_server) {
 			if (servObject.error_state) return;	// already closed by onConnect
 			req.on("data", data => {if (!servObject.error_state) module.exports.onData(normURL, data, servObject);});
 			req.on("end", _ => {if (!servObject.error_state) module.exports.onReqEnd(normURL, req.headers, servObject);});
-			req.on("close", _ => {if (!servObject.error_state) module.exports.onConnectionClose(normURL, req.headers, servObject);});
+			res.on("close", _ => {if (!servObject.error_state) module.exports.onConnectionClose(normURL, req.headers, servObject);});
             req.on("error", error => module.exports.onReqError(normURL, req.headers, error, servObject));
 		}
 	};
@@ -68,7 +68,7 @@ function onConnect(_url, _headers, servObject) { end(servObject); }
 function onData(_data, _servObject) { }
 function onReqError(_url, _headers, error, servObject) { servObject.error_state = true; statusInternalError(servObject, error); end(servObject); }
 function onReqEnd(_url, _headers, servObject) { statusNotFound(servObject); end(servObject); }
-function onConnectionClose(_url, _headers, _servObject) { close(servObject); }
+function onConnectionClose(_url, _headers, servObject) { close(servObject); }
 
 function statusNotFound(servObject, _error) {
 	servObject.res.writeHead(404, _squishHeaders({...HEADER_ERROR, ...conf.headers}));
