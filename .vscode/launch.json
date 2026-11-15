@@ -14,7 +14,9 @@
             "smartStep": true,
             "userDataDir": "${workspaceFolder}/.chrome",
             "preLaunchTask": "Delete Chrome Profile",
-            "outFiles": ["${workspaceFolder}/frontend/**/*.js"]
+            "outFiles": ["${workspaceFolder}/frontend/**/*.js", "!**/node_modules/**"],
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
+            "trace": true
         },
         {
             "type": "node",

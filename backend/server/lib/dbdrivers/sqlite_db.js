@@ -92,7 +92,7 @@ exports.runTransaction = async (cmdObjs, dbConnectInfo, dbCreationSQLs) => {
     } catch (err) { LOG.error(`DB network error running, transaction ${cmdObjs}, error: ${err}`); return false; }
 
     const cmdsToRun = [{cmd: "BEGIN TRANSACTION", params: []}, ...cmdObjs, {cmd: "COMMIT", params: []}];
-    for (const cmdObj of cmdsToRun) if (!(await exports.runCmd(cmdObj.cmd, cmdObj.params, dbConnectInfo, dbCreationSQLs)))
+    for (const cmdObj of cmdsToRun) if (!(await exports.runCmd(cmdObj.cmd, cmdObj.params||[], dbConnectInfo, dbCreationSQLs)))
         {await exports.runCmd("ROLLBACK", [], dbConnectInfo, dbCreationSQLs); return false;}
     return true;
 }
