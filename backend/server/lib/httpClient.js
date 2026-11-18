@@ -91,6 +91,40 @@ function deleteHttps(host, port, path, headers = {}, req, sslObj, callback) {
     result.then(({ data, status, resHeaders, error }) => callback(error, data, status, resHeaders)).catch((error) => callback(error, null));
 }
 
+/**
+ * Upgrades an HTTP/1.1 connection to another protocol (HTTP Upgrade), eg "websocket" for WebSockets or "tcp" for
+ * Docker attach style raw streams. Always HTTP/1.1 as HTTP/2 has no upgrade. Protocol specific handshake headers
+ * (eg sec-websocket-key) and talking the protocol over the returned socket are the caller's job.
+ *
+ * @param url The URL to connect to, http(s):// or ws(s)://
+ * @param options Optional - {protocol, method, headers, body, ssl_options}. protocol is sent as the upgrade header
+ *                (not needed if headers has one), method defaults to GET, ssl_options is the sslObj as for the other calls.
+ * @return Promise resolving to {ok, status, headers, socket, head, error}. On 101 ok is true, socket is the upgraded
+ *         connection and head its first bytes already read. If the server refuses ok is false and error has the reason.
+ *         Rejects if the connection fails.
+ */
+async function upgradeConnection(url, options={}) {
+    const urlObj = new URL(url), secure = urlObj.protocol == "https:" || urlObj.protocol == "wss:",
+        headers = _squishHeaders(options.headers||{}), body = options.body;
+    if (options.protocol) headers.upgrade = options.protocol;
+    if (!headers.upgrade) throw new Error(`No protocol to upgrade to given for URL ${url}.`);
+    headers.connection = "upgrade"; if (!headers["user-agent"]) headers["user-agent"] = MONKSHU_AGENT;
+    if (body) headers["content-length"] = Buffer.byteLength(body);
+    const reqOptions = { host: urlObj.hostname, port: urlObj.port || (secure ? 443 : 80), path: urlObj.pathname+urlObj.search,
+        method: (options.method||"GET").toUpperCase(), headers, agent: false };    // upgraded sockets are never pooled
+    if (options.ssl_options && typeof options.ssl_options == "object") await _addSecureOptions(reqOptions, options.ssl_options);
+    LOG.info(`httpClient upgrading connection to URL ${url} to protocol ${headers.upgrade} via HTTP1.`);
+
+    return new Promise((resolve, reject) => {
+        const upgradeRequest = (secure ? https : http).request(reqOptions);
+        upgradeRequest.on("upgrade", (res, socket, head) => resolve({ ok: true, status: res.statusCode, headers: { ...res.headers }, socket, head, error: null }));
+        upgradeRequest.on("response", res => {   // server refused the upgrade
+            res.resume(); resolve({ ok: false, status: res.statusCode, headers: { ...res.headers }, error: `Bad status: ${res.statusCode}` }); });
+        upgradeRequest.on("error", error => reject(error));
+        upgradeRequest.end(body);
+    });
+}
+
 async function fetch(url, options={}, redirected=false) {    // somewhat fetch compatible API
     const headers = options.headers||{}, urlObj = new URL(url); let method = options.method?.toLowerCase() || "get";
     if (urlObj.protocol == "https:") method = method+"Https"; if (method=="delete") method = "deleteHttp"; 
@@ -286,7 +320,7 @@ async function _addSecureOptions(options, sslObj) {
     if (sslObj.rejectUnauthorized !== undefined) options.rejectUnauthorized = sslObj.rejectUnauthorized;
 }
 
-module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, fetch, main };
+module.exports = { get, post, put, delete: deleteHttp, getHttps, postHttps, putHttps, deleteHttps, upgradeConnection, fetch, main };
 
 if (require.main === module) main();
 
