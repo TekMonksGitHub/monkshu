@@ -15,6 +15,10 @@ exports.processRequest = async (req, res, _dataSender, _errorSender, _codeSender
         res.socket.destroy(); res.end(); return true; } 
     else return false;
 }
+exports.processUpgrade = async (req, socket, _head, _access, error) => {    // WebSockets
+    if (!_isBlacklistedIP(req)) return false;
+    error.error(`Blocking blacklisted IP ${utils.getClientIP(req)}`); socket.destroy(); return true;
+}
 
 function _isBlacklistedIP(req) {
 	let clientIP = utils.getClientIP(req);

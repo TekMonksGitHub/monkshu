@@ -44,7 +44,18 @@ function bootstrap() {
 	const httpd = options && (!conf.forceHTTP1) ? http2.createSecureServer({...options, allowHTTP1: true}, listener) : options ? https.createServer(options, listener) : http.createServer(listener); // create server for http2 or http1 based on configurations
 	const hostinterface = os.platform!="darwin"?(conf.host||"::"):"::";	// Mac won't let app bind to lower ports unless it listens to the wildcard host
 	httpd.setTimeout(conf.timeout);
-	httpd.listen(conf.port, hostinterface);	
+	httpd.on("upgrade", async (req, socket, head) => {	// WebSockets, handled by extensions which support it eg proxy
+		socket.on("error", err => error.error(`Upgrade socket error from ${_getReqHost(req)}: ${err}`));
+		access.info(`From: ${_getReqHost(req)} Agent: ${req.headers["user-agent"]} UPGRADE: ${req.url}`);
+		try {
+			for (const extension of extensions) if (extension.processUpgrade && await extension.processUpgrade(req, socket, head, access, error)) {
+				access.info(`Upgrade ${req.url} handled by extension ${extension.name}`);
+				return;
+			}
+		} catch (err) { error.error(`Upgrade ${req.url} failed: ${err.stack||err}`); }
+		socket.destroy();
+	});
+	httpd.listen(conf.port, hostinterface);
 	
 	access.info(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${hostinterface}:${conf.port}`);
 	console.log(`${conf.ssl?"HTTPS":"HTTP"} transport started on ${hostinterface}:${conf.port}`);
