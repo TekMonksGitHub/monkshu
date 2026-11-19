@@ -3,7 +3,7 @@
 	"host": "::", <-- The host name or IP to listen to, 0.0.0.0 means all IPv4 and :: means all IPv4 and IPv6
 	"extensions": ["redirect", "proxy", "diskcache"], <-- Server extensions, order matters as server evaluates them in this order
 	"webroot": "./../", <-- The directory to serve from
-	"proxies": [{"http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"}], <-- HTTP proxies, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one ,
+	"proxies": [{"http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"}], <-- HTTP proxies, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one, a target can also be {"url": "...", "ssl_options": {...}} to pass httpClient SSL options eg a client certificate ,
 	"redirects": [{"http(.*)://localhost:8080/apps/test1/(.*)":"http{{{$1}}}://test1.monkshu.org:8080/apps/test1/{{{$2}}}"}], <-- Redirects, {{{1...n}}} mean the nth matching group, starting from index 1 for the first one ,
 	"rewriteurl": [{"/test1/(.*)":"/apps/test1/{{{$1}}}"}], <-- URL rewrite (just path), {{{1...n}}} mean the nth matching group, starting from index 1 for the first one 
 	"logdir": "./logs", <-- The logs directory
