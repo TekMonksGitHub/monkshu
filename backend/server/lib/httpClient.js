@@ -313,8 +313,8 @@ async function _addSecureOptions(options, sslObj) {
         options.pfx = await _cacheReadFile(sslObj.pfxPath);
         options.passphrase = crypt.decrypt(sslObj.encryptedPassphrase, sslObj.encryptionKey);
     } else if (sslObj.certPath && sslObj.encryptedKeyPath) {
-        options.cert = await _cacheReadFile(ssl.certPath);
-        options.key = crypt.decrypt(await _cacheReadFile(ssl.encryptedKeyPath), sslObj.encryptionKey);
+        options.cert = await _cacheReadFile(sslObj.certPath);
+        options.key = crypt.decrypt(await _cacheReadFile(sslObj.encryptedKeyPath), sslObj.encryptionKey);
     }
 
     if (sslObj.rejectUnauthorized !== undefined) options.rejectUnauthorized = sslObj.rejectUnauthorized;
